@@ -1244,10 +1244,6 @@ class Latexparser(Parser):
 
     def _collateBackslashInfixLeftOversToContiguous(self):
         """
-        #TODO maybe this can be a general algorithm.... grouping by consecutiveness.... even in 3D space... like how bubbles come together to make bigger bubbles (or atoms => molecules :))
-        
-        we do this with bubble-merge, comes with a debugging tool <<ppprint>>
-        so that we can see whats going on
         """
         if self.parallelise:
             self.event__addImplicitZero.wait()

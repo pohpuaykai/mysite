@@ -12,6 +12,91 @@ class LongestCommonSubString:
 
     """
     @classmethod
+    def alcs(cls, s1, s2):
+        m = len(s1)
+        n = len(s2)
+        swapped = False
+        #because of how we do the 1D, the longer string has to be s2...
+        if m > n: # swap s1 and s2....
+            s1, s2, = s2, s1
+            m, n = n, m
+            swapped = True
+
+
+        matches = []
+        #helper
+        def putInMatch(harvestableIndiceHolder, matchesE, swappedE):
+            if harvestableIndiceHolder[3] - harvestableIndiceHolder[1] > 1 and harvestableIndiceHolder[2] - harvestableIndiceHolder[0] > 1:
+                if swappedE:#TODO refactor
+                    matchesE.append([
+                    {
+                        'startPos':harvestableIndiceHolder[1],
+                        'endPos':harvestableIndiceHolder[3],
+                        's':s2[harvestableIndiceHolder[1]:harvestableIndiceHolder[3]]
+                    },
+                    {
+                        'startPos':harvestableIndiceHolder[0],
+                        'endPos':harvestableIndiceHolder[2],
+                        's':s1[harvestableIndiceHolder[0]:harvestableIndiceHolder[2]]
+                    }])
+                else:
+                    matchesE.append([
+                    {
+                        'startPos':harvestableIndiceHolder[0],
+                        'endPos':harvestableIndiceHolder[2],
+                        's':s1[harvestableIndiceHolder[0]:harvestableIndiceHolder[2]]
+                    }, 
+                    {
+                        'startPos':harvestableIndiceHolder[1],
+                        'endPos':harvestableIndiceHolder[3],
+                        's':s2[harvestableIndiceHolder[1]:harvestableIndiceHolder[3]]
+                    }])
+            return matchesE
+
+        temparrayCount = (max(n, m) + 1)
+        indiceHolderIniter = [-1, -1, -1, -1]
+        #Create a 1D array to store the previous row's results
+        import copy
+        prevCoord = [indiceHolderIniter] * temparrayCount # s1_start, s2_start, s1_end, s2_end
+        cs = []
+        c = ''
+        tlcs = ''
+        res = 0
+        for i in range(1, m + 1):
+            take = None
+            clear = False
+            # Create a temporary array to store the current row
+            # print('**', i, '*****************************')
+            currCoord = [indiceHolderIniter] * temparrayCount # s1_start, s2_start=-1(no match), s1_end, s2_end
+            for j in range(1, n + 1):
+                if s1[i - 1] == s2[j - 1]:
+                    currCoord[j] = copy.deepcopy(prevCoord[j - 1])
+                    if currCoord[j] == [-1, -1, -1, -1]:
+                        currCoord[j][0] = i - 1
+                        currCoord[j][1] = j - 1
+                    currCoord[j][2] = i
+                    currCoord[j][3] = j
+            # print(prevCoord)
+            # print(currCoord)
+            #get our answers :)
+            harvestableIdx = None
+            for k in range(0, temparrayCount):
+                if prevCoord[k] != indiceHolderIniter and currCoord[k] == indiceHolderIniter: #there is something to harvest
+                    if harvestableIdx == None: # we also want the longest to be at least length 2
+                        harvestableIdx = k
+                    harvestableIdx = max(harvestableIdx, k)#we want the last in the consecutive harvestables
+            # import pdb;pdb.set_trace()
+            if harvestableIdx is not None:
+                matches = putInMatch(prevCoord[harvestableIdx], matches, swapped)
+
+            prevCoord = currCoord
+        
+        #at last get our straggler
+        matches = putInMatch(prevCoord[-1], matches, swapped)
+        return matches
+
+
+    @classmethod
     def lcs(cls, s1, s2):
         m = len(s1)
         n = len(s2)
@@ -52,6 +137,8 @@ class LongestCommonSubString:
             if len(s) > len(longestCommonSubString):
                 longestCommonSubString = s
         return longestCommonSubString
+
+
 
     #Other less COOL algorithms~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @classmethod
