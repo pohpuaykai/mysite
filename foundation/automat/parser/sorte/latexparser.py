@@ -60,7 +60,7 @@ class Latexparser(Parser):
             '_updateInfixNearestBracketInfix':False,
             '__updateInfixNearestBracketInfix':False,#
             '_removeCaretThatIsNotExponent':False,
-            '_findLeftOverPosition':False,
+            '_findLeftOverPosition':True,
             '_contiguousLeftOvers':False,
             '_collateBackslashInfixLeftOversToContiguous':False,
             '__updateBackslashLeftOversBracketInfo':False,
@@ -1068,12 +1068,6 @@ class Latexparser(Parser):
         self.occupiedBrackets = set()#[]# for bubble merge later, these entreSpaces are connected
         #self.infixOperatorPositions
         for infixInfoDict in self.infixList:
-            ##############
-            if self.showError():
-                print('recording occupied positions for ')
-                print((infixInfoDict['name'], infixInfoDict['startPos'], infixInfoDict['endPos'], infixInfoDict['tight__leftType'], infixInfoDict['tight__rightType']))
-                # import pdb;pdb.set_trace()
-            ##############
             listOfOccupiedRanges.add((infixInfoDict['position'], infixInfoDict['position']+len(infixInfoDict['name']))) # might have repeats since some 'brackets' are infixes
             # import pdb;pdb.set_trace()
             #add all the brackets that do not belong to backSlash 
