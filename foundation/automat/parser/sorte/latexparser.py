@@ -1253,114 +1253,176 @@ class Latexparser(Parser):
                 eKey = 'ganzEndPos'
                 self.consecutiveGroups[(ding[sKey], ding[eKey])] = [ding]
 
-        def rangesConsecutiveInEqsIgnoringSpace(grenzeRange0, grenzeRange1):#and unoccupiedBrackets found in _findLeftOverPosition
-            start0 = grenzeRange0[0]
-            end0 = grenzeRange0[1]
-            start1 = grenzeRange1[0]#ding['ganzStartPos']
-            end1 = grenzeRange1[1]#ding['ganzEndPos']
-            ##############
-            if self.showError():
-                print(start0, end0, start1, end1, '<<<<rcieis<<<append<<', ' end0<=start1 ', end0<=start1, ' self._eqs[end0:start1].strip() ', self._eqs[end0:start1].strip(), ' len(self._eqs[end0:start1].strip()) ', len(self._eqs[end0:start1].strip()))
-                print('<<<<rcieis<<<prepend<<', ' end1<=start0 ', end1<=start0, ' self._eqs[end1:start0].strip() ', self._eqs[end1:start0].strip(), ' len(self._eqs[end1:start0].strip()) ', len(self._eqs[end1:start0].strip()))
-                # import pdb;pdb.set_trace()
 
-            ##############
+
+
+        from foundation.automat.common.bubblemerge import BubbleMerge
+
+        ranges0 = list(self.consecutiveGroups.keys())
+        def prependable0(range0, range1):
             hikinoko = []
-            for hiki in range(end0, start1):
+            for hiki in range(range0[1], range1[0]):
                 if hiki not in self.occupiedBrackets:
                     hikinoko.append(self._eqs[hiki])
-            # if end0<=start1 and len(self._eqs[end0:start1].strip()) == 0:#len(''.join(hikinoko).strip()) == 0:
-            if end0<=start1 and len(''.join(hikinoko).strip()) == 0:
-                # print('>>>>>>>>>>>>>>>>>>>>append')
-                return 'append'
+            if range0[1]<=range1[0] and len(''.join(hikinoko).strip()) == 0:
+                return True
+            return False
+        def appendable0(range0, range1):
             hikinoko = []
-            for hiki in range(end1, start0):
+            for hiki in range(range0[1], range1[0]):
                 if hiki not in self.occupiedBrackets:
                     hikinoko.append(self._eqs[hiki])
-            # if end1<=start0 and len(self._eqs[end1:start0].strip()) == 0:#len(''.join(hikinoko).strip()) == 0:
-            if end1<=start0 and len(''.join(hikinoko).strip()) == 0:
-                # print('>>>>>>>>>>>>>>>>>>>>prepend')
-                return 'prepend'
-            return None
+            if range0[1]<=range1[0] and len(''.join(hikinoko).strip()) == 0:
+                return True
+            return False
+        def handlePrepend0(allRanges, range0, range1):
+            #first modify allRanges,
+            newRange = (range0[0], range1[1])
+            if range0 in allRanges:
+                del allRanges[allRanges.index(range0)]
+            if range1 in allRanges:
+                del allRanges[allRanges.index(range1)]
+            allRanges.append(newRange)
+            #then modify self.consecutiveGroups
+            list0 = self.consecutiveGroups[range0]
+            list1 = self.consecutiveGroups[range1]
+            newList = list0 + list1
+            if range0 in self.consecutiveGroups:
+                del self.consecutiveGroups[range0]
+            if range1 in self.consecutiveGroups:
+                del self.consecutiveGroups[range1]
+            self.consecutiveGroups[newRange] = newList
+            return allRanges
+        def handleAppend0(allRanges, range0, range1):
+            #first modify allRanges,
+            newRange = (range0[0], range1[1])
+            if range0 in allRanges:
+                del allRanges[allRanges.index(range0)]
+            if range1 in allRanges:
+                del allRanges[allRanges.index(range1)]
+            allRanges.append(newRange)
+            #then modify self.consecutiveGroups
+            list0 = self.consecutiveGroups[range0]
+            list1 = self.consecutiveGroups[range1]
+            newList = list0 + list1
+            if range0 in self.consecutiveGroups:
+                del self.consecutiveGroups[range0]
+            if range1 in self.consecutiveGroups:
+                del self.consecutiveGroups[range1]
+            self.consecutiveGroups[newRange] = newList
+            return allRanges
+        BubbleMerge.bubbleMerge(ranges0, prependable0, appendable0, handlePrepend0, handleAppend0)
 
-        sortedConsecutiveGroupsItems = sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0])
-        ###################################
-        if self.showError():
-            print('))))))))))))))))))))))))))))')
-            self.ppprint(self.consecutiveGroups, sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0]))
-            print('SGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGI')
-            print('))))))))))))))))))))))))))))')
-        ###################################
-        changed = True
-        while changed:
-            #sortedConsecutiveGroupsItems = sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0])
-            changed = False
-            ###################
-            if self.showError():
-                print('@@@@@@@@@@@@@@@@@@@@@@@, reset sortedConsecutiveGroupsItems')
-                self.ppprint(self.consecutiveGroups, sortedConsecutiveGroupsItems)
-                print('@@@@@@@@@@@@@@@@@@@@@@@, reset sortedConsecutiveGroupsItems')
-            ###################
-            for grenzeRange0, existingDings0 in sortedConsecutiveGroupsItems: # TODO refactor to more dimensions
 
-                if changed:
-                    if self.showError():
-                        print('BREAKKKKKKKKKKKKKKKKKKKKKKKKKKKK2')
-                    break
-                for grenzeRange1, existingDings1 in sortedConsecutiveGroupsItems:
-                    if grenzeRange0 == grenzeRange1:
-                        continue
-                    #########
-                    if self.showError():
-                        def slst(existingD):
-                            nD = []
-                            for din in existingD:
-                                if din['type'] == 'infix':
-                                    dingTup = lambda ding : (ding['name'], ding['position'], ding['position']+len(ding['name']))
-                                else:
-                                    dingTup = lambda ding : (ding['name'], ding['ganzStartPos'], ding['ganzEndPos'])
-                                nD.append(dingTup(din))
-                            return nD
-                        print('w', grenzeRange0, slst(existingDings0),'||||||', grenzeRange1, slst(existingDings1))
-                    #########
-                    action = rangesConsecutiveInEqsIgnoringSpace(grenzeRange0, grenzeRange1)
-                    if action is not None:
-                        if action == 'append':
-                            newGrenzeRange = (grenzeRange0[0], grenzeRange1[1])
-                            newExistingDings = existingDings0 + existingDings1
-                        else: #action == 'prepend'
-                            newGrenzeRange = (grenzeRange1[0], grenzeRange0[1])
-                            newExistingDings = existingDings1 + existingDings0
-                        if grenzeRange0 in self.consecutiveGroups:
-                            del self.consecutiveGroups[grenzeRange0]
-                        if grenzeRange1 in self.consecutiveGroups:
-                            del self.consecutiveGroups[grenzeRange1]
-                        self.consecutiveGroups[newGrenzeRange] = newExistingDings
-                        sortedConsecutiveGroupsItems = sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0])
-                        changed = True
-                        #############
-                        if self.showError():
-                            print('====================', action)
-                            if action == 'append':
-                                if ding['type'] == 'infix':
-                                    dingTup = lambda ding : (ding['name'], ding['position'], ding['position']+len(ding['name']))
-                                else:
-                                    dingTup = lambda ding : (ding['name'], ding['ganzStartPos'], ding['ganzEndPos'])
-                                print(grenzeRange0, list(map(lambda ding: dingTup(ding), existingDings0)))
-                                print('++++++++++++++++++++')
-                                print(grenzeRange1, list(map(lambda ding: dingTup(ding), existingDings1)))
-                            else:
-                                print(grenzeRange1, list(map(lambda ding: dingTup(ding), existingDings1)))
-                                print('++++++++++++++++++++')
-                                print(grenzeRange0, list(map(lambda ding: dingTup(ding), existingDings0)))
-                            self.ppprint(self.consecutiveGroups, sortedConsecutiveGroupsItems)
-                            print('====================')
-                        #############
-                        if self.showError():
-                            print('BREAKKKKKKKKKKKKKKKKKKKKKKKKKKKK1')
-                        break
-                    if self.showError():
-                        print('AFTER BREAK1, changed: ', changed)
+
+        # def rangesConsecutiveInEqsIgnoringSpace(grenzeRange0, grenzeRange1):#and unoccupiedBrackets found in _findLeftOverPosition
+        #     start0 = grenzeRange0[0]
+        #     end0 = grenzeRange0[1]
+        #     start1 = grenzeRange1[0]#ding['ganzStartPos']
+        #     end1 = grenzeRange1[1]#ding['ganzEndPos']
+        #     ##############
+        #     if self.showError():
+        #         print(start0, end0, start1, end1, '<<<<rcieis<<<append<<', ' end0<=start1 ', end0<=start1, ' self._eqs[end0:start1].strip() ', self._eqs[end0:start1].strip(), ' len(self._eqs[end0:start1].strip()) ', len(self._eqs[end0:start1].strip()))
+        #         print('<<<<rcieis<<<prepend<<', ' end1<=start0 ', end1<=start0, ' self._eqs[end1:start0].strip() ', self._eqs[end1:start0].strip(), ' len(self._eqs[end1:start0].strip()) ', len(self._eqs[end1:start0].strip()))
+        #         # import pdb;pdb.set_trace()
+
+        #     ##############
+        #     hikinoko = []
+        #     for hiki in range(end0, start1):
+        #         if hiki not in self.occupiedBrackets:
+        #             hikinoko.append(self._eqs[hiki])
+        #     # if end0<=start1 and len(self._eqs[end0:start1].strip()) == 0:#len(''.join(hikinoko).strip()) == 0:
+        #     if end0<=start1 and len(''.join(hikinoko).strip()) == 0:
+        #         # print('>>>>>>>>>>>>>>>>>>>>append')
+        #         return 'append'
+        #     hikinoko = []
+        #     for hiki in range(end1, start0):
+        #         if hiki not in self.occupiedBrackets:
+        #             hikinoko.append(self._eqs[hiki])
+        #     # if end1<=start0 and len(self._eqs[end1:start0].strip()) == 0:#len(''.join(hikinoko).strip()) == 0:
+        #     if end1<=start0 and len(''.join(hikinoko).strip()) == 0:
+        #         # print('>>>>>>>>>>>>>>>>>>>>prepend')
+        #         return 'prepend'
+        #     return None
+
+        # sortedConsecutiveGroupsItems = sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0])
+        # ###################################
+        # if self.showError():
+        #     print('))))))))))))))))))))))))))))')
+        #     self.ppprint(self.consecutiveGroups, sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0]))
+        #     print('SGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGISGGI')
+        #     print('))))))))))))))))))))))))))))')
+        # ###################################
+        # changed = True
+        # while changed:
+        #     #sortedConsecutiveGroupsItems = sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0])
+        #     changed = False
+        #     ###################
+        #     if self.showError():
+        #         print('@@@@@@@@@@@@@@@@@@@@@@@, reset sortedConsecutiveGroupsItems')
+        #         self.ppprint(self.consecutiveGroups, sortedConsecutiveGroupsItems)
+        #         print('@@@@@@@@@@@@@@@@@@@@@@@, reset sortedConsecutiveGroupsItems')
+        #     ###################
+        #     for grenzeRange0, existingDings0 in sortedConsecutiveGroupsItems: # TODO refactor to more dimensions
+
+        #         if changed:
+        #             if self.showError():
+        #                 print('BREAKKKKKKKKKKKKKKKKKKKKKKKKKKKK2')
+        #             break
+        #         for grenzeRange1, existingDings1 in sortedConsecutiveGroupsItems:
+        #             if grenzeRange0 == grenzeRange1:
+        #                 continue
+        #             #########
+        #             if self.showError():
+        #                 def slst(existingD):
+        #                     nD = []
+        #                     for din in existingD:
+        #                         if din['type'] == 'infix':
+        #                             dingTup = lambda ding : (ding['name'], ding['position'], ding['position']+len(ding['name']))
+        #                         else:
+        #                             dingTup = lambda ding : (ding['name'], ding['ganzStartPos'], ding['ganzEndPos'])
+        #                         nD.append(dingTup(din))
+        #                     return nD
+        #                 print('w', grenzeRange0, slst(existingDings0),'||||||', grenzeRange1, slst(existingDings1))
+        #             #########
+        #             action = rangesConsecutiveInEqsIgnoringSpace(grenzeRange0, grenzeRange1)
+        #             if action is not None:
+        #                 if action == 'append':
+        #                     newGrenzeRange = (grenzeRange0[0], grenzeRange1[1])
+        #                     newExistingDings = existingDings0 + existingDings1
+        #                 else: #action == 'prepend'
+        #                     newGrenzeRange = (grenzeRange1[0], grenzeRange0[1])
+        #                     newExistingDings = existingDings1 + existingDings0
+        #                 if grenzeRange0 in self.consecutiveGroups:
+        #                     del self.consecutiveGroups[grenzeRange0]
+        #                 if grenzeRange1 in self.consecutiveGroups:
+        #                     del self.consecutiveGroups[grenzeRange1]
+        #                 self.consecutiveGroups[newGrenzeRange] = newExistingDings
+        #                 sortedConsecutiveGroupsItems = sorted(self.consecutiveGroups.items(), key=lambda item: item[0][0])
+        #                 changed = True
+        #                 #############
+        #                 if self.showError():
+        #                     print('====================', action)
+        #                     if action == 'append':
+        #                         if ding['type'] == 'infix':
+        #                             dingTup = lambda ding : (ding['name'], ding['position'], ding['position']+len(ding['name']))
+        #                         else:
+        #                             dingTup = lambda ding : (ding['name'], ding['ganzStartPos'], ding['ganzEndPos'])
+        #                         print(grenzeRange0, list(map(lambda ding: dingTup(ding), existingDings0)))
+        #                         print('++++++++++++++++++++')
+        #                         print(grenzeRange1, list(map(lambda ding: dingTup(ding), existingDings1)))
+        #                     else:
+        #                         print(grenzeRange1, list(map(lambda ding: dingTup(ding), existingDings1)))
+        #                         print('++++++++++++++++++++')
+        #                         print(grenzeRange0, list(map(lambda ding: dingTup(ding), existingDings0)))
+        #                     self.ppprint(self.consecutiveGroups, sortedConsecutiveGroupsItems)
+        #                     print('====================')
+        #                 #############
+        #                 if self.showError():
+        #                     print('BREAKKKKKKKKKKKKKKKKKKKKKKKKKKKK1')
+        #                 break
+        #             if self.showError():
+        #                 print('AFTER BREAK1, changed: ', changed)
 
         #here we would have allDings in consecutive-groupings, then we add the implicit multiplications yay! Complete answer....
 

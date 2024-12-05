@@ -42,7 +42,7 @@ def test__longCommonString__bloteBespiel(verbose=False):
 
 
 
-def test__oneTermFactorization__moreThanOneCommonString(verbose=False):
+def test__oneTermFactorization__moreThanOneCommonString(verbose=False): # TODO wrong , please refer to common.tests.bubblemergetest.py test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString
     schemeFormula0 = '(* (+ x 1) (+ x 2))'
     schemeFormula1 = '(* (* (+ x 1) (- x 1)) (+ x 2))'
     commonSubstring = LongestCommonSubString.alcs(schemeFormula0, schemeFormula1)
