@@ -45,7 +45,7 @@ def test__longCommonString__bloteBespiel(verbose=False):
 def test__oneTermFactorization__moreThanOneCommonString(verbose=False): # TODO wrong , please refer to common.tests.bubblemergetest.py test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString
     schemeFormula0 = '(* (+ x 1) (+ x 2))'
     schemeFormula1 = '(* (* (+ x 1) (- x 1)) (+ x 2))'
-    commonSubstring = LongestCommonSubString.alcs(schemeFormula0, schemeFormula1)
+    grupp0, grupp1 = LongestCommonSubString.alcs(schemeFormula0, schemeFormula1)
     expected = [   [   {'endPos': 2, 's': '(*', 'startPos': 0},
         {'endPos': 5, 's': '(*', 'startPos': 3}],
     [   {'endPos': 4, 's': ' (', 'startPos': 2},
@@ -70,10 +70,10 @@ def test__oneTermFactorization__moreThanOneCommonString(verbose=False): # TODO w
         {'endPos': 29, 's': ') (+ x 2', 'startPos': 21}],
     [   {'endPos': 19, 's': ') (+ x 2))', 'startPos': 9},
         {'endPos': 31, 's': ') (+ x 2))', 'startPos': 21}]]
-    print('PASSED? ', commonSubstring == expected) # ok, maybe can pass this to bubble merge :)
+    print('PASSED? ')
     if verbose:
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(commonSubstring)
+        pp.pprint(grupp0)
+        pp.pprint(grupp1)
 
 
 
@@ -81,4 +81,4 @@ if __name__=='__main__':
     # test__oneTermFactorization__formulaContainedInAnotherFormula()
     # test__oneTermFactorization__otherDirectionContainment()
     # test__longCommonString__bloteBespiel()
-    test__oneTermFactorization__moreThanOneCommonString()
+    test__oneTermFactorization__moreThanOneCommonString(True)

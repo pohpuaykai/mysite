@@ -11,7 +11,6 @@ class BubbleMerge:
             changed = False
             originalCopy = copy.deepcopy(rangesC) # for bisectionChecking which need to ignore self
             
-            ###THIS IS ACTUALLY APPEND
             for selfIdx, range0 in enumerate(rangesC):
                 # import pdb;pdb.set_trace()
                 if range0 in originalCopy:

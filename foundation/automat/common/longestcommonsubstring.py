@@ -93,7 +93,139 @@ class LongestCommonSubString:
         
         #at last get our straggler
         matches = putInMatch(prevCoord[-1], matches, swapped)
-        return matches
+
+        return cls._mergeShardsFromALCS(matches)
+
+
+    @classmethod
+    def _mergeShardsFromALCS(cls, matches):
+        """
+        matches can only come from alcs
+        and an example looks like this:
+
+        matches = [   
+        [   {'endPos': 2, 's': '(*', 'startPos': 0},
+            {'endPos': 5, 's': '(*', 'startPos': 3}],
+        [   {'endPos': 4, 's': ' (', 'startPos': 2},
+            {'endPos': 24, 's': ' (', 'startPos': 22}],
+        [   {'endPos': 5, 's': ' (+', 'startPos': 2},
+            {'endPos': 25, 's': ' (+', 'startPos': 22}],
+        [   {'endPos': 7, 's': ' (+ x', 'startPos': 2},
+            {'endPos': 27, 's': ' (+ x', 'startPos': 22}],
+        [   {'endPos': 8, 's': ' (+ x ', 'startPos': 2},
+            {'endPos': 28, 's': ' (+ x ', 'startPos': 22}],
+        [   {'endPos': 9, 's': ' x 1', 'startPos': 5},
+            {'endPos': 20, 's': ' x 1', 'startPos': 16}],
+        [   {'endPos': 12, 's': ') (', 'startPos': 9},
+            {'endPos': 24, 's': ') (', 'startPos': 21}],
+        [   {'endPos': 13, 's': ') (+', 'startPos': 9},
+            {'endPos': 25, 's': ') (+', 'startPos': 21}],
+        [   {'endPos': 15, 's': ') (+ x', 'startPos': 9},
+            {'endPos': 27, 's': ') (+ x', 'startPos': 21}],
+        [   {'endPos': 16, 's': ') (+ x ', 'startPos': 9},
+            {'endPos': 28, 's': ') (+ x ', 'startPos': 21}],
+        [   {'endPos': 17, 's': ') (+ x 2', 'startPos': 9},
+            {'endPos': 29, 's': ') (+ x 2', 'startPos': 21}],
+        [   {'endPos': 19, 's': ') (+ x 2))', 'startPos': 9},
+            {'endPos': 31, 's': ') (+ x 2))', 'startPos': 21}]]
+        """
+        from foundation.automat.common.bubblemerge import BubbleMerge
+
+        def mergeGrupp(gruppp):
+            ranges0 = list(gruppp.keys())
+            def prependable0(range0, range1):
+                overlap = range1[0] <= range0[1] and range0[0] <= range1[1] and range0[0] <= range1[0]
+                return overlap
+                ###touching not allowed, bespiel:
+                ###(2, 8): ' (+ x '
+                ###(9, 12): ') ('
+                # touching = range0[1]+1==range1[0] and range0[0] <= range1[1]
+                # return overlap or touching
+            def appendable0(range0, range1): 
+                overlap = range1[0] <= range0[1] and range0[0] <= range1[1] and range0[0] <= range1[0]
+                return overlap
+                ###touching not allowed, bespiel:
+                ###(2, 8): ' (+ x '
+                ###(9, 12): ') ('
+                # touching = range0[1]+1==range1[0] and range0[0] <= range1[1]
+                # return overlap or touching
+            def handlePrepend0(allRanges, range0, range1):
+                #first modify allRanges,
+                newRange = (min(range0[0], range1[0]), max(range0[1],  range1[1]))
+                if range0 in allRanges:
+                    del allRanges[allRanges.index(range0)]
+                if range1 in allRanges:
+                    del allRanges[allRanges.index(range1)]
+                allRanges.append(newRange)
+                #then modify gruppp
+                str0 = gruppp[range0]
+                str1 = gruppp[range1]
+                if range0[0] <= range1[0] and range1[1] <= range0[1]:
+                    newString = str0
+                elif range1[0] <= range0[0] and range0[1] <= range1[1]:
+                    newString = str1
+                elif range0[1]>range1[0]:
+                    str0Start = 0
+                    str0End = range0[1] - range0[0]
+                    str1Start = range1[0] - range0[0]
+                    str1End = range1[1] - range0[0]
+                    intersectingStr = str0[str1Start:str0End]
+                    newString = str0[str0Start:str1Start] + intersectingStr + str1[str0End-str1Start:]
+                    # import pdb;pdb.set_trace()
+                elif range0[1]==range1[0] or range0[1]+1==range1[0]:#touching
+                    newString = str0+str1
+                if range0 in gruppp:
+                    del gruppp[range0]
+                if range1 in gruppp:
+                    del gruppp[range1]
+                gruppp[newRange] = newString
+                # import pdb;pdb.set_trace()
+                return allRanges
+            def handleAppend0(allRanges, range0, range1):
+                #first modify allRanges,
+                newRange = (min(range0[0], range1[0]), max(range0[1],  range1[1]))
+                if range0 in allRanges:
+                    del allRanges[allRanges.index(range0)]
+                if range1 in allRanges:
+                    del allRanges[allRanges.index(range1)]
+                allRanges.append(newRange)
+                #then modify gruppp
+                str0 = gruppp[range0]
+                str1 = gruppp[range1]
+                if range0[0] <= range1[0] and range1[1] <= range0[1]:
+                    newString = str0
+                elif range1[0] <= range0[0] and range0[1] <= range1[1]:
+                    newString = str1
+                elif range0[1]>range1[0]:
+                    str0Start = 0
+                    str0End = range0[1] - range0[0]
+                    str1Start = range1[0] - range0[0]
+                    str1End = range1[1] - range0[0]
+                    intersectingStr = str0[str1Start:str0End]
+                    newString = str0[str0Start:str1Start] + intersectingStr + str1[str0End-str1Start:]
+                    # import pdb;pdb.set_trace()
+                elif range0[1]==range1[0] or range0[1]+1==range1[0]:#touching
+                    newString = str0+str1
+                if range0 in gruppp:
+                    del gruppp[range0]
+                if range1 in gruppp:
+                    del gruppp[range1]
+                gruppp[newRange] = newString
+                return allRanges
+            BubbleMerge.bubbleMerge(ranges0, prependable0, appendable0, handlePrepend0, handleAppend0)
+
+        grupp0 = {}
+        grupp1 = {}
+        for rangeRaw in matches:
+            infoDict0, infoDict1 = rangeRaw
+            grupp0[(infoDict0['startPos'], infoDict0['endPos'])] = infoDict0['s']
+            grupp1[(infoDict1['startPos'], infoDict1['endPos'])] = infoDict1['s']
+
+        mergeGrupp(grupp0)
+        mergeGrupp(grupp1)
+        return grupp0, grupp1
+
+
 
 
     @classmethod
