@@ -5,79 +5,6 @@ from foundation.automat.common.bubblemerge import BubbleMerge
 
 pp = pprint.PrettyPrinter(indent=4)
 
-def test__binarySearchPre__manySameNumbers(verbose=False):
-    """
-    sortedList[i] < numToInsert <= sortedList[i+1]
-    """
-    testName = inspect.currentframe().f_code.co_name
-    sortedList = [1, 2, 3, 3, 3, 3, 5, 6]
-    numToInsert = 3
-    idx = BubbleMerge.binarySearchPre(sortedList, numToInsert)
-    expected = 1
-    if verbose:
-        print(testName, idx)
-    print('PASSED? ', expected == idx)
-
-
-def test__binarySearchPre__leftMost(verbose=False):
-    testName = inspect.currentframe().f_code.co_name
-    sortedList = [1, 2, 3, 3, 3, 3, 5, 6]
-    numToInsert = 0
-    idx = BubbleMerge.binarySearchPre(sortedList, numToInsert)
-    expected = 0
-    if verbose:
-        print(testName, idx)
-    print('PASSED? ', expected == idx)
-
-
-def test__binarySearchPre__rightMost(verbose=False):
-    testName = inspect.currentframe().f_code.co_name
-    sortedList = [1, 2, 3, 3, 3, 3, 5, 6]
-    numToInsert = 7
-    idx = BubbleMerge.binarySearchPre(sortedList, numToInsert)
-    expected = 7
-    if verbose:
-        print(testName, idx)
-    print('PASSED? ', expected == idx)
-
-
-def test__binarySearchApp__manySameNumbers(verbose=False):
-    """
-    sortedList[i] <= numToInsert < sortedList[i+1]
-    """
-    testName = inspect.currentframe().f_code.co_name
-    sortedList = [1, 2, 3, 3, 3, 3, 5, 6]
-    numToInsert = 3
-    idx = BubbleMerge.binarySearchApp(sortedList, numToInsert)
-    expected = 2
-    if verbose:
-        print(testName, idx)
-    print('PASSED? ', expected == idx)
-
-
-def test__binarySearchApp__leftMost(verbose=False):
-    testName = inspect.currentframe().f_code.co_name
-    sortedList = [1, 2, 3, 3, 3, 3, 5, 6]
-    numToInsert = 0
-    idx = BubbleMerge.binarySearchApp(sortedList, numToInsert)
-    expected = 0
-    if verbose:
-        print(testName, idx)
-    print('PASSED? ', expected == idx)
-
-
-def test__binarySearchApp__rightMost(verbose=False):
-    testName = inspect.currentframe().f_code.co_name
-    sortedList = [1, 2, 3, 3, 3, 3, 5, 6]
-    numToInsert = 7
-    idx = BubbleMerge.binarySearchApp(sortedList, numToInsert)
-    expected = 7
-    if verbose:
-        print(testName, idx)
-    print('PASSED? ', expected == idx)
-
-
-
 
 def test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString(verbose=False):
     """
@@ -178,11 +105,11 @@ def test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString(verb
             del grupp0[range1]
         grupp0[newRange] = newString
         ##############
-        print('prepend0 ******************')
-        print('range0: ', range0, 'range1:', range1, 'newRange:', newRange)
-        print('str0:', str0, 'str1:', str1, 'newString', newString)
-        pp.pprint(grupp0)
-        pp.pprint(allRanges)
+        # print('prepend0 ******************')
+        # print('range0: ', range0, 'range1:', range1, 'newRange:', newRange)
+        # print('str0:', str0, 'str1:', str1, 'newString', newString)
+        # pp.pprint(grupp0)
+        # pp.pprint(allRanges)
         ##############
         # import pdb;pdb.set_trace()
         return allRanges
@@ -217,11 +144,11 @@ def test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString(verb
             del grupp0[range1]
         grupp0[newRange] = newString
         ##############
-        print('append0 ******************')
-        print('range0: ', range0, 'range1:', range1, 'newRange:', newRange)
-        print('str0:', str0, 'str1:', str1, 'newString', newString)
-        pp.pprint(grupp0)
-        pp.pprint(allRanges)
+        # print('append0 ******************')
+        # print('range0: ', range0, 'range1:', range1, 'newRange:', newRange)
+        # print('str0:', str0, 'str1:', str1, 'newString', newString)
+        # pp.pprint(grupp0)
+        # pp.pprint(allRanges)
         ##############
         return allRanges
     BubbleMerge.bubbleMerge(ranges0, prependable0, appendable0, handlePrepend0, handleAppend0)
@@ -343,7 +270,234 @@ def test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString(verb
     #(21, 31): ') (+ x 2))'
 
 
-def test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous0(verbose):
+
+def test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubStringALLHARVEST(verbose=False):
+    """
+    #write test case, use shit from LCS test__oneTermFactorization__moreThanOneCommonString
+    originally, the strings were:
+
+    schemeFormula0 = '(* (+ x 1) (+ x 2))'
+    schemeFormula1 = '(* (* (+ x 1) (- x 1)) (+ x 2))'
+
+
+    """
+    testName = inspect.currentframe().f_code.co_name
+    rangesRaw = [   
+    [   {'endPos': 2, 's': '(*', 'startPos': 0},
+        {'endPos': 2, 's': '(*', 'startPos': 0}],
+    [   {'endPos': 2, 's': '(*', 'startPos': 0},
+        {'endPos': 5, 's': '(*', 'startPos': 3}],
+    [   {'endPos': 3, 's': '(* ', 'startPos': 0},
+        {'endPos': 3, 's': '(* ', 'startPos': 0}],
+    [   {'endPos': 3, 's': '(* ', 'startPos': 0},
+        {'endPos': 6, 's': '(* ', 'startPos': 3}],
+    [   {'endPos': 4, 's': '(* (', 'startPos': 0},
+        {'endPos': 4, 's': '(* (', 'startPos': 0}],
+    [   {'endPos': 4, 's': '(* (', 'startPos': 0},
+        {'endPos': 7, 's': '(* (', 'startPos': 3}],
+    [   {'endPos': 4, 's': ' (', 'startPos': 2},
+        {'endPos': 15, 's': ' (', 'startPos': 13}],
+    [   {'endPos': 4, 's': ' (', 'startPos': 2},
+        {'endPos': 24, 's': ' (', 'startPos': 22}],
+    [   {'endPos': 5, 's': '(* (+', 'startPos': 0},
+        {'endPos': 8, 's': '(* (+', 'startPos': 3}],
+    [   {'endPos': 5, 's': ' (+', 'startPos': 2},
+        {'endPos': 25, 's': ' (+', 'startPos': 22}],
+    [   {'endPos': 6, 's': '(* (+ ', 'startPos': 0},
+        {'endPos': 9, 's': '(* (+ ', 'startPos': 3}],
+    [   {'endPos': 6, 's': ' (+ ', 'startPos': 2},
+        {'endPos': 26, 's': ' (+ ', 'startPos': 22}],
+    [   {'endPos': 7, 's': '(* (+ x', 'startPos': 0},
+        {'endPos': 10, 's': '(* (+ x', 'startPos': 3}],
+    [   {'endPos': 7, 's': ' x', 'startPos': 5},
+        {'endPos': 18, 's': ' x', 'startPos': 16}],
+    [   {'endPos': 7, 's': ' (+ x', 'startPos': 2},
+        {'endPos': 27, 's': ' (+ x', 'startPos': 22}],
+    [   {'endPos': 8, 's': '(* (+ x ', 'startPos': 0},
+        {'endPos': 11, 's': '(* (+ x ', 'startPos': 3}],
+    [   {'endPos': 8, 's': ' x ', 'startPos': 5},
+        {'endPos': 19, 's': ' x ', 'startPos': 16}],
+    [   {'endPos': 8, 's': ' (+ x ', 'startPos': 2},
+        {'endPos': 28, 's': ' (+ x ', 'startPos': 22}],
+    [   {'endPos': 9, 's': '(* (+ x 1', 'startPos': 0},
+        {'endPos': 12, 's': '(* (+ x 1', 'startPos': 3}],
+    [   {'endPos': 9, 's': ' x 1', 'startPos': 5},
+        {'endPos': 20, 's': ' x 1', 'startPos': 16}],
+    [   {'endPos': 10, 's': '(* (+ x 1)', 'startPos': 0},
+        {'endPos': 13, 's': '(* (+ x 1)', 'startPos': 3}],
+    [   {'endPos': 10, 's': ' x 1)', 'startPos': 5},
+        {'endPos': 21, 's': ' x 1)', 'startPos': 16}],
+    [   {'endPos': 11, 's': '(* (+ x 1) ', 'startPos': 0},
+        {'endPos': 14, 's': '(* (+ x 1) ', 'startPos': 3}],
+    [   {'endPos': 11, 's': ') ', 'startPos': 9},
+        {'endPos': 23, 's': ') ', 'startPos': 21}],
+    [   {'endPos': 12, 's': ' (', 'startPos': 10},
+        {'endPos': 4, 's': ' (', 'startPos': 2}],
+    [   {'endPos': 12, 's': ' (', 'startPos': 10},
+        {'endPos': 7, 's': ' (', 'startPos': 5}],
+    [   {'endPos': 12, 's': '(* (+ x 1) (', 'startPos': 0},
+        {'endPos': 15, 's': '(* (+ x 1) (', 'startPos': 3}],
+    [   {'endPos': 12, 's': ') (', 'startPos': 9},
+        {'endPos': 24, 's': ') (', 'startPos': 21}],
+    [   {'endPos': 13, 's': ' (+', 'startPos': 10},
+        {'endPos': 8, 's': ' (+', 'startPos': 5}],
+    [   {'endPos': 13, 's': ') (+', 'startPos': 9},
+        {'endPos': 25, 's': ') (+', 'startPos': 21}],
+    [   {'endPos': 14, 's': ' (+ ', 'startPos': 10},
+        {'endPos': 9, 's': ' (+ ', 'startPos': 5}],
+    [   {'endPos': 14, 's': ') (+ ', 'startPos': 9},
+        {'endPos': 26, 's': ') (+ ', 'startPos': 21}],
+    [   {'endPos': 15, 's': ' (+ x', 'startPos': 10},
+        {'endPos': 10, 's': ' (+ x', 'startPos': 5}],
+    [   {'endPos': 15, 's': ' x', 'startPos': 13},
+        {'endPos': 18, 's': ' x', 'startPos': 16}],
+    [   {'endPos': 15, 's': ') (+ x', 'startPos': 9},
+        {'endPos': 27, 's': ') (+ x', 'startPos': 21}],
+    [   {'endPos': 16, 's': ' (+ x ', 'startPos': 10},
+        {'endPos': 11, 's': ' (+ x ', 'startPos': 5}],
+    [   {'endPos': 16, 's': ' x ', 'startPos': 13},
+        {'endPos': 19, 's': ' x ', 'startPos': 16}],
+    [   {'endPos': 16, 's': ') (+ x ', 'startPos': 9},
+        {'endPos': 28, 's': ') (+ x ', 'startPos': 21}],
+    [   {'endPos': 17, 's': ') (+ x 2', 'startPos': 9},
+        {'endPos': 29, 's': ') (+ x 2', 'startPos': 21}],
+    [   {'endPos': 19, 's': ') (+ x 2))', 'startPos': 9},
+        {'endPos': 31, 's': ') (+ x 2))', 'startPos': 21}]]
+
+
+    def mergeGrupp(gruppp):
+        ranges0 = list(gruppp.keys())
+        def prependable0(range0, range1):
+            overlap = range1[0] <= range0[1] and range0[0] <= range1[1] and range0[0] <= range1[0]
+            return overlap
+            ###touching not allowed, bespiel:
+            ###(2, 8): ' (+ x '
+            ###(9, 12): ') ('
+            # touching = range0[1]+1==range1[0] and range0[0] <= range1[1]
+            # return overlap or touching
+        def appendable0(range0, range1): 
+            overlap = range1[0] <= range0[1] and range0[0] <= range1[1] and range0[0] <= range1[0]
+            return overlap
+            ###touching not allowed, bespiel:
+            ###(2, 8): ' (+ x '
+            ###(9, 12): ') ('
+            # touching = range0[1]+1==range1[0] and range0[0] <= range1[1]
+            # return overlap or touching
+        def handlePrepend0(allRanges, range0, range1):
+            #first modify allRanges,
+            newRange = (min(range0[0], range1[0]), max(range0[1],  range1[1]))
+            if range0 in allRanges:
+                # del allRanges[allRanges.index(range0)]
+                # print(allRanges)
+                # print('index Of Range0 ', allRanges.index(range0))
+                allRanges.pop(allRanges.index(range0))
+                # print('deleted ', range0, ' from allRanges ', range0 not in allRanges)
+            if range1 in allRanges:
+                # del allRanges[allRanges.index(range1)]
+                # print(allRanges)
+                # print('index Of Range1 ', allRanges.index(range1))
+                allRanges.pop(allRanges.index(range1))
+                # print('deleted ', range1, ' from allRanges', range1 not in allRanges)
+            if newRange not in allRanges:
+                allRanges.append(newRange)
+            # print('added ', newRange, ' to allRanges ', newRange in allRanges)
+            #then modify gruppp
+            str0 = gruppp[range0]
+            str1 = gruppp[range1]
+            if range0[0] <= range1[0] and range1[1] <= range0[1]:
+                newString = str0
+            elif range1[0] <= range0[0] and range0[1] <= range1[1]:
+                newString = str1
+            elif range0[1]>range1[0]:
+                str0Start = 0
+                str0End = range0[1] - range0[0]
+                str1Start = range1[0] - range0[0]
+                str1End = range1[1] - range0[0]
+                intersectingStr = str0[str1Start:str0End]
+                newString = str0[str0Start:str1Start] + intersectingStr + str1[str0End-str1Start:]
+                # import pdb;pdb.set_trace()
+            elif range0[1]==range1[0] or range0[1]+1==range1[0]:#touching
+                newString = str0+str1
+            if range0 in gruppp:
+                del gruppp[range0]
+            if range1 in gruppp:
+                del gruppp[range1]
+            gruppp[newRange] = newString
+            ###################
+            # print('PP', range0, '||', str0, '||', range1, '||', str1, 'new:', newRange, '||', newString)
+            # pp.pprint(gruppp)
+            # print(allRanges)
+            # print('PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP')
+            ###################
+            return allRanges
+        def handleAppend0(allRanges, range0, range1):
+            #first modify allRanges,
+            newRange = (min(range0[0], range1[0]), max(range0[1],  range1[1]))
+            if range0 in allRanges:
+                del allRanges[allRanges.index(range0)]
+            if range1 in allRanges:
+                del allRanges[allRanges.index(range1)]
+            if newRange not in allRanges:
+                allRanges.append(newRange)
+            #then modify gruppp
+            str0 = gruppp[range0]
+            str1 = gruppp[range1]
+            if range0[0] <= range1[0] and range1[1] <= range0[1]:
+                newString = str0
+            elif range1[0] <= range0[0] and range0[1] <= range1[1]:
+                newString = str1
+            elif range0[1]>range1[0]:
+                str0Start = 0
+                str0End = range0[1] - range0[0]
+                str1Start = range1[0] - range0[0]
+                str1End = range1[1] - range0[0]
+                intersectingStr = str0[str1Start:str0End]
+                newString = str0[str0Start:str1Start] + intersectingStr + str1[str0End-str1Start:]
+                # import pdb;pdb.set_trace()
+            elif range0[1]==range1[0] or range0[1]+1==range1[0]:#touching
+                newString = str0+str1
+            if range0 in gruppp:
+                del gruppp[range0]
+            if range1 in gruppp:
+                del gruppp[range1]
+            gruppp[newRange] = newString
+            ###################
+            # print('AA', range0, '||', str0, '||', range1, '||', str1, 'new:', newRange, '||', newString)
+            # pp.pprint(gruppp)
+            # print(allRanges)
+            # print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+            ###################
+            return allRanges
+        BubbleMerge.bubbleMerge(ranges0, prependable0, appendable0, handlePrepend0, handleAppend0)
+
+    grupp0 = {}
+    grupp1 = {}
+    for rangeRaw in rangesRaw:
+        infoDict0, infoDict1 = rangeRaw
+        grupp0[(infoDict0['startPos'], infoDict0['endPos'])] = infoDict0['s']
+        grupp1[(infoDict1['startPos'], infoDict1['endPos'])] = infoDict1['s']
+
+    if verbose:
+        print('vor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('grupp0')
+        pp.pprint(grupp0)
+        print('grupp1')
+        pp.pprint(grupp1)
+
+    mergeGrupp(grupp0)
+    mergeGrupp(grupp1)
+
+    if verbose:
+        print('nach~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('grupp0')
+        pp.pprint(grupp0)
+        print('grupp1')
+        pp.pprint(grupp1)
+
+
+
+
+def test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous0(verbose=False):
     """
     #test case 2 from latexparser # test__findingBackSlashAndInfixOperations__Trig1
     """
@@ -426,10 +580,10 @@ def test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLef
     if verbose:
         pp.pprint( rangesRaw)
         pp.pprint(expectedRaw)
-        print('PASSED? ', rangesRaw == expectedRaw)
+    print('PASSED? ', rangesRaw == expectedRaw)
 
 
-def test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous1(verbose):
+def test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous1(verbose=False):
     """
     #test case 3 from latexparser # test__BODMAS__enclosingBracketInBackslashArg
     """
@@ -530,17 +684,12 @@ def test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLef
     if verbose:
         pp.pprint( rangesRaw)
         pp.pprint(expectedRaw)
-        print('PASSED? ', rangesRaw == expectedRaw)
+    print('PASSED? ', rangesRaw == expectedRaw)
 
 
 
 if __name__=='__main__':
-    # test__binarySearchPre__manySameNumbers()
-    # test__binarySearchPre__leftMost()
-    # test__binarySearchPre__rightMost()
-    # test__binarySearchApp__manySameNumbers()
-    # test__binarySearchApp__leftMost()
-    # test__binarySearchApp__rightMost()
     # test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString() # not tested
-    # test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous0(True) # not tested
-    test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous1(True) # not tested
+    test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubStringALLHARVEST()
+    test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous0()
+    test__consecutivenessBasedOnAnotherStr__LatexParser_collateBackslashInfixLeftOversToContiguous1()

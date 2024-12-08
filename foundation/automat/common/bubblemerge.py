@@ -3,6 +3,8 @@ class BubbleMerge:
 
     @classmethod
     def bubbleMerge(cls, ranges, prependable, appendable, handlePrepend, handleAppend):
+        from foundation.automat.common.binarysearch import BinarySearch
+
         import copy
         changed = True
         
@@ -21,7 +23,7 @@ class BubbleMerge:
                 if len(rangesC) == 1:
                     changed = False
                     break
-                prependableIdx = cls.binarySearchPre(lsByEnd, range0[-1], key=lambda t: t[0])
+                prependableIdx = BinarySearch.binarySearchPre(lsByEnd, range0[-1], key=lambda t: t[0])
                 #############
                 # print('P*******************lsByEnd')
                 # print(range0, 'in ', lsByEnd, 'len:', len(lsByEnd), 'prependAT:', prependableIdx)
@@ -44,7 +46,7 @@ class BubbleMerge:
                 if len(rangesC) == 1:
                     changed = False
                     break
-                appendableIdx = cls.binarySearchApp(lsByStart, range0[0], key=lambda t: t[-1])
+                appendableIdx = BinarySearch.binarySearchApp(lsByStart, range0[0], key=lambda t: t[-1])
                 #############
                 # print('A*******************lsByStart')
                 # print(range0, 'in ', lsByStart, 'len:', len(lsByStart), 'appendAT: ', appendableIdx)
@@ -59,73 +61,3 @@ class BubbleMerge:
             # print('changed', changed)
             # print('rangesC', rangesC)
             ###############
-
-
-    @classmethod
-    def binarySearchPre(cls, sortedList, numToInsert, key=None):
-        if len(sortedList) == 0:
-            raise Exception('sortedList cannot be empty')
-        if key == None:
-            key = lambda x: x
-        tookSortedList = list(map(key, sortedList))
-        return cls.binarySearchPreK(tookSortedList, numToInsert)
-
-
-    @classmethod
-    def binarySearchPreK(cls, sortedList, numToInsert):
-        """
-        assumes that sortedList is sorted ascending
-
-        finds the smallest position i, (there can be repeats in sortedList)
-        where
-        sortedList[i] < numToInsert <= sortedList[i+1]
-        """
-        from math import ceil
-        s, e = 0, len(sortedList)
-        while s+1!=e:
-            m = int(ceil((s+e)/2.0))
-            if sortedList[m] < numToInsert:# go Right
-                s, e = m, e
-            else: # go Left
-                s, e = s, m
-        #check for consecutive same numbers in sortedList, that is smaller than s
-        smallerIdx = s
-        for i in range(s, -1, -1):
-            if sortedList[s] == sortedList[i] and i < smallerIdx:
-                smallerIdx = i
-        return smallerIdx
-
-
-    @classmethod
-    def binarySearchApp(cls, sortedList, numToInsert, key=None):
-        if len(sortedList) == 0:
-            raise Exception('sortedList cannot be empty')
-        if key == None:
-            key = lambda x: x
-        tookSortedList = list(map(key, sortedList))
-        return cls.binarySearchAppK(tookSortedList, numToInsert)
-
-
-    @classmethod
-    def binarySearchAppK(cls, sortedList, numToInsert):
-        """
-        assumes that sortedList is sorted ascending
-
-        finds the smallest position i, (there can be repeats in sortedList)
-        where
-        sortedList[i] <= numToInsert < sortedList[i+1]
-        """
-        from math import ceil
-        s, e = 0, len(sortedList)
-        while s+1!=e:
-            m = int(ceil(s+e)/2.0)
-            if sortedList[m] <= numToInsert:# go Right
-                s, e = m, e
-            else: # go Left
-                s, e = s, m
-        #check for consecutive same numbers in sortedList, that is smaller than s
-        smallerIdx = s
-        for i in range(s, -1, -1):
-            if sortedList[s] == sortedList[i] and i < smallerIdx:
-                smallerIdx = i
-        return smallerIdx

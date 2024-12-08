@@ -44,7 +44,9 @@ def test__longCommonString__bloteBespiel(verbose=False):
 
 def test__oneTermFactorization__moreThanOneCommonString(verbose=False): # TODO wrong , please refer to common.tests.bubblemergetest.py test__overlappingIntervalsTwoSetsOfIntervals__AllLongestCommonSubString
     schemeFormula0 = '(* (+ x 1) (+ x 2))'
-    schemeFormula1 = '(* (* (+ x 1) (- x 1)) (+ x 2))'
+    schemeFormula1 = '(* (* (+ x 1) (- x 1)) (+ x 2))'    
+    # schemeFormula1 = '(* (+ x 1) (+ x 2))'
+    # schemeFormula0 = '(* (* (+ x 1) (- x 1)) (+ x 2))'
     grupp0, grupp1 = LongestCommonSubString.alcs(schemeFormula0, schemeFormula1)
     expected = [   [   {'endPos': 2, 's': '(*', 'startPos': 0},
         {'endPos': 5, 's': '(*', 'startPos': 3}],
@@ -71,9 +73,13 @@ def test__oneTermFactorization__moreThanOneCommonString(verbose=False): # TODO w
     [   {'endPos': 19, 's': ') (+ x 2))', 'startPos': 9},
         {'endPos': 31, 's': ') (+ x 2))', 'startPos': 21}]]
     print('PASSED? ')
+    expectedGrupp0 = {(0, 19): '(* (+ x 1) (+ x 2))'}
+    expectedGrupp1 = {(3, 15): '(* (+ x 1) (', (21, 31): ') (+ x 2))'}
     if verbose:
         pp.pprint(grupp0)
+        print(expectedGrupp0, '<<<<<<<<<<<<<<<<<<<<expected')
         pp.pprint(grupp1)
+        print(expectedGrupp1, '<<<<<<<<<<<<<<<<<<<<expected')
 
 
 

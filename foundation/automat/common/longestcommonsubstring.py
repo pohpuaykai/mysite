@@ -15,42 +15,22 @@ class LongestCommonSubString:
     def alcs(cls, s1, s2):
         m = len(s1)
         n = len(s2)
-        swapped = False
-        #because of how we do the 1D, the longer string has to be s2...
-        if m > n: # swap s1 and s2....
-            s1, s2, = s2, s1
-            m, n = n, m
-            swapped = True
 
 
         matches = []
         #helper
-        def putInMatch(harvestableIndiceHolder, matchesE, swappedE):
-            if harvestableIndiceHolder[3] - harvestableIndiceHolder[1] > 1 and harvestableIndiceHolder[2] - harvestableIndiceHolder[0] > 1:
-                if swappedE:#TODO refactor
-                    matchesE.append([
-                    {
-                        'startPos':harvestableIndiceHolder[1],
-                        'endPos':harvestableIndiceHolder[3],
-                        's':s2[harvestableIndiceHolder[1]:harvestableIndiceHolder[3]]
-                    },
-                    {
-                        'startPos':harvestableIndiceHolder[0],
-                        'endPos':harvestableIndiceHolder[2],
-                        's':s1[harvestableIndiceHolder[0]:harvestableIndiceHolder[2]]
-                    }])
-                else:
-                    matchesE.append([
-                    {
-                        'startPos':harvestableIndiceHolder[0],
-                        'endPos':harvestableIndiceHolder[2],
-                        's':s1[harvestableIndiceHolder[0]:harvestableIndiceHolder[2]]
-                    }, 
-                    {
-                        'startPos':harvestableIndiceHolder[1],
-                        'endPos':harvestableIndiceHolder[3],
-                        's':s2[harvestableIndiceHolder[1]:harvestableIndiceHolder[3]]
-                    }])
+        def putInMatch(harvestableIndiceHolder, matchesE):
+            matchesE.append([
+            {
+                'startPos':harvestableIndiceHolder[0],
+                'endPos':harvestableIndiceHolder[2],
+                's':s1[harvestableIndiceHolder[0]:harvestableIndiceHolder[2]]
+            }, 
+            {
+                'startPos':harvestableIndiceHolder[1],
+                'endPos':harvestableIndiceHolder[3],
+                's':s2[harvestableIndiceHolder[1]:harvestableIndiceHolder[3]]
+            }])
             return matchesE
 
         temparrayCount = (max(n, m) + 1)
@@ -69,32 +49,108 @@ class LongestCommonSubString:
             # print('**', i, '*****************************')
             currCoord = [indiceHolderIniter] * temparrayCount # s1_start, s2_start=-1(no match), s1_end, s2_end
             for j in range(1, n + 1):
-                if s1[i - 1] == s2[j - 1]:
+                #Courtesey of GeeksForGeeks: https://www.geeksforgeeks.org/space-optimized-solution-lcs/
+                if s1[i - 1] == s2[j - 1]: # If characters match, 
+                    #increment LCS length by 1
                     currCoord[j] = copy.deepcopy(prevCoord[j - 1])
                     if currCoord[j] == [-1, -1, -1, -1]:
                         currCoord[j][0] = i - 1
                         currCoord[j][1] = j - 1
                     currCoord[j][2] = i
                     currCoord[j][3] = j
+                #seems to return everything....
+                # else:#Else characters do not match
+                #     #Take the maximum of
+                #     tspl = len(s1[prevCoord[j][0]:prevCoord[j][2]])
+                #     tscl = len(s1[currCoord[j-1][0]:currCoord[j-1][2]])
+                #     if tspl > tscl: # take tspl -> currCoord[j]
+                #         currCoord[j] = copy.deepcopy(prevCoord[j])
+                #     else: #take tscl -> currCoord[j]
+                #         currCoord[j] = copy.deepcopy(currCoord[j-1])
+
             # print(prevCoord)
             # print(currCoord)
             #get our answers :)
-            harvestableIdx = None
-            for k in range(0, temparrayCount):
-                if prevCoord[k] != indiceHolderIniter and currCoord[k] == indiceHolderIniter: #there is something to harvest
-                    if harvestableIdx == None: # we also want the longest to be at least length 2
-                        harvestableIdx = k
-                    harvestableIdx = max(harvestableIdx, k)#we want the last in the consecutive harvestables
-            # import pdb;pdb.set_trace()
-            if harvestableIdx is not None:
-                matches = putInMatch(prevCoord[harvestableIdx], matches, swapped)
+            #########################
+            #actually should be the end of consecutive non-None that are all harvestable..., but thats a lot to harvest...., but lets try see if its correct
+            # harvestableIdx = None
+            # for k in range(0, temparrayCount):
+            #     if prevCoord[k] != indiceHolderIniter and currCoord[k] == indiceHolderIniter: #there is something to harvest
+            #         if harvestableIdx == None: # we also want the longest to be at least length 2
+            #             harvestableIdx = k
+            #         harvestableIdx = max(harvestableIdx, k)#we want the last in the consecutive harvestables
+            # # import pdb;pdb.set_trace()
+            # if harvestableIdx is not None:
+            #     matches = putInMatch(prevCoord[harvestableIdx], matches)
+            #########################
 
+
+
+            for k in range(1, temparrayCount):
+                if prevCoord[k-1] != indiceHolderIniter and currCoord[k] == indiceHolderIniter: #there is something to harvest
+                    #at least length 2?, so we get rid of trivial 1 character matches
+                    if prevCoord[k-1][2] - prevCoord[k-1][0] > 1:
+                        #the unwanted overlapps are still there
+                        matches = putInMatch(prevCoord[k-1], matches) # just harvest first, don't care long or short, now we have too much? => there are overlappings that are not a match
+
+
+            ###############################
+            isIndiceHolderOrNotPrev = []
+            prevStrs = []
+            isIndiceHolderOrNotCurr = []
+            currStrs = []
+            for k in range(0, temparrayCount):
+                if prevCoord[k] == indiceHolderIniter:
+                    isIndiceHolderOrNotPrev.append('N')
+                    prevStrs.append(k)
+                else:
+                    isIndiceHolderOrNotPrev.append('Y')
+                    prevStrs.append(s1[prevCoord[k][0]:prevCoord[k][2]])
+                if currCoord[k] == indiceHolderIniter:
+                    isIndiceHolderOrNotCurr.append('N')
+                    currStrs.append(k)
+                else:
+                    isIndiceHolderOrNotCurr.append('Y')
+                    currStrs.append(s1[currCoord[k][0]:currCoord[k][2]])
+            import pprint
+            pp = pprint.PrettyPrinter(indent=4)
+            print(''.join(isIndiceHolderOrNotPrev))# pp.pprint(isIndiceHolderOrNotPrev)
+            print(''.join(isIndiceHolderOrNotCurr))# pp.pprint(isIndiceHolderOrNotCurr)
+            print(prevStrs)#pp.pprint(prevStrs)
+            print(currStrs)#pp.pprint(currStrs)
+            # print('*********************************', harvestableIdx)
+            print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+            ###############################
             prevCoord = currCoord
         
         #at last get our straggler
-        matches = putInMatch(prevCoord[-1], matches, swapped)
+        matches = putInMatch(prevCoord[-1], matches)
+        squareCoordinatesToMatches = {}
+        for match in matches:
+            squareCoordinatesToMatches[(match[0]['startPos'], match[0]['endPos'], match[1]['startPos'], match[1]['endPos'])] = match
+        ###############################
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        prettyMatches = []
+        for match in matches:
+            matchArea = (match[0]['endPos'] - match[0]['startPos']) * (match[1]['endPos'] - match[1]['startPos'])
+            prettyMatches.append({
+                0:[match[0]['startPos'], match[0]['endPos'], match[0]['s']],
+                1:[match[1]['startPos'], match[1]['endPos'], match[1]['s']],
+                'a':matchArea
+            })
+        #TODO if we plot this out on a excel, 
+        #TODO the answers we want.... are the only ones that have SOME overlap with other squares...., and etrepeut thats the answer?
+        pp.pprint(prettyMatches)
+        ###############################
+        # return None, None
+        # return cls._mergeShardsFromALCS(matches)
+        squareCoordinates = cls._getAreasWithSomeOverLap(list(squareCoordinatesToMatches.keys()))
+        returnDict = {}
+        for squareCoordinate in squareCoordinates:
+            returnDict[squareCoordinate] = squareCoordinatesToMatches[squareCoordinate]
+        return returnDict
 
-        return cls._mergeShardsFromALCS(matches)
 
 
     @classmethod
@@ -156,7 +212,8 @@ class LongestCommonSubString:
                     del allRanges[allRanges.index(range0)]
                 if range1 in allRanges:
                     del allRanges[allRanges.index(range1)]
-                allRanges.append(newRange)
+                if newRange not in allRanges:
+                    allRanges.append(newRange)
                 #then modify gruppp
                 str0 = gruppp[range0]
                 str1 = gruppp[range1]
@@ -188,7 +245,8 @@ class LongestCommonSubString:
                     del allRanges[allRanges.index(range0)]
                 if range1 in allRanges:
                     del allRanges[allRanges.index(range1)]
-                allRanges.append(newRange)
+                if newRange not in allRanges:
+                    allRanges.append(newRange)
                 #then modify gruppp
                 str0 = gruppp[range0]
                 str1 = gruppp[range1]
