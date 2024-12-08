@@ -48,131 +48,134 @@ class Latexparser(Parser):
     INTEGRALS = ['int', 'oint', 'iint'] # TODO hikitoru this from sfunctors
     FUNCTIONNAMES = TRIGOFUNCTION + ['frac', 'sqrt',  'log', 'ln'] + INTEGRALS
 
-    def __init__(self, equationStr, verbose=False, parallelise=False):
-        self._eqs = equationStr
-        self.verbose = verbose
-        self.alleDing = [] # collect all symbol after interlevelsubtreegrafting
-        #method specfific verbosity
-        self.methodVerbose = {
-            '_findInfixAndEnclosingBrackets':False,
-            '_findBackSlashPositions':False,
-            '_tagBracketsToBackslash':False,
-            '_updateInfixNearestBracketInfix':False,
-            '__updateInfixNearestBracketInfix':False,#
-            '_removeCaretThatIsNotExponent':False,
-            '_findLeftOverPosition':True,
-            '_contiguousLeftOvers':False,
-            '_collateBackslashInfixLeftOversToContiguous':False,
-            '__updateBackslashLeftOversBracketInfo':False,
-            '_updateBackslashLeftOversBracketInfo':False,
-            '_graftGrenzeRangesIntoContainmentTree':False,#
-            '__addImplicitZero':False,
-            '__addImplicitMultiply':False,
-            '__intraGrenzeSubtreeUe':False,#
-            '__interLevelSubtreeGrafting':False,
-            '_reformatToAST':False,
-            '_latexSpecialCases':False
-        }
-        def showError(): # TODO this call is very expensive..., maybe write everything to a log file?
-            if self.verbose:
-                for frame in inspect.stack():
-                    methodName = frame.function
-                    #try to get the first frame that is in methodVerbose:
-                    show = self.methodVerbose.get(methodName)
-                    if show is not None: # found methodName
-                        return show # show is True/False (not None)
-            return False
-            # methodName = inspect.currentframe().f_back.f_code.co_name#f_back goes 1 frame up the call stack.
-            # return self.verbose and methodName in self.methodVerbose and self.methodVerbose[methodName]
-        self.showError = showError
+    def __init__(self, equationStr, ast=None, verbose=False, parallelise=False):
+        if ast is None:
+            self._eqs = equationStr
+            self.verbose = verbose
+            self.alleDing = [] # collect all symbol after interlevelsubtreegrafting
+            #method specfific verbosity
+            self.methodVerbose = {
+                '_findInfixAndEnclosingBrackets':False,
+                '_findBackSlashPositions':False,
+                '_tagBracketsToBackslash':False,
+                '_updateInfixNearestBracketInfix':False,
+                '__updateInfixNearestBracketInfix':False,#
+                '_removeCaretThatIsNotExponent':False,
+                '_findLeftOverPosition':True,
+                '_contiguousLeftOvers':False,
+                '_collateBackslashInfixLeftOversToContiguous':False,
+                '__updateBackslashLeftOversBracketInfo':False,
+                '_updateBackslashLeftOversBracketInfo':False,
+                '_graftGrenzeRangesIntoContainmentTree':False,#
+                '__addImplicitZero':False,
+                '__addImplicitMultiply':False,
+                '__intraGrenzeSubtreeUe':False,#
+                '__interLevelSubtreeGrafting':False,
+                '_reformatToAST':False,
+                '_latexSpecialCases':False
+            }
+            def showError(): # TODO this call is very expensive..., maybe write everything to a log file?
+                if self.verbose:
+                    for frame in inspect.stack():
+                        methodName = frame.function
+                        #try to get the first frame that is in methodVerbose:
+                        show = self.methodVerbose.get(methodName)
+                        if show is not None: # found methodName
+                            return show # show is True/False (not None)
+                return False
+                # methodName = inspect.currentframe().f_back.f_code.co_name#f_back goes 1 frame up the call stack.
+                # return self.verbose and methodName in self.methodVerbose and self.methodVerbose[methodName]
+            self.showError = showError
 
-        #########DEBUGGING TOOL FOR RESULT OF BUBBLE MERGE:
+            #########DEBUGGING TOOL FOR RESULT OF BUBBLE MERGE:
 
-        def ppprint(cg, scgi):#Debugging tool TODO refactor
-            m = {}
-            for grange, dings in cg.items():
-                sdings = []
-                for ding in dings:
-                    if ding['type'] == 'infix':
-                        sdings.append((ding['name'], ding['position'], ding['position']+len(ding['name'])))
-                    else:
-                        sdings.append((ding['name'], ding['ganzStartPos'], ding['ganzEndPos']))
-                m[grange] = sdings
-            import pprint
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(m)
-            n = []
-            for grange, dings in scgi:
-                sdings = []
-                for ding in dings:
-                    if ding['type'] == 'infix':
-                        sdings.append((ding['name'], ding['position'], ding['position']+len(ding['name'])))
-                    else:
-                        sdings.append((ding['name'], ding['ganzStartPos'], ding['ganzEndPos']))
-                n.append([grange, sdings])
-            pp.pprint(n)
+            def ppprint(cg, scgi):#Debugging tool TODO refactor
+                m = {}
+                for grange, dings in cg.items():
+                    sdings = []
+                    for ding in dings:
+                        if ding['type'] == 'infix':
+                            sdings.append((ding['name'], ding['position'], ding['position']+len(ding['name'])))
+                        else:
+                            sdings.append((ding['name'], ding['ganzStartPos'], ding['ganzEndPos']))
+                    m[grange] = sdings
+                import pprint
+                pp = pprint.PrettyPrinter(indent=4)
+                pp.pprint(m)
+                n = []
+                for grange, dings in scgi:
+                    sdings = []
+                    for ding in dings:
+                        if ding['type'] == 'infix':
+                            sdings.append((ding['name'], ding['position'], ding['position']+len(ding['name'])))
+                        else:
+                            sdings.append((ding['name'], ding['ganzStartPos'], ding['ganzEndPos']))
+                    n.append([grange, sdings])
+                pp.pprint(n)
 
-        self.ppprint = ppprint
+            self.ppprint = ppprint
 
 
-        #################DEBUGGING TOOL FOR PARENT/CHILD RELATIONSHIP:
-        def printConsecutiveGroup(consecutiveGroups):
-            grenzeRangeToShortDings = {}
-            for grenzeRange, dings in consecutiveGroups.items():
-                # dings = consecutiveGroups[grenzeRange]
-                # import pdb;pdb.set_trace()
-
-                shortDings = {}
-                for d in dings:
-                    idd = (d['name'], d['startPos'], d['endPos'])
-                    c0 = None if 'child' not in d or d['child'][1] is None else (d['child'][1]['name'], d['child'][1]['startPos'], d['child'][1]['endPos'])
-                    c1 = None if 'child' not in d or 2 not in d['child'] or d['child'][2] is None else (d['child'][2]['name'], d['child'][2]['startPos'], d['child'][2]['endPos'])
-                    pard = None if d['parent'] is None else (d['parent']['name'], d['parent']['startPos'], d['parent']['endPos'])
-                    shortDings[idd] = {'c1':c0, 'c2':c1, 'parent':pard}
+            #################DEBUGGING TOOL FOR PARENT/CHILD RELATIONSHIP:
+            def printConsecutiveGroup(consecutiveGroups):
+                grenzeRangeToShortDings = {}
+                for grenzeRange, dings in consecutiveGroups.items():
+                    # dings = consecutiveGroups[grenzeRange]
                     # import pdb;pdb.set_trace()
-                grenzeRangeToShortDings[grenzeRange] = shortDings
-            # print('level: ', level, 'grenzeRanges: ', grenzeRanges, 'grenzeRangeToShortDings', )
-            import pprint
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(grenzeRangeToShortDings)
 
-        self.printConsecutiveGroup = printConsecutiveGroup
-        self.parallelise = parallelise
-        """
-        From ChatGPT:
-        multiprocessing.Value:
+                    shortDings = {}
+                    for d in dings:
+                        idd = (d['name'], d['startPos'], d['endPos'])
+                        c0 = None if 'child' not in d or d['child'][1] is None else (d['child'][1]['name'], d['child'][1]['startPos'], d['child'][1]['endPos'])
+                        c1 = None if 'child' not in d or 2 not in d['child'] or d['child'][2] is None else (d['child'][2]['name'], d['child'][2]['startPos'], d['child'][2]['endPos'])
+                        pard = None if d['parent'] is None else (d['parent']['name'], d['parent']['startPos'], d['parent']['endPos'])
+                        shortDings[idd] = {'c1':c0, 'c2':c1, 'parent':pard}
+                        # import pdb;pdb.set_trace()
+                    grenzeRangeToShortDings[grenzeRange] = shortDings
+                # print('level: ', level, 'grenzeRanges: ', grenzeRanges, 'grenzeRangeToShortDings', )
+                import pprint
+                pp = pprint.PrettyPrinter(indent=4)
+                pp.pprint(grenzeRangeToShortDings)
 
-        'b': signed char (integer, 1 byte)
-        'B': unsigned char (integer, 1 byte)
-        'h': signed short (integer, 2 bytes)
-        'H': unsigned short (integer, 2 bytes)
-        'i': signed int (integer, typically 4 bytes)
-        'I': unsigned int (integer, typically 4 bytes)
-        'l': signed long (integer, typically 4 bytes)
-        'L': unsigned long (integer, typically 4 bytes)
-        'q': signed long long (integer, 8 bytes)
-        'Q': unsigned long long (integer, 8 bytes)
-        'f': float (single-precision, typically 4 bytes)
-        'd': double (double-precision, typically 8 bytes)
-        """
-        self.equalPos = self._eqs.index('=') # will explode if no equals :)
-        #maybe set all EVENT to false(clear()) before parsing, then
-        #dump each "method" as processes into Pool
-        #each method will have a .wait() for the oMethod/s, its waiting for
-        #oMethod/s that complete will call set(), signalling method (waiting for oMethod) to start. :)
+            self.printConsecutiveGroup = printConsecutiveGroup
+            self.parallelise = parallelise
+            """
+            From ChatGPT:
+            multiprocessing.Value:
 
-        if self.parallelise:
-            self.event__findBackSlashPositions = mp.Event()
-            self.event__findInfixAndEnclosingBrackets = mp.Event()
-            self.event__updateInfixNearestBracketInfix = mp.Event()
-            self.event__removeCaretThatIsNotExponent = mp.Event()
-            self.event__findLeftOverPosition = mp.Event()
-            self.event__contiguousLeftOvers = mp.Event()
-            self.event__addImplicitZero = mp.Event()
-            self.event__collateBackslashInfixLeftOversToContiguous = mp.Event()
-            self.event__addImplicitMultipy = mp.Event()
-            self.event__subTreeGraftingUntilTwoTrees = mp.Event()
-            self.event__reformatToAST = mp.Event()
+            'b': signed char (integer, 1 byte)
+            'B': unsigned char (integer, 1 byte)
+            'h': signed short (integer, 2 bytes)
+            'H': unsigned short (integer, 2 bytes)
+            'i': signed int (integer, typically 4 bytes)
+            'I': unsigned int (integer, typically 4 bytes)
+            'l': signed long (integer, typically 4 bytes)
+            'L': unsigned long (integer, typically 4 bytes)
+            'q': signed long long (integer, 8 bytes)
+            'Q': unsigned long long (integer, 8 bytes)
+            'f': float (single-precision, typically 4 bytes)
+            'd': double (double-precision, typically 8 bytes)
+            """
+            self.equalPos = self._eqs.index('=') # will explode if no equals :)
+            #maybe set all EVENT to false(clear()) before parsing, then
+            #dump each "method" as processes into Pool
+            #each method will have a .wait() for the oMethod/s, its waiting for
+            #oMethod/s that complete will call set(), signalling method (waiting for oMethod) to start. :)
+
+            if self.parallelise:
+                self.event__findBackSlashPositions = mp.Event()
+                self.event__findInfixAndEnclosingBrackets = mp.Event()
+                self.event__updateInfixNearestBracketInfix = mp.Event()
+                self.event__removeCaretThatIsNotExponent = mp.Event()
+                self.event__findLeftOverPosition = mp.Event()
+                self.event__contiguousLeftOvers = mp.Event()
+                self.event__addImplicitZero = mp.Event()
+                self.event__collateBackslashInfixLeftOversToContiguous = mp.Event()
+                self.event__addImplicitMultipy = mp.Event()
+                self.event__subTreeGraftingUntilTwoTrees = mp.Event()
+                self.event__reformatToAST = mp.Event()
+        else: # unparse Mode
+            self.ast = ast
 
 
 
@@ -3261,11 +3264,72 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
         #TODO Pool multiprocessing with method priorities (Chodai!) -- dependency ha chain desu yo, sou shitara, motto hayaku arimasu ka?
 
 
+#################################################################################################unparsing
+
+
+    def _convertASTToLatexStyleAST(self):
+        """
+        #~ DRAFT ~#
+        TODO use logic from Schemeparser._toLatex
+
+
+        Die Verschiedenen, den wir vorsichtiger merken mussen:
+        [Scheme] => `Latex`
+        1. [nroot] => `\\sqrt[n]`
+        2. [/] => `\\frac`
+        3. [(log a )] => `\\log` {if a = 10} or `\\ln` {if a = e} or `\\log_{a}`
+
+        """
+        raise Exception('unImplemented')
+
+
+    def _findEqualTupleLeavesBackslashInfixNodes(self):
+        """
+        #~ DRAFT ~#
+
+        """
+        self.equalTuple = ('=', 0)
+        self.leaves = set()
+        self.nodeIdToInfixArgsBrackets = {}
+        if self.equalTuple not in self.ast:
+            raise Exception('All equations must have = and Equal Tuple must have ID 0')
+
+        stack = [self.equalTuple]
+        while len(stack) > 0:
+            currentNode = stack.pop()
+            nodeId = currentNode[1]
+            nodeName = currentNode[0]
+            if currentNode not in self.ast: #it is a leaf
+                self.leaves.add(str(nodeName)) # no need the nodeId
+            elif nodeName in Latexparser.PRIOIRITIZED_INFIX: # then its an infix
+                aux = { # we use full brackets, since we are bracket freaks
+                    'leftOpenBracket':'(',#the other option is to use brackets according to some logic
+                    'leftCloseBracket':')',
+                    'rightOpenBracket':'(',
+                    'rightCloseBracket':')',
+                }
+                self.nodeIdToInfixArgsBrackets[nodeId] = aux
+            elif nodeName in Latexparser.FUNCTIONNAMES: # recognised functions
+                aux = {
+                    'argument1SubSuper':'^', # we always put the upperCase first
+                    'argument1OpenBracket':'{', # we always enclose with curly brackets
+                    'argument1CloseBracket':'}', # we always enclose with curly brackets
+                    'hasArgument1':False,# TODO this was never used before
+                    'argument2SubSuper':'_', # we always put the lowerCase later
+                    'argument2OpenBracket':'{', # we always enclose with curly brackets
+                    'argument2CloseBracket':'}', # we always enclose with curly brackets
+                    'hasArgument2':False# TODO this was never used before
+                }
+                self.backslashes[nodeName] = aux # names conversion handled by  _convertASTToLatexStyleAST
+            # elif nodeName in Latexparser.VARIABLENAMESTAKEANARG: # we are not expecting this
+            else: #Unrecognised nodes.... put in backslash?
+                raise Exception('unImplemented')
 
 
 
     def _unparse(self): # TODO from AST to LaTeX string... 
         """
+        This assumes that we have self.ast
         #~ DRAFT ~#
         TODO
         1. remove implicit 0-
@@ -3273,6 +3337,11 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
         """
         #find the implicit 0- in AST and remove (would subtree equivalence be easier?)
         #find the implicit-multiply in AST and remove
+
+        #TODO check if we need to run _findEqualTupleLeavesBackslashInfixNodes again
+        if len(self.leaves) == 0:
+            self._convertASTToLatexStyleAST()
+            self._findEqualTupleLeavesBackslashInfixNodes()
         return self._recursiveUnparse(self.equalTuple)
 
 
