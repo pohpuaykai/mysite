@@ -48,7 +48,7 @@ class Latexparser(Parser):
     INTEGRALS = ['int', 'oint', 'iint'] # TODO hikitoru this from sfunctors
     FUNCTIONNAMES = TRIGOFUNCTION + ['frac', 'sqrt',  'log', 'ln'] + INTEGRALS
 
-    def __init__(self, equationStr, ast=None, verbose=False, parallelise=False):
+    def __init__(self, equationStr=None, ast=None, verbose=False, parallelise=False):
         if ast is None:
             self._eqs = equationStr
             self.verbose = verbose
@@ -61,7 +61,7 @@ class Latexparser(Parser):
                 '_updateInfixNearestBracketInfix':False,
                 '__updateInfixNearestBracketInfix':False,#
                 '_removeCaretThatIsNotExponent':False,
-                '_findLeftOverPosition':True,
+                '_findLeftOverPosition':False,
                 '_contiguousLeftOvers':False,
                 '_collateBackslashInfixLeftOversToContiguous':False,
                 '__updateBackslashLeftOversBracketInfo':False,
@@ -176,6 +176,9 @@ class Latexparser(Parser):
                 self.event__reformatToAST = mp.Event()
         else: # unparse Mode
             self.ast = ast
+            self.leaves = set()
+            self.backslashes ={}
+            self.nodeIdToInfixArgsBrackets = {}
 
 
 
@@ -3011,7 +3014,7 @@ if __name__=='__main__':
                     children[parentChildIndex] = exponentialNode
                 #finis replacement de currentNode avec exponentialNode
                 self.nodeId += 1
-                self.ast[exponentialNode] = [(currentNode, powerNode)]
+                self.ast[exponentialNode] = [currentNode, powerNode]
                 self.ast[currentNode] = [argNode]
                 stack += latexASTCopy[currentNode]
             elif currentNode in latexASTCopy: # latexAST do not contain leaves
@@ -3030,217 +3033,6 @@ if __name__=='__main__':
         7. Combine subtrees by argEnclosure, handle sqrt, trigpower specialcases
         8. Find 2 with subtreenoparent, attach them to =
         9. Run through all backslash/infix to form AST...
-
-
-        
-        VARIABLE DEPENDENCIES... 
-        $$$$
-        -> export
-        <- import
-        <> import&export(but modified.)
-        $$$$
-event__findBackSlashPositions
-->self.variablesPos
-->self.functionPos
-->self.noBraBackslashPos
-
-event__findInfixAndEnclosingBrackets
-->self.matchingBracketsLocation
-->self.infixList
-
-event__updateInfixNearestBracketInfix
-<-self.variablesPos
-<-self.functionPos
-<-self.matchingBracketsLocation
-<>self.infixList
-->self.allowedInfix
-->self.listOfInfixInfoDict
-
-event__removeCaretThatIsNotExponent
-<-self.functionPos
-<-self.allowedInfix
-<>self.infixList
-
-event__findLeftOverPosition
-<-self.noBraBackslashPos
-<-self.variablesPos
-<-self.functionPos
-<-self.infixList
-->self.unoccupiedPoss
-
-event__contiguousLeftOvers
-<-self.unoccupiedPoss
-->self.contiguousInfoList
-
-event__addImplicitZero
-<-self.infixList
-->self.contiguousInfoList
-
-event__collateBackslashInfixLeftOversToContiguous
-<-self.contiguousInfoList
-<-self.noBraBackslashPos
-<-self.variablesPos
-<-self.functionPos
-<-self.infixList
-->self.consecutiveGroups
-
-event__addImplicitMultipy
-<-self.consecutiveGroups
-->self.newConsecutiveGroups
-->self.infixList
-
-event__subTreeGraftingUntilTwoTrees
-<-self.newConsecutiveGroups
-->self.alleDing
-
-event__reformatToAST
-<-self.alleDing
-->self.ast
-
-
-
-
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_dependency_between_methods (da ich schriebe 'cycle detection' nicht. )
-dependenciesGraphStr = '''event__findBackSlashPositions
-->self.variablesPos
-->self.functionPos
-->self.noBraBackslashPos
-
-event__findInfixAndEnclosingBrackets
-->self.matchingBracketsLocation
-->self.infixList
-
-event__updateInfixNearestBracketInfix
-<-self.variablesPos
-<-self.functionPos
-<-self.matchingBracketsLocation
-<>self.infixList
-->self.allowedInfix
-->self.listOfInfixInfoDict
-
-event__removeCaretThatIsNotExponent
-<-self.functionPos
-<-self.allowedInfix
-<>self.infixList
-
-event__findLeftOverPosition
-<-self.noBraBackslashPos
-<-self.variablesPos
-<-self.functionPos
-<-self.infixList
-->self.unoccupiedPoss
-
-event__contiguousLeftOvers
-<-self.unoccupiedPoss
-->self.contiguousInfoList
-
-event__addImplicitZero
-<-self.infixList
-->self.contiguousInfoList
-
-event__collateBackslashInfixLeftOversToContiguous
-<-self.contiguousInfoList
-<-self.noBraBackslashPos
-<-self.variablesPos
-<-self.functionPos
-<-self.infixList
-->self.consecutiveGroups
-
-event__addImplicitMultipy
-<-self.consecutiveGroups
-->self.newConsecutiveGroups
-->self.infixList
-
-event__subTreeGraftingUntilTwoTrees
-<-self.newConsecutiveGroups
-->self.alleDing
-
-event__reformatToAST
-<-self.alleDing
-->self.ast'''
-
-import os
-resultGraphType = 'import' # could either be 'export' or 'import'
-codify = True # if true, will change all the node name to numbers, then possibly easier to see
-
-
-numberify = {}
-numberId = 0
-currentMethodNodeName = None
-dependenciesGraph = {}
-for line in dependenciesGraphStr.split('\n'):
-    if len(line.strip()) == 0:
-        continue
-    print(line)
-    #import pdb;pdb.set_trace()
-    if line.startswith('event__'): #its a methodNode
-        currentMethodNodeName = line # should remove the prefix event__
-        numberify[currentMethodNodeName] = numberId
-        numberId += 1
-    elif line.startswith('->') or line.startswith('<>'):
-        if currentMethodNodeName is None:
-            raise Exception('Import currentMethodNodeName is None')
-        exImDict = dependenciesGraph.get(currentMethodNodeName, {'export':[], 'import':[]})
-        exImDict['export'].append(line[2:]) # take out -> or <>
-        dependenciesGraph[currentMethodNodeName] = exImDict
-    elif line.startswith('<-') or line.startswith('<>'):
-        if currentMethodNodeName is None:
-            raise Exception('Export currentMethodNodeName is None')
-        exImDict = dependenciesGraph.get(currentMethodNodeName, {'export':[], 'import':[]})
-        exImDict['import'].append(line[2:]) # take out <- or <>
-        dependenciesGraph[currentMethodNodeName] = exImDict
-    else:
-        raise Exception('UnHandled')
-
-newDependenciesGraph = {}
-if codify:
-    for nodeName, dings in dependenciesGraph.items():
-        newDependenciesGraph[numberify[nodeName]] = dings
-    dependenciesGraph = newDependenciesGraph
-
-#find import/export Sources and put them in a queue
-queue = []
-for methodNodeName, exImDict in dependenciesGraph.items():
-    if len(exImDict[resultGraphType]) == 0:
-        queue.append(methodNodeName)
-
-
-if resultGraphType == 'export':
-    oppoType = 'import'
-else:
-    oppoType = 'export'
-
-
-
-AST = {}
-while len(queue) > 0: # there is dependency loop, need to detect cycles
-    cNode = queue.pop()
-    cEdges = dependenciesGraph[cNode][oppoType]
-    ###look for children, they have edges on oppoType
-    children = set()
-    for aNode, exImDict in dependenciesGraph.items():
-        if aNode == cNode:
-            continue
-        aEdges = exImDict[resultGraphType]
-        #import pdb;pdb.set_trace()
-        for aEdge in aEdges:
-            if aEdge in cEdges:
-                children.add(aNode)
-    children = list(children)
-    ###
-    #import pdb;pdb.set_trace()
-    AST[cNode] = children
-    for child in children:
-        queue.append(child)
-
-
-
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(AST)
-
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_dependency_between_methods
-
 
 
 
@@ -3267,11 +3059,56 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
 #################################################################################################unparsing
 
 
+    def _findImplicitMultiplyIds(self):
+        """
+        if that tree T has 
+        1. internalNodes(nonLeaves) are all multiplies and 
+        2. leaves are number/variable/backslash, 
+        then 
+        All the internalNodes of T all qualify as implicitMultiply
+
+        if backslash, then (nomatter the children)  True -> memo[idx]
+        if number/variable, then True -> memo[idx]
+        if *, return (memo[child0Id] and memo[child1Id]) -> memo[idx]
+        else False -> memo[idx]
+
+        then go through memo, and record all the idx, such that memo[idx]=True
+        """
+
+
+        def __recursiveFindImplicitMulitplyIds(node, memo):
+            """TODO test
+            Courtesey of https://www.geeksforgeeks.org/introduction-to-dynamic-programming-on-trees/
+            """
+            nodeName = node[0]
+            nodeId = node[1]
+            if nodeName in Latexparser.FUNCTIONNAMES or nodeName in Latexparser.VARIABLENAMESTAKEANARG: # then node is a backslash
+                memo[nodeId] = True
+            elif node not in self.ast: # it is a number/variable
+                memo[nodeId] = True
+            elif nodeName == '*':
+                leftNode, rightNode = self.ast[node]
+                leftIs = __recursiveFindImplicitMulitplyIds(leftNode, memo)
+                rightIs = __recursiveFindImplicitMulitplyIds(rightNode, memo)
+                memo[nodeId] = leftIs and rightIs
+            else:
+                memo[nodeId] = False
+            return memo[nodeId]
+
+        memo = {}
+        __recursiveFindImplicitMulitplyIds(('=', 0), memo)
+        for nodeId, isImplicitMulitply in memo.items():
+            self.implicitMultiplies.add(nodeId)
+
+
+
     def _convertASTToLatexStyleAST(self):
         """
         #~ DRAFT ~#
         TODO use logic from Schemeparser._toLatex
 
+
+        we assume that self.ast is a standard AST, we will store the transformed self.ast as self.latexAST
 
         Die Verschiedenen, den wir vorsichtiger merken mussen:
         [Scheme] => `Latex`
@@ -3280,7 +3117,129 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
         3. [(log a )] => `\\log` {if a = 10} or `\\ln` {if a = e} or `\\log_{a}`
 
         """
-        raise Exception('unImplemented')
+        self.implicitMultiplies = set()
+
+
+        #~~~~~~~~~~~~~~~~~~~HELPER FUNCTION 
+
+        # def updateChildToParent():
+        childToParent = {} # invertedTree, for easy manipulation later
+        stack = [self.equalTuple]
+        while len(stack) > 0:
+            parent = stack.pop()
+            children = self.ast.get(parent, [])
+            for child in children:
+                childToParent[child] = parent
+            stack += children
+        
+        # childToParent = updateChildToParent()
+        #~~~~~~~~~~~~~~~~~~~HELPER FUNCTION 
+
+        #first pass to catelog all the implicit multiply..., there could be a whole chain/tree of multiplies, and 
+        stack = [self.equalTuple]
+        while len(stack) > 0:
+            currentNode = 
+
+
+
+        self.latexAST = {}
+        stack = [self.equalTuple]
+        while len(stack) > 0:
+            currentNode = stack.pop()
+            nodeId = currentNode[1]
+            nodeName = currentNode[0]
+            children = self.ast.get(currentNode)
+            # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<_convertASTToLatexStyleAST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', currentNode, children)
+            # import pdb;pdb.set_trace()
+            if children is not None:
+                modifiedParent = False
+                if nodeName == '*':
+                    # print('IS MULTIPLY')
+                    # HANDLE IMPLICIT-MULITPLY *********************
+                    isImplicitMulitply = False
+                    arg1IsBackSlash = children[0][0] in Latexparser.FUNCTIONNAMES or children[0][0] in Latexparser.VARIABLENAMESTAKEANARG
+                    arg1IsLeaf = children[0] not in self.ast
+                    arg1IsImplicitMultiply = children[0][1] in self.implicitMultiplies # 
+                    arg2IsBackSlash = children[1][0] in Latexparser.FUNCTIONNAMES or children[1][0] in Latexparser.VARIABLENAMESTAKEANARG
+                    arg2IsLeaf = children[1] not in self.ast
+                    arg2IsImplicitMultiply = children[1][1] in self.implicitMultiplies
+                    print('checkingXXXXXXXXXXXXXXXXXXXXXXXXXXXXimplicitmultiply')
+                    print(children)
+                    print('arg1IsBackSlash', arg1IsBackSlash)
+                    print('arg1IsLeaf', arg1IsLeaf)
+                    print('arg1IsImplicitMultiply', arg1IsImplicitMultiply)
+                    print('arg2IsBackSlash', arg2IsBackSlash)
+                    print('arg2IsLeaf', arg2IsLeaf)
+                    print('arg2IsImplicitMultiply', arg2IsImplicitMultiply)
+                    if (arg1IsLeaf or arg2IsLeaf) or (arg1IsBackSlash and arg2IsBackSlash):
+                        nodeName = ''
+                        self.implicitMultiplies.add(nodeId)
+                        modifiedParent = True
+                        # print('erased MULTIPLY')
+                    # HANDLE IMPLICIT-MULTIPLY *********************
+
+                elif nodeName == 'nroot':
+                    nodeName = 'sqrt'
+                    modifiedParent = True
+                elif nodeName == '/':
+                    nodeName = 'frac'
+                    modifiedParent = True
+                elif nodeName == 'log':
+                    #we assume that the first argument is the base
+                    baseNode = children[0]
+                    if baseNode[0] == 'e': #cest ln
+                        nodeName = 'ln'
+                        children = [children[1]] # take out the base.
+                        modifiedParent = True
+                    elif str(baseNode[0]) == '10':
+                        #same nodeName
+                        children = [children[1]] # take out the base.
+                        modifiedParent = True
+                elif nodeName in Latexparser.TRIGOFUNCTION:
+                    # import pdb;pdb.set_trace()
+                    #remove exponent above it, if any
+                    parentName, parentId = childToParent[currentNode]
+                    if parentName == '^':
+                        #find the exponentNode
+                        firstChild, secondChild = self.ast[(parentName, parentId)]
+                        if firstChild[1] == currentNode[1]: # id(firstChild)==id(currentNode), then secondChild is the exponentNode
+                            exponentNode = secondChild
+                        else: # else firstChild is the exponentNode
+                            exponentNode = firstChild
+                        # print('<<<<<<<<<<<<<<<<<<EXPONENTTRIG')
+                        # import pdb;pdb.set_trace()
+
+                        #make a new node with exponent as first argument
+                        children = [exponentNode, children[0]]
+                        del self.latexAST[(parentName, parentId)]
+                        parentOfParent = childToParent[(parentName, parentId)]
+                        childrenOfParentOfParent = self.latexAST[parentOfParent]
+                        #replace parent with currentNode in childrenOfParentOfParent
+                        theChildIdx = None
+                        for childIdx, child in enumerate(childrenOfParentOfParent):
+                            if child[1] == parentId:
+                                theChildIdx = childIdx
+                                break
+                        childrenOfParentOfParent[theChildIdx] = currentNode
+                        self.latexAST[parentOfParent] = childrenOfParentOfParent
+                        # print((nodeName, nodeId), 'children: ', children)
+                        # import pdb;pdb.set_trace()
+                        # childToParent = updateChildToParent()
+                        #TODO make id number consecutive again?
+                    #if no exponentialParent, then no change :)
+                self.latexAST[(nodeName, nodeId)] = children
+                if modifiedParent:
+                    parent = childToParent[currentNode]
+                    childrenOfParent = self.latexAST[parent]
+                    #find which child newNode is in
+                    theChildIdx = None
+                    for childIdx, child in enumerate(childrenOfParent):
+                        if child[1] == nodeId:
+                            theChildIdx = childIdx
+                    childrenOfParent[theChildIdx] = (nodeName, nodeId)#replace oldChild with newChild
+                stack += list(children)
+            print(stack)
+            print(self.latexAST)
 
 
     def _findEqualTupleLeavesBackslashInfixNodes(self):
@@ -3288,42 +3247,200 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
         #~ DRAFT ~#
 
         """
-        self.equalTuple = ('=', 0)
+
+        #~~~~~~~~~~~~~~~~~~~HELPER FUNCTION 
+        from foundation.automat.common.pathfinderintree import PathFinderInTree
+        def implicitMultiplyHasAExponentAndAllTheInfixesInItsPathAreAscendingHierachy(multiplyNode):
+            exponentNodes = PathFinderInTree.findNodeNameWhoseChildrenAreLeaves(self.latexAST, '^', multiplyNode)
+            for exponentNode in exponentNodes:
+                path = PathFinderInTree.getPath(self.latexAST, multiplyNode, exponentNode)
+                prevHiearchyNum = len(Latexparser.PRIOIRITIZED_INFIX) + 2 # smallest possible hierachy
+                for node in path:
+                    nodeName = node[0]
+                    if nodeName == '': # implicit-multiply
+                        nodeName = '*' # temporary so its ok
+                    if nodeName not in Latexparser.PRIOIRITIZED_INFIX: # not an infix
+                        prevHiearchyNum = None
+                        break
+                    elif prevHiearchyNum < Latexparser.PRIOIRITIZED_INFIX.index(nodeName): # wrong order
+                        prevHiearchyNum = None
+                        break
+                    prevHiearchyNum = Latexparser.PRIOIRITIZED_INFIX.index(nodeName)
+                if prevHiearchyNum is not None:
+                    return True#? just one exponent is enough?
+            return False
+
+
+        def updateChildToParent():
+            childToParent = {} # invertedTree, for easy manipulation later
+            stack = [self.equalTuple]
+            while len(stack) > 0:
+                parent = stack.pop()
+                children = self.latexAST.get(parent, [])
+                for child in children:
+                    childToParent[child] = parent
+                stack += children
+            return childToParent
+        childToParent = updateChildToParent()
+        #~~~~~~~~~~~~~~~~~~~HELPER FUNCTION 
+
+        # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<_findEqualTupleLeavesBackslashInfixNodes<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', self.latexAST)
+
+        # self.implicitMultiply = []
         self.leaves = set()
         self.nodeIdToInfixArgsBrackets = {}
-        if self.equalTuple not in self.ast:
+        if self.equalTuple not in self.latexAST:
             raise Exception('All equations must have = and Equal Tuple must have ID 0')
 
         stack = [self.equalTuple]
         while len(stack) > 0:
             currentNode = stack.pop()
+            children = self.latexAST.get(currentNode)
             nodeId = currentNode[1]
             nodeName = currentNode[0]
-            if currentNode not in self.ast: #it is a leaf
-                self.leaves.add(str(nodeName)) # no need the nodeId
-            elif nodeName in Latexparser.PRIOIRITIZED_INFIX: # then its an infix
-                aux = { # we use full brackets, since we are bracket freaks
-                    'leftOpenBracket':'(',#the other option is to use brackets according to some logic
-                    'leftCloseBracket':')',
-                    'rightOpenBracket':'(',
-                    'rightCloseBracket':')',
-                }
-                self.nodeIdToInfixArgsBrackets[nodeId] = aux
-            elif nodeName in Latexparser.FUNCTIONNAMES: # recognised functions
-                aux = {
-                    'argument1SubSuper':'^', # we always put the upperCase first
-                    'argument1OpenBracket':'{', # we always enclose with curly brackets
-                    'argument1CloseBracket':'}', # we always enclose with curly brackets
-                    'hasArgument1':False,# TODO this was never used before
-                    'argument2SubSuper':'_', # we always put the lowerCase later
-                    'argument2OpenBracket':'{', # we always enclose with curly brackets
-                    'argument2CloseBracket':'}', # we always enclose with curly brackets
-                    'hasArgument2':False# TODO this was never used before
-                }
-                self.backslashes[nodeName] = aux # names conversion handled by  _convertASTToLatexStyleAST
-            # elif nodeName in Latexparser.VARIABLENAMESTAKEANARG: # we are not expecting this
-            else: #Unrecognised nodes.... put in backslash?
-                raise Exception('unImplemented')
+            # HANDLE IMPLICIT-MINUS *********************
+            print('currentNode:', currentNode)
+            print(currentNode)
+            # import pdb;pdb.set_trace()
+            if children is not None:
+                # if currentNode not in self.ast: #it is a leaf
+                #     self.leaves.add(str(nodeName)) # no need the nodeId
+                leftChildIsImplicitMinus = False
+                rightChildIsImplcitMinus = False
+                #take care of implicit-minus
+                print('currentNode', currentNode)
+                if children[0][0] == '-' or (len(children) > 1 and children[1][0] == '-'):
+                    for childIdx, child in enumerate(children):
+                        if child[0] == '-':
+                            childrenOfChild = self.latexAST.get(child)
+                            #check if name(childrenOfChild[0]) is 0
+                            try:
+                                if int(childrenOfChild[0][0]) == 0:
+                                    if childIdx == 0:
+                                        leftChildIsImplicitMinus = True
+                                    else:
+                                        rightChildIsImplcitMinus = True
+                            except:
+                                pass
+            # HANDLE IMPLICIT-MINUS *********************
+                #If parent is implicit-multiply, then no need brackets either
+                parentIsImplicitMultiply = childToParent.get(currentNode, ('='))[0] == ''# only implicit-multiply can have be empty string
+                # print('parentIsImplicitMultiply', parentIsImplicitMultiply, currentNode, childToParent)
+
+                if nodeName in ['=', '^']: #TODO do we take out ALL MULTIPLIES?
+                    aux = { # we use full brackets, since we are bracket freaks
+                        'leftOpenBracket':'',#the other option is to use brackets according to some logic
+                        'leftCloseBracket':'',
+                        'rightOpenBracket':'',
+                        'rightCloseBracket':'',
+                    }
+                    # print('bracketsChecking....', currentNode, aux)
+                    self.nodeIdToInfixArgsBrackets[nodeId] = aux
+                elif nodeName in Latexparser.PRIOIRITIZED_INFIX+['']: # +[''] # because we already handled implicit-multiply
+                    # HANDLE IMPLICIT-MULITPLY *********************
+                    isImplicitMulitply = False
+                    if nodeName in ['*', ''] and currentNode[1] in self.implicitMultiplies: # we already handled implicit-multiply
+                        isImplicitMulitply = True
+                    # HANDLE IMPLICIT-MULTIPLY *********************
+                    # HANDLE *^-hierachy****************************
+                    #^ is always higher hierachy than *, if child of * is ^, then that side no need brackets
+                    leftChildHasExponent = implicitMultiplyHasAExponentAndAllTheInfixesInItsPathAreAscendingHierachy(children[0])
+                    rightChildHasExponent = implicitMultiplyHasAExponentAndAllTheInfixesInItsPathAreAscendingHierachy(children[1])
+                    # leftChildHasExponent = True if children[0][0] == '^' else False
+                    # rightChildHasExponent = True if children[1][0] == '^' else False
+                    if leftChildHasExponent and rightChildHasExponent: # we can then make this multiplication go away as implicit-multiply
+                        print('has LEFTRIGHT EXPONENT', currentNode, )
+                        newNode = ('', nodeId)
+                        self.latexAST[newNode] = self.latexAST[currentNode]
+                        del self.latexAST[currentNode]
+
+                        parent = childToParent[currentNode]
+                        firstChild, secondChild = self.latexAST[parent]
+                        if firstChild[1] == currentNode[1]: # id(firstChild)==id(currentNode), then secondChild is the exponentNode
+                            childrenOfParent = [newNode, secondChild]
+                        else: # else firstChild is the exponentNode
+                            childrenOfParent = [firstChild, newNode]
+                        #make a new node with exponent as first argument
+                        self.latexAST[parent] = childrenOfParent
+
+                        childToParent = updateChildToParent()
+                        self.implicitMultiplies.add(currentNode[1])
+                        isImplicitMulitply = True
+                    # HANDLE *^-hierachy****************************
+                    aux = { # we use full brackets, since we are bracket freaks #the other option is to use brackets according to some logic
+                        'leftOpenBracket':'(' if not leftChildIsImplicitMinus and not isImplicitMulitply and not parentIsImplicitMultiply and not leftChildHasExponent else '',
+                        'leftCloseBracket':')' if not leftChildIsImplicitMinus and not isImplicitMulitply and not parentIsImplicitMultiply and not leftChildHasExponent else '',
+                        'rightOpenBracket':'(' if not rightChildIsImplcitMinus and not isImplicitMulitply and not parentIsImplicitMultiply and not rightChildHasExponent else '',
+                        'rightCloseBracket':')' if not rightChildIsImplcitMinus and not isImplicitMulitply and not parentIsImplicitMultiply and not rightChildHasExponent else '',
+                    }
+                    self.nodeIdToInfixArgsBrackets[nodeId] = aux
+                elif nodeName in Latexparser.FUNCTIONNAMES or nodeName in Latexparser.VARIABLENAMESTAKEANARG: # recognised functions
+                    ##############
+                    print('_findEqualTupleLeavesBackslashInfixNodes nodeName in Latexparser.FUNCTIONNAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                    print(nodeName)
+                    print(children)
+                    # import pdb;pdb.set_trace()
+                    ##############
+                    hasArgument1 = len(children) > 0
+                    hasArgument2 = len(children) > 1
+                    if nodeName in Latexparser.TRIGOFUNCTION:
+                        argument1SubSuper = '^' if hasArgument1 and hasArgument2 else ''
+                        argument1OpenBracket = '{' if hasArgument1 and hasArgument2 and len(children[0][0]) > 1 else ('(' if hasArgument1 else '')
+                        argument1CloseBracket = '}' if hasArgument1 and hasArgument2 and len(children[0][0]) > 1 else (')' if hasArgument1 else '')
+                        argument2SubSuper = ''
+                        argument2OpenBracket = '(' if hasArgument1 and hasArgument2 else ''
+                        argument2CloseBracket = ')' if hasArgument1 and hasArgument2 else ''
+                    elif nodeName == 'sqrt':
+                        argument1SubSuper = ''
+                        argument1OpenBracket = '' if str(children[0][0]) == '2' else '['
+                        argument1CloseBracket = '' if str(children[0][0]) == '2' else ']'
+                        argument2SubSuper = ''
+                        argument2OpenBracket = '{'
+                        argument2CloseBracket = '}'
+                    elif nodeName == 'ln':
+                        argument1SubSuper = ''
+                        argument1OpenBracket = '('
+                        argument1CloseBracket = ')'
+                        argument2SubSuper = ''
+                        argument2OpenBracket = ''
+                        argument2CloseBracket = ''
+                    elif nodeName == 'log':
+                        argument1SubSuper = '' if str(children[0][0]) == '10' else '_'
+                        argument1OpenBracket = '' if str(children[0][0]) == '10' or len(children[0][0]) == 1 else '{'
+                        argument1CloseBracket = '' if str(children[0][0]) == '10' or len(children[0][0]) == 1 else '}'
+                        argument2SubSuper = ''
+                        argument2OpenBracket = '('
+                        argument2CloseBracket = ')'
+                    elif nodeName == 'frac':
+                        argument1SubSuper = ''
+                        argument1OpenBracket = '{'
+                        argument1CloseBracket = '}'
+                        argument2SubSuper = ''
+                        argument2OpenBracket = '{'
+                        argument2CloseBracket = '}'
+                    else:
+                        raise Exception('unImplemented') # my fault
+
+                    aux = {
+                        'argument1SubSuper':argument1SubSuper, # we always put the upperCase first
+                        'argument1OpenBracket':argument1OpenBracket, # we always enclose with curly brackets
+                        'argument1CloseBracket':argument1CloseBracket, # we always enclose with curly brackets
+                        'hasArgument1':hasArgument1,# TODO this was never used before
+                        'argument2SubSuper':argument2SubSuper, # we always put the lowerCase later
+                        'argument2OpenBracket':argument2OpenBracket, # we always enclose with curly brackets
+                        'argument2CloseBracket':argument2CloseBracket, # we always enclose with curly brackets
+                        'hasArgument2':hasArgument2# TODO this was never used before
+                    }
+                    self.backslashes[nodeId] = aux # names conversion handled by  _convertASTToLatexStyleAST
+                # elif nodeName in Latexparser.VARIABLENAMESTAKEANARG: # we are not expecting this
+                else: #Unrecognised nodes.... put in backslash?
+                    raise Exception(f'unImplemented: {nodeName}')
+                stack += children
+                # print(stack, '<<<<stack')
+            else:#its a leaves
+                # import pdb;pdb.set_trace()
+                self.leaves.add(nodeName)
+            print(stack)
 
 
 
@@ -3339,9 +3456,15 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
         #find the implicit-multiply in AST and remove
 
         #TODO check if we need to run _findEqualTupleLeavesBackslashInfixNodes again
+        self.equalTuple = ('=', 0)
         if len(self.leaves) == 0:
+            # print('A1')
             self._convertASTToLatexStyleAST()
+            # print('A2', self.latexAST)
             self._findEqualTupleLeavesBackslashInfixNodes()
+            print('latexAST', self.latexAST)
+            print('self.leaves', self.leaves)
+            print('self.backslashes', self.backslashes)
         return self._recursiveUnparse(self.equalTuple)
 
 
@@ -3350,11 +3473,15 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
         name = keyTuple[0]
         #does not include backslash_variable although they are the real leaves. TODO have a consolidated AST, and a LatexAST...
         if name in self.leaves: # TODO, rename self.leaves to something ChildClass specific (confusing later)
+            print('****1', keyTuple)
             return name # return the namestr
         nid = keyTuple[1]
-        arguments = self.ast[keyTuple]
-        if name in self.backslashes:
-            aux = self.backslashes[name]
+        arguments = self.latexAST.get(keyTuple)
+        if arguments is None:# its a leaves
+            print('****2', keyTuple)
+            return name
+        if nid in self.backslashes:
+            aux = self.backslashes[nid]
             """
             aux = {
                 'argument1SubSuper':'_',
@@ -3368,16 +3495,40 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
             }
             """
              # what about \sqrt, \log, \ln....
+            print('****3', keyTuple)
             if aux['hasArgument1'] and aux['hasArgument2']:
-                return f"\\{name}{aux['argument1SubSuper']}{aux['argument1OpenBracket']}{self._recursiveUnparse(arguments[0])}{aux['argument1CloseBracket']}{aux['argument2SubSuper']}{aux['argument2OpenBracket']}{self._recursiveUnparse(arguments[1])}{aux['argument2CloseBracket']}"
+                argument1 = self._recursiveUnparse(arguments[0])
+                argument2 = self._recursiveUnparse(arguments[1])
+                argument1SubSuper = aux['argument1SubSuper']
+                argument1OpenBracket = aux['argument1OpenBracket']
+                argument1CloseBracket = aux['argument1CloseBracket']
+                argument2SubSuper = aux['argument2SubSuper']
+                argument2OpenBracket = aux['argument2OpenBracket']
+                argument2CloseBracket = aux['argument2CloseBracket']
+                print('****4', keyTuple)
+                return f"\\{name}{argument1SubSuper}{argument1OpenBracket}{argument1}{argument1CloseBracket}{argument2SubSuper}{argument2OpenBracket}{argument2}{argument2CloseBracket}"
             elif aux['hasArgument1']:
-                return f"\\{name}{aux['argument1SubSuper']}{aux['argument1OpenBracket']}{self._recursiveUnparse(arguments[0])}{aux['argument1CloseBracket']}"
+                argument1 = self._recursiveUnparse(arguments[0])
+                argument1SubSuper = aux['argument1SubSuper']
+                argument1OpenBracket = aux['argument1OpenBracket']
+                argument1CloseBracket = aux['argument1CloseBracket']
+                print('****5', keyTuple)
+                return f"\\{name}{argument1SubSuper}{argument1OpenBracket}{argument1}{argument1CloseBracket}"
             elif aux['hasArgument2']:
-                return f"\\{name}{aux['argument2SubSuper']}{aux['argument2OpenBracket']}{self._recursiveUnparse(arguments[1])}{aux['argument2CloseBracket']}"
+                argument2 = self._recursiveUnparse(arguments[1])
+                argument2SubSuper = aux['argument2SubSuper']
+                argument2OpenBracket = aux['argument2OpenBracket']
+                argument2CloseBracket = aux['argument2CloseBracket']
+                print('****6', keyTuple)
+                return f"\\{name}{argument2SubSuper}{argument2OpenBracket}{argument2}{argument2CloseBracket}"
             else:
+                print('****7', keyTuple)
                 return f"\\{name}"
 
-        if name in Latexparser.PRIOIRITIZED_INFIX:
+        if name in Latexparser.PRIOIRITIZED_INFIX+['=', '']: # equals handled similiarly to infix, '' is implicit-multiply
+            print('infix', name, 'id', nid, 'INFIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+            argument1 = self._recursiveUnparse(arguments[0])
+            argument2 = self._recursiveUnparse(arguments[1])
             aux = self.nodeIdToInfixArgsBrackets[nid]
             """
             aux = {
@@ -3387,7 +3538,36 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$incomplete code to check variable_depende
                 'rightCloseBracket':rightCloseBracket,
             }
             """
-            return f"\\{aux['leftOpenBracket']}{self._recursiveUnparse(arguments[0])}{aux['leftCloseBracket']}{name}{aux['rightOpenBracket']}{self._recursiveUnparse(arguments[1])}{aux['rightCloseBracket']}"#need to get the brackets....
+            leftOpenBracket = aux['leftOpenBracket']
+            leftCloseBracket = aux['leftCloseBracket']
+            if argument1 in self.leaves:
+                leftOpenBracket = ''
+                leftCloseBracket = ''
+
+
+            rightOpenBracket = aux['rightOpenBracket']
+            rightCloseBracket = aux['rightCloseBracket']
+            if argument2 in self.leaves:
+                rightOpenBracket = ''
+                rightCloseBracket = ''
+            #override for exponential
+            if name == '^':
+                rightOpenBracket = '{'
+                rightCloseBracket = '}'
+            if name == '-': # implicit-minus
+                try:
+                    if int(argument1) == 0:
+                        print('is IMPLICIT_MINUS')
+                        argument1 = ''
+                        leftOpenBracket = '' # already in the previous (if argument1 in self.leaves)
+                        leftCloseBracket = ''
+                        rightOpenBracket = ''
+                        rightCloseBracket = ''
+                except:
+                    pass
+            print(leftOpenBracket, '|', argument1, '|', leftCloseBracket, '|', name, '|', rightOpenBracket, '|', argument2, '|', rightCloseBracket, (name, nid))
+            print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+            return f"{leftOpenBracket}{argument1}{leftCloseBracket}{name}{rightOpenBracket}{argument2}{rightCloseBracket}"
         raise Exception(f'Unhandled {keyTuple}')
 
     def latexToScheme(self):

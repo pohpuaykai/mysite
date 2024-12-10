@@ -160,10 +160,12 @@ class Equation:
         distributionOpStr is '*' (Multiplication)
         baseOpStr is '+' (Addition)
 
-        We assume COMMUTATIVITY because the distributiveOps can appear as a TREE, since we do not order the returnList
+        We assume COMMUTATIVITY since we do not order the returnList nor terms, and the FACTORISABLE can be a tree.
+
+        TODO [FACTORISABLE-finding] can be made to be more EFFICIENT with DynamicProgrammingOnTrees, see test examples for more details.
 
         ~SKETCH~
-        1. Find a node with (distributionOpStr as name)
+        1. Find a node with (distributionOpStr as name) [FACTORISABLE-finding]
             a. if there are no such node,
                 ~1. iterate through each node H of distributivePath,
                     !1. if name(H) != baseOpStr, break it into a new distributive path if more than 1 node, else discard (distributivePath with only 1 node, is not factorisable)
@@ -209,14 +211,14 @@ class Equation:
                             break # this is better than EnclosureTree.makeEnclosureTreeWithRoots (because tree so only 1 parent)
                 #here we have root, DFS down
                 #~~~~~~~~~~~~~STEP3
-                terms = []
+                terms = []#Here we flatten the FACTORIZABLE to a path.... 
                 stack = [distributiveRoot]
                 while len(stack) > 0:
                     current = stack.pop()
                     children = astCopy[current]
                     for child in children:
                         if child[0] != distributiveOpStr:# a term, since childname!=distributiveOpStr #handle baseOp later
-                            terms.append(child) # commutative
+                            terms.append(child) # communtative 
 
                 #~~~~~~~~~~~~~STEP3a
                 distributivePaths.append(terms)

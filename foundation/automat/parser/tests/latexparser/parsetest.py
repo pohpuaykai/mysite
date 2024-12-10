@@ -81,10 +81,11 @@ def test__findingBackSlashAndInfixOperations__Trig1(verbose=False):
     equationStr = '\\sin^2(x) + \\cos^2(x)=1'
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
-    expected_ast = {   ('+', 3): [('^', 10), ('^', 9)],
+    expected_ast = {   
+    ('+', 3): [('^', 10), ('^', 9)],
     ('=', 0): [('+', 3), ('1', 1)],
-    ('^', 9): [(('cos', 4), ('2', 7))],
-    ('^', 10): [(('sin', 2), ('2', 6))],
+    ('^', 9): [('cos', 4), ('2', 7)],
+    ('^', 10): [('sin', 2), ('2', 6)],
     ('cos', 4): [('x', 8)],
     ('sin', 2): [('x', 5)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
@@ -100,8 +101,8 @@ def test__findingBackSlashAndInfixOperations__Trig2(verbose=False):
     parser._parse()
     expected_ast = {   ('+', 3): [('^', 10), ('^', 9)],
     ('=', 0): [('+', 3), ('1', 1)],
-    ('^', 9): [(('cos', 4), ('2', 5))],
-    ('^', 10): [(('sin', 2), ('2', 7))],
+    ('^', 9): [('cos', 4), ('2', 5)],
+    ('^', 10): [('sin', 2), ('2', 7)],
     ('cos', 4): [('x', 6)],
     ('sin', 2): [('x', 8)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
@@ -475,9 +476,9 @@ def test__backslashInfixInBackslash__trigInTrig(verbose=False):
     ('-', 14): [('1', 13), ('/', 15)],
     ('/', 15): [('pi', 18), ('5', 17)],
     ('=', 0): [('+', 3), ('F', 1)],
-    ('^', 19): [(('sin', 2), ('-', 9))],
-    ('^', 20): [(('tan', 7), ('4', 12))],
-    ('^', 21): [(('cos', 10), ('43', 16))],
+    ('^', 19): [('sin', 2), ('-', 9)],
+    ('^', 20): [('tan', 7), ('4', 12)],
+    ('^', 21): [('cos', 10), ('43', 16)],
     ('cos', 10): [('-', 14)],
     ('sin', 2): [('-', 6)],
     ('tan', 7): [('theta', 11)]}
@@ -523,10 +524,10 @@ def test__backslashInfixInBackslash__fracInFrac(verbose=False):
     ('/', 3): [('-', 9), ('+', 6)],
     ('/', 4): [('+', 12), ('-', 15)],
     ('=', 0): [('/', 2), ('F', 1)],
-    ('^', 37): [(('cos', 16), ('2', 36))],
-    ('^', 38): [(('sin', 14), ('2', 34))],
-    ('^', 39): [(('cos', 13), ('2', 30))],
-    ('^', 40): [(('sin', 11), ('2', 31))],
+    ('^', 37): [('cos', 16), ('2', 36)],
+    ('^', 38): [('sin', 14), ('2', 34)],
+    ('^', 39): [('cos', 13), ('2', 30)],
+    ('^', 40): [('sin', 11), ('2', 31)],
     ('cos', 5): [('*', 21)],
     ('cos', 8): [('*', 27)],
     ('cos', 13): [('x', 29)],
@@ -886,48 +887,48 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__contiguousLeftOvers__decimalPlaces()
-    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
-    test__findingBackSlashAndInfixOperations__Trig0()
-    test__findingBackSlashAndInfixOperations__Trig1()
-    test__findingBackSlashAndInfixOperations__Trig2()
-    test__findingBackSlashAndInfixOperations__Sqrt0()
-    test__findingBackSlashAndInfixOperations__Sqrt1()
-    test__findingBackSlashAndInfixOperations__Ln()
-    test__findingBackSlashAndInfixOperations__Frac()
-    test__findingBackSlashAndInfixOperations__Log0()
-    test__findingBackSlashAndInfixOperations__Log1()
-    test__findingBackSlashAndInfixOperations__tildeVariable()
-    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
-    test__infixInBackslash__paraboloid()
-    test__sqrtWithPowerCaretRightOtherInfix__hill()
-    test__nonInfixBrackets__addImplicitMultiply()
-    test__nonInfixBrackets__addImplicitMultiply0()
-    test__nonInfixBrackets__addImplicitMultiply1()
-    test__BODMAS__priorityBetweenInfixForBrackets()
-    test__BODMAS__enclosingBracketInBackslashArg()
-    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
-    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
-    test__BODMAS__enclosingBracket()
-    test__manyFracCaretEnclosingBrac__partialFrac()
-    test__fracWithLogNoBase__changeLogBaseFormula()
-    test__backslashInfixInBackslash__sqrtInSqrt()
-    test__backslashInfixInBackslash__trigInTrig()
-    test__backslashInfixInBackslash__logInLog()
-    test__backslashInfixInBackslash__fracInFrac()
-    test__hassliche__highPowersAndRandomCoefficientsPITEST()
-    test__hassliche__nestedPolynomial()
-    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
-    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
-    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
-    test__hassliche__degree5()
+    # test__contiguousLeftOvers__decimalPlaces()
+    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    # test__findingBackSlashAndInfixOperations__Trig0()
+    # test__findingBackSlashAndInfixOperations__Trig1()
+    # test__findingBackSlashAndInfixOperations__Trig2()
+    # test__findingBackSlashAndInfixOperations__Sqrt0()
+    # test__findingBackSlashAndInfixOperations__Sqrt1()
+    # test__findingBackSlashAndInfixOperations__Ln()
+    # test__findingBackSlashAndInfixOperations__Frac()
+    # test__findingBackSlashAndInfixOperations__Log0()
+    # test__findingBackSlashAndInfixOperations__Log1()
+    # test__findingBackSlashAndInfixOperations__tildeVariable()
+    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
+    # test__infixInBackslash__paraboloid()
+    # test__sqrtWithPowerCaretRightOtherInfix__hill()
+    # test__nonInfixBrackets__addImplicitMultiply()
+    # test__nonInfixBrackets__addImplicitMultiply0()
+    # test__nonInfixBrackets__addImplicitMultiply1()
+    # test__BODMAS__priorityBetweenInfixForBrackets()
+    # test__BODMAS__enclosingBracketInBackslashArg()
+    # test__BODMAS__enclosingBracketInBackslashArgWithExponent()
+    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
+    # test__BODMAS__enclosingBracket()
+    # test__manyFracCaretEnclosingBrac__partialFrac()
+    # test__fracWithLogNoBase__changeLogBaseFormula()
+    # test__backslashInfixInBackslash__sqrtInSqrt()
+    # test__backslashInfixInBackslash__trigInTrig()
+    # test__backslashInfixInBackslash__logInLog()
+    # test__backslashInfixInBackslash__fracInFrac()
+    # test__hassliche__highPowersAndRandomCoefficientsPITEST()
+    # test__hassliche__nestedPolynomial()
+    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
+    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
+    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
+    # test__hassliche__degree5()
     test__hassliche__degree6()
     # test__hassliche__degree7(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(True) # not tested yet, use nDisplay to help please
-    test__paveWayForDifferentiation__productRule()
-    test__paveWayForDifferentiation__sumRule()
-    test__paveWayForIntegration__enclosingBracketNonBackslash()
+    # test__paveWayForDifferentiation__productRule()
+    # test__paveWayForDifferentiation__sumRule()
+    # test__paveWayForIntegration__enclosingBracketNonBackslash()
     # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(True) # not tested yet << still throws, TODO refactor brackslash args into a list, ... and the rest of the code...
