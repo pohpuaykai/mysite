@@ -1,22 +1,21 @@
 class DynamicProgrammingOnTrees:
 
     @classmethod
-    def findAllNodeIdsWithPredicate(cls, ast, predicate, startNode):
+    def dpOnTree(cls, ast, startNode, baseCases, modifiers, recursionLogic):
         """
         Courtsey of https://www.geeksforgeeks.org/introduction-to-dynamic-programming-on-trees/
         """
 
-        def _recursiveFindPredicateIds(node, memo):
-            nodeName = node[0]
-            nodeId = node[1]
-            memo[nodeId] = predicate(node, memo, _recursiveFindPredicateIds)
-            return memo[nodeId]
+        def _recursionFunction(node, memo, states):
+            signalFromBaseCases = baseCases(node, memo, states)
+            if 'return' signalFromBasesCases:
+                return signalFromBasesCases['return']
+            node, memo, states = modifiers(node, memo, states)
+            node, memo, states = recursionLogic(node, memo, states, _recursionFunction)
 
-        idsWithPredicate = []
+
         memo = {}
-        _recursiveFindPredicateIds(startNode, memo)
-        for nodeId, predicateValue in memo.items():
-            if predicateValue == True:
-                idsWithPredicate.append(nodeId)
+        states = {}
+        _recursionFunction(startNode, memo, states)
 
-        return idsWithPredicate
+        return memo, states
