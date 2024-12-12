@@ -3167,7 +3167,6 @@ if __name__=='__main__':
                         #TODO make id number consecutive again?
                     #if no exponentialParent, then no change :)
                 self.latexAST[(nodeName, nodeId)] = children
-                print('>>>>>>>>>>>>>>>>>>>self.latexAST', self.latexAST)
                 if modifiedParent:
                     parent = childToParent[currentNode]
                     childrenOfParent = self.latexAST[parent]
@@ -3179,9 +3178,7 @@ if __name__=='__main__':
                     childrenOfParent[theChildIdx] = (nodeName, nodeId)#replace oldChild with newChild
                 for child in children:
                     childToParent[child] = (nodeName, nodeId)
-                    print('childToParent: c:', child,' p: ', (nodeName, nodeId))
             else:
-                print(childToParent)
                 parent = childToParent[currentNode]
                 childrenOfParent = self.latexAST[parent]
                 #find which child newNode is in
@@ -3190,7 +3187,6 @@ if __name__=='__main__':
                     if child[1] == nodeId:
                         theChildIdx = childIdx
                 #if the children[0] is a weird constant like \pi, we need to put a space behind the \pi
-                print(nodeName, '<<nodeName')
                 if theChildIdx == 0 and not any(c.isdigit() for c in str(nodeName)) and len(nodeName) > 1: # weird constant
                     #is it first child?
                     newName = nodeName + ' '
@@ -3198,13 +3194,12 @@ if __name__=='__main__':
                     self.leaves.add(newName)
                 else:
                     self.leaves.add(nodeName)
-            # print(stack)
-            print('><><><><><><><><><><><><><><>><><><><><', currentNode)
 
 
-
+        from foundation.automat.common.termsofbaseop import TermsOfBaseOp
         groupingByRightId, groupsWithBaseOp = TermsOfBaseOp.nodeOfBaseOpByGroup(self.ast, '+')
-        cls.plusIdsThatDoNotNeedBrackets = flatten(groupingByRightId) # TODO implement flatten
+        from foundation.automat.common.flattener import Flattener
+        self.plusIdsThatDoNotNeedBrackets = Flattener.flatten(groupingByRightId) # TODO implement flatten
 
 
     def _findEqualTupleLeavesBackslashInfixNodes(self):
@@ -3229,8 +3224,6 @@ if __name__=='__main__':
             nodeName = currentNode[0]
             self.totalNodeCount += 1
             # HANDLE IMPLICIT-MINUS *********************
-            print('currentNode:', currentNode)
-            print(currentNode)
             # import pdb;pdb.set_trace()
             if children is not None:
                 # if currentNode not in self.ast: #it is a leaf
@@ -3238,7 +3231,7 @@ if __name__=='__main__':
                 leftChildIsImplicitMinus = False
                 rightChildIsImplcitMinus = False
                 #take care of implicit-minus
-                print('currentNode', currentNode)
+                # print('currentNode', currentNode)
                 if children[0][0] == '-' or (len(children) > 1 and children[1][0] == '-'):
                     for childIdx, child in enumerate(children):
                         if child[0] == '-':
@@ -3278,10 +3271,10 @@ if __name__=='__main__':
                     #     print('13>>>', (nodeName, nodeId), children[1], children[1][0] in self.leaves, len(children[1][0]) > 1, hasRightBracketExponent, aux)
                 elif nodeName in ['+']:
                     aux = { # we use full brackets, since we are bracket freaks
-                        'leftOpenBracket':'' if nodeId in cls.plusIdsThatDoNotNeedBrackets else '(',#the other option is to use brackets according to some logic
-                        'leftCloseBracket':'' if nodeId in cls.plusIdsThatDoNotNeedBrackets else ')',
-                        'rightOpenBracket':'' if nodeId in cls.plusIdsThatDoNotNeedBrackets else '(',
-                        'rightCloseBracket':'' if nodeId in cls.plusIdsThatDoNotNeedBrackets else ')',
+                        'leftOpenBracket':'' if nodeId in self.plusIdsThatDoNotNeedBrackets else '(',#the other option is to use brackets according to some logic
+                        'leftCloseBracket':'' if nodeId in self.plusIdsThatDoNotNeedBrackets else ')',
+                        'rightOpenBracket':'' if nodeId in self.plusIdsThatDoNotNeedBrackets else '(',
+                        'rightCloseBracket':'' if nodeId in self.plusIdsThatDoNotNeedBrackets else ')',
                     }
                     self.nodeIdToInfixArgsBrackets[nodeId] = aux
                 elif nodeName in ['-']:
@@ -3374,19 +3367,10 @@ if __name__=='__main__':
                         'hasArgument2':hasArgument2# TODO this was never used before
                     }
                     self.backslashes[nodeId] = aux # names conversion handled by  _convertASTToLatexStyleAST
-                    ##############
-                    print('_findEqualTupleLeavesBackslashInfixNodes nodeName in Latexparser.FUNCTIONNAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                    print(nodeName)
-                    print(children)
-                    print(aux)
-                    # import pdb;pdb.set_trace()
-                    ##############
                 # elif nodeName in Latexparser.VARIABLENAMESTAKEANARG: # we are not expecting this
                 else: #Unrecognised nodes.... put in backslash?
                     raise Exception(f'unImplemented: {nodeName}')
                 stack += children
-                # print(stack, '<<<<stack')
-            print(stack)
 
 
 
@@ -3406,12 +3390,7 @@ if __name__=='__main__':
         if len(self.leaves) == 0:
             # print('A1')
             self._convertASTToLatexStyleAST()
-            print('A2', self.latexAST, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-            print('leaves', self.leaves)
             self._findEqualTupleLeavesBackslashInfixNodes()
-            # print('latexAST', self.latexAST)
-            # print('self.leaves', self.leaves)
-            # print('self.backslashes', self.backslashes)
         return self._recursiveUnparse(self.equalTuple)
 
 
@@ -3424,29 +3403,14 @@ if __name__=='__main__':
             if not any(c.isdigit() for c in returnName) and len(returnName) > 1:# if first letter is capitalised... then its a special variable? like Psi
                 returnName = f'\\{returnName}'
 
-            print('****1', keyTuple, returnName)
             return returnName # return the namestr
         nid = keyTuple[1]
         arguments = self.latexAST.get(keyTuple)
         if arguments is None:# its a leaves
-            print('****2', keyTuple)
             return name
         if nid in self.backslashes:
             aux = self.backslashes[nid]
-            """
-            aux = {
-                'argument1SubSuper':'_',
-                'argument1OpenBracket':'{',
-                'argument1CloseBracket':'}',
-                'hasArgument1':,
-                'argument2SubSuper':'^',
-                'argument2OpenBracket':'',
-                'argument2CloseBracket':'',
-                'hasArgument2':
-            }
-            """
              # what about \sqrt, \log, \ln....
-            print('****3', keyTuple)
             if aux['hasArgument1'] and aux['hasArgument2']:
                 argument1 = self._recursiveUnparse(arguments[0])
                 argument2 = self._recursiveUnparse(arguments[1])
@@ -3456,59 +3420,35 @@ if __name__=='__main__':
                 argument2SubSuper = aux['argument2SubSuper']
                 argument2OpenBracket = aux['argument2OpenBracket']
                 argument2CloseBracket = aux['argument2CloseBracket']
-                print('****4', keyTuple)
                 return f"\\{name}{argument1SubSuper}{argument1OpenBracket}{argument1}{argument1CloseBracket}{argument2SubSuper}{argument2OpenBracket}{argument2}{argument2CloseBracket}"
             elif aux['hasArgument1']:
                 argument1 = self._recursiveUnparse(arguments[0])
                 argument1SubSuper = aux['argument1SubSuper']
                 argument1OpenBracket = aux['argument1OpenBracket']
                 argument1CloseBracket = aux['argument1CloseBracket']
-                print('****5', keyTuple)
                 return f"\\{name}{argument1SubSuper}{argument1OpenBracket}{argument1}{argument1CloseBracket}"
             elif aux['hasArgument2']:
                 argument2 = self._recursiveUnparse(arguments[1])
                 argument2SubSuper = aux['argument2SubSuper']
                 argument2OpenBracket = aux['argument2OpenBracket']
                 argument2CloseBracket = aux['argument2CloseBracket']
-                print('****6', keyTuple)
                 return f"\\{name}{argument2SubSuper}{argument2OpenBracket}{argument2}{argument2CloseBracket}"
             else:
-                print('****7', keyTuple)
                 return f"\\{name}"
 
         if name in Latexparser.PRIOIRITIZED_INFIX+['=', '']: # equals handled similiarly to infix, '' is implicit-multiply
-            print('infix', name, 'id', nid, 'INFIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
             argument1 = self._recursiveUnparse(arguments[0])
             argument2 = self._recursiveUnparse(arguments[1])
             aux = self.nodeIdToInfixArgsBrackets[nid]
-            """
-            aux = {
-                'leftOpenBracket':leftOpenBracket,
-                'leftCloseBracket':leftCloseBracket,
-                'rightOpenBracket':rightOpenBracket,
-                'rightCloseBracket':rightCloseBracket,
-            }
-            """
             leftOpenBracket = aux['leftOpenBracket']
             leftCloseBracket = aux['leftCloseBracket']
-            # if argument1 in self.leaves:
-            #     leftOpenBracket = ''
-            #     leftCloseBracket = ''
 
 
             rightOpenBracket = aux['rightOpenBracket']
             rightCloseBracket = aux['rightCloseBracket']
-            # if argument2 in self.leaves:
-            #     rightOpenBracket = ''
-            #     rightCloseBracket = ''
-            #override for exponential
-            # if name == '^':
-            #     rightOpenBracket = '{'
-            #     rightCloseBracket = '}'
             if name == '-': # implicit-minus
                 try:
                     if int(argument1) == 0:
-                        print('is IMPLICIT_MINUS')
                         argument1 = ''
                         leftOpenBracket = '' # already in the previous (if argument1 in self.leaves)
                         leftCloseBracket = ''
@@ -3516,8 +3456,6 @@ if __name__=='__main__':
                         rightCloseBracket = ''
                 except:
                     pass
-            print(leftOpenBracket, '|', argument1, '|', leftCloseBracket, '|', name, '|', rightOpenBracket, '|', argument2, '|', rightCloseBracket, (name, nid))
-            print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
             return f"{leftOpenBracket}{argument1}{leftCloseBracket}{name}{rightOpenBracket}{argument2}{rightCloseBracket}"
         raise Exception(f'Unhandled {keyTuple}')
 

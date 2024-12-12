@@ -269,7 +269,7 @@ def test__nonInfixBrackets__addImplicitMultiply(verbose=False):
 def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = '(1+(1+1)(1+1)+1)+1=6'
+    equationStr = '(1+(1+1)(1+1)+1)+1=7'
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {   
@@ -279,7 +279,7 @@ def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
     ('+', 8): [('1', 7), ('1', 9)],
     ('+', 10): [('+', 2), ('1', 11)],
     ('+', 12): [('+', 10), ('1', 13)],
-    ('=', 0): [('+', 12), ('6', 14)]}
+    ('=', 0): [('+', 12), ('7', 14)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)

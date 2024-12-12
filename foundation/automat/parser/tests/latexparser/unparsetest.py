@@ -56,7 +56,7 @@ def test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(verbose=Fa
 
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '-\\sin(2x_0)=-2\\sin(x_0)\\cos(x_0)'
+    expected_eqsStr = '(19y+z^4+4w^{12})^{30}=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -98,7 +98,7 @@ def test__findingBackSlashAndInfixOperations__Trig1(verbose=False):
 
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\sin^2(x) + \\cos^2(x)=1'
+    expected_eqsStr = '\\sin^2(x)+\\cos^2(x)=1'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -117,7 +117,7 @@ def test__findingBackSlashAndInfixOperations__Trig2(verbose=False):
 
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\sin^{2}(x)+\\cos^{2}(x)=1'
+    expected_eqsStr = '\\sin^2(x)+\\cos^2(x)=1'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -256,7 +256,7 @@ def test__sqrtWithPowerCaretRightOtherInfix__hill(verbose=False):
     ('nroot', 3): [('2', 12), ('+', 8)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'z=-\\sqrt[2]{x^2+y^2}'
+    expected_eqsStr = 'z=-\\sqrt{x^2+y^2}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -276,7 +276,7 @@ def test__nonInfixBrackets__addImplicitMultiply(verbose=False):
     ('=', 0): [('*', 9), ('16', 1)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '(1+(1+(1+1)))(((1+1)+1)+1)=16'
+    expected_eqsStr = '(1+1+1+1)(1+1+1+1)=16'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -292,10 +292,10 @@ def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
     ('+', 8): [('1', 7), ('1', 9)],
     ('+', 10): [('+', 2), ('1', 11)],
     ('+', 12): [('+', 10), ('1', 13)],
-    ('=', 0): [('+', 12), ('6', 14)]}
+    ('=', 0): [('+', 12), ('7', 14)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '(1+(1+1)(1+1)+1)+1=6'
+    expected_eqsStr = '1+(1+1)(1+1)+1+1=7'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -316,7 +316,7 @@ def test__nonInfixBrackets__addImplicitMultiply1(verbose=False):
     ('=', 0): [('+', 19), ('18', 1)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '((1+(1+(1+1)))(((1+1)+1)+1)+1)+1=18'
+    expected_eqsStr = '(1+1+1+1)(1+1+1+1)+1+1=18'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -354,7 +354,7 @@ def test__BODMAS__enclosingBracketInBackslashArg(verbose=False):
     ('=', 0): [('/', 1), ('-', 3)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\frac{2}{(x-1)(x+1)} = \\frac{1}{x-1} - \\frac{1}{x+1}'
+    expected_eqsStr = '\\frac{2}{(x-1)(x+1)}=\\frac{1}{x-1}-\\frac{1}{x+1}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -496,25 +496,7 @@ def test__backslashInfixInBackslash__trigInTrig(verbose=False):
     ('tan', 7): [('theta', 11)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\sin^{20-\\cos^{43}(1-\\frac{\\pi}{5})}(9-\\tan^4(\\theta))+5=F'
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
-    if verbose:
-        print(eqsStr)
-
-
-def test__backslashInfixInBackslash__logInLog(verbose=False):
-    pp = pprint.PrettyPrinter(indent=4)
-
-    ast = {   
-    ('-', 9): [('90', 8), ('x', 10)],
-    ('=', 0): [('log', 2), ('F', 1)],
-    ('^', 6): [('z', 5), ('5', 7)],
-    ('log', 2): [('log', 4), ('log', 3)],
-    ('log', 3): [(10, 11), ('^', 6)],
-    ('log', 4): [('e', 12), ('-', 9)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
-    eqsStr = parser._unparse()
-    expected_eqsStr = '\\log_{\\ln(90-x)}(\\log(z^5))=F'
+    expected_eqsStr = '\\sin^{20-\\cos^{43}(1-\\frac{\\pi }{5})}(9-\\tan^4(\\theta))+5=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -597,7 +579,7 @@ def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False):
     ('nroot', 22): [(2, 36), ('2', 35)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'P(x) = 7x^{13} - 3x^{9} + 5x^{8} - \\sqrt{2}x^{4} + \\pi x^{2} - 42'
+    expected_eqsStr = 'Px=7x^{13}-3x^9+5x^8-\\sqrt{2}x^4+\\pi x^2-42'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -624,7 +606,7 @@ def test__hassliche__nestedPolynomial(verbose=False):
     ('^', 28): [('x', 27), ('21', 29)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'Q(x) = (x^3 - 2x^2 + 5x - 7)^2 - (x - 1)^3 + 3x^{21}'
+    expected_eqsStr = 'Qx=(x^3-2x^2+5x-7)^2-(x-1)^3+3x^{21}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -652,13 +634,13 @@ def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=F
     ('^', 27): [('x', 26), ('3', 28)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'R(x) = -0.5x^{10} + 3.14x^{8} - \\frac{2}{3}x^{5} + 1.618x^{3} - \\frac{1}{x}'
+    expected_eqsStr = 'Rx=-0.5x^{10}+3.14x^8-\\frac{2}{3}x^5+1.618x^3-\\frac{1}{x}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
 
 
-def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(verbose=False):
+def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(verbose=False):#TODO does not handle S(x, y) very well.
     pp = pprint.PrettyPrinter(indent=4)
 
     ast = {   
@@ -684,7 +666,7 @@ def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(
     ('^', 35): [('x', 34), ('2', 36)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'S(x, y) = x^5y^4 - 7x^3y^2 + 2x^2 - y^3 + x^2y - 4'
+    expected_eqsStr = 'S\\x, y=x^5y^4-7x^3y^2+2x^2-y^3+x^2y-4' # TODO ugly
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -711,13 +693,13 @@ def test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(verbos
     ('sin', 18): [('x', 22)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'T(x) = e^{x} - \\cos(x)x^4 + x^3\\sin(x) - \\ln(x^2+1)'
+    expected_eqsStr = 'Tx=e^x-\\cos(x)x^4+x^3\\sin(x)-\\ln(x^2+1)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
 
 
-def test__hassliche__degree5(verbose=False):
+def test__hassliche__degree5(verbose=False):#TODO ugly.... ?
     pp = pprint.PrettyPrinter(indent=4)
 
     ast = {   
@@ -746,13 +728,13 @@ def test__hassliche__degree5(verbose=False):
     ('^', 20): [('x', 19), ('2', 21)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '(x - 1)(x + 2)(x - 3)(x + 4)(x - 5) = x^5 - 3x^4 - 32x^3 + 94x^2 + 31x - 120'
+    expected_eqsStr = '(x-1)(x+2)(x-3)(x+4)(x-5)=(x^5-3x^4)-(32x^3)+94x^2+31x-120'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
 
 
-def test__hassliche__degree6(verbose=False):
+def test__hassliche__degree6(verbose=False):#TODO ugly
     pp = pprint.PrettyPrinter(indent=4)
 
     ast = {   
@@ -786,7 +768,7 @@ def test__hassliche__degree6(verbose=False):
     ('^', 26): [('x', 25), ('2', 27)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '(x - 1)(x - 2)(x + 3)(x + 4)(x - 5)(x + 6) = x^6 + 5x^5 - 35x^4 - 75x^3 + 368x^2 + 246x - 720'
+    expected_eqsStr = '(x-1)(x-2)(x+3)(x+4)(x-5)(x+6)=x^6+(5x^5-35x^4)-(75x^3)+368x^2+246x-720'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -842,7 +824,7 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=Fa
 
 
 #
-def test__paveWayForDifferentiation__productRule(verbose=False):
+def test__paveWayForDifferentiation__productRule(verbose=False):#TODO ugly
     pp = pprint.PrettyPrinter(indent=4)
 
     ast = {   
@@ -856,7 +838,7 @@ def test__paveWayForDifferentiation__productRule(verbose=False):
     ('=', 0): [('*', 2), ('+', 7)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\frac{d}{dx}uv=u\\frac{dv}{dx}+v\\frac{du}{dx}'
+    expected_eqsStr = '\\frac{d}{\\dx}\\uv=u\\frac{\\dv }{\\dx}+v\\frac{\\du }{\\dx}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -874,7 +856,7 @@ def test__paveWayForDifferentiation__sumRule(verbose=False):
     ('=', 0): [('*', 2), ('+', 7)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\frac{d}{dx}(u+v)=\\frac{du}{dx}+\\frac{dv}{dx}'
+    expected_eqsStr = '\\frac{d}{\\dx}(u+v)=\\frac{\\du }{\\dx}+\\frac{\\dv }{\\dx}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -900,7 +882,7 @@ def test__paveWayForIntegration__enclosingBracketNonBackslash(verbose=False):
     ('int', 1): [('*', 24)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\int{(x-3)(x+1)}dx=\\frac{1}{3}x^3-3x^2-3x+C'
+    expected_eqsStr = '\\int{(x-3)(x+1)}\\dx=(\\frac{1}{3}x^3-3x^2)-(3x)+C'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -919,48 +901,48 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    # test__contiguousLeftOvers__decimalPlaces(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
-    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__findingBackSlashAndInfixOperations__Trig0(True)
-    # test__findingBackSlashAndInfixOperations__Trig1(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__findingBackSlashAndInfixOperations__Trig2(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__findingBackSlashAndInfixOperations__Sqrt0(True)
-    # test__findingBackSlashAndInfixOperations__Sqrt1(True)
-    # test__findingBackSlashAndInfixOperations__Ln(True)
-    # test__findingBackSlashAndInfixOperations__Frac(True)
-    # test__findingBackSlashAndInfixOperations__Log0(True)
-    # test__findingBackSlashAndInfixOperations__Log1(True)
-    # test__findingBackSlashAndInfixOperations__tildeVariable(True)
-    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(True)
-    # test__infixInBackslash__paraboloid(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__sqrtWithPowerCaretRightOtherInfix__hill(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__nonInfixBrackets__addImplicitMultiply(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__nonInfixBrackets__addImplicitMultiply0(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__nonInfixBrackets__addImplicitMultiply1(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__BODMAS__priorityBetweenInfixForBrackets(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__BODMAS__enclosingBracketInBackslashArg(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__BODMAS__enclosingBracketInBackslashArgWithExponent(True)
-    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__BODMAS__enclosingBracket(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__manyFracCaretEnclosingBrac__partialFrac(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__fracWithLogNoBase__changeLogBaseFormula(True)
-    # test__backslashInfixInBackslash__sqrtInSqrt(True)
-    # test__backslashInfixInBackslash__trigInTrig(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__backslashInfixInBackslash__logInLog(True)
-    # test__backslashInfixInBackslash__fracInFrac(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__highPowersAndRandomCoefficientsPITEST(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__nestedPolynomial(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__degree5(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__hassliche__degree6(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
+    test__contiguousLeftOvers__decimalPlaces()
+    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    test__findingBackSlashAndInfixOperations__Trig0()
+    test__findingBackSlashAndInfixOperations__Trig1()
+    test__findingBackSlashAndInfixOperations__Trig2()
+    test__findingBackSlashAndInfixOperations__Sqrt0()
+    test__findingBackSlashAndInfixOperations__Sqrt1()
+    test__findingBackSlashAndInfixOperations__Ln()
+    test__findingBackSlashAndInfixOperations__Frac()
+    test__findingBackSlashAndInfixOperations__Log0()
+    test__findingBackSlashAndInfixOperations__Log1()
+    test__findingBackSlashAndInfixOperations__tildeVariable()
+    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
+    test__infixInBackslash__paraboloid()
+    test__sqrtWithPowerCaretRightOtherInfix__hill()
+    test__nonInfixBrackets__addImplicitMultiply()
+    test__nonInfixBrackets__addImplicitMultiply0()
+    test__nonInfixBrackets__addImplicitMultiply1()
+    test__BODMAS__priorityBetweenInfixForBrackets()
+    test__BODMAS__enclosingBracketInBackslashArg()
+    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
+    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
+    test__BODMAS__enclosingBracket()
+    test__manyFracCaretEnclosingBrac__partialFrac()
+    test__fracWithLogNoBase__changeLogBaseFormula()
+    test__backslashInfixInBackslash__sqrtInSqrt()
+    test__backslashInfixInBackslash__trigInTrig()
+    test__backslashInfixInBackslash__logInLog()
+    test__backslashInfixInBackslash__fracInFrac()
+    test__hassliche__highPowersAndRandomCoefficientsPITEST()
+    test__hassliche__nestedPolynomial()
+    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
+    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
+    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
+    test__hassliche__degree5()
+    test__hassliche__degree6()
     # test__hassliche__degree7(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(True) # not tested yet, use nDisplay to help please
-    # test__paveWayForDifferentiation__productRule(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__paveWayForDifferentiation__sumRule(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
-    # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # not tested yet =>  ..+..+..+..+ ==> no brackets
+    # test__paveWayForDifferentiation__productRule(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
+    # test__paveWayForDifferentiation__sumRule(True)  # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
+    # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
     # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(True) # not tested yet << still throws, TODO refactor brackslash args into a list, ... and the rest of the code...

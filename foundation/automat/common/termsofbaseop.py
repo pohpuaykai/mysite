@@ -16,6 +16,7 @@ class TermsOfBaseOp:
         #####################IMPLEMENTATIONs
         #
         reverseIdMapping = dict(map(lambda t: (t[1], t[0]), consecutiveNodeId__latexASTNodeId.items()))
+        from foundation.automat.common.unionfindbyrankwithpathcompression import UnionFindByRankWithPathCompression
         uf = UnionFindByRankWithPathCompression(totalNumberOfNodes)
         idToGroup = {}
         allIdsWithBaseOp = []
