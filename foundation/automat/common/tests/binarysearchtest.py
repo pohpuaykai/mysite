@@ -19,7 +19,7 @@ def test__binarySearchPre__manySameNumbers(verbose=False):
     expected = 2
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchPre__manySameNumbersLargestIndex(verbose=False):
@@ -35,7 +35,7 @@ def test__binarySearchPre__manySameNumbersLargestIndex(verbose=False):
     expected = 5
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchPre__leftMost(verbose=False):
@@ -46,7 +46,7 @@ def test__binarySearchPre__leftMost(verbose=False):
     expected = 0
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchPre__rightMost(verbose=False):
@@ -57,7 +57,7 @@ def test__binarySearchPre__rightMost(verbose=False):
     expected = 8
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchApp__manySameNumbers(verbose=False):
@@ -73,7 +73,7 @@ def test__binarySearchApp__manySameNumbers(verbose=False):
     expected = 3
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchApp__manySameNumbersLargestIndex(verbose=False):
@@ -89,7 +89,7 @@ def test__binarySearchApp__manySameNumbersLargestIndex(verbose=False):
     expected = 6
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchApp__leftMost(verbose=False):
@@ -103,7 +103,7 @@ def test__binarySearchApp__leftMost(verbose=False):
     expected = 0
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 def test__binarySearchApp__rightMost(verbose=False):
@@ -114,7 +114,7 @@ def test__binarySearchApp__rightMost(verbose=False):
     expected = 8
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 

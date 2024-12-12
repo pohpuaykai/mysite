@@ -2,7 +2,7 @@ class BubbleMerge:
 
 
     @classmethod
-    def bubbleMerge(cls, ranges, prependable, appendable, handlePrepend, handleAppend):
+    def bubbleMerge(cls, ranges, prependable, appendable, handlePrepend, handleAppend):#Does this work like UnionFind YES? construct graph of connectedness between each interval (nlogn - (sort, then linear) comparison if connected?) , then run UnionFind TODO refactor
         from foundation.automat.common.binarysearch import BinarySearch
 
         import copy
