@@ -3039,6 +3039,14 @@ if __name__=='__main__':
         UNIMPLEMENTED:
         10. convert backslash variables to internal variables mapping
         11. convert backslash function name to standard function name IN automat.arithmetic.function.py
+
+
+
+        #TODO need to find all these too: self.functions, self.variables, self.primitives,self.totalNodeCount
+        #TODO self.functions[funcName] = count
+        #TODO self.variables[varStr] = count
+        #TODO self.primitives = count
+        #TODO self.totalNodeCount = count
         """
         self.nodeId = 1 # 0 is for =, for _parse, TODO
         self._findInfixAndEnclosingBrackets()
@@ -3062,8 +3070,6 @@ if __name__=='__main__':
 
     def _convertASTToLatexStyleAST(self):
         """
-        #~ DRAFT ~#
-        TODO use logic from Schemeparser._toLatex
 
 
         we assume that self.ast is a standard AST, we will store the transformed self.ast as self.latexAST
@@ -3204,7 +3210,6 @@ if __name__=='__main__':
 
     def _findEqualTupleLeavesBackslashInfixNodes(self):
         """
-        #~ DRAFT ~#
 
         """
 
@@ -3377,15 +3382,12 @@ if __name__=='__main__':
     def _unparse(self): # TODO from AST to LaTeX string... 
         """
         This assumes that we have self.ast
-        #~ DRAFT ~#
-        TODO
         1. remove implicit 0-
         2. remove implicit-multiply
         """
         #find the implicit 0- in AST and remove (would subtree equivalence be easier?)
         #find the implicit-multiply in AST and remove
 
-        #TODO check if we need to run _findEqualTupleLeavesBackslashInfixNodes again
         self.equalTuple = ('=', 0)
         if len(self.leaves) == 0:
             # print('A1')

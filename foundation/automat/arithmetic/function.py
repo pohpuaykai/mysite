@@ -21,8 +21,9 @@ class Function:#(metaclass=FunctionHook):
 
 
     """
-    FUNC_NAMES = [] # TODO this need to filled in __init__, need to parse the folder automat.arithmetic.standard
-    FUNCNAME_FILENAME = [] # TODO this need to be filled in __init__, need to parse the folder automat.arithmetic.standard
+    _FUNC_NAMES = []
+    _FUNCNAME__MODULENAME = {}
+    _FUNCNAME__CLASSNAME = {}
     _TRIGNOMETRIC_NAMES = []
 
     def __init__subclass(cls, **kwargs):
@@ -36,7 +37,7 @@ class Function:#(metaclass=FunctionHook):
 
     # @property # for now it wll return a property-object, and the expected list... , TODO so we will use it as a cls_method FOR NOW
     @classmethod
-    def TRIGONOMETRIC_NAMES(cls):
+    def TRIGONOMETRIC_NAMES(cls): #TODO refactor0
         if len(cls._TRIGNOMETRIC_NAMES) == 0:
             #gather all the trigonometric function names
             module_dir = os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'standard')
@@ -57,6 +58,54 @@ class Function:#(metaclass=FunctionHook):
         return cls._TRIGNOMETRIC_NAMES
 
 
+    @classmethod
+    def FUNC_NAMES(cls): #TODO refactor0
+        if len(cls._FUNC_NAMES) == 0:
+            #gather all the function names
+            module_dir = os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'standard')
+            for module in os.listdir(module_dir):
+                if module.endswith('.py') and module != '__init__.py':
+                    module_name = module[:-3] # remove .py
+                    module_obj = importlib.import_module(f'.{module_name}', package='foundation.automat.arithmetic.standard')
+                    for name, ocls in inspect.getmembers(module_obj, predicate=inspect.isclass):
+                        if name in ['Function']: #skip the parent of all function
+                            continue
+                        cls._FUNC_NAMES.append(ocls.FUNC_NAME)
+        return cls._FUNC_NAMES
+
+
+    @classmethod
+    def FUNCNAME__MODULENAME(cls): #TODO refactor0
+        if len(cls._FUNCNAME__MODULENAME) == 0:
+            #gather all the function names
+            module_dir = os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'standard')
+            for module in os.listdir(module_dir):
+                if module.endswith('.py') and module != '__init__.py':
+                    module_name = module[:-3] # remove .py
+                    module_obj = importlib.import_module(f'.{module_name}', package='foundation.automat.arithmetic.standard')
+                    for klassName, ocls in inspect.getmembers(module_obj, predicate=inspect.isclass):
+                        if klassName in ['Function']: #skip the parent of all function
+                            continue
+                        cls._FUNCNAME__MODULENAME[ocls.FUNC_NAME] = module_name
+        return cls._FUNCNAME__MODULENAME
+
+
+    @classmethod
+    def FUNCNAME__CLASSNAME(cls): # TODO refactor0
+        if len(cls._FUNCNAME__CLASSNAME) == 0:
+            #gather all the function names
+            module_dir = os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'standard')
+            for module in os.listdir(module_dir):
+                if module.endswith('.py') and module != '__init__.py':
+                    module_name = module[:-3] # remove.py
+                    module_obj = importlib.import_module(f'.{module_name}', package='foundation.automat.arithmetic.standard')
+                    for klassName, ocls in inspect.getmembers(module_obj, predicate=inspect.isclass):
+                        if klassName in ['Function']: # skip the parent of all function
+                            continue
+                        cls._FUNCNAME__CLASSNAME[ocls.FUNC_NAME] = klassName
+        return cls._FUNCNAME__CLASSNAME
+
+
 
     def __init__(self, equation):
         print('in __init__')
@@ -66,6 +115,9 @@ class Function:#(metaclass=FunctionHook):
 
     def substitute(self, substitutionDictionary):
         """
+        #~ DRAFT ~#
+        TODO expand this to allow string substitutions, for integration/differentiation
+
         substituteDictionary is mapping from variable to primitives (numbers), this method finds self.FUNC_NAME sub-AST, in
         self.equation.ast, and then substitute each variable under each sub-AST using substituteDictionary
 
@@ -121,8 +173,9 @@ class Function:#(metaclass=FunctionHook):
                 del ast[(current.label, current.id)]
         return ast # substituted ast
 
-    def inverse(self, argumentIdx, nodeIds):
+    def reverse(self, argumentIdx, nodeIds):
         """
+        #~ DRAFT ~#
         make argumentIdx the subject of the subAST
 
         :param argumentIdx: the index of the argument of self(this function) to make into the subject of the formula
@@ -149,7 +202,7 @@ class Function:#(metaclass=FunctionHook):
                 replacementDictionary[key] = value
         #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
         (invertedResults, functionCountChange, variableCountChange,
-         primitiveCountChange, totalNodeCountChange) = self.inverses[argumentIdx](
+         primitiveCountChange, totalNodeCountChange) = self.reverses[argumentIdx](
             replacementDictionary, self.eq.totalNodeCount)
 
         for oldKey, oldValue in invertedResults.items():
@@ -160,6 +213,9 @@ class Function:#(metaclass=FunctionHook):
 
     def evalFunctor(self):
         """
+
+        #~ DRAFT ~#
+        
         evaluates the AST for functors like Differentiation and Integration
 
 

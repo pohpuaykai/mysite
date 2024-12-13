@@ -9,10 +9,10 @@ class Parser(ABC):
     :param parserName: the name of the parser
     :type parserName: str
     """
-    PARSERNAME_PARSERCLASSSTR = {
-        'scheme':'Schemeparser',
-        'latex':'Latexparser',
-        'html':'Htmlparser'
+    PARSERNAME_PARSERMODULESTRCLASSSTR = {
+        'scheme':('schemeparser', 'Schemeparser'),
+        'latex':('latexparser', 'Latexparser'),
+        'html':('htmlparser', 'Htmlparser') # TODO 
     }
 
     def __init__(self, parserName):
@@ -23,7 +23,7 @@ class Parser(ABC):
         :type parserName: str
         """
         self.parserName = parserName
-        self.PARSERNAME_PARSERCLASSSTR = Parser.PARSERNAME_PARSERCLASSSTR
+        self.PARSERNAME_PARSERMODULESTRCLASSSTR = Parser.PARSERNAME_PARSERMODULESTRCLASSSTR
 
     def parse(self, equationStr):
         """
@@ -47,9 +47,14 @@ class Parser(ABC):
         """
         # will raise exception if parserName not in PARSERNAME_PARSERCLASSSTR
         # actual parsing is done in individual child class
-        from foundation.automat.parser.sorte import Schemeparser, Latexparser, Htmlparser  #prevents circular import
-        parser = globals()[self.PARSERNAME_PARSERCLASSSTR[self.parserName]](equationStr)
-        ast, functions, variables, primitives, totalNodeCount = parser._parse()
+        # from foundation.automat.parser.sorte import Schemeparser, Latexparser, Htmlparser  #prevents circular import
+        # import pdb;pdb.set_trace()
+        parserModelStr, parserClassStr = self.PARSERNAME_PARSERMODULESTRCLASSSTR[self.parserName]
+        import importlib, inspect
+        module_obj = importlib.import_module(f'.{parserModelStr}', package='foundation.automat.parser.sorte')
+        className, parser = list(filter(lambda tup: tup[0]==parserClassStr,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
+        globals()[className] = parser
+        ast, functions, variables, primitives, totalNodeCount = parser(equationStr=equationStr)._parse()
         return ast, functions, variables, primitives, totalNodeCount
 
 

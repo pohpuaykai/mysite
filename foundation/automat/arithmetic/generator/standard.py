@@ -15,7 +15,7 @@ class StandardFunctionClassGenerator:
         pp = pprint.PrettyPrinter(indent=4)
         self.pformat = pp.pformat
 
-    def generateClass(self, verbose=False):
+    def generateClass(self, verbose=False, toRun=None):
         """
         Generates all the standard function in Python and dumps them into arithmetic.configuration.standard
 
@@ -39,12 +39,16 @@ class StandardFunctionClassGenerator:
 
         :param verbose: prints written file path to logger
         :type verbose: bool
+        :param toRun: None=run all standard
+        else its the name of the json file to run.
         """
 
         #copied from https://realpython.com/primer-on-jinja-templating/
         environment = Environment(loader=FileSystemLoader(os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'generator', 'template', 'standard', 'function')))# put in the full directory
         for filename in os.listdir(self.standardConfigFileFolder):
             if filename.endswith('.json'): # then its good! sei vorsichtung um nicht zu non-configuration-files zu beitragen
+                if toRun is not None and filename != toRun:
+                    continue # skip this file
                 if verbose:
                     info(f'processing {filename}')
                 JSONfile = open(os.path.join(self.standardConfigFileFolder, filename), 'r')
@@ -163,7 +167,15 @@ class StandardFunctionClassGenerator:
                 info(f"written {filename}")
 
 
+
+import sys
 if __name__=='__main__':
+    flag = sys.argv[0]
+    toRun = None
+    if flag == 'alles':
+        toRun = None
+    else:
+        toRun = flag
     print('generating standard function class files START')
-    StandardFunctionClassGenerator().generateClass(verbose=True)
+    StandardFunctionClassGenerator().generateClass(verbose=True, toRun=toRun)
     print('generating standard function class files END')

@@ -4,8 +4,417 @@ import pprint
 from foundation.automat.core.equation import Equation
 
 
+pp = pprint.PrettyPrinter(indent=4)
+
+def test__makeSubject2Input__addition0(verbose=False):
+    eq0 = Equation('(= a (+ b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__addition1(verbose=False):
+    eq0 = Equation('(= a (+ b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__subtraction0(verbose=False):
+    eq0 = Equation('(= a (- b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__subtraction1(verbose=False):
+    eq0 = Equation('(= a (- b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__multiply0(verbose=False):
+    eq0 = Equation('(= a (* b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__multiply1(verbose=False):
+    eq0 = Equation('(= a (* b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__divide0(verbose=False):
+    eq0 = Equation('(= a (/ b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__divide1(verbose=False):
+    eq0 = Equation('(= a (/ b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__exponent0(verbose=False):
+    eq0 = Equation('(= a (^ b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__exponent1(verbose=False):
+    eq0 = Equation('(= a (^ b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__nroot0(verbose=False):
+    eq0 = Equation('(= a (nroot b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+def test__makeSubject2Input__nroot1(verbose=False):
+    eq0 = Equation('(= a (nroot b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject2Input__log0(verbose=False):
+    eq0 = Equation('(= a (log b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject2Input__log1(verbose=False):
+    eq0 = Equation('(= a (log b c))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('c')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arccosec(verbose=False):
+    eq0 = Equation('(= a (arccosec b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arccosech(verbose=False):
+    eq0 = Equation('(= a (arccosech b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arccos(verbose=False):
+    eq0 = Equation('(= a (arccos b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arccosh(verbose=False):
+    eq0 = Equation('(= a (arccosh b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arccot(verbose=False):
+    eq0 = Equation('(= a (arccot b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arccoth(verbose=False):
+    eq0 = Equation('(= a (arccoth b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arcsec(verbose=False):
+    eq0 = Equation('(= a (arcsec b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arcsech(verbose=False):
+    eq0 = Equation('(= a (arcsech b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arcsin(verbose=False):
+    eq0 = Equation('(= a (arcsin b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arcsinh(verbose=False):
+    eq0 = Equation('(= a (arcsinh b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arctan(verbose=False):
+    eq0 = Equation('(= a (arctan b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__arctanh(verbose=False):
+    eq0 = Equation('(= a (arctanh b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__cosec(verbose=False):
+    eq0 = Equation('(= a (cosec b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__cosech(verbose=False):
+    eq0 = Equation('(= a (cosech b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__cos(verbose=False):
+    eq0 = Equation('(= a (cos b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__cosh(verbose=False):
+    eq0 = Equation('(= a (cosh b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__cot(verbose=False):
+    eq0 = Equation('(= a (cot b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__coth(verbose=False):
+    eq0 = Equation('(= a (coth b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__sec(verbose=False):
+    eq0 = Equation('(= a (sec b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__sech(verbose=False):
+    eq0 = Equation('(= a (sech b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__sin(verbose=False):
+    eq0 = Equation('(= a (sin b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__sinh(verbose=False):
+    eq0 = Equation('(= a (sinh b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__tan(verbose=False):
+    eq0 = Equation('(= a (tan b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+
+def test__makeSubject1Input__tanh(verbose=False):
+    eq0 = Equation('(= a (tanh b))', 'scheme', verbose=True)
+    modifiedAST = eq0.makeSubject('b')
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = None # to be filled in 
+    if verbose:
+        print(latexStr)
+
+
+#################################################################################################################
+
 def test__onetermFactorisation__cutSubtreeAtRoot(verbose=False):
-    pp = pprint.PrettyPrinter(indent=4)
 
 
     eq0 = Equation('(= z (+ (* 2 a) (+ (* 2 b) (+ (* 2 c) (+ (* 2 d) (+ (* 2 e) (+ (* 2 f) (+ (* 2 g) (+ (* 2 h) (+ (* 2 i) (+ (* 2 j) (* 2 k))))))))))))', 'scheme')
@@ -15,12 +424,13 @@ def test__onetermFactorisation__cutSubtreeAtRoot(verbose=False):
             rootNode = nonLeaf
             break
     subTree = eq0._cutSubASTAtRoot(rootNode) # need to find a rootNode (with the rightID)
+    expected = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == subTree)
     if verbose:
         pp.pprint(subTree)
 
 
 def test__onetermFactorisation__cutSubtreeAtRoot0(verbose=False):
-    pp = pprint.PrettyPrinter(indent=4)
 
 
     eq0 = Equation('(= z (+ (* (sin (* (+ x 1) (- x 1))) a) (+ (* (sin (* (+ x 1) (- x 1))) b) (+ (* (sin (* (+ x 1) (- x 1))) c) (+ (* (sin (* (+ x 1) (- x 1))) d) (+ (* (sin (* (+ x 1) (- x 1))) e) (+ (* (sin (* (+ x 1) (- x 1))) f) (+ (* (sin (* (+ x 1) (- x 1))) g) (+ (* (sin (* (+ x 1) (- x 1))) h) (+ (* (sin (* (+ x 1) (- x 1))) i) (+ (* (sin (* (+ x 1) (- x 1))) j) (* (sin (* (+ x 1) (- x 1))) k))))))))))))', 'scheme')
@@ -30,6 +440,8 @@ def test__onetermFactorisation__cutSubtreeAtRoot0(verbose=False):
             rootNode = nonLeaf
             break
     subTree = eq0._cutSubASTAtRoot(rootNode) # need to find a rootNode (with the rightID)
+    expected = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == subTree)
     if verbose:
         pp.pprint(subTree) # we are expecting the AST of (sin (* (+ x 1) (- x 1)))
 
@@ -104,7 +516,46 @@ def test__onetermFactorisation__findDistributivePath0(verbose=False):
 
 
 if __name__=='__main__':
-    test__onetermFactorisation__cutSubtreeAtRoot()
-    test__onetermFactorisation__cutSubtreeAtRoot0()
-    test__onetermFactorisation__findDistributivePath()
-    test__onetermFactorisation__findDistributivePath0()
+    test__makeSubject2Input__addition0(True)
+    # test__makeSubject2Input__addition1(True)
+    # test__makeSubject2Input__subtraction0(True)
+    # test__makeSubject2Input__subtraction1(True)
+    # test__makeSubject2Input__multiply0(True)
+    # test__makeSubject2Input__multiply1(True)
+    # test__makeSubject2Input__divide0(True)
+    # test__makeSubject2Input__divide1(True)
+    # test__makeSubject2Input__exponent0(True)
+    # test__makeSubject2Input__exponent1(True)
+    # test__makeSubject2Input__nroot0(True)
+    # test__makeSubject2Input__nroot1(True)
+    # test__makeSubject2Input__log0(True)
+    # test__makeSubject2Input__log1(True)
+    # test__makeSubject1Input__arccosec(True)
+    # test__makeSubject1Input__arccosech(True)
+    # test__makeSubject1Input__arccos(True)
+    # test__makeSubject1Input__arccosh(True)
+    # test__makeSubject1Input__arccot(True)
+    # test__makeSubject1Input__arccoth(True)
+    # test__makeSubject1Input__arcsec(True)
+    # test__makeSubject1Input__arcsech(True)
+    # test__makeSubject1Input__arcsin(True)
+    # test__makeSubject1Input__arcsinh(True)
+    # test__makeSubject1Input__arctan(True)
+    # test__makeSubject1Input__arctanh(True)
+    # test__makeSubject1Input__cosec(True)
+    # test__makeSubject1Input__cosech(True)
+    # test__makeSubject1Input__cos(True)
+    # test__makeSubject1Input__cosh(True)
+    # test__makeSubject1Input__cot(True)
+    # test__makeSubject1Input__coth(True)
+    # test__makeSubject1Input__sec(True)
+    # test__makeSubject1Input__sech(True)
+    # test__makeSubject1Input__sin(True)
+    # test__makeSubject1Input__sinh(True)
+    # test__makeSubject1Input__tan(True)
+    # test__makeSubject1Input__tanh(True)
+
+    # test__onetermFactorisation__cutSubtreeAtRoot()
+    # test__onetermFactorisation__cutSubtreeAtRoot0()
+    # test__onetermFactorisation__findDistributivePath()
+    # test__onetermFactorisation__findDistributivePath0()

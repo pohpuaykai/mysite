@@ -7,6 +7,8 @@ class Schemeparser(Parser):
     Naive Parser for Scheme Strings. More details about 'Scheme' format, check
     https://groups.csail.mit.edu/mac/ftpdir/scheme-7.4/doc-html/scheme_2.html
     """
+    FUNC_NAMES = Function.FUNC_NAMES()
+
     def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None):
         if ast is None:
             self._eqs = equationStr
@@ -61,7 +63,7 @@ class Schemeparser(Parser):
             totalNodeCount += 1
             if isNum(current.label):
                 primitives += 1
-            elif current.label in Function.FUNC_NAMES: # is a function
+            elif current.label in Schemeparser.FUNC_NAMES: # is a function
                 functionsD[current.label] = functionsD.get(current.label, 0) + 1
             else: # is a variable
                 variablesD[current.label] = variablesD.get(current.label, 0) + 1

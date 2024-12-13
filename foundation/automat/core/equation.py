@@ -3,7 +3,7 @@ from importlib import import_module
 
 from foundation.automat.common.backtracker import Backtracker
 from foundation.automat.arithmetic.function import Function
-from foundation.automat.parser import Parser
+from foundation.automat.parser.parser import Parser
 
 class Equation:
     """
@@ -20,7 +20,11 @@ class Equation:
     :param parserName: the name of the parser to be used
     :type parserName: str
     """
-    def __init__(self, equationStr, parserName):
+    FUNCNAME__MODULENAME = Function.FUNCNAME__MODULENAME()
+    FUNCNAME__CLASSNAME = Function.FUNCNAME__CLASSNAME()
+
+
+    def __init__(self, equationStr, parserName, verbose=False):
         """
         loads the parser with that name, throws a tantrum if parserName was not found. Also the constructor
 
@@ -29,6 +33,7 @@ class Equation:
         :param parserName: the name of the parser to be used
         :type parserName: str
         """
+        self.verbose = verbose
         self._eqs = equationStr
         self._parserName = parserName
         (self.ast, self.functions, self.variables, self.primitives,
@@ -36,6 +41,7 @@ class Equation:
 
     def makeSubject(self, variable):
         """
+        #~ DRAFT ~#
         make variable the subject of this equation
 
         :param variable:
@@ -47,9 +53,13 @@ class Equation:
         if variable not in self.variables:
             raise Exception("Variable Not Available")
         if self.variables[variable] > 1: 
-            #TODO, unable to further handle without more patterns like quadratic, cubic, quartic, AST-equivalence-for-special-substitution-techniques
+            #TODO, unable to further handle without more patterns like quadratic, cubic, quartic, AST-equivalence-for-special-substitution-to-make-polynomials-techniques
+            #TODO partial-fractions
             #TODO can put factorisation here
             raise Exception("Cannot handle")
+
+        if self.verbose:
+            print('working on AST:', self.ast)
 
         #find path from subRoot to variable
         stack = [Backtracker(
@@ -57,7 +67,7 @@ class Equation:
             None, #neighbours
             None, # argumentIdx
             None, #prev
-            None, #id
+            0, #id
         )]
         found = None
         while len(stack) != 0:
@@ -65,57 +75,73 @@ class Equation:
             if current.label == variable:
                 found = current
                 break
-            for argumentIdx, (label, id) in enumerate(self.ast[current.label]):
+            currentNode = (current.label, current.id)
+            for argumentIdx, (label, idx) in enumerate(self.ast.get(currentNode, [])):
                 backtracker = Backtracker(
                     label, #label
                     None, #neighbours
                     argumentIdx, #argumentIdx
                     current, #prev
-                    id
+                    idx
                 )
                 stack.append(backtracker)
-            if found is None:
-                raise Exception("No path to variable") # this shouldn't happen, most probably a parser error
-            ops = [{
-                'functionName':found.label,
-                'argumentIdx':found.argumentIdx,
-                'id':found.id,
-                'lastId':found.prev.id if found.prev is not None else None
-            }]
-            while found.prev is not None:
-                found = found.prev
+        if found is None:
+            raise Exception("No path to variable") # this shouldn't happen, most probably a parser error
+        # ops = [{
+        #     'functionName':found.label,
+        #     'argumentIdx':found.argumentIdx,
+        #     'id':found.id,
+        #     'lastId':found.prev.id if found.prev is not None else None
+        # }] # chain of inverses to apply
+        ops = [] # chain of inverses to apply, ignore the future-subject-of-formula
+        while found.prev is not None:
+            found = found.prev
+            if found.label != '=':#cannot apply reverse(=)
                 ops.append({
                     'functionName':found.label,
                     'argumentIdx':found.argumentIdx,
                     'id':found.id,
                     'lastId':found.prev.id if found.prev is not None else None
                 })
-            originalAst = deepcopy(self.ast)
-            #apply the inverses
-            while len(ops) != 0:
-                op = ops.pop(0) # apply in reverse order (start with the one nearest to =)
-                op_filename = Function.FUNCNAME_FILENAME[op['functionName']]
-                op_foldername = "arithmetic.standard."+op_filename
-                functionClass = getattr(import_module(op_foldername, op_filename))
-                (invertedAst, functionCountChange,
-                variableCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).inverse(
-                    op.argumentIdx, [op.id, op.lastId]
-                )
-                #update the `stat` of self
-                self.ast = invertedAst
-                for funcName, countChange in functionCountChange.items():
-                    self.functions[funcName] += countChange
-                for varStr, countChange in variableCountChange.items():
-                    self.variables[varStr] += countChange
-                self.primitives = primitiveCountChange
-                self.totalNodeCount += totalNodeCountChange
-            modifiedAst = deepcopy(self.ast)
-            self.ast = originalAst# put back
-            return modifiedAst
+            # print('oplabel', found.label, ops)
+        # originalAst = deepcopy(self.ast)
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_START
+        def getFunctionClass(funcName):
+            moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
+            className = Equation.FUNCNAME__CLASSNAME[funcName] # TODO implement
+            import importlib, inspect
+            module_obj = importlib.import_module(f'.{moduleName}', package='foundation.automat.arithmetic.standard')
+            klassName, functionClass = list(filter(lambda tup: tup[0]==className,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
+            globals()[className] = functionClass
+            return functionClass
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_END
+        #apply the inverses
+        while len(ops) != 0:
+            op = ops.pop(0) # apply in reverse order (start with the one nearest to =)
+            # op_filename = Function.FUNCNAME_FILENAME[op['functionName']] # Function.FUNCNAME_FILENAME == []
+            # op_foldername = "arithmetic.standard."+op_filename
+            # functionClass = getattr(import_module(op_foldername, op_filename))
+            functionClass = getFunctionClass(op['functionName'])
+            (invertedAst, functionCountChange,
+            variableCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).reverse(
+                op['argumentIdx'], [op['id'], op['lastId']]
+            )
+            #update the `stat` of self
+            self.ast = invertedAst
+            for funcName, countChange in functionCountChange.items():
+                self.functions[funcName] += countChange
+            for varStr, countChange in variableCountChange.items():
+                self.variables[varStr] += countChange
+            self.primitives = primitiveCountChange
+            self.totalNodeCount += totalNodeCountChange
+        modifiedAst = deepcopy(self.ast)
+        # self.ast = originalAst# put back
+        return modifiedAst
 
 
     def toString(self, format):
         """
+        #~ DRAFT ~#
         write the equation to string
 
         :param format: states the format to be used, to write to a string
@@ -125,7 +151,10 @@ class Equation:
 
 
     def _findCommonFactorOfDistributivePath(self, distributivePath):
-        """TODO test
+        """
+
+        #~ DRAFT ~#
+        TODO test
         current target usage for one-term factorisation
 
         ~SKETCH~
@@ -153,7 +182,10 @@ class Equation:
 
 
     def _findAllDistributivePaths(self, distributiveOpStr, baseOpStr):
-        """TODO test
+        """
+
+        #~ DRAFT ~#
+        TODO test
         current target usage for one-term factorisation
 
         For Example: 
@@ -256,7 +288,10 @@ class Equation:
 
 
     def _cutSubASTAtRoot(self, rootNode):
-        """TODO test
+        """
+
+        #~ DRAFT ~#
+        TODO test
         current target usage for one-term factorisation
 
         ~SKETCH~
@@ -279,9 +314,3 @@ class Equation:
                 subAST[current] = children
                 stack += children
             return subAST
-
-
-
-
-if __name__=='__main__':
-    eq0 = Equation('(= a (+ b c))', 'scheme')

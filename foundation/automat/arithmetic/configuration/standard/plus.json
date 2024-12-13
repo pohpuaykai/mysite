@@ -10,7 +10,7 @@
   "init_string_newValue": {"full": "newValue", "code": "@vnV@"},
   "imports":["from foundation.automat.arithmetic.function import Function"],
   "return_reverse": {
-    "imports":["from foundation.automat.arithmetic.standard.plus import Plus"],
+    "imports":["from foundation.automat.arithmetic.standard.minus import Minus"],
     "reversedAst": [
       {
         "@vk0@": {
