@@ -66,7 +66,12 @@ class StandardFunctionClassGenerator:
                         initSubstitutionDict[config[initKey]['code']] = config[initKey]['full']
                 replacementDictVN = f"{initSubstitutionDict['@vrD@']}"
                 def subShortHandWithActualCode(value):
-                    if not isinstance(value, str):
+                    #convert all list to tuples
+                    if isinstance(value, list):
+                        #VALUE IS A LIST
+                        print('is a LISTLSITLISLTISLTILSTILSTISLTILSTILSTILSIT')
+                        return tuple(value)
+                    if not isinstance(value, str): # TODO should include int and float and complex? incase we use that for configuration too
                         return value
                     resultStr = ''
                     keyword = ''

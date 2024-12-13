@@ -200,16 +200,24 @@ class Function:#(metaclass=FunctionHook):
         for key, value in ast.items():
             if key[1] in nodeIds:
                 replacementDictionary[key] = value
+
+
+        print('*****replacementDictionary')
+        print(replacementDictionary)
+        print('*****')
         #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
-        (invertedResults, functionCountChange, variableCountChange,
-         primitiveCountChange, totalNodeCountChange) = self.reverses[argumentIdx](
+        (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange) = self.reverses[argumentIdx](
             replacementDictionary, self.eq.totalNodeCount)
+
+        print('*****invertedResults')
+        print(invertedResults)
+        print('*****')
 
         for oldKey, oldValue in invertedResults.items():
             if oldKey in ast: # due to addition of operations, `oldKey` might not exist in ast
                 del ast[oldKey]
             ast[oldValue['newKey']] = oldValue['newValue']
-        return ast, functionCountChange, variableCountChange, primitiveCountChange, totalNodeCountChange
+        return ast, functionCountChange, primitiveCountChange, totalNodeCountChange
 
     def evalFunctor(self):
         """

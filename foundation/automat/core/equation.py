@@ -122,8 +122,7 @@ class Equation:
             # op_foldername = "arithmetic.standard."+op_filename
             # functionClass = getattr(import_module(op_foldername, op_filename))
             functionClass = getFunctionClass(op['functionName'])
-            (invertedAst, functionCountChange,
-            variableCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).reverse(
+            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).reverse(
                 op['argumentIdx'], [op['id'], op['lastId']]
             )
             #update the `stat` of self
