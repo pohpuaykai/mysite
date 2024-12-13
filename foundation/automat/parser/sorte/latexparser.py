@@ -3401,7 +3401,10 @@ if __name__=='__main__':
         if name in self.leaves: # TODO, rename self.leaves to something ChildClass specific (confusing later)
             returnName = name
             if not any(c.isdigit() for c in returnName) and len(returnName) > 1:# if first letter is capitalised... then its a special variable? like Psi
-                returnName = f'\\{returnName}'
+                if '_' in returnName or '^' in returnName: #variables like V_{BE}
+                    pass # do not add a backslash
+                else:
+                    returnName = f'\\{returnName}'
 
             return returnName # return the namestr
         nid = keyTuple[1]

@@ -62,6 +62,23 @@ def test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(verbose=Fa
         print(eqsStr)
 
 
+def test__schemeToLatex__variablesWithCurlyBrackets(verbose=False):#TODO add to parser....and handle
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {   
+    ('*', 2): [('I_{ES}', 3), ('-', 4)],
+    ('-', 4): [('^', 5), ('1', 6)],
+    ('/', 8): [('V_{BE}', 9), ('V_T', 10)],
+    ('=', 0): [('I_E', 1), ('*', 2)],
+    ('^', 5): [('e', 7), ('/', 8)]}
+
+    parser = Latexparser(ast=ast, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = 'I_E =I_{ES} (e^{\\frac{V_{BE} }{V_T}}-1)'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
 
 def test__findingBackSlashAndInfixOperations__Trig0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -901,43 +918,44 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__contiguousLeftOvers__decimalPlaces()
-    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
-    test__findingBackSlashAndInfixOperations__Trig0()
-    test__findingBackSlashAndInfixOperations__Trig1()
-    test__findingBackSlashAndInfixOperations__Trig2()
-    test__findingBackSlashAndInfixOperations__Sqrt0()
-    test__findingBackSlashAndInfixOperations__Sqrt1()
-    test__findingBackSlashAndInfixOperations__Ln()
-    test__findingBackSlashAndInfixOperations__Frac()
-    test__findingBackSlashAndInfixOperations__Log0()
-    test__findingBackSlashAndInfixOperations__Log1()
-    test__findingBackSlashAndInfixOperations__tildeVariable()
-    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
-    test__infixInBackslash__paraboloid()
-    test__sqrtWithPowerCaretRightOtherInfix__hill()
-    test__nonInfixBrackets__addImplicitMultiply()
-    test__nonInfixBrackets__addImplicitMultiply0()
-    test__nonInfixBrackets__addImplicitMultiply1()
-    test__BODMAS__priorityBetweenInfixForBrackets()
-    test__BODMAS__enclosingBracketInBackslashArg()
-    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
-    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
-    test__BODMAS__enclosingBracket()
-    test__manyFracCaretEnclosingBrac__partialFrac()
-    test__fracWithLogNoBase__changeLogBaseFormula()
-    test__backslashInfixInBackslash__sqrtInSqrt()
-    test__backslashInfixInBackslash__trigInTrig()
-    test__backslashInfixInBackslash__logInLog()
-    test__backslashInfixInBackslash__fracInFrac()
-    test__hassliche__highPowersAndRandomCoefficientsPITEST()
-    test__hassliche__nestedPolynomial()
-    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
-    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
-    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
-    test__hassliche__degree5()
-    test__hassliche__degree6()
+    # test__contiguousLeftOvers__decimalPlaces()
+    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    test__schemeToLatex__variablesWithCurlyBrackets(True)
+    # test__findingBackSlashAndInfixOperations__Trig0()
+    # test__findingBackSlashAndInfixOperations__Trig1()
+    # test__findingBackSlashAndInfixOperations__Trig2()
+    # test__findingBackSlashAndInfixOperations__Sqrt0()
+    # test__findingBackSlashAndInfixOperations__Sqrt1()
+    # test__findingBackSlashAndInfixOperations__Ln()
+    # test__findingBackSlashAndInfixOperations__Frac()
+    # test__findingBackSlashAndInfixOperations__Log0()
+    # test__findingBackSlashAndInfixOperations__Log1()
+    # test__findingBackSlashAndInfixOperations__tildeVariable()
+    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
+    # test__infixInBackslash__paraboloid()
+    # test__sqrtWithPowerCaretRightOtherInfix__hill()
+    # test__nonInfixBrackets__addImplicitMultiply()
+    # test__nonInfixBrackets__addImplicitMultiply0()
+    # test__nonInfixBrackets__addImplicitMultiply1()
+    # test__BODMAS__priorityBetweenInfixForBrackets()
+    # test__BODMAS__enclosingBracketInBackslashArg()
+    # test__BODMAS__enclosingBracketInBackslashArgWithExponent()
+    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
+    # test__BODMAS__enclosingBracket()
+    # test__manyFracCaretEnclosingBrac__partialFrac()
+    # test__fracWithLogNoBase__changeLogBaseFormula()
+    # test__backslashInfixInBackslash__sqrtInSqrt()
+    # test__backslashInfixInBackslash__trigInTrig()
+    # test__backslashInfixInBackslash__logInLog()
+    # test__backslashInfixInBackslash__fracInFrac()
+    # test__hassliche__highPowersAndRandomCoefficientsPITEST()
+    # test__hassliche__nestedPolynomial()
+    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
+    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
+    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
+    # test__hassliche__degree5()
+    # test__hassliche__degree6()
     # test__hassliche__degree7(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True) # not tested yet, use nDisplay to help please
     # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True) # not tested yet, use nDisplay to help please

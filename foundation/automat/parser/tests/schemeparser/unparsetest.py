@@ -65,16 +65,16 @@ def test__schemeParserTest__ebersMollModelp1(verbose=False):
     #Ebers-Moll model : https://en.wikipedia.org/wiki/Bipolar_junction_transistor#Ebers%E2%80%93Moll_model
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T) 1))))'
+    equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T)) 1)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
     ast = parser.ast
     pp.pprint(ast)
     expected_ast = {   
     ('*', 2): [('I_{ES}', 3), ('-', 4)],
-    ('-', 4): [('^', 5)],
-    ('/', 7): [('V_{BE}', 9), ('V_T', 10)],
+    ('-', 4): [('^', 5), ('1', 6)],
+    ('/', 8): [('V_{BE}', 9), ('V_T', 10)],
     ('=', 0): [('I_E', 1), ('*', 2)],
-    ('^', 5): [('e', 6), ('/', 7), ('1', 8)]}
+    ('^', 5): [('e', 7), ('/', 8)]}
     unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (equationStr==unparsedStr) and (ast==expected_ast))
 

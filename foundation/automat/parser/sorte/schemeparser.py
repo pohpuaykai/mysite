@@ -197,4 +197,10 @@ class Schemeparser(Parser):
         Then we call the _unparse function of Latex to get the NICESWEETSTRING
         """
         from foundation.automat.parser.sorte.latexparser import Latexparser
+        if self.verbose:
+            import pprint
+            pp = pprint.PrettyPrinter(indent=4)
+            print('self.ast***********')
+            pp.pprint(self.ast)
+            print('*******************')
         return Latexparser(ast=self.ast)._unparse()

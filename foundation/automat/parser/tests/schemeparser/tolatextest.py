@@ -12,7 +12,7 @@ def test__schemeParserTest__add(verbose=False):
     expected_latexStr = 'a=b+c'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (latexStr == expected_latexStr))
     if verbose:
-        pp.pprint(latexStr)
+        print(latexStr)
 
 
 def test__schemeParserTest__harmonicMean(verbose=False):
@@ -24,7 +24,7 @@ def test__schemeParserTest__harmonicMean(verbose=False):
     expected_latexStr = '\\frac{1}{a}=\\frac{1}{b}+\\frac{1}{c}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (latexStr == expected_latexStr))
     if verbose:
-        pp.pprint(latexStr)
+        print(latexStr)
 
 
 def test__schemeParserTest__phasorDiagram(verbose=False):
@@ -36,19 +36,19 @@ def test__schemeParserTest__phasorDiagram(verbose=False):
     expected_latexStr = 'e^{ix}=\\cos(x)+i\\sin(x)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (latexStr == expected_latexStr))
     if verbose:
-        pp.pprint(latexStr)
+        print(latexStr)
 
 
 def test__schemeParserTest__ebersMollModelp1(verbose=False):
     #Ebers-Moll model : https://en.wikipedia.org/wiki/Bipolar_junction_transistor#Ebers%E2%80%93Moll_model
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T) 1))))'
+    equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T)) 1)))'
     latexStr = Schemeparser(equationStr=equationStr, verbose=verbose)._toLatex()
-    expected_latexStr = None
+    expected_latexStr = 'I_E =I_{ES} (e^{\\frac{V_{BE} }{V_T}}-1)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (latexStr == expected_latexStr))
     if verbose:
-        pp.pprint(latexStr)
+        print(latexStr)
 
 
 def test__schemeParserTest__earlyEffectModel(verbose=False):
@@ -57,15 +57,15 @@ def test__schemeParserTest__earlyEffectModel(verbose=False):
 
     equationStr = '(= I_E (* I_S (* (^ e (/ V_{BE} V_T)) (+ 1 (/ V_{CE} V_A)))))'
     latexStr = Schemeparser(equationStr=equationStr, verbose=verbose)._toLatex()
-    expected_latexStr = None
+    expected_latexStr = 'I_E =I_S e^{\\frac{V_{BE} }{V_T}}(1+\\frac{V_{CE} }{V_A})'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (latexStr == expected_latexStr))
     if verbose:
-        pp.pprint(latexStr)
+        print(latexStr)
 
 
 if __name__=='__main__':
-    # test__schemeParserTest__add()
-    # test__schemeParserTest__harmonicMean(True)
-    # test__schemeParserTest__phasorDiagram(True)
-    # test__schemeParserTest__ebersMollModelp1(True) # does not work
-    test__schemeParserTest__earlyEffectModel(True) # does not work very well with weird variables....
+    test__schemeParserTest__add()
+    test__schemeParserTest__harmonicMean()
+    test__schemeParserTest__phasorDiagram()
+    test__schemeParserTest__ebersMollModelp1()
+    test__schemeParserTest__earlyEffectModel()
