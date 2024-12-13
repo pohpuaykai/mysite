@@ -47,7 +47,7 @@ class StandardFunctionClassGenerator:
         environment = Environment(loader=FileSystemLoader(os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'generator', 'template', 'standard', 'function')))# put in the full directory
         for filename in os.listdir(self.standardConfigFileFolder):
             if filename.endswith('.json'): # then its good! sei vorsichtung um nicht zu non-configuration-files zu beitragen
-                if toRun is not None and filename != toRun:
+                if toRun is not None and filename != toRun+'.json':
                     continue # skip this file
                 if verbose:
                     info(f'processing {filename}')
@@ -170,12 +170,12 @@ class StandardFunctionClassGenerator:
 
 import sys
 if __name__=='__main__':
-    flag = sys.argv[0]
+    flag = sys.argv[1] if len(sys.argv) > 1 else 'alles'
     toRun = None
     if flag == 'alles':
         toRun = None
     else:
         toRun = flag
-    print('generating standard function class files START')
+    print('generating standard function class files START', toRun)
     StandardFunctionClassGenerator().generateClass(verbose=True, toRun=toRun)
     print('generating standard function class files END')

@@ -66,9 +66,9 @@ class Plus(Function):
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
         
-        from foundation.automat.arithmetic.standard.plus import Plus
+        from foundation.automat.arithmetic.standard.minus import Minus
         
-        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Minus.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Minus.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0], replacementDictionary[key1][1]]}}, {Minus.FUNC_NAME: 1, FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Minus.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Minus.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0], replacementDictionary[key1][1]]}}, {Minus.FUNC_NAME: 1, Plus.FUNC_NAME: -1}, 0, 0
 
     
     def _reverse2(self, replacementDictionary, totalNodeCount):
@@ -108,9 +108,9 @@ class Plus(Function):
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
         
-        from foundation.automat.arithmetic.standard.plus import Plus
+        from foundation.automat.arithmetic.standard.minus import Minus
         
-        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][1], [Minus.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Minus.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0], replacementDictionary[key1][0]]}}, {Minus.FUNC_NAME: 1, FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][1], [Minus.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Minus.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0], replacementDictionary[key1][0]]}}, {Minus.FUNC_NAME: 1, Plus.FUNC_NAME: -1}, 0, 0
 
     
 

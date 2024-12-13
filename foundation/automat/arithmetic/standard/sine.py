@@ -65,7 +65,7 @@ class Sine(Function):
         
         from foundation.automat.arithmetic.standard.arcsine import Arcsine
         
-        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Arcsine.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Arcsine.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0]]}}, {Arcsine.FUNC_NAME: 1, FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Arcsine.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Arcsine.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0]]}}, {Arcsine.FUNC_NAME: 1, Sine.FUNC_NAME: -1}, 0, 0
 
     
 

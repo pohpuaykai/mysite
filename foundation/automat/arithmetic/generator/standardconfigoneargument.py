@@ -12,12 +12,14 @@ class Standardconfigoneargument:
 
 
     @classmethod
-    def generateConfigurations(cls, verbose=False):
+    def generateConfigurations(cls, verbose=False, toRun=None):
         #copied from https://realpython.com/primer-on-jinja-templating/
         environment = Environment(loader=FileSystemLoader(os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'generator', 'template', 'configuration')))
         template = environment.get_template("standardoneargument.json.jinja2")
 
         for function_name, mapping in FUNC_NAMES.items():
+            if toRun is not None and function_name != toRun:
+                continue # skip
             vorfname = function_name
             vorcname = mapping['class_name']
             hinfname = mapping['reverse_prefix']+function_name
@@ -59,7 +61,16 @@ class Standardconfigoneargument:
                 info(f"written {content} {os.linesep} {filename} to {directory}")
 
 
+
+
+import sys
 if __name__=='__main__':
-    print('standardconfigoneargument START')
-    Standardconfigoneargument.generateConfigurations(verbose=True)
+    flag = sys.argv[1] if len(sys.argv) > 1 else 'alles'
+    toRun = None
+    if flag == 'alles':
+        toRun = None
+    else:
+        toRun = flag
+    print('standardconfigoneargument START ', toRun)
+    Standardconfigoneargument.generateConfigurations(verbose=True, toRun=toRun)
     print('standardconfigoneargument END')

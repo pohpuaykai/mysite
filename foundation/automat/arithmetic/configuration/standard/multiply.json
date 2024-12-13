@@ -1,4 +1,5 @@
 {
+  "init_type": {"full": "other", "code":"@te@"},
   "init_funcName": {"full": "*", "code": "@fN@"},
   "init_className": {"full": "Multiply", "code": "@cN@"},
   "init_variableName_funcName": {"full": "FUNC_NAME", "code": "@vfN@"},
@@ -21,7 +22,7 @@
           "@vnK@": "@vk1@",
           "@vnV@": ["@item_0_0@", "@item_1_1@"]
         },
-      "functionCountAdded": {"@cN_Divide@.@vfN@": 1, "@vfN@": -1},
+      "functionCountAdded": {"@cN_Divide@.@vfN@": 1, "@cN@.@vfN@": -1},
       "primitiveCountAdded": 0,
       "totalNodeCountAdded": 0
       },

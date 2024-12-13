@@ -1,4 +1,5 @@
 {
+  "init_type": {"full": "other", "code":"@te@"},
   "init_funcName": {"full": "nroot", "code": "@fN@"},
   "init_className": {"full": "Nroot", "code": "@cN@"},
   "init_variableName_funcName": {"full": "FUNC_NAME", "code": "@vfN@"},
@@ -27,7 +28,7 @@
           "@vnK@": ["@cN_Logarithm@.@vfN@", "@vtN@"],
           "@vnV@": ["@item_1_1@", "@item_0_0@"]
         },
-      "functionCountAdded": {"@cN_Divide@.@vfN@": 1, "@cN_Logarithm@.@vfN@":1, "@vfN@": -1},
+      "functionCountAdded": {"@cN_Divide@.@vfN@": 1, "@cN_Logarithm@.@vfN@":1, "@cN@.@vfN@": -1},
       "primitiveCountAdded": 0,
       "totalNodeCountAdded": 0
       },
@@ -40,7 +41,7 @@
           "@vnK@": "@vk1@",
           "@vnV@": ["@item_0_0@", "@item_1_0@"]
         },
-      "functionCountAdded": {"@cN_Exponential@.@vfN@": 1, "@vfN@": -1},
+      "functionCountAdded": {"@cN_Exponential@.@vfN@": 1, "@cN@.@vfN@": -1},
       "primitiveCountAdded": 0,
       "totalNodeCountAdded": 0
       }
