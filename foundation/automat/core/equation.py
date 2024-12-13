@@ -38,6 +38,13 @@ class Equation:
         self._parserName = parserName
         (self.ast, self.functions, self.variables, self.primitives,
          self.totalNodeCount) = Parser(parserName).parse(self._eqs)
+        #############
+        if verbose:
+            print('self.functions', self.functions)
+            print('self.variables', self.variables)
+            print('self.primitives', self.primitives)
+            print('self.totalNodeCount', self.totalNodeCount)
+        #############
 
     def makeSubject(self, variable):
         """
@@ -77,6 +84,7 @@ class Equation:
                 break
             currentNode = (current.label, current.id)
             for argumentIdx, (label, idx) in enumerate(self.ast.get(currentNode, [])):
+                print('argIdx', argumentIdx, 'label', label)
                 backtracker = Backtracker(
                     label, #label
                     None, #neighbours
@@ -87,24 +95,37 @@ class Equation:
                 stack.append(backtracker)
         if found is None:
             raise Exception("No path to variable") # this shouldn't happen, most probably a parser error
-        # ops = [{
-        #     'functionName':found.label,
-        #     'argumentIdx':found.argumentIdx,
-        #     'id':found.id,
-        #     'lastId':found.prev.id if found.prev is not None else None
-        # }] # chain of inverses to apply
-        ops = [] # chain of inverses to apply, ignore the future-subject-of-formula
+        print('found.label:', found.label)
+        ops = [{
+                    'functionName':found.label,
+                    'argumentIdx':found.argumentIdx, # this is the argumentIdx of self in its parent
+                    'id':found.id,
+                    'lastId':found.prev.id if found.prev is not None else None
+                }] # chain of inverses to apply,
         while found.prev is not None:
             found = found.prev
             if found.label != '=':#cannot apply reverse(=)
                 ops.append({
                     'functionName':found.label,
-                    'argumentIdx':found.argumentIdx,
+                    'argumentIdx':found.argumentIdx, # this is the argumentIdx of self in its parent
                     'id':found.id,
                     'lastId':found.prev.id if found.prev is not None else None
                 })
             # print('oplabel', found.label, ops)
         # originalAst = deepcopy(self.ast)
+        #
+        operationOrderWithIdx = []
+        for opIdx in range(1, len(ops)):
+            hinOp = ops[opIdx-1]
+            vorOp = ops[opIdx]
+            operationOrderWithIdx.append({
+                'functionName':vorOp['functionName'],
+                'argumentIdx':hinOp['argumentIdx'], # take the child's argumentIdx
+                'id':vorOp['id'],
+                'lastId':vorOp['lastId']
+            })
+        ops = operationOrderWithIdx
+        print('ops', ops)
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_START
         def getFunctionClass(funcName):
             moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
@@ -121,21 +142,25 @@ class Equation:
             # op_filename = Function.FUNCNAME_FILENAME[op['functionName']] # Function.FUNCNAME_FILENAME == []
             # op_foldername = "arithmetic.standard."+op_filename
             # functionClass = getattr(import_module(op_foldername, op_filename))
+            print('applying op', op)
             functionClass = getFunctionClass(op['functionName'])
             (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).reverse(
-                op['argumentIdx'], [op['id'], op['lastId']]
-            )
+                op['argumentIdx']+1, [op['id'], op['lastId']]
+            )#magic 1 because of our stupid conventionDecision, refactor if you wish
             #update the `stat` of self
             self.ast = invertedAst
             for funcName, countChange in functionCountChange.items():
-                self.functions[funcName] += countChange
-            for varStr, countChange in variableCountChange.items():
-                self.variables[varStr] += countChange
+                originalSum = self.functions.get(funcName, 0) + countChange
+                self.functions[funcName] = originalSum
+            # for varStr, countChange in variableCountChange.items():
+            #     self.variables[varStr] += countChange
             self.primitives = primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
-        modifiedAst = deepcopy(self.ast)
+        print('reversed AST: ', self.ast)
+        return self.ast
+        # modifiedAst = deepcopy(self.ast)
         # self.ast = originalAst# put back
-        return modifiedAst
+        # return modifiedAst
 
 
     def toString(self, format):

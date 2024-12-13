@@ -65,7 +65,7 @@ class Arccosine(Function):
         
         from foundation.automat.arithmetic.standard.cosine import Cosine
         
-        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Cosine.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Cosine.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0]]}}, {Cosine.FUNC_NAME: 1, Arccosine.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Cosine.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Cosine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Cosine.FUNC_NAME: 1, Arccosine.FUNC_NAME: -1}, 0, 0
 
     
 

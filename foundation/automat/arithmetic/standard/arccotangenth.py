@@ -65,7 +65,7 @@ class Arccotangenth(Function):
         
         from foundation.automat.arithmetic.standard.cotangenth import Cotangenth
         
-        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Cotangenth.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Cotangenth.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0]]}}, {Cotangenth.FUNC_NAME: 1, Arccotangenth.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Cotangenth.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Cotangenth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Cotangenth.FUNC_NAME: 1, Arccotangenth.FUNC_NAME: -1}, 0, 0
 
     
 

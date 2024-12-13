@@ -65,7 +65,7 @@ class Cosecant(Function):
         
         from foundation.automat.arithmetic.standard.arccosecant import Arccosecant
         
-        return {key0: {"newKey": key0, "newValue": [replacementDictionary[key1][0], [Arccosecant.FUNC_NAME, replacementDictionary[key0][1][1]]]}, key1: {"newKey": [Arccosecant.FUNC_NAME, key1[1]], "newValue": [replacementDictionary[key0][0]]}}, {Arccosecant.FUNC_NAME: 1, Cosecant.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosecant.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Arccosecant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccosecant.FUNC_NAME: 1, Cosecant.FUNC_NAME: -1}, 0, 0
 
     
 

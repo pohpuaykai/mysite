@@ -216,7 +216,7 @@ class Function:#(metaclass=FunctionHook):
         for oldKey, oldValue in invertedResults.items():
             if oldKey in ast: # due to addition of operations, `oldKey` might not exist in ast
                 del ast[oldKey]
-            ast[oldValue['newKey']] = oldValue['newValue']
+            ast[oldValue['newKey']] = list(oldValue['newValue'])
         return ast, functionCountChange, primitiveCountChange, totalNodeCountChange
 
     def evalFunctor(self):

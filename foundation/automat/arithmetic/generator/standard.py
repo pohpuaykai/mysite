@@ -4,7 +4,7 @@ import os
 import re
 
 from foundation.automat import AUTOMAT_MODULE_DIR, info
-from foundation.automat.common import getMatchesOrNone, recursiveNaiveTraverseAndEdit
+from foundation.automat.common import getMatchesOrNone, recursiveNaiveTraverseAndEditToTuple
 
 class StandardFunctionClassGenerator:
 
@@ -66,11 +66,6 @@ class StandardFunctionClassGenerator:
                         initSubstitutionDict[config[initKey]['code']] = config[initKey]['full']
                 replacementDictVN = f"{initSubstitutionDict['@vrD@']}"
                 def subShortHandWithActualCode(value):
-                    #convert all list to tuples
-                    if isinstance(value, list):
-                        #VALUE IS A LIST
-                        print('is a LISTLSITLISLTISLTILSTILSTISLTILSTILSTILSIT')
-                        return tuple(value)
                     if not isinstance(value, str): # TODO should include int and float and complex? incase we use that for configuration too
                         return value
                     resultStr = ''
@@ -114,7 +109,7 @@ class StandardFunctionClassGenerator:
                     return resultStr
                 returnReversesCode = []
                 for idx, reverseReturn in enumerate(config['return_reverse']["reversedAst"]):
-                    functionReturns = recursiveNaiveTraverseAndEdit(reverseReturn, subShortHandWithActualCode)
+                    functionReturns = recursiveNaiveTraverseAndEditToTuple(reverseReturn, subShortHandWithActualCode)
                     functionCountAdded = functionReturns['functionCountAdded']
                     del functionReturns['functionCountAdded']
                     primitiveCountAdded = functionReturns['primitiveCountAdded']
@@ -169,7 +164,7 @@ class StandardFunctionClassGenerator:
         with open(os.path.join(directory, filename), mode='w', encoding='utf-8') as file:
             file.write(content)
             if verbose:
-                info(f"written {filename}")
+                info(f"written {directory}  {filename}")
 
 
 

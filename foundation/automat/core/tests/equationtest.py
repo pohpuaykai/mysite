@@ -11,7 +11,8 @@ def test__makeSubject2Input__addition0(verbose=False):
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'b=a-c' # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -21,7 +22,8 @@ def test__makeSubject2Input__addition1(verbose=False):
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'c=a-b' # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -31,7 +33,8 @@ def test__makeSubject2Input__subtraction0(verbose=False):
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'b=a+c' # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -41,7 +44,8 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'c=b-a' # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -52,6 +56,7 @@ def test__makeSubject2Input__multiply0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -62,6 +67,7 @@ def test__makeSubject2Input__multiply1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -72,6 +78,7 @@ def test__makeSubject2Input__divide0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -82,6 +89,7 @@ def test__makeSubject2Input__divide1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -92,6 +100,7 @@ def test__makeSubject2Input__exponent0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -102,6 +111,7 @@ def test__makeSubject2Input__exponent1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -112,6 +122,7 @@ def test__makeSubject2Input__nroot0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -122,6 +133,7 @@ def test__makeSubject2Input__nroot1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -133,6 +145,7 @@ def test__makeSubject2Input__log0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -144,6 +157,7 @@ def test__makeSubject2Input__log1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -155,6 +169,7 @@ def test__makeSubject1Input__arccosec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -166,6 +181,7 @@ def test__makeSubject1Input__arccosech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -177,6 +193,7 @@ def test__makeSubject1Input__arccos(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -188,6 +205,7 @@ def test__makeSubject1Input__arccosh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -199,6 +217,7 @@ def test__makeSubject1Input__arccot(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -210,6 +229,7 @@ def test__makeSubject1Input__arccoth(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -221,6 +241,7 @@ def test__makeSubject1Input__arcsec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -232,6 +253,7 @@ def test__makeSubject1Input__arcsech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -243,6 +265,7 @@ def test__makeSubject1Input__arcsin(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -254,6 +277,7 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -265,6 +289,7 @@ def test__makeSubject1Input__arctan(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -276,6 +301,7 @@ def test__makeSubject1Input__arctanh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -287,6 +313,7 @@ def test__makeSubject1Input__cosec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -298,6 +325,7 @@ def test__makeSubject1Input__cosech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -309,6 +337,7 @@ def test__makeSubject1Input__cos(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -320,6 +349,7 @@ def test__makeSubject1Input__cosh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -331,6 +361,7 @@ def test__makeSubject1Input__cot(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -342,6 +373,7 @@ def test__makeSubject1Input__coth(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -353,6 +385,7 @@ def test__makeSubject1Input__sec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -364,6 +397,7 @@ def test__makeSubject1Input__sech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -375,6 +409,7 @@ def test__makeSubject1Input__sin(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -386,6 +421,7 @@ def test__makeSubject1Input__sinh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -397,6 +433,7 @@ def test__makeSubject1Input__tan(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -408,6 +445,7 @@ def test__makeSubject1Input__tanh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = None # to be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print(latexStr)
 
@@ -516,44 +554,44 @@ def test__onetermFactorisation__findDistributivePath0(verbose=False):
 
 
 if __name__=='__main__':
-    test__makeSubject2Input__addition0(True)
+    # test__makeSubject2Input__addition0(True)
     # test__makeSubject2Input__addition1(True)
     # test__makeSubject2Input__subtraction0(True)
     # test__makeSubject2Input__subtraction1(True)
-    # test__makeSubject2Input__multiply0(True)
-    # test__makeSubject2Input__multiply1(True)
-    # test__makeSubject2Input__divide0(True)
-    # test__makeSubject2Input__divide1(True)
-    # test__makeSubject2Input__exponent0(True)
-    # test__makeSubject2Input__exponent1(True)
-    # test__makeSubject2Input__nroot0(True)
-    # test__makeSubject2Input__nroot1(True)
-    # test__makeSubject2Input__log0(True)
-    # test__makeSubject2Input__log1(True)
-    # test__makeSubject1Input__arccosec(True)
-    # test__makeSubject1Input__arccosech(True)
-    # test__makeSubject1Input__arccos(True)
-    # test__makeSubject1Input__arccosh(True)
-    # test__makeSubject1Input__arccot(True)
-    # test__makeSubject1Input__arccoth(True)
-    # test__makeSubject1Input__arcsec(True)
-    # test__makeSubject1Input__arcsech(True)
-    # test__makeSubject1Input__arcsin(True)
-    # test__makeSubject1Input__arcsinh(True)
-    # test__makeSubject1Input__arctan(True)
-    # test__makeSubject1Input__arctanh(True)
-    # test__makeSubject1Input__cosec(True)
-    # test__makeSubject1Input__cosech(True)
-    # test__makeSubject1Input__cos(True)
-    # test__makeSubject1Input__cosh(True)
-    # test__makeSubject1Input__cot(True)
-    # test__makeSubject1Input__coth(True)
-    # test__makeSubject1Input__sec(True)
-    # test__makeSubject1Input__sech(True)
-    # test__makeSubject1Input__sin(True)
-    # test__makeSubject1Input__sinh(True)
-    # test__makeSubject1Input__tan(True)
-    # test__makeSubject1Input__tanh(True)
+    # test__makeSubject2Input__multiply0(True) # not yet passed configuration error
+    # test__makeSubject2Input__multiply1(True) # not yet passed configuration error
+    # test__makeSubject2Input__divide0(True) # not yet passed configuration error
+    # test__makeSubject2Input__divide1(True) # not yet passed configuration error
+    # test__makeSubject2Input__exponent0(True) # not yet passed configuration error
+    # test__makeSubject2Input__exponent1(True) # not yet passed configuration error
+    # test__makeSubject2Input__nroot0(True) # not yet passed configuration error
+    # test__makeSubject2Input__nroot1(True) # not yet passed configuration error
+    # test__makeSubject2Input__log0(True) # not yet passed configuration error
+    # test__makeSubject2Input__log1(True) # not yet passed configuration error
+    # test__makeSubject1Input__arccosec(True) # not yet passed configuration error
+    # test__makeSubject1Input__arccosech(True) # not yet passed configuration error
+    # test__makeSubject1Input__arccos(True) # not yet passed configuration error
+    # test__makeSubject1Input__arccosh(True) # not yet passed configuration error
+    # test__makeSubject1Input__arccot(True) # not yet passed configuration error
+    # test__makeSubject1Input__arccoth(True) # not yet passed configuration error
+    # test__makeSubject1Input__arcsec(True) # not yet passed configuration error
+    # test__makeSubject1Input__arcsech(True) # not yet passed configuration error
+    # test__makeSubject1Input__arcsin(True) # not yet passed configuration error
+    # test__makeSubject1Input__arcsinh(True) # not yet passed configuration error
+    # test__makeSubject1Input__arctan(True) # not yet passed configuration error
+    # test__makeSubject1Input__arctanh(True) # not yet passed configuration error
+    # test__makeSubject1Input__cosec(True) # not yet passed configuration error
+    # test__makeSubject1Input__cosech(True) # not yet passed configuration error
+    # test__makeSubject1Input__cos(True) # not yet passed configuration error
+    # test__makeSubject1Input__cosh(True) # not yet passed configuration error
+    # test__makeSubject1Input__cot(True) # not yet passed configuration error
+    # test__makeSubject1Input__coth(True) # not yet passed configuration error
+    # test__makeSubject1Input__sec(True) # not yet passed configuration error
+    # test__makeSubject1Input__sech(True) # not yet passed configuration error
+    # test__makeSubject1Input__sin(True) # not yet passed configuration error
+    # test__makeSubject1Input__sinh(True) # not yet passed configuration error
+    # test__makeSubject1Input__tan(True) # not yet passed configuration error
+    # test__makeSubject1Input__tanh(True) # not yet passed configuration error
 
     # test__onetermFactorisation__cutSubtreeAtRoot()
     # test__onetermFactorisation__cutSubtreeAtRoot0()

@@ -89,7 +89,42 @@ class Pythondatastructuretraversal:
             raise Exception(f'Async generator {hasattr(pyds, "__anext__")} or iterator {hasattr(pyds, "__aiter__")} Unhandled')
         else: # has to be a primitive type... right? Naive
             #print(type(pyds))
-            #print(pyds)
+            # print(pyds)
+
+            return procedure(pyds)
+
+
+
+    @classmethod
+    def recursiveNaiveTraverseAndEditToTuple(cls, pyds:Any, procedure:Callable[[T], T]) -> Any:
+        """
+        traverses the pyds recursively, but converts everything to either a dictionary or list
+        raises Exception if we see Async
+
+        Also converts all list to tuples... TODO refactor, similiar to this: recursiveNaiveTraverseAndEdit
+
+        :param pyds:
+        :type pyds:
+        :param procedure:
+        :type procedure:
+        """
+        if isinstance(pyds, collections.abc.Mapping): # For mapping (like dict), just convert to dictionary
+            return dict([(cls.recursiveNaiveTraverseAndEditToTuple(key, procedure), cls.recursiveNaiveTraverseAndEditToTuple(value, procedure)) for key, value in pyds.items()])
+        #<class 'str'> is iterable too...
+        #elif isinstance(pyds, collections.abc.Iterable) or hasattr(pyds, '__next__'): # For any iterable (like list, tuple, set) AND generators
+        elif isinstance(pyds, list): # convert to list
+            return tuple([cls.recursiveNaiveTraverseAndEditToTuple(item, procedure) for item in pyds])
+        elif isinstance(pyds, tuple): # convert to tuple
+            return tuple([cls.recursiveNaiveTraverseAndEditToTuple(item, procedure) for item in pyds])
+        elif isinstance(pyds, set): #convert to set
+            return set([cls.recursiveNaiveTraverseAndEditToTuple(item, procedure) for item in pyds])
+            # else:
+            #   raise Exception(f'unhandled type: {type(pyds)}')
+        elif hasattr(pyds, '__anext__') or hasattr(pyds, '__aiter__'): # scream if you see async iterator and generator
+            raise Exception(f'Async generator {hasattr(pyds, "__anext__")} or iterator {hasattr(pyds, "__aiter__")} Unhandled')
+        else: # has to be a primitive type... right? Naive
+            #print(type(pyds))
+            # print(pyds)
 
             return procedure(pyds)
 
