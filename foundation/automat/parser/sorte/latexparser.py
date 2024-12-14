@@ -301,6 +301,9 @@ class Latexparser(Parser):
                     'argument2CloseBracket':'',
                     'hasArgument2':False#TODO this was never used
                 } # for unparsing function
+
+                originalCount = self.functions.get(labelName, 0)
+                self.functions[labelName] = originalCount + 1
             elif labelName in Latexparser.FUNCTIONNAMES: #all the function that we accept, TODO link this to automat.arithmetic module
                 """
                 sqrt - \sqrt[rootpower]{rootand} # note if rootand is a single character, then curly braces are not needed, if no rootpower, then rootpower=2
@@ -564,6 +567,9 @@ class Latexparser(Parser):
                     'argument2CloseBracket':'',
                     'hasArgument2':False# TODO this was never used before
                 }#for unparsing function
+                
+                originalCount = self.functions.get(labelName, 0)
+                self.functions[labelName] = originalCount + 1
 
         if self.showError():
             print('event__findBackSlashPositions IS RELEASED')
@@ -1238,6 +1244,13 @@ class Latexparser(Parser):
             print(list(map(lambda conti: (conti['name'], conti['startPos'], conti['endPos']), self.contiguousInfoList)))
             print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
             # import pdb;pdb.set_trace()
+        #sort into primitives and variables
+        for leaf in self.leaves:
+            if isNum(leaf):
+                self.primitives += 1
+            else:
+                originalCount = self.variables.get(str(leaf), 0)
+                self.variables[str(leaf)] = originalCount + 1
         if self.parallelise:
             self.event__contiguousLeftOvers.set()
 
@@ -1254,6 +1267,9 @@ class Latexparser(Parser):
         for ding in allDings:
             if ding['type'] == 'infix':
                 self.consecutiveGroups[(ding['position'], ding['position']+len(ding['name']))] = [ding]
+
+                originalCount = self.functions.get(ding['name'], 0)
+                self.functions[ding['name']] = originalCount +1
             else:
                 sKey = 'ganzStartPos'
                 eKey = 'ganzEndPos'
@@ -2810,6 +2826,7 @@ if __name__=='__main__':
         if self.parallelise:
             self.event__subTreeGraftingUntilTwoTrees.wait()
         #add the = (with children) in alleDing, YAY!
+        self.totalNodeCount = len(self.alleDing)
         #first find ding with no parent
         dingsNoParents = []
         for ding in self.alleDing:
@@ -3020,6 +3037,9 @@ if __name__=='__main__':
             elif currentNode in latexASTCopy: # latexAST do not contain leaves
                 self.ast[currentNode] = latexASTCopy[currentNode]
                 stack += latexASTCopy[currentNode]
+
+            originalCount = self.functions.get(nodeName, 0)
+            self.functions[nodeName] = originalCount + 1
         
 
     def _parse(self):
@@ -3049,6 +3069,10 @@ if __name__=='__main__':
         #TODO self.totalNodeCount = count
         """
         self.nodeId = 1 # 0 is for =, for _parse, TODO
+        self.functions = {}
+        self.variables = {}
+        self.primitives = 0
+        self.totalNodeCount = 0
         self._findInfixAndEnclosingBrackets()
         self._findBackSlashPositions()
         self._tagBracketsToBackslash()
@@ -3062,6 +3086,7 @@ if __name__=='__main__':
         self._reformatToAST()
         self._latexSpecialCases()
         #TODO Pool multiprocessing with method priorities (Chodai!) -- dependency ha chain desu yo, sou shitara, motto hayaku arimasu ka?
+        return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
 
 
 #################################################################################################unparsing
