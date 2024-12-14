@@ -11,7 +11,8 @@
   "init_string_newValue": {"full": "newValue", "code": "@vnV@"},
   "imports":["from foundation.automat.arithmetic.function import Function"],
   "return_reverse": {
-    "imports":["from foundation.automat.arithmetic.standard.nroot import Nroot"],
+    "imports":["from foundation.automat.arithmetic.standard.exponential import Exponential",
+      "from foundation.automat.arithmetic.standard.nroot import Nroot"],
     "reversedAst": [
       {
         "@vk0@": {
@@ -19,7 +20,7 @@
           "@vnV@": ["@item_1_0@", ["@cN_Nroot@.@vfN@", "@id_0_1@"]]
         },
         "@vk1@": {
-          "@vnK@": "@vk1@",
+          "@vnK@": ["@cN_Nroot@.@vfN@", "@idk_1@"],
           "@vnV@": ["@item_0_0@", "@item_1_1@"]
         },
       "functionCountAdded": {"@cN_Nroot@.@vfN@": 1, "@cN@.@vfN@": -1},
@@ -29,10 +30,10 @@
       {
         "@vk0@": {
           "@vnK@": "@vk0@",
-          "@vnV@": ["@item_0_0@", ["@cN_Exponential@.@vfN@", "@id_0_1@"]]
+          "@vnV@": ["@item_1_1@", ["@cN_Exponential@.@vfN@", "@id_0_1@"]]
         },
         "@vk1@": {
-          "@vnK@": "@vk1@",
+          "@vnK@": ["@cN_Exponential@.@vfN@", "@idk_1@"],
           "@vnV@": ["@item_1_0@", "@item_0_0@"]
         },
       "functionCountAdded": {"@cN_Exponential@.@vfN@": 1, "@cN@.@vfN@": -1},

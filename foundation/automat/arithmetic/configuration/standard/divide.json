@@ -16,10 +16,10 @@
       {
         "@vk0@": {
           "@vnK@": "@vk0@",
-          "@vnV@": ["@item_0_1@", ["@cN_Multiply@.@vfN@", "@id_0_1@"]]
+          "@vnV@": ["@item_1_0@", ["@cN_Multiply@.@vfN@", "@id_0_1@"]]
         },
         "@vk1@": {
-          "@vnK@": "@vk1@",
+          "@vnK@": ["@cN_Multiply@.@vfN@", "@idk_1@"],
           "@vnV@": ["@item_0_0@", "@item_1_1@"]
         },
       "functionCountAdded": {"@cN_Multiply@.@vfN@": 1, "@cN@.@vfN@": -1},
@@ -29,10 +29,10 @@
       {
         "@vk0@": {
           "@vnK@": "@vk0@",
-          "@vnV@": ["@item_1_0@", ["@cN_Divide@.@vfN@", "@id_0_1@"]]
+          "@vnV@": ["@item_1_1@", ["@cN_Divide@.@vfN@", "@id_0_1@"]]
         },
         "@vk1@": {
-          "@vnK@": "@vk1@",
+          "@vnK@": ["@cN_Divide@.@vfN@", "@idk_1@"],
           "@vnV@": ["@item_1_0@", "@item_0_0@"]
         },
       "functionCountAdded": {},

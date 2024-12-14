@@ -59,7 +59,7 @@ class Multiply(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if value[1][0] == self.FUNC_NAME:
+            if len(value) > 1 and value[1][0] == self.FUNC_NAME:
                 key0 = key
             else:
                 key1 = key
@@ -68,7 +68,7 @@ class Multiply(Function):
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key0][1], (Divide.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": key1, "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Divide.FUNC_NAME: 1, Multiply.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Divide.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Divide.FUNC_NAME: 1, Multiply.FUNC_NAME: -1}, 0, 0
 
     
     def _reverse2(self, replacementDictionary, totalNodeCount):
@@ -101,7 +101,7 @@ class Multiply(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if value[1][0] == self.FUNC_NAME:
+            if len(value) > 1 and value[1][0] == self.FUNC_NAME:
                 key0 = key
             else:
                 key1 = key
@@ -110,7 +110,7 @@ class Multiply(Function):
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": key1, "newValue": (replacementDictionary[key0][0], replacementDictionary[key0][1])}}, {}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {}, 0, 0
 
     
 

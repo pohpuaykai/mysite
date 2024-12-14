@@ -56,7 +56,7 @@ class Tangenth(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if value[1][0] == self.FUNC_NAME:
+            if len(value) > 1 and value[1][0] == self.FUNC_NAME:
                 key0 = key
             else:
                 key1 = key

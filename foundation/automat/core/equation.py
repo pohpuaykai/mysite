@@ -39,7 +39,7 @@ class Equation:
         (self.ast, self.functions, self.variables, self.primitives,
          self.totalNodeCount) = Parser(parserName).parse(self._eqs)
         #############
-        if verbose:
+        if self.verbose:
             print('self.functions', self.functions)
             print('self.variables', self.variables)
             print('self.primitives', self.primitives)
@@ -84,7 +84,6 @@ class Equation:
                 break
             currentNode = (current.label, current.id)
             for argumentIdx, (label, idx) in enumerate(self.ast.get(currentNode, [])):
-                print('argIdx', argumentIdx, 'label', label)
                 backtracker = Backtracker(
                     label, #label
                     None, #neighbours
@@ -95,7 +94,8 @@ class Equation:
                 stack.append(backtracker)
         if found is None:
             raise Exception("No path to variable") # this shouldn't happen, most probably a parser error
-        print('found.label:', found.label)
+        if self.verbose:
+            print('found.label:', found.label)
         ops = [{
                     'functionName':found.label,
                     'argumentIdx':found.argumentIdx, # this is the argumentIdx of self in its parent
@@ -125,7 +125,8 @@ class Equation:
                 'lastId':vorOp['lastId']
             })
         ops = operationOrderWithIdx
-        print('ops', ops)
+        if self.verbose:
+            print('ops', ops)
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_START
         def getFunctionClass(funcName):
             moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
@@ -139,10 +140,8 @@ class Equation:
         #apply the inverses
         while len(ops) != 0:
             op = ops.pop(0) # apply in reverse order (start with the one nearest to =)
-            # op_filename = Function.FUNCNAME_FILENAME[op['functionName']] # Function.FUNCNAME_FILENAME == []
-            # op_foldername = "arithmetic.standard."+op_filename
-            # functionClass = getattr(import_module(op_foldername, op_filename))
-            print('applying op', op)
+            if self.verbose:
+                print('applying op', op)
             functionClass = getFunctionClass(op['functionName'])
             (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).reverse(
                 op['argumentIdx']+1, [op['id'], op['lastId']]
@@ -152,15 +151,9 @@ class Equation:
             for funcName, countChange in functionCountChange.items():
                 originalSum = self.functions.get(funcName, 0) + countChange
                 self.functions[funcName] = originalSum
-            # for varStr, countChange in variableCountChange.items():
-            #     self.variables[varStr] += countChange
             self.primitives = primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
-        print('reversed AST: ', self.ast)
         return self.ast
-        # modifiedAst = deepcopy(self.ast)
-        # self.ast = originalAst# put back
-        # return modifiedAst
 
 
     def toString(self, format):

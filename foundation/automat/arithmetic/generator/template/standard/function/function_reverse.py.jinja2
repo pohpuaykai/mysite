@@ -28,7 +28,7 @@
         {{vKey0}} = None
         {{vKey1}} = None
         for key, value in {{vReplacementDict}}.items():
-            if value[1][0] == self.FUNC_NAME:
+            if len(value) > 1 and value[1][0] == self.FUNC_NAME:
                 {{vKey0}} = key
             else:
                 {{vKey1}} = key

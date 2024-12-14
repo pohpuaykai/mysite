@@ -59,18 +59,18 @@ class Nroot(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if value[1][0] == self.FUNC_NAME:
+            if len(value) > 1 and value[1][0] == self.FUNC_NAME:
                 key0 = key
             else:
                 key1 = key
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
         
-        from foundation.automat.arithmetic.standard.divide import Divide
+        from foundation.automat.arithmetic.standard.exponential import Exponential
         
         from foundation.automat.arithmetic.standard.logarithm import Logarithm
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Divide.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": key1, "newValue": (1, (Logarithm.FUNC_NAME, replacementDictionary[key1][1][1]))}, 0: {"newKey": (Logarithm.FUNC_NAME, totalNodeCount), "newValue": (replacementDictionary[key1][1], replacementDictionary[key0][0])}}, {Divide.FUNC_NAME: 1, Logarithm.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Logarithm.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Logarithm.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Logarithm.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
 
     
     def _reverse2(self, replacementDictionary, totalNodeCount):
@@ -103,18 +103,18 @@ class Nroot(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if value[1][0] == self.FUNC_NAME:
+            if len(value) > 1 and value[1][0] == self.FUNC_NAME:
                 key0 = key
             else:
                 key1 = key
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
         
-        from foundation.automat.arithmetic.standard.divide import Divide
+        from foundation.automat.arithmetic.standard.exponential import Exponential
         
         from foundation.automat.arithmetic.standard.logarithm import Logarithm
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Exponential.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": key1, "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Exponential.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Exponential.FUNC_NAME, replacementDictionary[key0][1][1]))}, key1: {"newKey": (Exponential.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Exponential.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
 
     
 
