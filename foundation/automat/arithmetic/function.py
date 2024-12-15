@@ -107,9 +107,10 @@ class Function:#(metaclass=FunctionHook):
 
 
 
-    def __init__(self, equation):
+    def __init__(self, equation, verbose=False):
         self.eq = equation
         self.inverses = None
+        self.verbose = verbose
 
 
     def substitute(self, substitutionDictionary):
@@ -172,7 +173,7 @@ class Function:#(metaclass=FunctionHook):
                 del ast[(current.label, current.id)]
         return ast # substituted ast
 
-    def reverse(self, argumentIdx, nodeIds):
+    def reverse(self, equationSide, argumentIdx, nodeIds):
         """
         #~ DRAFT ~#
         make argumentIdx the subject of the subAST
@@ -200,10 +201,19 @@ class Function:#(metaclass=FunctionHook):
             if key[1] in nodeIds:
                 replacementDictionary[key] = value
 
+        if self.verbose:
+            print('replacementDictionary')
+            print(replacementDictionary)
+            print('len(replacementDictionary):', len(replacementDictionary))
+
 
         #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
-        (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange) = self.reverses[argumentIdx](
+        (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange) = self.reverses[(equationSide, str(argumentIdx))](
             replacementDictionary, self.eq.totalNodeCount)
+
+        if self.verbose:
+            print('invertedResults')
+            print(invertedResults)
 
 
         for oldKey, oldValue in invertedResults.items():

@@ -88,14 +88,22 @@ class Equation:
                     label, #label
                     None, #neighbours
                     argumentIdx, #argumentIdx
-                    current, #prev
+                    current, #prev=parent
                     idx
                 )
                 stack.append(backtracker)
         if found is None:
             raise Exception("No path to variable") # this shouldn't happen, most probably a parser error
+        #find out which side of the equation found is on, need to backtrack all the way back to =, and see its argumentIdx
         if self.verbose:
             print('found.label:', found.label)
+        foundBackUp = Backtracker(
+            found.label,
+            None,
+            found.argumentIdx,
+            found.prev,
+            found.id
+        )
         ops = [{
                     'functionName':found.label,
                     'argumentIdx':found.argumentIdx, # this is the argumentIdx of self in its parent
@@ -114,6 +122,24 @@ class Equation:
             # print('oplabel', found.label, ops)
         # originalAst = deepcopy(self.ast)
         #
+        found = foundBackUp #reset found
+        while found.prev is not None:
+            if found.prev.label == '=':
+                firstAncestorOfFound = (found.label, found.id)
+                if self.verbose:
+                    print(firstAncestorOfFound)
+                childrenOfEquals = self.ast[('=', 0)]
+                firstAncestorOfFoundChildIdx = childrenOfEquals.index(firstAncestorOfFound)
+                if firstAncestorOfFoundChildIdx == 0:#left side
+                    equationSide = 'L'
+                elif firstAncestorOfFoundChildIdx == 1:#right side
+                    equationSide = 'R'
+                else:
+                    raise Exception(f'firstAncestorOfFoundChildIdx: {firstAncestorOfFoundChildIdx}')
+            found = found.prev
+        if equationSide != 'L' and equationSide != 'R':
+            raise Exception(f'equationSide must be L or R, equationSide:{equationSide}')
+
         operationOrderWithIdx = []
         for opIdx in range(1, len(ops)):
             hinOp = ops[opIdx-1]
@@ -139,15 +165,15 @@ class Equation:
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_END
         #apply the inverses
         while len(ops) != 0:
-            op = ops.pop(0) # apply in reverse order (start with the one nearest to =)
+            op = ops.pop(-1) # apply in reverse order (start with the one nearest to =)
             if self.verbose:
                 print('applying op', op)
             functionClass = getFunctionClass(op['functionName'])
-            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self).reverse(
-                op['argumentIdx']+1, [op['id'], op['lastId']]
+            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self, verbose=self.verbose).reverse(
+                equationSide, op['argumentIdx'], [op['id'], op['lastId']]
             )#magic 1 because of our stupid conventionDecision, refactor if you wish
             #update the `stat` of self
-            self.ast = invertedAst
+            self.ast = invertedAst #TODO since equation is changed after each op, we have to recalculate the next op again, after the reversal... and so, we only need to calculate one op at a time... => might it go into an infinity loop?
             for funcName, countChange in functionCountChange.items():
                 originalSum = self.functions.get(funcName, 0) + countChange
                 self.functions[funcName] = originalSum

@@ -14,7 +14,7 @@ def test__moreThan1Op__seriesResistance0(verbose=False):
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'R_1-R_3=R_2' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -29,7 +29,7 @@ def test__moreThan1Op__seriesResistance1(verbose=False):
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'R_1-R_2=R_3' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -44,7 +44,7 @@ def test__moreThan1Op__parallelResistance0(verbose=False):
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = 'R_1=\\frac{1}{\\frac{1}{R_2}+\\frac{1}{R_3}}' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -364,8 +364,8 @@ def test__moreThan1Op__acPower2(verbose=False):
 if __name__=='__main__':
     # test__moreThan1Op__seriesResistance0(True)
     # test__moreThan1Op__seriesResistance1(True)
-    test__moreThan1Op__parallelResistance0(True) # not tested yet
-    # test__moreThan1Op__parallelResistance1(True) # not tested yet
+    # test__moreThan1Op__parallelResistance0(True)
+    test__moreThan1Op__parallelResistance1(True) # not tested yet
     # test__moreThan1Op__parallelResistance2(True) # not tested yet
     # test__moreThan1Op__ohmPowerLaw0(True) # not tested yet
     # test__moreThan1Op__ohmPowerLaw1(True) # not tested yet

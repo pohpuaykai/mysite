@@ -14,15 +14,14 @@ class {{className}}(Function):
         kwargs['funcName'] = '{{funcName}}'
         super().__init_subclass__(**kwargs)
 
-    def __init__(self, equation):
+    def __init__(self, equation, verbose=False):
         """
 
         """
         super().__init__(equation)
         self.reverses = {
-            {% for i in range(num_of_variables) %}
-                {{i+1}}: self._reverse{{i+1}}{% if not loop.last %},
-                {% endif %}
+            {% for (equationSide, argumentIdx), reverseFunctionName in mainTemplateReverseFunctionNames %}
+                ("{{equationSide}}", "{{argumentIdx}}"): self.{{reverseFunctionName}}{% if not loop.last %},{% endif %}
             {% endfor %}
         }
 

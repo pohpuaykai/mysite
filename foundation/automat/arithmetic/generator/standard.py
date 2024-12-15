@@ -107,8 +107,9 @@ class StandardFunctionClassGenerator:
                         else:
                             resultStr += c
                     return resultStr
+                mainTemplateReverseFunctionNames = []
                 returnReversesCode = []
-                for idx, reverseReturn in enumerate(config['return_reverse']["reversedAst"]):
+                for reverseReturn in config['return_reverse']["reversedAst"]:
                     functionReturns = recursiveNaiveTraverseAndEditToTuple(reverseReturn, subShortHandWithActualCode)
                     functionCountAdded = functionReturns['functionCountAdded']
                     del functionReturns['functionCountAdded']
@@ -116,10 +117,18 @@ class StandardFunctionClassGenerator:
                     del functionReturns['primitiveCountAdded']
                     totalNodeCountAdded = functionReturns['totalNodeCountAdded']
                     del functionReturns['totalNodeCountAdded']
+                    reverseFunctionImports = reverseReturn['imports']
+                    del functionReturns['imports']
                     #fill template for reverse function
+                    equationSide = functionReturns['equationSide']
+                    del functionReturns['equationSide']
+                    argumentIdx = functionReturns['argumentIdx']
+                    del functionReturns['argumentIdx']
                     reverseFTemplate = environment.get_template("function_reverse.py.jinja2")
                     renderedReverseFTemplate = reverseFTemplate.render({
-                        'idx':idx,
+                        'idx':argumentIdx,
+                        'equationSide':equationSide,
+                        'valueSideIdx': 0 if equationSide == 'L' else 1,
                         'vReplacementDict':initSubstitutionDict['@vrD@'],
                         'vTotalNodeCount':initSubstitutionDict['@vtN@'],
                         'funcName':initSubstitutionDict['@fN@'],
@@ -130,9 +139,10 @@ class StandardFunctionClassGenerator:
                         'functionCountAdded':str(functionCountAdded).replace("'", ""),#self.pformat(functionCountAdded).replace("'", ""), # we are assuming that pformat string always have use '"' to quote strings
                         'primitivesCountAdded':primitiveCountAdded,
                         'totalNodeCountAdded':totalNodeCountAdded,
-                        'imports':config['return_reverse']['imports'] if 'imports' in config['return_reverse'] else [],
+                        'reverseFunctionImports':reverseFunctionImports,
                     })
                     returnReversesCode.append(renderedReverseFTemplate)
+                    mainTemplateReverseFunctionNames.append(((equationSide, argumentIdx), f'_reverse{equationSide}{argumentIdx}'))
 
                 #fill template for calculate function
                 calculateFTemplate = environment.get_template("function_calculate.py.jinja2")
@@ -145,11 +155,13 @@ class StandardFunctionClassGenerator:
 
                 #main template for this class
                 mainFTemplate = environment.get_template("function.py.jinja2")
+                
                 renderedMainFTemplate = mainFTemplate.render({
                     'type':initSubstitutionDict['@te@'] if '@te@' in initSubstitutionDict else 'other',
                     'className':initSubstitutionDict['@cN@'],
                     'funcName':initSubstitutionDict['@fN@'],
-                    'num_of_variables':config['return_calculation'][0]['variableCount'],
+                    # 'num_of_variables':config['return_calculation'][0]['variableCount'],
+                    'mainTemplateReverseFunctionNames':mainTemplateReverseFunctionNames,
                     'reverseFunctionStrs':returnReversesCode,
                     'calculateFunctionStr':renderedCalculateFTemplate,
                     'imports':config['imports']
