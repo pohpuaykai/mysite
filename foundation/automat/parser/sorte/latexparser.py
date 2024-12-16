@@ -61,6 +61,7 @@ class Latexparser(Parser):
                 '_updateInfixNearestBracketInfix':False,
                 '__updateInfixNearestBracketInfix':False,#
                 '_removeCaretThatIsNotExponent':False,
+                '_tagBracketsToExponent':False,
                 '_findLeftOverPosition':False,
                 '_contiguousLeftOvers':False,
                 '_collateBackslashInfixLeftOversToContiguous':False,
@@ -198,7 +199,8 @@ class Latexparser(Parser):
                     'openBracketType':o, 
                     'closeBracketType':self.open__close[o], 
                     'openBracketPos':matchingOpenBracketPos, 
-                    'closeBracketPos':idx
+                    'closeBracketPos':idx,
+                    'belongToExponent':False
                 })
                 self.bracketStartToEndMap[matchingOpenBracketPos+len(o)] = idx # this is for _findBackSlashPositions, which takes argstartpos, statt bracketstartpos.
                 # if self.showError():
@@ -593,8 +595,8 @@ class Latexparser(Parser):
                 """
                 if vInfoDict['argument1StartPosition'] is not None and (vInfoDict['argument1StartPosition'] - lenOrZero(vInfoDict['argument1BracketType'])) == bracketInfoDict['openBracketPos']:# and (vInfoDict['argument1StartPosition'] - lenOrZero(vInfoDict['argument1BracketType'])) <= startBracketPos and endBracketPos <= (vInfoDict['argument1EndPosition'] + lenOrZero(vInfoDict['argument1BracketType'])):
 
-                    # if self.showError():
-                    #     print('bracketPos: ', (startBracketPos, endBracketPos), ' is arg Of backslashVariable: ', (vInfoDict['name'], vInfoDict['startPos']))
+                    if self.showError():
+                        print('bracketPos: ', (startBracketPos, endBracketPos), ' is arg Of backslashVariable: ', (vInfoDict['name'], vInfoDict['startPos']))
                     bracketInfoDict['belongToBackslash'] = True
                     continue
             #######
@@ -609,8 +611,8 @@ class Latexparser(Parser):
                 ##########################
                 if fInfoDict['argument1BracketType'] is not None and (fInfoDict['argument1StartPosition'] - lenOrZero(fInfoDict['argument1BracketType'])) == bracketInfoDict['openBracketPos'] :# and (fInfoDict['argument1StartPosition'] - lenOrZero(fInfoDict['argument1BracketType'])) <= startBracketPos and endBracketPos <= (fInfoDict['argument1EndPosition'] + lenOrZero(fInfoDict['argument1BracketType'])):
 
-                    # if self.showError():
-                    #     print('bracketPos: ', (startBracketPos, endBracketPos), ' is arg1 Of backslashFunction: ', (fInfoDict['name'], fInfoDict['startPos']))
+                    if self.showError():
+                        print('bracketPos: ', (startBracketPos, endBracketPos), ' is arg1 Of backslashFunction: ', (fInfoDict['name'], fInfoDict['startPos']))
                     bracketInfoDict['belongToBackslash'] = True
                     continue
                 ##########################
@@ -619,10 +621,13 @@ class Latexparser(Parser):
                 ##########################
                 if fInfoDict['argument2BracketType'] is not None and (fInfoDict['argument2StartPosition'] - lenOrZero(fInfoDict['argument2BracketType'])) == bracketInfoDict['openBracketPos']:# and (fInfoDict['argument2StartPosition'] - lenOrZero(fInfoDict['argument2BracketType'])) <= startBracketPos and endBracketPos <= (fInfoDict['argument2EndPosition'] + lenOrZero(fInfoDict['argument2BracketType'])):
 
-                    # if self.showError():
-                    #     print('bracketPos: ', (startBracketPos, endBracketPos), ' is arg2 Of backslashFunction: ', (fInfoDict['name'], fInfoDict['startPos']))
+                    if self.showError():
+                        print('bracketPos: ', (startBracketPos, endBracketPos), ' is arg2 Of backslashFunction: ', (fInfoDict['name'], fInfoDict['startPos']))
                     bracketInfoDict['belongToBackslash'] = True
                     continue
+
+            if self.showError():
+                print(bracketInfoDict)
 
 
 
@@ -1048,6 +1053,22 @@ class Latexparser(Parser):
             self.event__removeCaretThatIsNotExponent.set()
 
 
+    def _tagBracketsToExponent(self):#TODO rename to _tagBracketsToInfix
+        #THis has to happen after the removing fake exponents
+        for infixInfoDict in self.infixList:
+            for bracketInfoDict in self.matchingBracketsLocation:
+                #check if directly right of exponent is curly brackets
+                # if infixInfoDict['name'] == '^':
+                if infixInfoDict['position'] + len(infixInfoDict['name']) == bracketInfoDict['openBracketPos']:
+                    bracketInfoDict['belongToExponent'] = True
+                if infixInfoDict['position'] == bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType']):
+                    bracketInfoDict['belongToExponent'] = True
+                for infixBracket in infixInfoDict['enclosingBracketsNonBackslashArg']:
+                    # import pdb;pdb.set_trace()
+                    if infixBracket['enclosingStartPos'] == bracketInfoDict['openBracketPos']:
+                        bracketInfoDict['belongToExponent'] = True
+
+
     def _findLeftOverPosition(self):
         if self.parallelise:
             self.event__removeCaretThatIsNotExponent.wait()
@@ -1076,17 +1097,37 @@ class Latexparser(Parser):
             if functionInfoDict['argument2SubSuperPos'] is not None: # there is a ^ or _ on argument2
                 listOfOccupiedRanges.add((functionInfoDict['argument2SubSuperPos'], functionInfoDict['argument2SubSuperPos']+len(functionInfoDict['argument2SubSuperType'])))
         # sortedListOfOccupiedRanges = sorted(listOfOccupiedRanges, key=lambda tup: tup[0]) # TODO sort for binary search
+        # import pdb;pdb.set_trace()
+        self.occupiedBracketsNonBackslash = set()# for bubble merge later, these entreSpaces are connected
+        self.occupiedBrackets = set()
+        for bracketInfoDict in self.matchingBracketsLocation:
+            if bracketInfoDict['belongToBackslash'] or bracketInfoDict['belongToExponent']:
+                for pos in range(bracketInfoDict['openBracketPos'], bracketInfoDict['openBracketPos']+len(bracketInfoDict['openBracketType'])):
+                    self.occupiedBrackets.add(pos)
+                for pos in range(bracketInfoDict['closeBracketPos'], bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType'])):
+                    self.occupiedBrackets.add(pos)
+            if bracketInfoDict['belongToExponent'] and not bracketInfoDict['belongToBackslash']:
+                for pos in range(bracketInfoDict['openBracketPos'], bracketInfoDict['openBracketPos']+len(bracketInfoDict['openBracketType'])):
+                    self.occupiedBracketsNonBackslash.add(pos)
+                for pos in range(bracketInfoDict['closeBracketPos'], bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType'])):
+                    self.occupiedBracketsNonBackslash.add(pos)
 
-        self.occupiedBrackets = set()#[]# for bubble merge later, these entreSpaces are connected
+        # import pdb;pdb.set_trace()
         #self.infixOperatorPositions
         for infixInfoDict in self.infixList:
             listOfOccupiedRanges.add((infixInfoDict['position'], infixInfoDict['position']+len(infixInfoDict['name']))) # might have repeats since some 'brackets' are infixes
             # import pdb;pdb.set_trace()
             #add all the brackets that do not belong to backSlash 
             for bracketInfoDict in self.matchingBracketsLocation:
-                if not bracketInfoDict['belongToBackslash']:
-                    for pos in range(bracketInfoDict['openBracketPos'], bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType'])):
+                # if self.showError():
+                #     print('infix: ', (infixInfoDict['name'], infixInfoDict['position']), ' has bracket: ', bracketInfoDict, '?')
+                # if not bracketInfoDict['belongToBackslash']: # added belongToExponent
+                if not bracketInfoDict['belongToBackslash'] and bracketInfoDict['belongToExponent']:
+                    for pos in range(bracketInfoDict['openBracketPos'], bracketInfoDict['openBracketPos']+len(bracketInfoDict['openBracketType'])):
                         self.occupiedBrackets.add(pos)
+                    for pos in range(bracketInfoDict['closeBracketPos'], bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType'])):
+                        self.occupiedBrackets.add(pos)
+        # import pdb;pdb.set_trace()
         self.occupiedBrackets = sorted(list(self.occupiedBrackets))
 
         """
@@ -1098,13 +1139,20 @@ class Latexparser(Parser):
             # TODO binary search
             occupied = False 
             for occupiedRange in listOfOccupiedRanges:
-                if occupiedRange[0] <= pos and pos < occupiedRange[1]:
+                if (occupiedRange[0] <= pos and pos < occupiedRange[1]) or pos in self.occupiedBrackets:
                     occupied = True
             if not occupied:
-                if self._eqs[pos] in (Latexparser.OPEN_BRACKETS+Latexparser.CLOSE_BRACKETS):
-                    self.occupiedBrackets.append(pos)
-                else:
-                    self.unoccupiedPoss.add(pos)
+                ###################OG
+                # if self._eqs[pos] in (Latexparser.OPEN_BRACKETS+Latexparser.CLOSE_BRACKETS):
+                #     self.occupiedBrackets.append(pos)
+                # else:
+                #     self.unoccupiedPoss.add(pos)
+                ###################OG
+                ###########
+                self.unoccupiedPoss.add(pos)
+                ###########
+
+
                 # if self._eqs[pos] not in (Latexparser.OPEN_BRACKETS+Latexparser.CLOSE_BRACKETS): # exclude brackets from becoming variables and numbers
                 #     self.unoccupiedPoss.add(pos)
         self.unoccupiedPoss = sorted(list(self.unoccupiedPoss))
@@ -1276,7 +1324,17 @@ class Latexparser(Parser):
                 self.consecutiveGroups[(ding[sKey], ding[eKey])] = [ding]
 
 
-
+        if self.verbose:
+            print('self.occupiedBrackets')
+            print(self.occupiedBrackets)
+            print('self.occupiedBrackets(ACTUAL)')
+            occupiedBracketsStr = list(map(lambda pos: self._eqs[pos], self.occupiedBrackets))
+            print(occupiedBracketsStr)
+            print('self.occupiedBracketsNonBackslash')
+            print(self.occupiedBracketsNonBackslash)
+            print('self.occupiedBracketsNonBackslash(ACTUAL)')
+            occupiedBracketsNonBackslashStr = list(map(lambda pos: self._eqs[pos], self.occupiedBracketsNonBackslash))
+            print(occupiedBracketsNonBackslashStr)
 
         from foundation.automat.common.bubblemerge import BubbleMerge
 
@@ -1284,7 +1342,7 @@ class Latexparser(Parser):
         def prependable0(range0, range1):
             hikinoko = []
             for hiki in range(range0[1], range1[0]):
-                if hiki not in self.occupiedBrackets:
+                if hiki not in self.occupiedBracketsNonBackslash:
                     hikinoko.append(self._eqs[hiki])
             if range0[1]<=range1[0] and len(''.join(hikinoko).strip()) == 0:
                 return True
@@ -1292,7 +1350,7 @@ class Latexparser(Parser):
         def appendable0(range0, range1):
             hikinoko = []
             for hiki in range(range0[1], range1[0]):
-                if hiki not in self.occupiedBrackets:
+                if hiki not in self.occupiedBracketsNonBackslash:
                     hikinoko.append(self._eqs[hiki])
             if range0[1]<=range1[0] and len(''.join(hikinoko).strip()) == 0:
                 return True
@@ -1745,7 +1803,6 @@ class Latexparser(Parser):
                     print('*********_graftGrenzeRangesIntoContainmentTree********************************')
                     print('**********************alleDing:')
                 #####################
-        # self.__latexSpecialCases() #changes are made to the AST...
 
 
     def __addImplicitZero(self, dings):
@@ -3078,6 +3135,7 @@ if __name__=='__main__':
         self._tagBracketsToBackslash()
         self._updateInfixNearestBracketInfix()
         self._removeCaretThatIsNotExponent()
+        self._tagBracketsToExponent()
         self._findLeftOverPosition()
         self._contiguousLeftOvers()
         self._collateBackslashInfixLeftOversToContiguous()

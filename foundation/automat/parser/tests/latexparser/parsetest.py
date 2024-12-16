@@ -18,6 +18,49 @@ def test__contiguousLeftOvers__decimalPlaces(verbose=False):
         pp.pprint(parser.ast)
 
 
+
+def test__weirdVariables__variablesWithCurlyBracketsSimple(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = 'V_{BE}=V'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {('=', 0): [('V_{BE}', 1), ('V', 2)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__weirdVariables__variablesWithCurlyBracketsMinus(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = 'V_B-V_{BE}=V'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {('-', 2): [('V_B', 1), ('V_{BE}', 3)], ('=', 0): [('-', 2), ('V', 4)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__weirdVariables__variablesWithCurlyBracketsFrac(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = '\\frac{V_B-V_{BE}}{R_B}=V'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   
+    ('-', 4): [('V_B', 3), ('V_{BE}', 5)],
+    ('/', 2): [('-', 4), ('R_B', 6)],
+    ('=', 0): [('/', 2), ('V', 1)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
 def test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
@@ -365,7 +408,8 @@ def test__BODMAS__enclosingBracketInBackslashArgImplicitZero(verbose=False):
     equationStr = '\\frac{2}{(x-1)(x+1)} = \\frac{1}{x-1} + \\frac{-1}{x+1}'
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
-    expected_ast = {   ('*', 8): [('-', 6), ('+', 10)],
+    expected_ast = {   
+    ('*', 8): [('-', 6), ('+', 10)],
     ('+', 3): [('/', 2), ('/', 4)],
     ('+', 10): [('x', 9), ('1', 11)],
     ('+', 21): [('x', 20), ('1', 22)],
@@ -541,30 +585,29 @@ def test__backslashInfixInBackslash__fracInFrac(verbose=False):
         pp.pprint(parser.ast)
 
 
-def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False):
+def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False): # TODO not entirely correct... should treat P(x) differently... not sure how yet
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = 'P(x) = 7x^{13} - 3x^{9} + 5x^{8} - \\sqrt{2}x^{4} + \\pi x^{2} - 42'
+    equationStr = 'P = 7x^{13} - 3x^{9} + 5x^{8} - \\sqrt{2}x^{4} + \\pi x^{2} - 42' # 'P(x) = 7x^{13} - 3x^{9} + 5x^{8} - \\sqrt{2}x^{4} + \\pi x^{2} - 42', but we cannot handle P(x) now
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
-    expected_ast = {   ('*', 2): [('P', 1), ('x', 3)],
-    ('*', 5): [('7', 4), ('^', 7)],
-    ('*', 11): [('3', 10), ('^', 13)],
-    ('*', 17): [('5', 16), ('^', 19)],
-    ('*', 23): [('nroot', 22), ('^', 25)],
-    ('*', 29): [('pi', 28), ('^', 31)],
-    ('+', 15): [('-', 9), ('-', 21)],
-    ('+', 27): [('+', 15), ('-', 33)],
-    ('-', 9): [('*', 5), ('*', 11)],
-    ('-', 21): [('*', 17), ('*', 23)],
-    ('-', 33): [('*', 29), ('42', 34)],
-    ('=', 0): [('*', 2), ('+', 27)],
-    ('^', 7): [('x', 6), ('13', 8)],
-    ('^', 13): [('x', 12), ('9', 14)],
-    ('^', 19): [('x', 18), ('8', 20)],
-    ('^', 25): [('x', 24), ('4', 26)],
-    ('^', 31): [('x', 30), ('2', 32)],
-    ('nroot', 22): [(2, 36), ('2', 35)]}
+    expected_ast = {   ('*', 2): [('7', 1), ('^', 4)],
+    ('*', 8): [('3', 7), ('^', 10)],
+    ('*', 14): [('5', 13), ('^', 16)],
+    ('*', 20): [('nroot', 19), ('^', 22)],
+    ('*', 26): [('pi', 25), ('^', 28)],
+    ('+', 12): [('-', 6), ('-', 18)],
+    ('+', 24): [('+', 12), ('-', 30)],
+    ('-', 6): [('*', 2), ('*', 8)],
+    ('-', 18): [('*', 14), ('*', 20)],
+    ('-', 30): [('*', 26), ('42', 31)],
+    ('=', 0): [('P', 32), ('+', 24)],
+    ('^', 4): [('x', 3), ('13', 5)],
+    ('^', 10): [('x', 9), ('9', 11)],
+    ('^', 16): [('x', 15), ('8', 17)],
+    ('^', 22): [('x', 21), ('4', 23)],
+    ('^', 28): [('x', 27), ('2', 29)],
+    ('nroot', 19): [(2, 34), ('2', 33)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
@@ -573,20 +616,19 @@ def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False):
 def test__hassliche__nestedPolynomial(verbose=False): # TODO not entirely correct... should treat Q(x) differently... not sure how yet
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = 'Q(x) = (x^3 - 2x^2 + 5x - 7)^2 - (x - 1)^3 + 3x^{21}'
+    equationStr = 'Q = (x^3 - 2x^2 + 5x - 7)^2 - (x - 1)^3 + 3x^{21}' # 'Q(x) = (x^3 - 2x^2 + 5x - 7)^2 - (x - 1)^3 + 3x^{21}', but we cannot handle Q(x) now
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {   ('*', 6): [('2', 5), ('^', 8)],
     ('*', 12): [('5', 11), ('x', 13)],
     ('*', 26): [('3', 25), ('^', 28)],
-    ('*', 31): [('Q', 30), ('x', 32)],
     ('+', 10): [('-', 4), ('-', 14)],
     ('+', 24): [('^', 22), ('*', 26)],
     ('-', 4): [('^', 2), ('*', 6)],
     ('-', 14): [('*', 12), ('7', 15)],
     ('-', 18): [('^', 16), ('+', 24)],
     ('-', 20): [('x', 19), ('1', 21)],
-    ('=', 0): [('*', 31), ('-', 18)],
+    ('=', 0): [('Q', 30), ('-', 18)],
     ('^', 2): [('x', 1), ('3', 3)],
     ('^', 8): [('x', 7), ('2', 9)],
     ('^', 16): [('+', 10), ('2', 17)],
@@ -600,26 +642,25 @@ def test__hassliche__nestedPolynomial(verbose=False): # TODO not entirely correc
 def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=False): # TODO not entirely correct... should treat R(x) differently... not sure how yet
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = 'R(x) = -0.5x^{10} + 3.14x^{8} - \\frac{2}{3}x^{5} + 1.618x^{3} - \\frac{1}{x}'
+    equationStr = 'R = -0.5x^{10} + 3.14x^{8} - \\frac{2}{3}x^{5} + 1.618x^{3} - \\frac{1}{x}' # 'R(x) = -0.5x^{10} + 3.14x^{8} - \\frac{2}{3}x^{5} + 1.618x^{3} - \\frac{1}{x}', but we cannot handle R(x) now
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
-    expected_ast = {   ('*', 2): [('R', 1), ('x', 3)],
-    ('*', 7): [('0.5', 6), ('^', 9)],
-    ('*', 13): [('3.14', 12), ('^', 15)],
-    ('*', 19): [('/', 18), ('^', 21)],
-    ('*', 25): [('1.618', 24), ('^', 27)],
-    ('+', 11): [('-', 5), ('-', 17)],
-    ('+', 23): [('+', 11), ('-', 29)],
-    ('-', 5): [('0', 4), ('*', 7)],
-    ('-', 17): [('*', 13), ('*', 19)],
-    ('-', 29): [('*', 25), ('/', 30)],
-    ('/', 18): [('2', 31), ('3', 32)],
-    ('/', 30): [('1', 33), ('x', 34)],
-    ('=', 0): [('*', 2), ('+', 23)],
-    ('^', 9): [('x', 8), ('10', 10)],
-    ('^', 15): [('x', 14), ('8', 16)],
-    ('^', 21): [('x', 20), ('5', 22)],
-    ('^', 27): [('x', 26), ('3', 28)]}
+    expected_ast = {   ('*', 4): [('0.5', 3), ('^', 6)],
+    ('*', 10): [('3.14', 9), ('^', 12)],
+    ('*', 16): [('/', 15), ('^', 18)],
+    ('*', 22): [('1.618', 21), ('^', 24)],
+    ('+', 8): [('-', 2), ('-', 14)],
+    ('+', 20): [('+', 8), ('-', 26)],
+    ('-', 2): [('0', 1), ('*', 4)],
+    ('-', 14): [('*', 10), ('*', 16)],
+    ('-', 26): [('*', 22), ('/', 27)],
+    ('/', 15): [('2', 32), ('3', 29)],
+    ('/', 27): [('1', 30), ('x', 31)],
+    ('=', 0): [('R', 28), ('+', 20)],
+    ('^', 6): [('x', 5), ('10', 7)],
+    ('^', 12): [('x', 11), ('8', 13)],
+    ('^', 18): [('x', 17), ('5', 19)],
+    ('^', 24): [('x', 23), ('3', 25)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
@@ -628,30 +669,28 @@ def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=F
 def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(verbose=False): # TODO not entirely correct... should treat S(x, y) differently... not sure how yet
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = 'S(x, y) = x^5y^4 - 7x^3y^2 + 2x^2 - y^3 + x^2y - 4'
+    equationStr = 'S = x^5y^4 - 7x^3y^2 + 2x^2 - y^3 + x^2y - 4' # 'S(x, y) = x^5y^4 - 7x^3y^2 + 2x^2 - y^3 + x^2y - 4', but we cannot handle S(x, y) now
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {   
-    ('*', 2): [('S', 1), ('*', 4)],
-    ('*', 4): [('x,', 3), ('y', 5)],
-    ('*', 9): [('^', 7), ('^', 11)],
-    ('*', 15): [('7', 14), ('^', 17)],
-    ('*', 19): [('*', 15), ('^', 21)],
-    ('*', 25): [('2', 24), ('^', 27)],
-    ('*', 37): [('^', 35), ('y', 38)],
-    ('+', 23): [('-', 13), ('-', 29)],
-    ('+', 33): [('+', 23), ('-', 39)],
-    ('-', 13): [('*', 9), ('*', 19)],
-    ('-', 29): [('*', 25), ('^', 31)],
-    ('-', 39): [('*', 37), ('4', 40)],
-    ('=', 0): [('*', 2), ('+', 33)],
-    ('^', 7): [('x', 6), ('5', 8)],
-    ('^', 11): [('y', 10), ('4', 12)],
-    ('^', 17): [('x', 16), ('3', 18)],
-    ('^', 21): [('y', 20), ('2', 22)],
-    ('^', 27): [('x', 26), ('2', 28)],
-    ('^', 31): [('y', 30), ('3', 32)],
-    ('^', 35): [('x', 34), ('2', 36)]}
+    ('*', 4): [('^', 2), ('^', 6)],
+    ('*', 10): [('7', 9), ('^', 12)],
+    ('*', 14): [('*', 10), ('^', 16)],
+    ('*', 20): [('2', 19), ('^', 22)],
+    ('*', 32): [('^', 30), ('y', 33)],
+    ('+', 18): [('-', 8), ('-', 24)],
+    ('+', 28): [('+', 18), ('-', 34)],
+    ('-', 8): [('*', 4), ('*', 14)],
+    ('-', 24): [('*', 20), ('^', 26)],
+    ('-', 34): [('*', 32), ('4', 35)],
+    ('=', 0): [('S', 36), ('+', 28)],
+    ('^', 2): [('x', 1), ('5', 3)],
+    ('^', 6): [('y', 5), ('4', 7)],
+    ('^', 12): [('x', 11), ('3', 13)],
+    ('^', 16): [('y', 15), ('2', 17)],
+    ('^', 22): [('x', 21), ('2', 23)],
+    ('^', 26): [('y', 25), ('3', 27)],
+    ('^', 30): [('x', 29), ('2', 31)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
@@ -660,25 +699,24 @@ def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(
 def test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(verbose=False): # TODO not entirely correct... should treat T(x) differently... not sure how yet
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = 'T(x) = e^{x} - \\cos(x)x^4 + x^3\\sin(x) - \\ln(x^2+1)'
+    equationStr = 'T = e^{x} - \\cos(x)x^4 + x^3\\sin(x) - \\ln(x^2+1)' # 'T(x) = e^{x} - \\cos(x)x^4 + x^3\\sin(x) - \\ln(x^2+1)', but we cannot handle T(x) now
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {   
-    ('*', 2): [('T', 1), ('x', 3)],
-    ('*', 9): [('cos', 8), ('^', 11)],
-    ('*', 17): [('^', 15), ('sin', 18)],
-    ('+', 13): [('-', 7), ('-', 19)],
-    ('+', 26): [('^', 24), ('1', 27)],
-    ('-', 7): [('^', 5), ('*', 9)],
-    ('-', 19): [('*', 17), ('log', 20)],
-    ('=', 0): [('*', 2), ('+', 13)],
-    ('^', 5): [('e', 4), ('x', 6)],
-    ('^', 11): [('x', 10), ('4', 12)],
-    ('^', 15): [('x', 14), ('3', 16)],
-    ('^', 24): [('x', 23), ('2', 25)],
-    ('cos', 8): [('x', 21)],
-    ('log', 20): [('e', 28), ('+', 26)],
-    ('sin', 18): [('x', 22)]}
+    ('*', 6): [('cos', 5), ('^', 8)],
+    ('*', 14): [('^', 12), ('sin', 15)],
+    ('+', 10): [('-', 4), ('-', 16)],
+    ('+', 22): [('^', 20), ('1', 23)],
+    ('-', 4): [('^', 2), ('*', 6)],
+    ('-', 16): [('*', 14), ('log', 17)],
+    ('=', 0): [('T', 18), ('+', 10)],
+    ('^', 2): [('e', 1), ('x', 3)],
+    ('^', 8): [('x', 7), ('4', 9)],
+    ('^', 12): [('x', 11), ('3', 13)],
+    ('^', 20): [('x', 19), ('2', 21)],
+    ('cos', 5): [('x', 24)],
+    ('log', 17): [('e', 26), ('+', 22)],
+    ('sin', 15): [('x', 25)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
@@ -690,8 +728,7 @@ def test__hassliche__degree5(verbose=False):
     equationStr = '(x - 1)(x + 2)(x - 3)(x + 4)(x - 5) = x^5 - 3x^4 - 32x^3 + 94x^2 + 31x - 120'
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
-    expected_ast = {   
-    ('*', 6): [('3', 5), ('^', 8)],
+    expected_ast = {   ('*', 6): [('3', 5), ('^', 8)],
     ('*', 12): [('32', 11), ('^', 14)],
     ('*', 18): [('94', 17), ('^', 20)],
     ('*', 24): [('31', 23), ('x', 25)],
@@ -888,6 +925,9 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 if __name__=='__main__':
     test__contiguousLeftOvers__decimalPlaces()
+    test__weirdVariables__variablesWithCurlyBracketsSimple()
+    test__weirdVariables__variablesWithCurlyBracketsMinus()
+    test__weirdVariables__variablesWithCurlyBracketsFrac()
     test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
     test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
     test__findingBackSlashAndInfixOperations__Trig0()

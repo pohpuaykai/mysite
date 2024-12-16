@@ -61,16 +61,3 @@ class Standardconfigoneargument:
                 info(f"written {content} {os.linesep} {filename} to {directory}")
 
 
-
-
-import sys
-if __name__=='__main__':
-    flag = sys.argv[1] if len(sys.argv) > 1 else 'alles'
-    toRun = None
-    if flag == 'alles':
-        toRun = None
-    else:
-        toRun = flag
-    print('standardconfigoneargument START ', toRun)
-    Standardconfigoneargument.generateConfigurations(verbose=True, toRun=toRun)
-    print('standardconfigoneargument END')
