@@ -262,12 +262,12 @@ def test__moreThan1Op__acVoltage0(verbose=False):
 
 def test__moreThan1Op__acVoltage1(verbose=False):
     latexEq = 'v_t=V_{peak}\\sin(\\omega t+\\phi)'
-    subject = '\\omega'
+    subject = 'omega'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = '\\frac{\\arcsin(\\frac{v_t }{V_{peak}})-\\phi}{t}=\\omega'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -296,12 +296,12 @@ def test__moreThan1Op__acVoltage2(verbose=False):
 
 def test__moreThan1Op__acVoltage3(verbose=False):
     latexEq = 'v_t=V_{peak}\\sin(\\omega t+\\phi)'
-    subject = '\\phi'
+    subject = 'phi'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = '\\arcsin(\\frac{v_t }{V_{peak}})-\\omega t=\\phi'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -317,7 +317,7 @@ def test__moreThan1Op__acPower0(verbose=False):
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = '\\frac{\\frac{P}{\\cos(\\phi )}}{I_{rms}}=V_{rms}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -333,7 +333,7 @@ def test__moreThan1Op__acPower1(verbose=False):
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = '\\frac{\\frac{P}{\\cos(\\phi )}}{V_{rms}}=I_{rms}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -345,12 +345,12 @@ def test__moreThan1Op__acPower1(verbose=False):
 
 def test__moreThan1Op__acPower2(verbose=False):
     latexEq = 'P=V_{rms}I_{rms}\\cos(\\phi)'
-    subject = '\\phi'
+    subject = 'phi'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -360,26 +360,188 @@ def test__moreThan1Op__acPower2(verbose=False):
 
 
 
+def test__8levelsDeep__impedanceOfParallelRLCCircuit0(verbose=False):
+    latexEq = 'Z = ( \\frac{1}{R} + j ( \\omega C - \\frac{1}{\\omega L} ) )^{-1}'
+    subject = 'R'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__impedanceOfParallelRLCCircuit1(verbose=False):
+    latexEq = 'Z = ( \\frac{1}{R} + j ( \\omega C - \\frac{1}{\\omega L} ) )^{-1}'
+    subject = 'C'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__impedanceOfParallelRLCCircuit2(verbose=False):
+    latexEq = 'Z = ( \\frac{1}{R} + j ( \\omega C - \\frac{1}{\\omega L} ) )^{-1}'
+    subject = 'L'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+
+def test__8levelsDeep__voltageGainOfNonInvertingOp0(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+    subject = 'R_f'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__voltageGainOfNonInvertingOp1(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+    subject = 'R_1'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__voltageGainOfNonInvertingOp2(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+    subject = 'R_o'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__voltageGainOfNonInvertingOp3(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+    subject = 'R_L'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__voltageGainOfNonInvertingOp4(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+    subject = 's'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__8levelsDeep__voltageGainOfNonInvertingOp5(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+    subject = 'C'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
 if __name__=='__main__':
-    # test__moreThan1Op__seriesResistance0(True)
-    # test__moreThan1Op__seriesResistance1(True)
-    # test__moreThan1Op__parallelResistance0(True)
-    # test__moreThan1Op__parallelResistance1(True)
-    # test__moreThan1Op__parallelResistance2(True)
-    # test__moreThan1Op__ohmPowerLaw0(True)
-    # test__moreThan1Op__ohmPowerLaw1(True)
-    # test__moreThan1Op__ohmPowerLaw2(True)
-    # test__moreThan1Op__ohmPowerLaw3(True)
-    # test__moreThan1Op__transistorOhmLaw0(True)
-    # test__moreThan1Op__transistorOhmLaw1(True)
-    # test__moreThan1Op__transistorOhmLaw2(True)
-    # test__moreThan1Op__ebermollsModel0(True)
-    # test__moreThan1Op__ebermollsModel1(True)
-    # test__moreThan1Op__ebermollsModel2(True)
-    # test__moreThan1Op__acVoltage0(True)
-    # test__moreThan1Op__acVoltage1(True) # variable not available... latex parsing did not count \\omega as variable... TODO
-    # test__moreThan1Op__acVoltage2(True)
-    # test__moreThan1Op__acVoltage3(True) # variable not available... latex parsing did not count \\phi as variable... TODO
-    # test__moreThan1Op__acPower0(True) # latex parser treat V_{rms}I_{rms} as one variable ><
-    # test__moreThan1Op__acPower1(True) # latex parser treat V_{rms}I_{rms} as one variable ><
-    test__moreThan1Op__acPower2(True) # latex parser treat V_{rms}I_{rms} as one variable ><
+    test__moreThan1Op__seriesResistance0()
+    test__moreThan1Op__seriesResistance1()
+    test__moreThan1Op__parallelResistance0()
+    test__moreThan1Op__parallelResistance1()
+    test__moreThan1Op__parallelResistance2()
+    test__moreThan1Op__ohmPowerLaw0()
+    test__moreThan1Op__ohmPowerLaw1()
+    test__moreThan1Op__ohmPowerLaw2()
+    test__moreThan1Op__ohmPowerLaw3()
+    test__moreThan1Op__transistorOhmLaw0()
+    test__moreThan1Op__transistorOhmLaw1()
+    test__moreThan1Op__transistorOhmLaw2()
+    test__moreThan1Op__ebermollsModel0()
+    test__moreThan1Op__ebermollsModel1()
+    test__moreThan1Op__ebermollsModel2()
+    test__moreThan1Op__acVoltage0()
+    test__moreThan1Op__acVoltage1()
+    test__moreThan1Op__acVoltage2()
+    test__moreThan1Op__acVoltage3()
+    test__moreThan1Op__acPower0()
+    test__moreThan1Op__acPower1()
+    test__moreThan1Op__acPower2()
+    # test__8levelsDeep__impedanceOfParallelRLCCircuit0(True) # Latex parser error....
+    # test__8levelsDeep__impedanceOfParallelRLCCircuit1(True) # Latex parser error....
+    # test__8levelsDeep__impedanceOfParallelRLCCircuit2(True) # Latex parser error....
+    # test__8levelsDeep__voltageGainOfNonInvertingOp0(True) # Latex parser error....
+    # test__8levelsDeep__voltageGainOfNonInvertingOp1(True) # Latex parser error....
+    # test__8levelsDeep__voltageGainOfNonInvertingOp2(True) # Latex parser error....
+    # test__8levelsDeep__voltageGainOfNonInvertingOp3(True) # Latex parser error....
+    # test__8levelsDeep__voltageGainOfNonInvertingOp4(True) # Latex parser error....
+    # test__8levelsDeep__voltageGainOfNonInvertingOp5(True) # Latex parser error....

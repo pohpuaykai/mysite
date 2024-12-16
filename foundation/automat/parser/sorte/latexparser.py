@@ -570,8 +570,8 @@ class Latexparser(Parser):
                     'hasArgument2':False# TODO this was never used before
                 }#for unparsing function
                 
-                originalCount = self.functions.get(labelName, 0)
-                self.functions[labelName] = originalCount + 1
+                originalCount = self.variables.get(labelName, 0)
+                self.variables[labelName] = originalCount + 1
 
         if self.showError():
             print('event__findBackSlashPositions IS RELEASED')
@@ -1243,17 +1243,38 @@ class Latexparser(Parser):
                     # if wordPosRange[1] is None:
                     #     print(leftOverC)
                     #     wordPosRange[1] = wordPosRange[0]+1 # for easy array index, python array indexing endPos always plus 1
-                    self.contiguousInfoList.append({
-                        'name':word, 
-                        'startPos':wordStartPos,#wordPosRange[0],
-                        'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
-                        'parent':None,
-                        'type':'number' if isNum(word) else 'variable',
-                        'ganzStartPos':wordStartPos,#wordPosRange[0],
-                        'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
-                        'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
-                    })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
-                    self.leaves.add(word)
+
+                    #check if word contains V_{a}I_{b}, which are actually 2 words
+                    splitByCurlyEnds = list(filter(lambda frag: len(frag) > 0, word.split('}')))
+                    # import pdb;pdb.set_trace()
+                    if len(splitByCurlyEnds) > 1:
+                        for frag in splitByCurlyEnds:
+                            fword = frag+'}'
+                            fwordStartPos = wordStartPos + word.index(fword)
+                            fwordEndPos = fwordStartPos + len(fword)
+                            self.contiguousInfoList.append({
+                                'name':fword,
+                                'startPos':fwordStartPos,
+                                'endPos':fwordEndPos,
+                                'parent':None,
+                                'type':'number' if isNum(fword) else 'variable',
+                                'ganzStartPos':fwordStartPos,
+                                'ganzEndPos':fwordEndPos,
+                                'position':fwordStartPos
+                            })
+                            self.leaves.add(fword)
+                    else:
+                        self.contiguousInfoList.append({
+                            'name':word, 
+                            'startPos':wordStartPos,#wordPosRange[0],
+                            'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
+                            'parent':None,
+                            'type':'number' if isNum(word) else 'variable',
+                            'ganzStartPos':wordStartPos,#wordPosRange[0],
+                            'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
+                            'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
+                        })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
+                        self.leaves.add(word)
                 if leftOverC not in ['=', ' ']:
                     word = leftOverC
                     # wordPosRange = [unoccupiedPos, None]
@@ -1273,17 +1294,47 @@ class Latexparser(Parser):
             ############################
             previousIsNume = isNume
             previousPos = unoccupiedPos
-        self.contiguousInfoList.append({
-            'name':word, 
-            'startPos':wordStartPos,#wordPosRange[0],
-            'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
-            'parent':None,
-            'type':'number' if isNum(word) else 'variable',
-            'ganzStartPos':wordStartPos,#wordPosRange[0],
-            'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
-            'position':wordStartPos#wordPosRange[0]#this is for building AST's convienence
-        })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
-        self.leaves.add(word)
+        # self.contiguousInfoList.append({
+        #     'name':word, 
+        #     'startPos':wordStartPos,#wordPosRange[0],
+        #     'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
+        #     'parent':None,
+        #     'type':'number' if isNum(word) else 'variable',
+        #     'ganzStartPos':wordStartPos,#wordPosRange[0],
+        #     'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
+        #     'position':wordStartPos#wordPosRange[0]#this is for building AST's convienence
+        # })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
+        # self.leaves.add(word)
+        splitByCurlyEnds = list(filter(lambda frag: len(frag) > 0, word.split('}')))
+        # import pdb;pdb.set_trace()
+        if len(splitByCurlyEnds) > 1:
+            for frag in splitByCurlyEnds:
+                fword = frag+'}'
+                fwordStartPos = wordStartPos + word.index(fword)
+                fwordEndPos = fwordStartPos + len(fword)
+                self.contiguousInfoList.append({
+                    'name':fword,
+                    'startPos':fwordStartPos,
+                    'endPos':fwordEndPos,
+                    'parent':None,
+                    'type':'number' if isNum(fword) else 'variable',
+                    'ganzStartPos':fwordStartPos,
+                    'ganzEndPos':fwordEndPos,
+                    'position':fwordStartPos
+                })
+                self.leaves.add(fword)
+        else:
+            self.contiguousInfoList.append({
+                'name':word, 
+                'startPos':wordStartPos,#wordPosRange[0],
+                'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
+                'parent':None,
+                'type':'number' if isNum(word) else 'variable',
+                'ganzStartPos':wordStartPos,#wordPosRange[0],
+                'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
+                'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
+            })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
+            self.leaves.add(word)
         #debugging double check that we got the contiguous right....
         if self.showError():
             print('&&&&&&&&&&&&&&&contiguousInfoList&&&&&&&&&&&&&&&&&')
@@ -1324,7 +1375,7 @@ class Latexparser(Parser):
                 self.consecutiveGroups[(ding[sKey], ding[eKey])] = [ding]
 
 
-        if self.verbose:
+        if self.showError():
             print('self.occupiedBrackets')
             print(self.occupiedBrackets)
             print('self.occupiedBrackets(ACTUAL)')
