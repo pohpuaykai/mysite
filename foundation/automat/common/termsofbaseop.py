@@ -29,6 +29,7 @@ class TermsOfBaseOp:
             stack += children
             #
             nodeName, nodeId = currentNode
+            # print(currentNode, children)
             if nodeName == baseOpStr:
                 allIdsWithBaseOp.append(nodeId)
             tNodeId = consecutiveNodeId__latexASTNodeId[nodeId]
@@ -37,22 +38,35 @@ class TermsOfBaseOp:
                 tChildNodeId = consecutiveNodeId__latexASTNodeId[childNodeId]
                 if nodeName == baseOpStr and childNodeName == baseOpStr:
                     uf.union(tNodeId, tChildNodeId)
-        grouping = uf.grouping()
-        groupingByRightId = []
-        for group in grouping:
+        # grouping = uf.grouping()
+        grouping, groupingWithFirstInserted = uf.groupingWithFirstInserted()
+        groupingByRightIdWithEarliestJoiner = []
+        # import pdb;pdb.set_trace()
+        # for group in grouping:
+        for infoDict in groupingWithFirstInserted:
+            group = infoDict['grouping']
+            earliestJoiner = infoDict['earliestJoiner']
             groupByRightId = []
             for idx in group:
                 groupByRightId.append(reverseIdMapping[idx])
-            groupingByRightId.append(groupByRightId)
+            # groupingByRightId.append(groupByRightId)
+            if group[0] in allIdsWithBaseOp:
+                groupingByRightIdWithEarliestJoiner.append({
+                    'group':group,
+                    'earliestJoiner':earliestJoiner
+                })
         ###
         groupsWithBaseOp = []
-        for group in groupingByRightId:
-            if group[0] in allIdsWithBaseOp:
+        for infoDict in groupingByRightIdWithEarliestJoiner:
+            group = infoDict['group']
+            # earliestJoiner = infoDict['earliestJoiner']
+            if group[0] in allIdsWithBaseOp: # already check earlier, TODO remove, this is redundant
                 nodeGroup = []
                 for idx in group:
                     nodeGroup.append(idToGroup[idx])
                 groupsWithBaseOp.append(nodeGroup)
-        return groupingByRightId, groupsWithBaseOp
+
+        return groupingByRightIdWithEarliestJoiner, groupsWithBaseOp
 
 
     @classmethod
@@ -61,7 +75,7 @@ class TermsOfBaseOp:
         
         gets the children of groupsWithBaseOp, and then put them together :)
         """
-        groupingByRightId, groupsWithBaseOp = cls.idsOfBaseOpByGroup(ast, baseOp)
+        groupingByRightIdWithEarliestJoiner, groupsWithBaseOp = cls.idsOfBaseOpByGroup(ast, baseOp)
         termsByGroup = []
         for group in groupsWithBaseOp:
             childrenOfGroup = []
@@ -69,4 +83,5 @@ class TermsOfBaseOp:
                 children = ast.get(node, [])
                 childrenOfGroup += children
             termsByGroup.append(childrenOfGroup)
-        return termsByGroup
+        #TODO also return the first element of each group to be placed into unionFind (that will correspond to the root of the subTree, because we DFS)
+        return termsByGroup 

@@ -123,6 +123,7 @@ def test__onetermFactorisation__findDistributivePath0(verbose=False):
             tChildNodeId = consecutiveNodeId__latexASTNodeId[childNodeId]
             if nodeName == baseOpStr and childNodeName == baseOpStr:
                 uf.union(tNodeId, tChildNodeId)
+    import pdb;pdb.set_trace()
     grouping = uf.grouping()
     groupingByRightId = []
     for group in grouping:

@@ -92,7 +92,7 @@ def test__moreThan1Op__ohmPowerLaw0(verbose=False): # TODO nroot of even power, 
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = None # to be filled in 
+    expectedLatexStr = '\\sqrt{PR}=V' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -360,14 +360,16 @@ def test__moreThan1Op__acPower2(verbose=False):
 
 
 
-def test__8levelsDeep__impedanceOfParallelRLCCircuit0(verbose=False):
+def test__6levelsDeep__impedanceOfParallelRLCCircuit0(verbose=False):
     latexEq = 'Z = ( \\frac{1}{R} + j ( \\omega C - \\frac{1}{\\omega L} ) )^{-1}'
     subject = 'R'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{1}{\\sqrt[-1]{Z}-j(\\omega C-\\frac{1}{\\omega L})}=R'
+    #TODO \\sqrt[-1]{Z} is a bit weird... maybe 'fix' this in latexUnparse?, very unconventional to write like that
+    #TODO \\sqrt[-1]{Z} ==> \\frac{-1}{Z}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -377,14 +379,16 @@ def test__8levelsDeep__impedanceOfParallelRLCCircuit0(verbose=False):
 
 
 
-def test__8levelsDeep__impedanceOfParallelRLCCircuit1(verbose=False):
+def test__6levelsDeep__impedanceOfParallelRLCCircuit1(verbose=False):
     latexEq = 'Z = ( \\frac{1}{R} + j ( \\omega C - \\frac{1}{\\omega L} ) )^{-1}'
     subject = 'C'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{\\frac{\\sqrt[-1]{Z}-\\frac{1}{R}}{j}+\\frac{1}{\\omega L}}{\\omega}=C'
+    #TODO \\sqrt[-1]{Z} is a bit weird... maybe 'fix' this in latexUnparse?, very unconventional to write like that
+    #TODO \\sqrt[-1]{Z} ==> \\frac{-1}{Z}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -394,14 +398,17 @@ def test__8levelsDeep__impedanceOfParallelRLCCircuit1(verbose=False):
 
 
 
-def test__8levelsDeep__impedanceOfParallelRLCCircuit2(verbose=False):
+def test__6levelsDeep__impedanceOfParallelRLCCircuit2(verbose=False):
     latexEq = 'Z = ( \\frac{1}{R} + j ( \\omega C - \\frac{1}{\\omega L} ) )^{-1}'
     subject = 'L'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{\\frac{1}{\\omega C-\\frac{\\sqrt[-1]{Z}-\\frac{1}{R}}{j}}}{\\omega}=L'
+    #TODO \\sqrt[-1]{Z} is a bit weird... maybe 'fix' this in latexUnparse?, very unconventional to write like that
+    #TODO \\sqrt[-1]{Z} ==> \\frac{-1}{Z}
+    # TODO DOUBLE_INVERSE=>simplification_in_AST
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -412,14 +419,15 @@ def test__8levelsDeep__impedanceOfParallelRLCCircuit2(verbose=False):
 
 
 
-def test__8levelsDeep__voltageGainOfNonInvertingOp0(verbose=False):
-    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+def test__6levelsDeep__voltageGainOfNonInvertingOp0(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + s C R_2} )}}' # the space between s, C and R_2 is a MUST!
     subject = 'R_f'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '((A_v -\\frac{1}{1+\\frac{R_o }{R_L +\\frac{R_2}{1+sCR_2}}})-(1))R_1=R_f'
+    #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -429,14 +437,15 @@ def test__8levelsDeep__voltageGainOfNonInvertingOp0(verbose=False):
 
 
 
-def test__8levelsDeep__voltageGainOfNonInvertingOp1(verbose=False):
-    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+def test__6levelsDeep__voltageGainOfNonInvertingOp1(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + s C R_2} )}}'
     subject = 'R_1'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{R_f }{(A_v -\\frac{1}{1+\\frac{R_o }{R_L +\\frac{R_2}{1+sCR_2}}})-(1)}=R_1'
+    #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -446,14 +455,28 @@ def test__8levelsDeep__voltageGainOfNonInvertingOp1(verbose=False):
 
 
 
-def test__8levelsDeep__voltageGainOfNonInvertingOp2(verbose=False):
-    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+def test__6levelsDeep__voltageGainOfNonInvertingOp2(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + s C R_2} )}}'
     subject = 'R_o'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
+    # print(modifiedAST)
+    # expectedAST = {   ('*', 10): [('-', 9), ('+', 15)],
+    # ('*', 20): [('s', 19), ('C', 21)],
+    # ('*', 22): [('*', 20), ('R_2', 23)],
+    # ('+', 3): [('1', 2), ('/', 4)],
+    # ('+', 15): [('R_L', 14), ('/', 16)],
+    # ('+', 18): [('1', 17), ('*', 22)],
+    # ('-', 5): [('A_v', 1), ('+', 3)],
+    # ('-', 9): [('/', 6), ('1', 8)],
+    # ('/', 4): [('R_f', 12), ('R_1', 7)],
+    # ('/', 6): [('1', 11), ('-', 5)],
+    # ('/', 16): [('R_2', 24), ('+', 18)],
+    # ('=', 0): [('*', 10), ('R_o', 13)]}
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '(\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1)(R_L +\\frac{R_2}{1+sCR_2})=R_o'
+    #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -463,14 +486,15 @@ def test__8levelsDeep__voltageGainOfNonInvertingOp2(verbose=False):
 
 
 
-def test__8levelsDeep__voltageGainOfNonInvertingOp3(verbose=False):
-    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+def test__6levelsDeep__voltageGainOfNonInvertingOp3(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + s C R_2} )}}'
     subject = 'R_L'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{R_o }{\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1}-\\frac{R_2}{1+sCR_2}=R_L'
+    #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -480,14 +504,16 @@ def test__8levelsDeep__voltageGainOfNonInvertingOp3(verbose=False):
 
 
 
-def test__8levelsDeep__voltageGainOfNonInvertingOp4(verbose=False):
-    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+def test__6levelsDeep__voltageGainOfNonInvertingOp4(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + s C R_2} )}}'
     subject = 's'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
+    # print(modifiedAST)
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{\\frac{\\frac{R_2}{\\frac{R_o }{\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1}-R_L}-1}{R_2}}{C}=s'
+    # TODO DOUBLE_INVERSE=>simplification_in_AST
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -497,14 +523,14 @@ def test__8levelsDeep__voltageGainOfNonInvertingOp4(verbose=False):
 
 
 
-def test__8levelsDeep__voltageGainOfNonInvertingOp5(verbose=False):
-    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + sCR_2} )}}'
+def test__6levelsDeep__voltageGainOfNonInvertingOp5(verbose=False):
+    latexEq = 'A_v = 1 + \\frac{R_f}{R_1} + \\frac{1}{1 + \\frac{R_o}{( R_L + \\frac{R_2}{1 + s C R_2} )}}'
     subject = 'C'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
+    expectedLatexStr = '\\frac{\\frac{\\frac{R_2}{\\frac{R_o }{\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1}-R_L}-1}{R_2}}{s}=C'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -536,12 +562,12 @@ if __name__=='__main__':
     test__moreThan1Op__acPower0()
     test__moreThan1Op__acPower1()
     test__moreThan1Op__acPower2()
-    # test__8levelsDeep__impedanceOfParallelRLCCircuit0(True) # Latex parser error....
-    # test__8levelsDeep__impedanceOfParallelRLCCircuit1(True) # Latex parser error....
-    # test__8levelsDeep__impedanceOfParallelRLCCircuit2(True) # Latex parser error....
-    # test__8levelsDeep__voltageGainOfNonInvertingOp0(True) # Latex parser error....
-    # test__8levelsDeep__voltageGainOfNonInvertingOp1(True) # Latex parser error....
-    # test__8levelsDeep__voltageGainOfNonInvertingOp2(True) # Latex parser error....
-    # test__8levelsDeep__voltageGainOfNonInvertingOp3(True) # Latex parser error....
-    # test__8levelsDeep__voltageGainOfNonInvertingOp4(True) # Latex parser error....
-    # test__8levelsDeep__voltageGainOfNonInvertingOp5(True) # Latex parser error....
+    test__6levelsDeep__impedanceOfParallelRLCCircuit0() # TODO weird latex unparse sqrt[-1]
+    test__6levelsDeep__impedanceOfParallelRLCCircuit1() # TODO weird latex unparse sqrt[-1]
+    test__6levelsDeep__impedanceOfParallelRLCCircuit2() # TODO weird latex unparse sqrt[-1], DOUBLE_INVERSE=>simplification_in_AST
+    test__6levelsDeep__voltageGainOfNonInvertingOp0()
+    test__6levelsDeep__voltageGainOfNonInvertingOp1()
+    test__6levelsDeep__voltageGainOfNonInvertingOp2() #
+    test__6levelsDeep__voltageGainOfNonInvertingOp3()
+    test__6levelsDeep__voltageGainOfNonInvertingOp4() 
+    test__6levelsDeep__voltageGainOfNonInvertingOp5()

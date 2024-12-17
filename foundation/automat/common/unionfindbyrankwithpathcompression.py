@@ -53,7 +53,7 @@ class UnionFindByRankWithPathCompression:
 
         else:
             self.parent[yset] = xset
-            self.rank[xset] = self.rank[xset] + 1
+            self.rank[xset] = self.rank[xset] + 1 # (first insert) iff self.rank[xset]==self.rank[yset] (TODO PROOF)
 
     def grouping(self):
         groups = dict(map(lambda groupNum: (groupNum, []), set(self.parent)))
@@ -64,3 +64,21 @@ class UnionFindByRankWithPathCompression:
         for groupNum, group in sorted(groups.items(), key=lambda t:t[0]):# sort by groupNum
             listOfList.append(group)
         return listOfList
+
+    def groupingWithFirstInserted(self): #TODO test_case
+        from operator import itemgetter
+        listOfList = self.grouping()
+        listOfInfoDict = []
+        for grouping in listOfList:
+            # import pdb;pdb.set_trace()
+            def itemRankGetter():
+                itemRanksOrSingle = itemgetter(*grouping)(self.rank)
+                return list(itemRanksOrSingle) if isinstance(itemRanksOrSingle, tuple) else [itemRanksOrSingle]
+            itemRanks = itemRankGetter() # earliest-joiners-highest-rank
+            earliestJoinerIdxOfGrouping = max(range(len(itemRanks)), key=itemRanks.__getitem__)
+            earliestJoiner = grouping[earliestJoinerIdxOfGrouping]
+            listOfInfoDict.append({
+                'grouping':grouping,
+                'earliestJoiner':earliestJoiner
+            })
+        return listOfList, listOfInfoDict

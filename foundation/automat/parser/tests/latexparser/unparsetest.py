@@ -4,6 +4,25 @@ import pprint
 from foundation.automat.parser.sorte import Latexparser
 
 
+
+def test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {   
+    ('=', 0):[('-', 1), ('-1', 6)],
+    ('-', 1):[('1', 2), ('+', 3)],
+    ('+', 3):[('1', 4), ('1', 5)]
+    }
+
+    parser = Latexparser(ast=ast, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '1-(1+1)=-1'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
 def test__contiguousLeftOvers__decimalPlaces(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
@@ -249,11 +268,12 @@ def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=Fa
 def test__infixInBackslash__paraboloid(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('+', 6): [('^', 4), ('^', 8)],
+    ast = {   
+    ('+', 6): [('^', 4), ('^', 8)],
     ('=', 0): [('z', 2), ('nroot', 1)],
     ('^', 4): [('x', 3), ('2', 5)],
     ('^', 8): [('y', 7), ('2', 9)],
-    ('nroot', 1): [(2, 10), ('+', 6)]}
+    ('nroot', 1): [('2', 10), ('+', 6)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'z=\\sqrt{x^2+y^2}'
@@ -623,7 +643,7 @@ def test__hassliche__nestedPolynomial(verbose=False):
     ('^', 28): [('x', 27), ('21', 29)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'Qx=(x^3-2x^2+5x-7)^2-(x-1)^3+3x^{21}'
+    expected_eqsStr = 'Qx=(x^3-2x^2+5x-7)^2-((x-1)^3+3x^{21})'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -794,10 +814,43 @@ def test__hassliche__degree6(verbose=False):#TODO ugly
 def test__hassliche__degree7(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = None # need to wait for parsetest...
+    ast = {   
+    ('*', 6): [('4', 5), ('^', 8)],
+    ('*', 12): [('37', 11), ('^', 14)],
+    ('*', 18): [('58', 17), ('^', 20)],
+    ('*', 24): [('520', 23), ('^', 26)],
+    ('*', 30): [('201', 29), ('^', 32)],
+    ('*', 36): [('2156', 35), ('x', 37)],
+    ('*', 43): [('-', 41), ('+', 45)],
+    ('*', 47): [('*', 43), ('-', 49)],
+    ('*', 51): [('*', 47), ('+', 53)],
+    ('*', 55): [('*', 51), ('-', 57)],
+    ('*', 59): [('*', 55), ('+', 61)],
+    ('*', 63): [('*', 59), ('-', 65)],
+    ('+', 4): [('^', 2), ('-', 16)],
+    ('+', 22): [('+', 4), ('*', 24)],
+    ('+', 28): [('+', 22), ('-', 34)],
+    ('+', 38): [('+', 28), ('5040', 39)],
+    ('+', 45): [('x', 44), ('2', 46)],
+    ('+', 53): [('x', 52), ('4', 54)],
+    ('+', 61): [('x', 60), ('6', 62)],
+    ('-', 10): [('*', 6), ('*', 12)],
+    ('-', 16): [('-', 10), ('*', 18)],
+    ('-', 34): [('*', 30), ('*', 36)],
+    ('-', 41): [('x', 40), ('1', 42)],
+    ('-', 49): [('x', 48), ('3', 50)],
+    ('-', 57): [('x', 56), ('5', 58)],
+    ('-', 65): [('x', 64), ('7', 66)],
+    ('=', 0): [('*', 63), ('+', 38)],
+    ('^', 2): [('x', 1), ('7', 3)],
+    ('^', 8): [('x', 7), ('6', 9)],
+    ('^', 14): [('x', 13), ('5', 15)],
+    ('^', 20): [('x', 19), ('4', 21)],
+    ('^', 26): [('x', 25), ('3', 27)],
+    ('^', 32): [('x', 31), ('2', 33)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '(x - 1)(x + 2)(x - 3)(x + 4)(x - 5)(x + 6)(x - 7) = x^7 + 4x^6 - 37x^5 - 58x^4 + 520x^3 + 201x^2 - 2156x + 5040'
+    expected_eqsStr = '(x-1)(x+2)(x-3)(x+4)(x-5)(x+6)(x-7)=x^7+(4x^6-37x^5)-(58x^4)+520x^3+201x^2-2156x+5040'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -806,10 +859,53 @@ def test__hassliche__degree7(verbose=False):
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = None # need to wait for parsetest...
+    ast = {   ('*', 6): [('4', 5), ('^', 8)],
+    ('*', 12): [('2', 11), ('^', 14)],
+    ('*', 18): [('41', 17), ('^', 20)],
+    ('*', 24): [('69', 23), ('^', 26)],
+    ('*', 30): [('142', 29), ('^', 32)],
+    ('*', 36): [('420', 35), ('^', 38)],
+    ('*', 42): [('567', 41), ('^', 44)],
+    ('*', 48): [('174', 47), ('^', 50)],
+    ('*', 54): [('185', 53), ('x', 55)],
+    ('*', 61): [('2', 60), ('^', 63)],
+    ('*', 69): [('^', 67), ('^', 77)],
+    ('*', 79): [('*', 69), ('+', 83)],
+    ('*', 85): [('2', 84), ('x', 86)],
+    ('+', 4): [('^', 2), ('-', 22)],
+    ('+', 28): [('+', 4), ('*', 30)],
+    ('+', 34): [('+', 28), ('-', 46)],
+    ('+', 52): [('+', 34), ('-', 56)],
+    ('+', 59): [('x', 58), ('-', 65)],
+    ('+', 75): [('-', 73), ('1', 76)],
+    ('+', 83): [('^', 81), ('-', 87)],
+    ('-', 10): [('*', 6), ('*', 12)],
+    ('-', 16): [('-', 10), ('*', 18)],
+    ('-', 22): [('-', 16), ('*', 24)],
+    ('-', 40): [('*', 36), ('*', 42)],
+    ('-', 46): [('-', 40), ('*', 48)],
+    ('-', 56): [('*', 54), ('75', 57)],
+    ('-', 65): [('*', 61), ('3', 66)],
+    ('-', 73): [('^', 71), ('x', 74)],
+    ('-', 87): [('*', 85), ('5', 88)],
+    ('=', 0): [('*', 79), ('+', 52)],
+    ('^', 2): [('x', 1), ('10', 3)],
+    ('^', 8): [('x', 7), ('9', 9)],
+    ('^', 14): [('x', 13), ('8', 15)],
+    ('^', 20): [('x', 19), ('7', 21)],
+    ('^', 26): [('x', 25), ('6', 27)],
+    ('^', 32): [('x', 31), ('5', 33)],
+    ('^', 38): [('x', 37), ('4', 39)],
+    ('^', 44): [('x', 43), ('3', 45)],
+    ('^', 50): [('x', 49), ('2', 51)],
+    ('^', 63): [('x', 62), ('2', 64)],
+    ('^', 67): [('+', 59), ('2', 68)],
+    ('^', 71): [('x', 70), ('2', 72)],
+    ('^', 77): [('+', 75), ('3', 78)],
+    ('^', 81): [('x', 80), ('3', 82)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '((x + 2x^2 - 3)^2)((x^2 - x + 1)^3)((x^3 + 2x - 5)) = x^{10} + 4x^9 - 2x^8 - 41x^7 - 69x^6 + 142x^5 + 420x^4 - 567x^3 - 174x^2 + 185x - 75'
+    expected_eqsStr = '(x+2x^2-3)^2(x^2-x+1)^3(x^3+2x-5)=x^{10}+((4x^9-2x^8)-(41x^7))-(69x^6)+142x^5+(420x^4-567x^3)-(174x^2)+185x-75'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -818,10 +914,53 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(verbose=Fal
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = None # need to wait for parsetest...
+    ast = {   ('*', 6): [('3', 5), ('^', 8)],
+    ('*', 12): [('20', 11), ('^', 14)],
+    ('*', 18): [('60', 17), ('^', 20)],
+    ('*', 24): [('161', 23), ('^', 26)],
+    ('*', 30): [('260', 29), ('^', 32)],
+    ('*', 36): [('385', 35), ('^', 38)],
+    ('*', 42): [('494', 41), ('^', 44)],
+    ('*', 48): [('509', 47), ('^', 50)],
+    ('*', 54): [('378', 53), ('x', 55)],
+    ('*', 67): [('^', 65), ('^', 77)],
+    ('*', 73): [('2', 72), ('x', 74)],
+    ('*', 79): [('*', 67), ('+', 83)],
+    ('*', 85): [('3', 84), ('x', 86)],
+    ('+', 16): [('-', 10), ('*', 18)],
+    ('+', 22): [('+', 16), ('-', 34)],
+    ('+', 40): [('+', 22), ('*', 42)],
+    ('+', 46): [('+', 40), ('-', 52)],
+    ('+', 56): [('+', 46), ('196', 57)],
+    ('+', 61): [('^', 59), ('-', 63)],
+    ('+', 75): [('-', 71), ('4', 76)],
+    ('+', 83): [('^', 81), ('-', 87)],
+    ('-', 4): [('^', 2), ('*', 6)],
+    ('-', 10): [('-', 4), ('*', 12)],
+    ('-', 28): [('*', 24), ('*', 30)],
+    ('-', 34): [('-', 28), ('*', 36)],
+    ('-', 52): [('*', 48), ('*', 54)],
+    ('-', 63): [('x', 62), ('1', 64)],
+    ('-', 71): [('^', 69), ('*', 73)],
+    ('-', 87): [('*', 85), ('7', 88)],
+    ('=', 0): [('*', 79), ('+', 56)],
+    ('^', 2): [('x', 1), ('10', 3)],
+    ('^', 8): [('x', 7), ('9', 9)],
+    ('^', 14): [('x', 13), ('8', 15)],
+    ('^', 20): [('x', 19), ('7', 21)],
+    ('^', 26): [('x', 25), ('6', 27)],
+    ('^', 32): [('x', 31), ('5', 33)],
+    ('^', 38): [('x', 37), ('4', 39)],
+    ('^', 44): [('x', 43), ('3', 45)],
+    ('^', 50): [('x', 49), ('2', 51)],
+    ('^', 59): [('x', 58), ('2', 60)],
+    ('^', 65): [('+', 61), ('2', 66)],
+    ('^', 69): [('x', 68), ('3', 70)],
+    ('^', 77): [('+', 75), ('2', 78)],
+    ('^', 81): [('x', 80), ('2', 82)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '((x^2 + x - 1)^2)((x^3 - 2x + 4)^2)((x^2 + 3x - 7)) = x^{10} - 3x^9 - 20x^8 + 60x^7 + 161x^6 - 260x^5 - 385x^4 + 494x^3 + 509x^2 - 378x + 196'
+    expected_eqsStr = '(x^2+x-1)^2(x^3-2x+4)^2(x^2+3x-7)=(x^{10}-3x^9)-(20x^8)+60x^7+(161x^6-260x^5)-(385x^4)+494x^3+509x^2-378x+196'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -830,10 +969,69 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(verbose=Fa
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = None # need to wait for parsetest...
+    ast = {   ('*', 6): [('8', 5), ('^', 8)],
+    ('*', 12): [('14', 11), ('^', 14)],
+    ('*', 18): [('191', 17), ('^', 20)],
+    ('*', 24): [('48', 23), ('^', 26)],
+    ('*', 30): [('1218', 29), ('^', 32)],
+    ('*', 36): [('60', 35), ('^', 38)],
+    ('*', 42): [('2700', 41), ('^', 44)],
+    ('*', 48): [('1452', 47), ('^', 50)],
+    ('*', 54): [('4375', 53), ('^', 56)],
+    ('*', 60): [('3476', 59), ('^', 62)],
+    ('*', 66): [('2922', 65), ('^', 68)],
+    ('*', 72): [('1685', 71), ('^', 74)],
+    ('*', 78): [('655', 77), ('^', 80)],
+    ('*', 84): [('103', 83), ('x', 85)],
+    ('*', 93): [('2', 92), ('^', 95)],
+    ('*', 101): [('^', 99), ('^', 109)],
+    ('*', 111): [('*', 101), ('+', 115)],
+    ('*', 117): [('3', 116), ('x', 118)],
+    ('+', 4): [('^', 2), ('-', 16)],
+    ('+', 22): [('+', 4), ('*', 24)],
+    ('+', 28): [('+', 22), ('-', 46)],
+    ('+', 52): [('+', 28), ('*', 54)],
+    ('+', 58): [('+', 52), ('-', 70)],
+    ('+', 76): [('+', 58), ('*', 78)],
+    ('+', 82): [('+', 76), ('-', 86)],
+    ('+', 91): [('^', 89), ('-', 97)],
+    ('+', 107): [('-', 105), ('2', 108)],
+    ('+', 115): [('^', 113), ('-', 119)],
+    ('-', 10): [('*', 6), ('*', 12)],
+    ('-', 16): [('-', 10), ('*', 18)],
+    ('-', 34): [('*', 30), ('*', 36)],
+    ('-', 40): [('-', 34), ('*', 42)],
+    ('-', 46): [('-', 40), ('*', 48)],
+    ('-', 64): [('*', 60), ('*', 66)],
+    ('-', 70): [('-', 64), ('*', 72)],
+    ('-', 86): [('*', 84), ('400', 87)],
+    ('-', 97): [('*', 93), ('4', 98)],
+    ('-', 105): [('^', 103), ('x', 106)],
+    ('-', 119): [('*', 117), ('5', 120)],
+    ('=', 0): [('*', 111), ('+', 82)],
+    ('^', 2): [('x', 1), ('15', 3)],
+    ('^', 8): [('x', 7), ('14', 9)],
+    ('^', 14): [('x', 13), ('13', 15)],
+    ('^', 20): [('x', 19), ('12', 21)],
+    ('^', 26): [('x', 25), ('11', 27)],
+    ('^', 32): [('x', 31), ('10', 33)],
+    ('^', 38): [('x', 37), ('9', 39)],
+    ('^', 44): [('x', 43), ('8', 45)],
+    ('^', 50): [('x', 49), ('7', 51)],
+    ('^', 56): [('x', 55), ('6', 57)],
+    ('^', 62): [('x', 61), ('5', 63)],
+    ('^', 68): [('x', 67), ('4', 69)],
+    ('^', 74): [('x', 73), ('3', 75)],
+    ('^', 80): [('x', 79), ('2', 81)],
+    ('^', 89): [('x', 88), ('2', 90)],
+    ('^', 95): [('x', 94), ('3', 96)],
+    ('^', 99): [('+', 91), ('3', 100)],
+    ('^', 103): [('x', 102), ('2', 104)],
+    ('^', 109): [('+', 107), ('2', 110)],
+    ('^', 113): [('x', 112), ('3', 114)]}
     parser = Latexparser(ast=ast, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '((x^2 + 2x^3 - 4)^3)((x^2 - x + 2)^2)((x^3 + 3x - 5)) = x^{15} + 8x^{14} - 14x^{13} - 191x^{12} + 48x^{11} + 1218x^{10} - 60x^9 - 2700x^8 - 1452x^7 + 4375x^6 + 3476x^5 - 2922x^4 - 1685x^3 + 655x^2 + 103x - 400'
+    expected_eqsStr = '(x^2+2x^3-4)^3(x^2-x+2)^2(x^3+3x-5)=x^{15}+(8x^{14}-14x^{13})-(191x^{12})+48x^{11}+((1218x^{10}-60x^9)-(2700x^8))-(1452x^7)+4375x^6+(3476x^5-2922x^4)-(1685x^3)+655x^2+103x-400'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -918,6 +1116,7 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
+    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
     test__contiguousLeftOvers__decimalPlaces()
     test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
     test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
@@ -956,10 +1155,10 @@ if __name__=='__main__':
     test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
     test__hassliche__degree5()
     test__hassliche__degree6()
-    # test__hassliche__degree7(True) # not tested yet, use nDisplay to help please
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True) # not tested yet, use nDisplay to help please
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True) # not tested yet, use nDisplay to help please
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(True) # not tested yet, use nDisplay to help please
+    test__hassliche__degree7()
+    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
+    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
+    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
     # test__paveWayForDifferentiation__productRule(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
     # test__paveWayForDifferentiation__sumRule(True)  # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
     # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))

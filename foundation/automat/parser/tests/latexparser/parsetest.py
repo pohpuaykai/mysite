@@ -61,7 +61,6 @@ def test__weirdVariables__variablesWithCurlyBracketsFrac(verbose=False):
 
 
 
-
 def test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
@@ -76,7 +75,6 @@ def test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0(verbose=Fa
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
-
 
 
 
@@ -99,6 +97,24 @@ def test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1(verbose=Fa
 
 
 
+def test__makeSubject__manyVariablesStandingTogether(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = 'A_v = ( R_L + \\frac{R_2}{1 + s C R_2} )'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   
+    ('*', 8): [('s', 7), ('C', 9)],
+    ('*', 10): [('*', 8), ('R_2', 11)],
+    ('+', 3): [('R_L', 2), ('/', 4)],
+    ('+', 6): [('1', 5), ('*', 10)],
+    ('/', 4): [('R_2', 12), ('+', 6)],
+    ('=', 0): [('A_v', 1), ('+', 3)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
 
 def test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -118,6 +134,7 @@ def test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(ve
         pp.pprint(parser.ast)
 
 
+
 def test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
@@ -132,6 +149,39 @@ def test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(verbose=Fa
     ('^', 7): [('z', 6), ('4', 8)],
     ('^', 13): [('w', 12), ('12', 14)],
     ('^', 15): [('+', 9), ('30', 16)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = '(1)^{-1} = 1'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   
+    ('-', 4): [('0', 3), ('1', 5)],
+    ('=', 0): [('^', 2), ('1', 6)],
+    ('^', 2): [('1', 1), ('-', 4)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower0(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = '(1)^{\\sin(x)-1} = 1'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   
+    ('-', 5): [('sin', 4), ('1', 6)],
+    ('=', 0): [('^', 3), ('1', 1)],
+    ('^', 3): [('1', 2), ('-', 5)],
+    ('sin', 4): [('x', 7)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
@@ -525,7 +575,6 @@ def test__fracWithLogNoBase__changeLogBaseFormula(verbose=False):
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
     if verbose:
         pp.pprint(parser.ast)
-
 
 
 def test__backslashInfixInBackslash__sqrtInSqrt(verbose=False):
@@ -1147,8 +1196,11 @@ if __name__=='__main__':
     test__weirdVariables__variablesWithCurlyBracketsFrac()
     test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0()
     test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1()
+    test__makeSubject__manyVariablesStandingTogether()
     test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
     test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower()
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower0()
     test__findingBackSlashAndInfixOperations__Trig0()
     test__findingBackSlashAndInfixOperations__Trig1()
     test__findingBackSlashAndInfixOperations__Trig2()
