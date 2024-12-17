@@ -48,7 +48,6 @@ class Equation:
 
     def makeSubject(self, variable):
         """
-        #~ DRAFT ~#
         make variable the subject of this equation
 
         :param variable:
@@ -289,6 +288,95 @@ class Equation:
             self.primitives = primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
         return self.ast
+
+
+    def linearEliminationBySubstitution(self, eq, variable):
+        """
+        #~ DRAFT ~#
+        Make variable the subject of the Equation:self and Equation:eq
+        Find which side, variable is on each equation
+        Take the side_variable_node of self = side_not_variable_node of eq
+        Take every other node of eq and put into self.ast
+        relabel the ids on the newly formed equation
+
+        update the 
+        functionCountChange
+        primitiveCountChange
+        totalNodeCountChange
+
+
+        :param variable: variable to eliminate
+        :type variable: str
+        :param eq: another Equation containing the variable
+        :type format: :class:`Equation`
+        """
+        self.makeSubject(variable)
+        eq.makeSubject(variable)
+        #find which side of the = does variable be on
+        sideOfVariableOfSelf = None
+        if self.ast[('=', 0)][0][0] == variable:
+            sideOfVariableOfSelf = 0
+        elif self.ast[('=', 0)][1][0] == variable:
+            sideOfVariableOfSelf = 1
+        else:
+            raise Exception(f'{variable} not the subject of self') # something wrong with makeSubject
+        sideOfNonVariableOfEq = None
+        if eq.ast[('=', 0)][0][0] == variable:
+            sideOfNonVariableOfEq = 1
+        elif eq.ast[('=', 0)][1][0] == variable:
+            sideOfNonVariableOfEq = 0
+        else:
+            raise Exception(f'{variable} not the subject of eq') # something wrong with makeSubject
+
+        from copy import deepcopy
+        eqAst = deepcopy(eq.ast)
+        #rename the ids of eqAst by adding self.totalNodeCount to all of eqAst
+        newEqAst = {}
+        stack = [('=', 0)]
+        while len(stack) > 0:
+            nodeName, nodeId = stack.pop()
+            children = eqAst.get((nodeName, nodeId), [])
+            stack += children
+            if len(children) > 0: # we only put in nonLeaves
+                newEqAst[(nodeName, nodeId+self.totalNodeCount)] = children
+        self.ast[('=', 0)][sideOfVariableOfSelf] = newEqAst[][sideOfNonVariableOfEq]
+        del newEqAst[('=', self.totalNodeCount)]
+        self.ast.update(newEqAst)
+        #substitution complete
+
+        #update functionCountChange, should have no functionCountChange
+        def mergeCountDictionaries(d0, d1):
+            commonKeys = set(d0.keys()).intersection(set(d1.keys()))
+            cd0 = deepcopy(d0)
+            cd1 = deepcopy(d1)
+            for commonKey in commonKeys:
+                cd0[commonKey] += cd1[commonKey]
+            for key in (set(d1.keys()) - commonKeys):
+                cd0[key] = cd1[key]
+            return cd0
+        eqFunctions = deepcopy(eq.functions)
+        self.functions = mergeCountDictionaries(self.functions, eqFunctions)
+
+        #remove 1 count of variable from a both
+        eqVariable = deepcopy(eq.variables)
+        eqVariable[variable] -= 1
+        if eqVariable[variable] == 0:
+            del eqVariable[variable]
+        self.variables[variable] -= 1
+        if self.variables[variable] == 0:
+            del self.variables[variable]
+        self.variables = mergeCountDictionaries(self.variables, eqVariable)
+
+        #should have no change in primitives
+        eqPrimitives = deepcopy(eq.primitives)
+        self.primitives = mergeCountDictionaries(self.primitives, eqPrimitives)
+
+        self.totalNodeCount += eq.totalNodeCount - 1 #the equalNode was removed.
+        return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
+
+
+
+
 
 
     def toString(self, format):

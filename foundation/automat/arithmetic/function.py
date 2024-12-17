@@ -113,7 +113,7 @@ class Function:#(metaclass=FunctionHook):
         self.verbose = verbose
 
 
-    def substitute(self, substitutionDictionary):
+    def substituteValue(self, substitutionDictionary):
         """
         #~ DRAFT ~#
         TODO expand this to allow string substitutions, for integration/differentiation
