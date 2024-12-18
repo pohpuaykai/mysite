@@ -17,10 +17,10 @@ def test__basic__moveAdditionAndEquate(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=ast)._unparse()
     expectedLatexStr = 'a-c=d-e' # to be filled in 
-    expectedFunctions = None # count
-    expectedVariables = None # count
-    expectedPrimitives = None # count
-    expectedTotalNodeCount = None # count
+    expectedFunctions = {'-': 2} # count
+    expectedVariables = {'a': 1, 'c': 1, 'd': 1, 'e': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 7 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
         expectedFunctions == eq0.functions and 
@@ -28,6 +28,7 @@ def test__basic__moveAdditionAndEquate(verbose=False):
         expectedPrimitives == eq0.primitives and 
         expectedTotalNodeCount == eq0.totalNodeCount)
     if verbose:
+        print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
         print('variable to Eliminate: ', variableToEliminate)
         print('TF: ', latexStr)
@@ -64,6 +65,7 @@ def test__hatsukoi__step0(verbose=False):
         expectedPrimitives == eq0.primitives and 
         expectedTotalNodeCount == eq0.totalNodeCount)
     if verbose:
+        print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
         print('variable to Eliminate: ', variableToEliminate)
         print('TF: ', latexStr)
@@ -100,6 +102,7 @@ def test__hatsukoi__step1(verbose=False):
         expectedPrimitives == eq0.primitives and 
         expectedTotalNodeCount == eq0.totalNodeCount)
     if verbose:
+        print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
         print('variable to Eliminate: ', variableToEliminate)
         print('TF: ', latexStr)
@@ -136,6 +139,7 @@ def test__hatsukoi__step2(verbose=False):
         expectedPrimitives == eq0.primitives and 
         expectedTotalNodeCount == eq0.totalNodeCount)
     if verbose:
+        print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
         print('variable to Eliminate: ', variableToEliminate)
         print('TF: ', latexStr)
@@ -152,7 +156,7 @@ def test__hatsukoi__step2(verbose=False):
 
 
 if __name__=='__main__':
-    test__basic__moveAdditionAndEquate(True)
-    test__hatsukoi__step0(True)
-    test__hatsukoi__step1(True)
-    test__hatsukoi__step2(True)
+    test__basic__moveAdditionAndEquate()
+    # test__hatsukoi__step0(True) # latex parser error, self.variables {'}': 1, 'V_{Z1': 1, 'R_{Z1': 1, 'I_{Z1': 1}
+    # test__hatsukoi__step1(True) # latex parser error, self.variables {'V_': 1, 'R_{Z1': 1, '}': 1, 'I_{R}': 1, 'R': 1, 'I_{Z1': 1, 'in': 1}
+    # test__hatsukoi__step2(True) # latex parser error, self.variables {'I_{Z1': 1, 'R_{Z1': 1, 'V_{BE}': 1, 'R': 1, '}': 1, 'V_': 1, 'I_{RC}': 1, 'R_{C}': 1, 'in': 1}

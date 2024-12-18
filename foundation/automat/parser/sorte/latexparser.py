@@ -1429,8 +1429,8 @@ class Latexparser(Parser):
             if ding['type'] == 'infix':
                 self.consecutiveGroups[(ding['position'], ding['position']+len(ding['name']))] = [ding]
 
-                originalCount = self.functions.get(ding['name'], 0)
-                self.functions[ding['name']] = originalCount +1
+                # originalCount = self.functions.get(ding['name'], 0)
+                # self.functions[ding['name']] = originalCount +1
             else:
                 sKey = 'ganzStartPos'
                 eKey = 'ganzEndPos'
@@ -3032,7 +3032,7 @@ if __name__=='__main__':
         if self.parallelise:
             self.event__subTreeGraftingUntilTwoTrees.wait()
         #add the = (with children) in alleDing, YAY!
-        self.totalNodeCount = len(self.alleDing)
+        self.totalNodeCount = len(self.alleDing) + 1 #here, we do not have =
         #first find ding with no parent
         dingsNoParents = []
         for ding in self.alleDing:
@@ -3244,8 +3244,15 @@ if __name__=='__main__':
                 self.ast[currentNode] = latexASTCopy[currentNode]
                 stack += latexASTCopy[currentNode]
 
-            originalCount = self.functions.get(nodeName, 0)
-            self.functions[nodeName] = originalCount + 1
+        #last pass to get the statistics
+        stack = [self.equalTuple]
+        while len(stack) > 0:
+            nodeName, nodeId = stack.pop()
+            children = self.ast.get((nodeName, nodeId), [])
+            stack += children
+            if nodeName != '=' and len(children) > 0: #do not count equals
+                originalCount = self.functions.get(nodeName, 0)
+                self.functions[nodeName] = originalCount + 1
         
 
     def _parse(self):

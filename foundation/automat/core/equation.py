@@ -283,8 +283,9 @@ class Equation:
             #update the `stat` of self
             self.ast = invertedAst #TODO since equation is changed after each op, we have to recalculate the next op again, after the reversal... and so, we only need to calculate one op at a time... => might it go into an infinity loop?
             for funcName, countChange in functionCountChange.items():
-                originalSum = self.functions.get(funcName, 0) + countChange
-                self.functions[funcName] = originalSum
+                self.functions[funcName] = self.functions.get(funcName, 0) + countChange
+                if self.functions[funcName] == 0:
+                    del self.functions[funcName]
             self.primitives = primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
         return self.ast
@@ -310,27 +311,69 @@ class Equation:
         :param eq: another Equation containing the variable
         :type format: :class:`Equation`
         """
+        if self.verbose:
+            import pprint
+            pp = pprint.PrettyPrinter(indent=4)
+            print('before makeSubject self.ast totalNodeCount', self.totalNodeCount)
+            print('before makeSubject eq.ast totalNodeCount', eq.totalNodeCount)
+
         self.makeSubject(variable)
         eq.makeSubject(variable)
+        if self.verbose:
+            print('after makeSubject self.ast: ', self.ast)
+            print('after makeSubject self.ast totalNodeCount: ', self.totalNodeCount)
+            print('after makeSubject self.ast functions: ', self.functions)
+            print('after makeSubject self.ast variables: ', self.variables)
+            print('after makeSubject self.ast primitives', self.primitives)
+            print('after makeSubject eq.ast:', eq.ast)
+            print('after makeSubject eq.ast totalNodeCount: ', eq.totalNodeCount)
+            print('after makeSubject eq.ast functions: ', eq.functions)
+            print('after makeSubject eq.ast variables: ', eq.variables)
+            print('after makeSubject eq.ast primitives', eq.primitives)
+
         #find which side of the = does variable be on
         sideOfVariableOfSelf = None
         if self.ast[('=', 0)][0][0] == variable:
             sideOfVariableOfSelf = 0
+            variableIdInSelf = self.ast[('=', 0)][0][1]
         elif self.ast[('=', 0)][1][0] == variable:
             sideOfVariableOfSelf = 1
+            variableIdInSelf = self.ast[('=', 0)][1][1]
         else:
             raise Exception(f'{variable} not the subject of self') # something wrong with makeSubject
         sideOfNonVariableOfEq = None
         if eq.ast[('=', 0)][0][0] == variable:
             sideOfNonVariableOfEq = 1
+            variableIdInEq = eq.ast[('=', 0)][0][1]
         elif eq.ast[('=', 0)][1][0] == variable:
             sideOfNonVariableOfEq = 0
+            variableIdInEq = eq.ast[('=', 0)][1][1]
         else:
             raise Exception(f'{variable} not the subject of eq') # something wrong with makeSubject
 
+        #move nodeId in self.ast that are > variableIdInEq, for consecutiveness
+        newAst = {}
+        stack = [('=', 0)]
+        while len(stack) > 0:
+            nodeName, nodeId = stack.pop()
+            children = self.ast.get((nodeName, nodeId), [])
+            stack += children
+            if len(children) > 0: # only keeping those with children
+                newChildren = []
+                for child in children:
+                    childName, childId = child
+                    if childId > variableIdInSelf:
+                        childId -= 1 # removing 1 variable
+                    newChildren.append((childName, childId))
+                if nodeId > variableIdInSelf:
+                    nodeId -= 1 # removing 1 variable
+                newAst[(nodeName, nodeId)] = newChildren
+        self.ast = newAst
+
         from copy import deepcopy
         eqAst = deepcopy(eq.ast)
-        #rename the ids of eqAst by adding self.totalNodeCount to all of eqAst
+        #rename the ids of eqAst by adding self.totalNodeCount - 1 to all of eqAst
+        amountToIncreaseId = self.totalNodeCount - 2 # we will be removing 2 id from eq.ast, = and variable
         newEqAst = {}
         stack = [('=', 0)]
         while len(stack) > 0:
@@ -338,10 +381,34 @@ class Equation:
             children = eqAst.get((nodeName, nodeId), [])
             stack += children
             if len(children) > 0: # we only put in nonLeaves
-                newEqAst[(nodeName, nodeId+self.totalNodeCount)] = children
-        self.ast[('=', 0)][sideOfVariableOfSelf] = newEqAst[][sideOfNonVariableOfEq]
-        del newEqAst[('=', self.totalNodeCount)]
+                newChildren = []
+                for child in children:
+                    childName, childId = child
+                    if childId > variableIdInEq:
+                        childId -= 1 # removing 1 variable
+                    # import pdb;pdb.set_trace()
+                    newChildren.append((childName, childId+amountToIncreaseId))
+                if nodeId > variableIdInEq:
+                    nodeId -= 1
+                # import pdb;pdb.set_trace()
+                newEqAst[(nodeName, nodeId+amountToIncreaseId)] = newChildren
+        if self.verbose:
+            print('new self.ast:')
+            pp.pprint(self.ast)
+            print(f'after increasing nodeId by amountToIncreaseId ({amountToIncreaseId}) :')
+            pp.pprint(newEqAst)
+
+        self.ast[('=', 0)][sideOfVariableOfSelf] = newEqAst[('=', amountToIncreaseId)][sideOfNonVariableOfEq]
+        del newEqAst[('=', amountToIncreaseId)]
+        if self.verbose:
+            print('updating self.ast: ')
+            pp.pprint(self.ast)
+            print('with')
+            pp.pprint(newEqAst)
         self.ast.update(newEqAst)
+        if self.verbose:
+            print('updated ast: ')
+            pp.pprint(self.ast)
         #substitution complete
 
         #update functionCountChange, should have no functionCountChange
@@ -368,10 +435,11 @@ class Equation:
         self.variables = mergeCountDictionaries(self.variables, eqVariable)
 
         #should have no change in primitives
-        eqPrimitives = deepcopy(eq.primitives)
-        self.primitives = mergeCountDictionaries(self.primitives, eqPrimitives)
+        # eqPrimitives = deepcopy(eq.primitives)
+        # import pdb;pdb.set_trace()
+        self.primitives = eq.primitives#mergeCountDictionaries(self.primitives, eqPrimitives)
 
-        self.totalNodeCount += eq.totalNodeCount - 1 #the equalNode was removed.
+        self.totalNodeCount += eq.totalNodeCount - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
         return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
 
 
