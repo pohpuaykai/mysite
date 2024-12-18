@@ -107,10 +107,11 @@ class Function:#(metaclass=FunctionHook):
 
 
 
-    def __init__(self, equation, verbose=False):
+    def __init__(self, equation, idInAst, verbose=False):
         self.eq = equation
         self.inverses = None
         self.verbose = verbose
+        self.idInAst = idInAst
 
 
     def substituteValue(self, substitutionDictionary):
@@ -205,6 +206,7 @@ class Function:#(metaclass=FunctionHook):
             print('replacementDictionary')
             print(replacementDictionary)
             print('len(replacementDictionary):', len(replacementDictionary))
+            print('reverses key: ', (equationSide, str(argumentIdx)))
 
 
         #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse

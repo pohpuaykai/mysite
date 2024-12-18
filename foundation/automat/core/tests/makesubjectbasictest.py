@@ -13,9 +13,23 @@ def test__makeSubject2Input__addition0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a-c=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'-': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__addition1(verbose=False):
@@ -24,9 +38,23 @@ def test__makeSubject2Input__addition1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a-b=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'-': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__subtraction0(verbose=False):
@@ -35,9 +63,23 @@ def test__makeSubject2Input__subtraction0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a+c=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'+': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__subtraction1(verbose=False):
@@ -46,9 +88,23 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b-a=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'-': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__multiply0(verbose=False):
@@ -57,9 +113,23 @@ def test__makeSubject2Input__multiply0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\frac{a}{c}=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'/': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__multiply1(verbose=False):
@@ -68,9 +138,23 @@ def test__makeSubject2Input__multiply1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\frac{a}{b}=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'/': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__divide0(verbose=False):
@@ -79,9 +163,23 @@ def test__makeSubject2Input__divide0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'ac=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'*': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__divide1(verbose=False):
@@ -90,9 +188,23 @@ def test__makeSubject2Input__divide1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\frac{b}{a}=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'/': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__exponent0(verbose=False):
@@ -101,9 +213,23 @@ def test__makeSubject2Input__exponent0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\sqrt[c]{a}=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'nroot': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__exponent1(verbose=False):
@@ -112,9 +238,23 @@ def test__makeSubject2Input__exponent1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\log_b(a)=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'log': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__nroot0(verbose=False):
@@ -123,9 +263,23 @@ def test__makeSubject2Input__nroot0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\log_a(c)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'log': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__nroot1(verbose=False):
@@ -134,9 +288,23 @@ def test__makeSubject2Input__nroot1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a^b=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'^': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__log0(verbose=False):
@@ -145,9 +313,23 @@ def test__makeSubject2Input__log0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\sqrt[a]{c}=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'nroot': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject2Input__log1(verbose=False):
@@ -156,9 +338,23 @@ def test__makeSubject2Input__log1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b^a=c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'^': 1} # count
+    expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arccosec(verbose=False):
@@ -167,9 +363,23 @@ def test__makeSubject1Input__arccosec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\cosec(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cosec': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arccosech(verbose=False):
@@ -178,9 +388,23 @@ def test__makeSubject1Input__arccosech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\cosech(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cosech': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arccos(verbose=False):
@@ -189,9 +413,23 @@ def test__makeSubject1Input__arccos(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\cos(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cos': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arccosh(verbose=False):
@@ -200,9 +438,23 @@ def test__makeSubject1Input__arccosh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\cosh(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cosh': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arccot(verbose=False):
@@ -211,9 +463,23 @@ def test__makeSubject1Input__arccot(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\cot(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cot': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arccoth(verbose=False):
@@ -222,9 +488,23 @@ def test__makeSubject1Input__arccoth(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\coth(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'coth': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arcsec(verbose=False):
@@ -233,9 +513,23 @@ def test__makeSubject1Input__arcsec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\sec(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sec': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arcsech(verbose=False):
@@ -244,9 +538,23 @@ def test__makeSubject1Input__arcsech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\sech(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sech': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arcsin(verbose=False):
@@ -255,9 +563,23 @@ def test__makeSubject1Input__arcsin(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\sin(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sin': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = None # count
+    expectedTotalNodeCount = None # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arcsinh(verbose=False):
@@ -266,9 +588,23 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\sinh(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sinh': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arctan(verbose=False):
@@ -277,9 +613,23 @@ def test__makeSubject1Input__arctan(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\tan(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'tan': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__arctanh(verbose=False):
@@ -288,9 +638,23 @@ def test__makeSubject1Input__arctanh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\tanh(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'tanh': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__cosec(verbose=False):
@@ -299,9 +663,23 @@ def test__makeSubject1Input__cosec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arccosec(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccosec': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__cosech(verbose=False):
@@ -310,9 +688,23 @@ def test__makeSubject1Input__cosech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arccosech(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccosech': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__cos(verbose=False):
@@ -321,9 +713,23 @@ def test__makeSubject1Input__cos(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arccos(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccos': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__cosh(verbose=False):
@@ -332,9 +738,23 @@ def test__makeSubject1Input__cosh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arccosh(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccosh': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__cot(verbose=False):
@@ -343,9 +763,23 @@ def test__makeSubject1Input__cot(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arccot(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccot': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__coth(verbose=False):
@@ -354,9 +788,23 @@ def test__makeSubject1Input__coth(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arccoth(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccoth': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__sec(verbose=False):
@@ -365,9 +813,23 @@ def test__makeSubject1Input__sec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arcsec(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsec': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__sech(verbose=False):
@@ -376,9 +838,23 @@ def test__makeSubject1Input__sech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arcsech(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsech': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__sin(verbose=False):
@@ -387,9 +863,23 @@ def test__makeSubject1Input__sin(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arcsin(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsin': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__sinh(verbose=False):
@@ -398,9 +888,23 @@ def test__makeSubject1Input__sinh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arcsinh(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsinh': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__tan(verbose=False):
@@ -409,9 +913,23 @@ def test__makeSubject1Input__tan(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arctan(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arctan': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__makeSubject1Input__tanh(verbose=False):
@@ -420,9 +938,23 @@ def test__makeSubject1Input__tanh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = '\\arctanh(a)=b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arctanh': 1} # count
+    expectedVariables = {'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 
@@ -434,9 +966,23 @@ def test__leftSide__addition0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=c-b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'-': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__addition1(verbose=False):
@@ -445,9 +991,23 @@ def test__leftSide__addition1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=c-a' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'-': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__subtraction0(verbose=False):
@@ -456,9 +1016,23 @@ def test__leftSide__subtraction0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=c+b' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'+': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__subtraction1(verbose=False):
@@ -467,9 +1041,23 @@ def test__leftSide__subtraction1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=a-c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'-': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__multiply0(verbose=False):
@@ -478,9 +1066,23 @@ def test__leftSide__multiply0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\frac{c}{b}' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'/': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__multiply1(verbose=False):
@@ -489,9 +1091,23 @@ def test__leftSide__multiply1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=\\frac{c}{a}' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'/': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__divide0(verbose=False):
@@ -500,9 +1116,23 @@ def test__leftSide__divide0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=cb' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'*': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__divide1(verbose=False):
@@ -511,9 +1141,23 @@ def test__leftSide__divide1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=\\frac{a}{c}' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'/': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__exponent0(verbose=False):
@@ -522,9 +1166,23 @@ def test__leftSide__exponent0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\sqrt[b]{c}' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'nroot': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__exponent1(verbose=False):
@@ -533,9 +1191,23 @@ def test__leftSide__exponent1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=\\log_a(c)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'log': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__nroot0(verbose=False):
@@ -544,9 +1216,23 @@ def test__leftSide__nroot0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\log_c(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'log': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__nroot1(verbose=False):
@@ -555,9 +1241,23 @@ def test__leftSide__nroot1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=c^a' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'^': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__log0(verbose=False):
@@ -566,9 +1266,23 @@ def test__leftSide__log0(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\sqrt[c]{b}' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'nroot': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__log1(verbose=False):
@@ -577,9 +1291,23 @@ def test__leftSide__log1(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'b=a^c' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'^': 1} # count
+    expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 5 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arccosec(verbose=False):
@@ -588,9 +1316,23 @@ def test__leftSide__arccosec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\cosec(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cosec': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arccosech(verbose=False):
@@ -599,9 +1341,23 @@ def test__leftSide__arccosech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\cosech(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cosech': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arccos(verbose=False):
@@ -610,9 +1366,23 @@ def test__leftSide__arccos(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\cos(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cos': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arccosh(verbose=False):
@@ -621,9 +1391,23 @@ def test__leftSide__arccosh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\cosh(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cosh': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arccot(verbose=False):
@@ -632,9 +1416,23 @@ def test__leftSide__arccot(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\cot(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'cot': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arccoth(verbose=False):
@@ -643,9 +1441,23 @@ def test__leftSide__arccoth(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\coth(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'coth': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arcsec(verbose=False):
@@ -654,9 +1466,23 @@ def test__leftSide__arcsec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\sec(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sec': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arcsech(verbose=False):
@@ -665,9 +1491,23 @@ def test__leftSide__arcsech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\sech(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sech': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arcsin(verbose=False):
@@ -676,9 +1516,23 @@ def test__leftSide__arcsin(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\sin(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sin': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arcsinh(verbose=False):
@@ -687,9 +1541,23 @@ def test__leftSide__arcsinh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\sinh(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'sinh': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arctan(verbose=False):
@@ -698,9 +1566,23 @@ def test__leftSide__arctan(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\tan(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'tan': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__arctanh(verbose=False):
@@ -709,9 +1591,23 @@ def test__leftSide__arctanh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\tanh(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'tanh': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__cosec(verbose=False):
@@ -720,9 +1616,23 @@ def test__leftSide__cosec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arccosec(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccosec': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__cosech(verbose=False):
@@ -731,9 +1641,23 @@ def test__leftSide__cosech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arccosech(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccosech': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__cos(verbose=False):
@@ -742,9 +1666,23 @@ def test__leftSide__cos(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arccos(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccos': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__cosh(verbose=False):
@@ -753,9 +1691,23 @@ def test__leftSide__cosh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arccosh(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccosh': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__cot(verbose=False):
@@ -764,9 +1716,23 @@ def test__leftSide__cot(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arccot(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccot': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__coth(verbose=False):
@@ -775,9 +1741,23 @@ def test__leftSide__coth(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arccoth(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arccoth': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__sec(verbose=False):
@@ -786,9 +1766,23 @@ def test__leftSide__sec(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arcsec(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsec': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__sech(verbose=False):
@@ -797,9 +1791,23 @@ def test__leftSide__sech(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arcsech(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsech': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__sin(verbose=False):
@@ -808,9 +1816,23 @@ def test__leftSide__sin(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arcsin(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsin': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__sinh(verbose=False):
@@ -819,9 +1841,23 @@ def test__leftSide__sinh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arcsinh(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arcsinh': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__tan(verbose=False):
@@ -830,9 +1866,23 @@ def test__leftSide__tan(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arctan(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arctan': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 def test__leftSide__tanh(verbose=False):
@@ -841,9 +1891,23 @@ def test__leftSide__tanh(verbose=False):
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a=\\arctanh(b)' # to be filled in 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    expectedFunctions = {'arctanh': 1} # count
+    expectedVariables = {'b': 1, 'a': 1} # count
+    expectedPrimitives = 0 # count
+    expectedTotalNodeCount = 4 # count
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functions and 
+        expectedVariables == eq0.variables and 
+        expectedPrimitives == eq0.primitives and
+        expectedTotalNodeCount == eq0.totalNodeCount
+        )
     if verbose:
         print(latexStr)
+        print(eq0.functions)
+        print(eq0.variables)
+        print(eq0.primitives)
+        print(eq0.totalNodeCount)
 
 
 

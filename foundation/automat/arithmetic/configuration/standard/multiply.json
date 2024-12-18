@@ -37,7 +37,7 @@
           "@vnK@": ["@cN_Divide@.@vfN@", "@idk_1@"],
           "@vnV@": ["@item_0_0@", "@item_1_0@"]
         },
-      "functionCountAdded": {},
+      "functionCountAdded": {"@cN_Divide@.@vfN@": 1, "@cN@.@vfN@": -1},
       "primitiveCountAdded": 0,
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.divide import Divide"],
@@ -69,7 +69,7 @@
           "@vnK@": ["@cN_Divide@.@vfN@", "@idk_1@"],
           "@vnV@": ["@item_0_1@", "@item_1_0@"]
         },
-      "functionCountAdded": {},
+      "functionCountAdded": {"@cN_Divide@.@vfN@": 1, "@cN@.@vfN@": -1},
       "primitiveCountAdded": 0,
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.divide import Divide"],

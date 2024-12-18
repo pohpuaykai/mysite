@@ -61,8 +61,9 @@ class Latexparser(Parser):
                 '_updateInfixNearestBracketInfix':False,
                 '__updateInfixNearestBracketInfix':False,#
                 '_removeCaretThatIsNotExponent':False,
+                '_removeCaretThatArePartOfVariables':True,
                 '_tagBracketsToExponent':False,
-                '_findLeftOverPosition':False,
+                '_findLeftOverPosition':True,
                 '_contiguousLeftOvers':False,
                 '_collateBackslashInfixLeftOversToContiguous':False,
                 '__updateBackslashLeftOversBracketInfo':False,
@@ -70,8 +71,8 @@ class Latexparser(Parser):
                 '_graftGrenzeRangesIntoContainmentTree':False,#
                 '__addImplicitZero':False,
                 '__addImplicitMultiply':False,
-                '__intraGrenzeSubtreeUe':True,#
-                '__interLevelSubtreeGrafting':True,
+                '__intraGrenzeSubtreeUe':False,#
+                '__interLevelSubtreeGrafting':False,
                 '_reformatToAST':False,
                 '_latexSpecialCases':False
             }
@@ -570,8 +571,8 @@ class Latexparser(Parser):
                     'hasArgument2':False# TODO this was never used before
                 }#for unparsing function
                 
-                originalCount = self.variables.get(labelName, 0)
-                self.variables[labelName] = originalCount + 1
+                # originalCount = self.variables.get(labelName, 0)
+                # self.variables[labelName] = originalCount + 1
 
         if self.showError():
             print('event__findBackSlashPositions IS RELEASED')
@@ -1107,21 +1108,57 @@ class Latexparser(Parser):
         if self.parallelise:
             self.event__removeCaretThatIsNotExponent.set()
 
+    def _removeCaretThatArePartOfVariables(self):
+        newInfixList = []
+        for infixInfoDict in self.infixList:
+            if infixInfoDict['name'] == '^':
+                if self.showError():
+                    print('******')
+                    print(infixInfoDict)
+                    print('******')
+                if self._eqs[infixInfoDict['position'] + 1 ] == '{':
+                    #find matching bracket's closingPos
+                    closingBracketPos = None
+                    closingBracketType = None
+                    for bracketInfoDict in self.matchingBracketsLocation:
+                        if bracketInfoDict['openBracketPos'] == infixInfoDict['position'] + 1:
+                            closingBracketPos = bracketInfoDict['closeBracketPos']
+                            closingBracketType = bracketInfoDict['closeBracketType']
+                            break
+                    if closingBracketPos + len(closingBracketType) < len(self._eqs) and self._eqs[closingBracketPos + len(closingBracketType)] == '_':
+                        bracketInfoDict['belongToExponent'] = False
+                        # print('skip0')
+                        continue # do not count as exponent
+                elif infixInfoDict['position'] + 2 < len(self._eqs) and self._eqs[infixInfoDict['position'] + 2 ] == '_':
+                    # print('skip1')
+                    if self.showError():
+                        print(infixInfoDict)
+                        import pdb;pdb.set_trace()
+                    continue # do not count as exponent
+            #these are valid infixes
+            newInfixList.append(infixInfoDict)
+            if self.showError():
+                print(newInfixList)
+            # import pdb;pdb.set_trace()
+        self.infixList = newInfixList
+
 
     def _tagBracketsToExponent(self):#TODO rename to _tagBracketsToInfix
         #THis has to happen after the removing fake exponents
         for infixInfoDict in self.infixList:
             for bracketInfoDict in self.matchingBracketsLocation:
-                #check if directly right of exponent is curly brackets
-                # if infixInfoDict['name'] == '^':
-                if infixInfoDict['position'] + len(infixInfoDict['name']) == bracketInfoDict['openBracketPos']:
-                    bracketInfoDict['belongToExponent'] = True
-                if infixInfoDict['position'] == bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType']):
-                    bracketInfoDict['belongToExponent'] = True
-                for infixBracket in infixInfoDict['enclosingBracketsNonBackslashArg']:
-                    # import pdb;pdb.set_trace()
-                    if infixBracket['enclosingStartPos'] == bracketInfoDict['openBracketPos']:
+                #if before the curlybrackets is _, then, it does not belong to exponent
+                possibleUnderscorePos = bracketInfoDict['openBracketPos'] - 1 # length of underscore
+                if not(possibleUnderscorePos >= 0 and self._eqs[possibleUnderscorePos] == '_'):
+                    #check if directly right of exponent is curly brackets
+                    if infixInfoDict['position'] + len(infixInfoDict['name']) == bracketInfoDict['openBracketPos']:
                         bracketInfoDict['belongToExponent'] = True
+                    if infixInfoDict['position'] == bracketInfoDict['closeBracketPos']+len(bracketInfoDict['closeBracketType']):
+                        bracketInfoDict['belongToExponent'] = True
+                    for infixBracket in infixInfoDict['enclosingBracketsNonBackslashArg']:
+                        # import pdb;pdb.set_trace()
+                        if infixBracket['enclosingStartPos'] == bracketInfoDict['openBracketPos']:
+                            bracketInfoDict['belongToExponent'] = True
 
 
     def _findLeftOverPosition(self):
@@ -1156,6 +1193,8 @@ class Latexparser(Parser):
         self.occupiedBracketsNonBackslash = set()# for bubble merge later, these entreSpaces are connected
         self.occupiedBrackets = set()
         for bracketInfoDict in self.matchingBracketsLocation:
+            # import pdb;pdb.set_trace()
+
             if bracketInfoDict['belongToBackslash'] or bracketInfoDict['belongToExponent']:
                 for pos in range(bracketInfoDict['openBracketPos'], bracketInfoDict['openBracketPos']+len(bracketInfoDict['openBracketType'])):
                     self.occupiedBrackets.add(pos)
@@ -1255,9 +1294,42 @@ class Latexparser(Parser):
 
         but we cannot have 
         NV (like 2x, this requires a implicit-multiplication, deviens: 2*x)
+
+
+        The above works only if the collated is not in curly brackets.
+        If we are in curly brackets state, anything goes.
+        We may also have curly brackets in curlybrackets, so we 
+        have to keep a openCurlyBracket counter
         """
+        def splitWeirdVariable(variablesStr):
+            bracketCounter = 0
+            word = ''
+            variables = []
+            hadUnderscore = False
+            for ccc in variablesStr:
+                word += ccc
+                if ccc == '_':
+                    if bracketCounter == 0: # there might be underscore in the curlybrackets following underscore
+                        hadUnderscore = True
+                # elif ccc == '^': # this must be before the _
+                #     pass
+                elif ccc == '{':
+                    bracketCounter += 1
+                elif ccc == '}':
+                    bracketCounter -= 1
+                if bracketCounter == 0 and hadUnderscore and ccc!='_':
+                    # import pdb;pdb.set_trace()
+                    variables.append(word)
+                    hadUnderscore = False
+                    word = ''
+            if len(word)> 0:
+                variables.append(word)
+            # print('splitVariables', variables)
+            return variables
+
         if self.parallelise:
             self.event__findLeftOverPosition.wait()
+        openCurlyBracketsCounter = 0
         self.contiguousInfoList = []
         self.leaves = set() # for the unparsing function to check for base case
         previousIsNume = None
@@ -1276,15 +1348,21 @@ class Latexparser(Parser):
         ###############
         for unoccupiedPos in self.unoccupiedPoss: # start with left-most leftover
             leftOverC = self._eqs[unoccupiedPos]
+            if leftOverC == '{':
+                openCurlyBracketsCounter += 1
+            elif leftOverC == '}':
+                openCurlyBracketsCounter -= 1
             isNume = isNum(leftOverC) or leftOverC in ['.', ','] # some function like S(x, y)
             #############
             if self.showError():
                 print('leftOverC: ', leftOverC)
+                print('openCurlyBracket: ', openCurlyBracketsCounter)
+                print('openCurlyBracketsCounter > 0 or leftOverC != }', (openCurlyBracketsCounter > 0 or leftOverC == '}'))
                 print("leftOverC not in ['=', ' '] ", " (unoccupiedPos == previousPos+1) ", " previousIsNume is None ", " isNume == previousIsNume ", " (not previousIsNume) and isNume ")
                 print(f"""{leftOverC not in ['=', ' ']} and (({(unoccupiedPos == previousPos+1)}) and ({previousIsNume is None} or {isNume == previousIsNume} or {(not previousIsNume) and isNume}))""")
                 # import pdb;pdb.set_trace()
             #############
-            if leftOverC not in ['=', ' '] and ((unoccupiedPos == previousPos+1) and (previousIsNume is None or (isNume == previousIsNume) or ((not previousIsNume) and isNume))): #contiguous
+            if (openCurlyBracketsCounter > 0 or leftOverC == '}') or ( leftOverC not in ['=', ' '] and ((unoccupiedPos == previousPos+1) and (previousIsNume is None or (isNume == previousIsNume) or ((not previousIsNume) and isNume))) ): #contiguous
                 word += leftOverC # word coagulation
                 # if wordPosRange[0] is None:
                 #     wordPosRange[0] = unoccupiedPos
@@ -1300,15 +1378,45 @@ class Latexparser(Parser):
                     #     wordPosRange[1] = wordPosRange[0]+1 # for easy array index, python array indexing endPos always plus 1
 
                     #check if word contains V_{a}I_{b}, which are actually 2 words
-                    splitByCurlyEnds = list(filter(lambda frag: len(frag) > 0, word.split('}')))
+                    # splitByCurlyEnds = list(filter(lambda frag: len(frag) > 0, word.split('}')))
+                    # # import pdb;pdb.set_trace()
+                    # if len(splitByCurlyEnds) > 1:
+                    #     for frag in splitByCurlyEnds:
+                    #         fword = frag+'}'
+                    #         fwordStartPos = wordStartPos + word.index(fword)
+                    #         fwordEndPos = fwordStartPos + len(fword)
+                    #         if len(fword) > 0:
+                    #             self.contiguousInfoList.append({
+                    #                 'name':fword,
+                    #                 'startPos':fwordStartPos,
+                    #                 'endPos':fwordEndPos,
+                    #                 'parent':None,
+                    #                 'type':'number' if isNum(fword) else 'variable',
+                    #                 'ganzStartPos':fwordStartPos,
+                    #                 'ganzEndPos':fwordEndPos,
+                    #                 'position':fwordStartPos
+                    #             })
+                    #             self.leaves.add(fword)
+                    # else:
+                    #     if len(word) > 0:
+                    #         self.contiguousInfoList.append({
+                    #             'name':word, 
+                    #             'startPos':wordStartPos,#wordPosRange[0],
+                    #             'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
+                    #             'parent':None,
+                    #             'type':'number' if isNum(word) else 'variable',
+                    #             'ganzStartPos':wordStartPos,#wordPosRange[0],
+                    #             'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
+                    #             'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
+                    #         })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
+                    #         self.leaves.add(word)
+                    splitVariables = splitWeirdVariable(word)
                     # import pdb;pdb.set_trace()
-                    if len(splitByCurlyEnds) > 1:
-                        for frag in splitByCurlyEnds:
-                            fword = frag+'}'
+                    for fword in splitVariables:
+                        if len(fword) > 0:
                             fwordStartPos = wordStartPos + word.index(fword)
                             fwordEndPos = fwordStartPos + len(fword)
-                            if len(fword) > 0:
-                                self.contiguousInfoList.append({
+                            self.contiguousInfoList.append({
                                     'name':fword,
                                     'startPos':fwordStartPos,
                                     'endPos':fwordEndPos,
@@ -1317,21 +1425,7 @@ class Latexparser(Parser):
                                     'ganzStartPos':fwordStartPos,
                                     'ganzEndPos':fwordEndPos,
                                     'position':fwordStartPos
-                                })
-                                self.leaves.add(fword)
-                    else:
-                        if len(word) > 0:
-                            self.contiguousInfoList.append({
-                                'name':word, 
-                                'startPos':wordStartPos,#wordPosRange[0],
-                                'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
-                                'parent':None,
-                                'type':'number' if isNum(word) else 'variable',
-                                'ganzStartPos':wordStartPos,#wordPosRange[0],
-                                'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
-                                'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
-                            })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
-                            self.leaves.add(word)
+                            })
                 if leftOverC not in ['=', ' ']:
                     word = leftOverC
                     # wordPosRange = [unoccupiedPos, None]
@@ -1362,15 +1456,50 @@ class Latexparser(Parser):
         #     'position':wordStartPos#wordPosRange[0]#this is for building AST's convienence
         # })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
         # self.leaves.add(word)
-        splitByCurlyEnds = list(filter(lambda frag: len(frag) > 0, word.split('}')))
+        # splitByCurlyEnds = list(filter(lambda frag: len(frag) > 0, word.split('}')))
+        # # import pdb;pdb.set_trace()
+        # if len(splitByCurlyEnds) > 1:
+        #     for frag in splitByCurlyEnds:
+        #         fword = frag+'}'
+        #         fwordStartPos = wordStartPos + word.index(fword)
+        #         fwordEndPos = fwordStartPos + len(fword)
+        #         if len(fword) > 0:
+        #             self.contiguousInfoList.append({
+        #                 'name':fword,
+        #                 'startPos':fwordStartPos,
+        #                 'endPos':fwordEndPos,
+        #                 'parent':None,
+        #                 'type':'number' if isNum(fword) else 'variable',
+        #                 'ganzStartPos':fwordStartPos,
+        #                 'ganzEndPos':fwordEndPos,
+        #                 'position':fwordStartPos
+        #             })
+        #             self.leaves.add(fword)
+        # else:
+        #     if self.showError():
+        #         print('word', word, 'len(word):', len(word))
+        #         print('wordStartPos', wordStartPos)
+        #     if len(word) > 0:
+        #         self.contiguousInfoList.append({
+        #             'name':word, 
+        #             'startPos':wordStartPos,#wordPosRange[0],
+        #             'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
+        #             'parent':None,
+        #             'type':'number' if isNum(word) else 'variable',
+        #             'ganzStartPos':wordStartPos,#wordPosRange[0],
+        #             'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
+        #             'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
+        #         })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
+        #         self.leaves.add(word)
+
+
+        splitVariables = splitWeirdVariable(word)
         # import pdb;pdb.set_trace()
-        if len(splitByCurlyEnds) > 1:
-            for frag in splitByCurlyEnds:
-                fword = frag+'}'
+        for fword in splitVariables:
+            if len(fword) > 0:
                 fwordStartPos = wordStartPos + word.index(fword)
                 fwordEndPos = fwordStartPos + len(fword)
-                if len(fword) > 0:
-                    self.contiguousInfoList.append({
+                self.contiguousInfoList.append({
                         'name':fword,
                         'startPos':fwordStartPos,
                         'endPos':fwordEndPos,
@@ -1379,24 +1508,7 @@ class Latexparser(Parser):
                         'ganzStartPos':fwordStartPos,
                         'ganzEndPos':fwordEndPos,
                         'position':fwordStartPos
-                    })
-                    self.leaves.add(fword)
-        else:
-            if self.showError():
-                print('word', word, 'len(word):', len(word))
-                print('wordStartPos', wordStartPos)
-            if len(word) > 0:
-                self.contiguousInfoList.append({
-                    'name':word, 
-                    'startPos':wordStartPos,#wordPosRange[0],
-                    'endPos':wordStartPos+len(word),#wordPosRange[0]+len(word),#wordPosRange[1],
-                    'parent':None,
-                    'type':'number' if isNum(word) else 'variable',
-                    'ganzStartPos':wordStartPos,#wordPosRange[0],
-                    'ganzEndPos':wordStartPos+len(word),#wordPosRange[0]+len(word),
-                    'position':wordStartPos,#wordPosRange[0]#this is for building AST's convienence
-                })#, 'parentsInfo':self.wordLowestBackSlashArgumentParents}) # 
-                self.leaves.add(word)
+                })
         #debugging double check that we got the contiguous right....
         if self.showError():
             print('&&&&&&&&&&&&&&&contiguousInfoList&&&&&&&&&&&&&&&&&')
@@ -1406,12 +1518,12 @@ class Latexparser(Parser):
             print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
             # import pdb;pdb.set_trace()
         #sort into primitives and variables
-        for leaf in self.leaves:
-            if isNum(leaf):
-                self.primitives += 1
-            else:
-                originalCount = self.variables.get(str(leaf), 0)
-                self.variables[str(leaf)] = originalCount + 1
+        # for leaf in self.leaves:
+        #     if isNum(leaf):
+        #         self.primitives += 1
+        #     else:
+        #         originalCount = self.variables.get(str(leaf), 0)
+        #         self.variables[str(leaf)] = originalCount + 1
         if self.parallelise:
             self.event__contiguousLeftOvers.set()
 
@@ -3032,7 +3144,6 @@ if __name__=='__main__':
         if self.parallelise:
             self.event__subTreeGraftingUntilTwoTrees.wait()
         #add the = (with children) in alleDing, YAY!
-        self.totalNodeCount = len(self.alleDing) + 1 #here, we do not have =
         #first find ding with no parent
         dingsNoParents = []
         for ding in self.alleDing:
@@ -3245,14 +3356,22 @@ if __name__=='__main__':
                 stack += latexASTCopy[currentNode]
 
         #last pass to get the statistics
+        self.totalNodeCount = 0
         stack = [self.equalTuple]
         while len(stack) > 0:
             nodeName, nodeId = stack.pop()
+            self.totalNodeCount += 1
             children = self.ast.get((nodeName, nodeId), [])
             stack += children
             if nodeName != '=' and len(children) > 0: #do not count equals
                 originalCount = self.functions.get(nodeName, 0)
                 self.functions[nodeName] = originalCount + 1
+            if len(children) == 0:
+                if isNum(str(nodeName)):
+                    self.primitives += 1
+                else:
+                    originalCount = self.variables.get(str(nodeName), 0)
+                    self.variables[str(nodeName)] = originalCount + 1
         
 
     def _parse(self):
@@ -3292,6 +3411,7 @@ if __name__=='__main__':
         self._updateInfixNearestBracketInfix()
         self._removeCaretThatIsNotExponent()
         self._tagBracketsToExponent()
+        self._removeCaretThatArePartOfVariables()
         self._findLeftOverPosition()
         self._contiguousLeftOvers()
         self._collateBackslashInfixLeftOversToContiguous()
@@ -3513,6 +3633,7 @@ if __name__=='__main__':
                     self.nodeIdToInfixArgsBrackets[nodeId] = aux
                 elif nodeName in ['^']:
                     noLeftBracketExponent = children[0] not in self.latexAST or children[0][0] in Latexparser.FUNCTIONNAMES or children[0][0] in Latexparser.VARIABLENAMESTAKEANARG
+                    noLeftBracketExponent = '^' not in  children[0][0] and noLeftBracketExponent # this is for weirdvariables with ^, please testcase: test__weirdVariables__variablesWithCaretRealExponent
                     hasRightBracketExponent = children[1][0] not in self.leaves or (len(children[1][0]) > 1 and children[1][0] in self.leaves)
                     aux = { # we use full brackets, since we are bracket freaks
                         'leftOpenBracket':'' if noLeftBracketExponent else '(',#the other option is to use brackets according to some logic

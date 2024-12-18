@@ -28,7 +28,8 @@
         {{vKey0}} = None
         {{vKey1}} = None
         for key, value in {{vReplacementDict}}.items():
-            if len(value) > 1 and value[{{valueSideIdx}}][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[{{valueSideIdx}}][1] == self.idInAst:# value[{{valueSideIdx}}][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 {{vKey0}} = key
             else:
                 {{vKey1}} = key

@@ -32,6 +32,94 @@ def test__weirdVariables__variablesWithCurlyBracketsSimple(verbose=False):
 
 
 
+def test__weirdVariables__variablesWithCurlyBracketsWithNums(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = 'V_{Z1}=V'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {('=', 0): [('V_{Z1}', 1), ('V', 2)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+def test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = 'V_{Z_{1}}=V'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {('=', 0): [('V_{Z_{1}}', 1), ('V', 2)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = 'V_{in}=R I_R + V_{Z_{1}}'
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   ('*', 3): [('R', 2), ('I_R', 4)],
+    ('+', 5): [('*', 3), ('V_{Z_{1}}', 6)],
+    ('=', 0): [('V_{in}', 1), ('+', 5)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+
+def test__weirdVariables__variablesWithCaret(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+    #if we have underscore, then caret, then es ist exponential
+    equationStr = 'V=V^{Q_{1}}_{BE}' #TODO if caret follows an underscore, then its not exponential, sondern, der ganz Ding ist ein VARIABLE
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {('=', 0): [('V', 2), ('V^{Q_{1}}_{BE}', 1)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__weirdVariables__variablesWithCaretRealExponent(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+    #if we have underscore, then caret, then es ist exponential
+    equationStr = 'V^x=V^{Q_{1}}_{BE}^x' #TODO if caret follows an underscore, then its not exponential, sondern, der ganz Ding ist ein VARIABLE
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   
+    ('=', 0): [('^', 5), ('^', 2)],
+    ('^', 2): [('V^{Q_{1}}_{BE}', 1), ('x', 3)],
+    ('^', 5): [('V', 4), ('x', 6)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
+def test__weirdVariables__variablesWithCaretMoreComplex(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+    #if we have underscore, then caret, then es ist exponential
+    equationStr = 'I_{R_{C}} R_{C} - V^{Q_{1}}_{BE} - I_{R} R = 0' #TODO if caret follows an underscore, then its not exponential, sondern, der ganz Ding ist ein VARIABLE
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._parse()
+    expected_ast = {   
+    ('*', 3): [('I_{R_{C}}', 2), ('R_{C}', 4)],
+    ('*', 9): [('I_{R}', 8), ('R', 10)],
+    ('-', 5): [('*', 3), ('V^{Q_{1}}_{BE}', 6)],
+    ('-', 7): [('-', 5), ('*', 9)],
+    ('=', 0): [('-', 7), ('0', 1)]}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    if verbose:
+        pp.pprint(parser.ast)
+
+
+
 def test__weirdVariables__variablesWithCurlyBracketsMinus(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
@@ -1192,6 +1280,12 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 if __name__=='__main__':
     test__contiguousLeftOvers__decimalPlaces()
     test__weirdVariables__variablesWithCurlyBracketsSimple()
+    test__weirdVariables__variablesWithCurlyBracketsWithNums()
+    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets()
+    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex()
+    test__weirdVariables__variablesWithCaret()
+    test__weirdVariables__variablesWithCaretRealExponent()
+    test__weirdVariables__variablesWithCaretMoreComplex()
     test__weirdVariables__variablesWithCurlyBracketsMinus()
     test__weirdVariables__variablesWithCurlyBracketsFrac()
     test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0()

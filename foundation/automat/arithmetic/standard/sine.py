@@ -14,11 +14,11 @@ class Sine(Function):
         kwargs['funcName'] = 'sin'
         super().__init_subclass__(**kwargs)
 
-    def __init__(self, equation, verbose=False):
+    def __init__(self, equation, idInAst, verbose=False):
         """
 
         """
-        super().__init__(equation)
+        super().__init__(equation, idInAst, verbose=verbose)
         self.reverses = {
             
                 ("R", "0"): self._reverseR0,
@@ -58,7 +58,8 @@ class Sine(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if len(value) > 1 and value[1][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[1][1] == self.idInAst:# value[1][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 key0 = key
             else:
                 key1 = key
@@ -100,7 +101,8 @@ class Sine(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if len(value) > 1 and value[0][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[0][1] == self.idInAst:# value[0][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 key0 = key
             else:
                 key1 = key

@@ -14,11 +14,11 @@ class Multiply(Function):
         kwargs['funcName'] = '*'
         super().__init_subclass__(**kwargs)
 
-    def __init__(self, equation, verbose=False):
+    def __init__(self, equation, idInAst, verbose=False):
         """
 
         """
-        super().__init__(equation)
+        super().__init__(equation, idInAst, verbose=verbose)
         self.reverses = {
             
                 ("R", "0"): self._reverseR0,
@@ -62,7 +62,8 @@ class Multiply(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if len(value) > 1 and value[1][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[1][1] == self.idInAst:# value[1][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 key0 = key
             else:
                 key1 = key
@@ -104,7 +105,8 @@ class Multiply(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if len(value) > 1 and value[1][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[1][1] == self.idInAst:# value[1][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 key0 = key
             else:
                 key1 = key
@@ -113,7 +115,7 @@ class Multiply(Function):
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {}, 0, 0
+        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Divide.FUNC_NAME: 1, Multiply.FUNC_NAME: -1}, 0, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -146,7 +148,8 @@ class Multiply(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if len(value) > 1 and value[0][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[0][1] == self.idInAst:# value[0][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 key0 = key
             else:
                 key1 = key
@@ -188,7 +191,8 @@ class Multiply(Function):
         key0 = None
         key1 = None
         for key, value in replacementDictionary.items():
-            if len(value) > 1 and value[0][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
+            #We are checking for id-equivalence of this function, instead of name-equivalence like '==self.FUNC_NAME'
+            if len(value) > 1 and value[0][1] == self.idInAst:# value[0][0] == self.FUNC_NAME:# value[1] assumes that operation on the right-side
                 key0 = key
             else:
                 key1 = key
@@ -197,7 +201,7 @@ class Multiply(Function):
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Divide.FUNC_NAME: 1, Multiply.FUNC_NAME: -1}, 0, 0
 
     
 

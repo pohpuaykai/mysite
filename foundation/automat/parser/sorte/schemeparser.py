@@ -65,7 +65,7 @@ class Schemeparser(Parser):
                 primitives += 1
             elif current.label in Schemeparser.FUNC_NAMES: # is a function
                 functionsD[current.label] = functionsD.get(current.label, 0) + 1
-            else: # is a variable
+            elif current.label != '=': # is a variable
                 variablesD[current.label] = variablesD.get(current.label, 0) + 1
             #end of tabulating
             #node = (current.label, id)

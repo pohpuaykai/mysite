@@ -539,6 +539,40 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp5(verbose=False):
 
 
 
+
+def test__linearEliminationBySubstitution__eq0(verbose=False):
+    latexEq = 'I_{Z_{1}} R_{Z_{1}}=V_{in}-R I_{R}'
+    subject = 'I_{R}'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = '\\frac{V_{in} -I_{Z_{1}}R_{Z_{1}}}{R}=I_{R}' # TO be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
+
+def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simplication_in_AST TODO
+    latexEq = 'I_{R_{C}} R_{C} - V^{Q1}_{BE} - I_{R} R = 0'
+    subject = 'I_{R}'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    modifiedAST = eq0.makeSubject(subject)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    expectedLatexStr = 'I_{R} =\\frac{(I_{R_{C}} R_{C}-V^{Q1}_{BE})-(0)}{R}' # TO be filled in 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+
+
+
 if __name__=='__main__':
     test__moreThan1Op__seriesResistance0()
     test__moreThan1Op__seriesResistance1()
@@ -571,3 +605,5 @@ if __name__=='__main__':
     test__6levelsDeep__voltageGainOfNonInvertingOp3()
     test__6levelsDeep__voltageGainOfNonInvertingOp4() 
     test__6levelsDeep__voltageGainOfNonInvertingOp5()
+    test__linearEliminationBySubstitution__eq0()
+    test__linearEliminationBySubstitution__eq1() #TODO MINUS_ZERO=>simplication_in_AST

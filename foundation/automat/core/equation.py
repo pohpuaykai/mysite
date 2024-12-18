@@ -40,6 +40,8 @@ class Equation:
          self.totalNodeCount) = Parser(parserName).parse(self._eqs)
         #############
         if self.verbose:
+            print('~~~~~~~~~~~~~~~~~~~~INIT')
+            print(self.ast)
             print('self.functions', self.functions)
             print('self.variables', self.variables)
             print('self.primitives', self.primitives)
@@ -277,7 +279,7 @@ class Equation:
             if self.verbose:
                 print('applying op', op)
             functionClass = getFunctionClass(op['functionName'])
-            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self, verbose=self.verbose).reverse(
+            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self, op['id'], verbose=self.verbose).reverse(
                 equationSide, op['argumentIdx'], [op['id'], op['lastId']]
             )
             #update the `stat` of self
@@ -286,14 +288,13 @@ class Equation:
                 self.functions[funcName] = self.functions.get(funcName, 0) + countChange
                 if self.functions[funcName] == 0:
                     del self.functions[funcName]
-            self.primitives = primitiveCountChange
+            self.primitives += primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
         return self.ast
 
 
     def linearEliminationBySubstitution(self, eq, variable):
         """
-        #~ DRAFT ~#
         Make variable the subject of the Equation:self and Equation:eq
         Find which side, variable is on each equation
         Take the side_variable_node of self = side_not_variable_node of eq
@@ -435,10 +436,9 @@ class Equation:
         self.variables = mergeCountDictionaries(self.variables, eqVariable)
 
         #should have no change in primitives
-        # eqPrimitives = deepcopy(eq.primitives)
         # import pdb;pdb.set_trace()
-        self.primitives = eq.primitives#mergeCountDictionaries(self.primitives, eqPrimitives)
-
+        self.primitives += eq.primitives#mergeCountDictionaries(self.primitives, eqPrimitives)
+        # import pdb;pdb.set_trace()
         self.totalNodeCount += eq.totalNodeCount - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
         return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
 
