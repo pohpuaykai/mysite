@@ -296,9 +296,23 @@ class Equation:
 
     def substituteValue(self, substitutionDictionary):
         """
-        #~ DRAFT ~#
 
         substituteDictionary is mapping from variable to primitives (numbers), 
+
+        TODO
+        test substitute value for many multilevel-AST, after you get infinite precision & symbolic, like ChatGPT suggested.
+        ChatGPT suggests that, to get infinity precision:
+        1. use "from decimal import Decimal" (but this does not support trigonometric functions)
+        2. implement your own trigo function: Taylor/Maclaurin series, ...
+        3. get ideas from https://mpmath.org/ (although there are forum complains https://stackoverflow.com/questions/25714830/python-mpmath-not-arbitrary-precision)
+        4. symbolic-irrationals-calculation. like give answers in log, sqrt, exponentials, pi, e, ....
+            (ChatGPT ni yotte) other irrationals can come from:
+            1. explicitly constructed irrational&transcendental numbers, Liouville Numbers, Chaitin Constant
+            2. Infinite series, zeta(3)
+            3. Continued fractions, golden ratio
+            4. Integrals, Hypergeometric function
+            5. Iterative processes, Newton's Method
+
         self.equation.ast, and then substitute each variable under each sub-AST using substituteDictionary
 
         :param substitutionDictionary: mapping from variable (str) to numbers
