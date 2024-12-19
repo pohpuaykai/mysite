@@ -115,7 +115,7 @@ class Arccotangenth(Function):
 
     
 
-    def __calculate(self, v0):
+    def _calculate(self, v0):
         """
         Used to get the numerical value of this function, when all the inputs applied are numerical.
         Also used in substitution method of parent :class:`Function`
@@ -128,5 +128,5 @@ class Arccotangenth(Function):
         :rtype: float
         """
         from math import atanh
-        num=1.0/atanh(v0)
+        num=atanh(1.0/v0)
         return num

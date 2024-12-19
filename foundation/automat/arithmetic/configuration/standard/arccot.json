@@ -49,6 +49,6 @@
   "return_calculation": [{
     "imports": ["from math import atan"],
     "variableCount": 1,
-    "code": ["num=1.0/atan(v0)"]
+    "code": ["num=atan(1.0/v0)"]
   }]
 }

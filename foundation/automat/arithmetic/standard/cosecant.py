@@ -115,7 +115,7 @@ class Cosecant(Function):
 
     
 
-    def __calculate(self, v0):
+    def _calculate(self, v0):
         """
         Used to get the numerical value of this function, when all the inputs applied are numerical.
         Also used in substitution method of parent :class:`Function`
@@ -127,6 +127,6 @@ class Cosecant(Function):
         :return: calculated numerical result
         :rtype: float
         """
-        from math import cos
-        num=1.0/cos(v0)
+        from math import sin
+        num=1.0/sin(v0)
         return num

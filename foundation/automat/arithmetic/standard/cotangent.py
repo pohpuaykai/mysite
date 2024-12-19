@@ -115,7 +115,7 @@ class Cotangent(Function):
 
     
 
-    def __calculate(self, v0):
+    def _calculate(self, v0):
         """
         Used to get the numerical value of this function, when all the inputs applied are numerical.
         Also used in substitution method of parent :class:`Function`

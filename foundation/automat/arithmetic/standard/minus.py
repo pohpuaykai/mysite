@@ -201,7 +201,7 @@ class Minus(Function):
 
     
 
-    def __calculate(self, v0, v1):
+    def _calculate(self, v0, v1):
         """
         Used to get the numerical value of this function, when all the inputs applied are numerical.
         Also used in substitution method of parent :class:`Function`

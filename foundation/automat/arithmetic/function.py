@@ -114,66 +114,6 @@ class Function:#(metaclass=FunctionHook):
         self.idInAst = idInAst
 
 
-    def substituteValue(self, substitutionDictionary):
-        """
-        #~ DRAFT ~#
-        TODO expand this to allow string substitutions, for integration/differentiation
-
-        substituteDictionary is mapping from variable to primitives (numbers), this method finds self.FUNC_NAME sub-AST, in
-        self.equation.ast, and then substitute each variable under each sub-AST using substituteDictionary
-
-        :param substitutionDictionary: mapping from variable (str) to numbers
-        :type substitutionDictionary: dict[str, float]
-        """
-        #error-checking
-        if self.FUNC_NAME not in self.eq.functions: # FUNC_NAME only defined in child
-            raise Exception("Function not in equation")
-        if len(substitutionDictionary) == 0:
-            raise Exception("Did not input substitution")
-        for variableStr, value in substitutionDictionary.items():
-            if variableStr not in self.eq.variables:
-                raise Exception("Function not in equation")
-        #look for all the self.FUNC_NAME, to make the substitutions
-        ast = deepcopy(self.eq.ast)
-        stack = [Backtracker(
-            ast['='][0], # label
-            None, # neighbours
-            None, # argumentIdx
-            None, # prev
-            ast['='][1] # id
-        )]
-        while len(stack) != 0:
-            current = stack.pop()
-            neighbours = deepcopy(ast[current.label]) # cannot modify the data, that we are reading (race condition)
-            hasFunction = False # does the sub-AST we are substituting, have a function as a input?
-            for idx, neighbour in enumerate(neighbours):
-                if current.label == self.FUNC_NAME: # FUNC_NAME only defined in child
-                    if neighbour.label in self.eq.functions: # is a function
-                        hasFunction = True # there is a function as input, so sub-AST cannot be removed
-                        stack.append(Backtracker(
-                            neighbour.label, # label
-                            None, # neighbours
-                            idx, # argumentIdx
-                            current, # prev
-                            neighbour.id # id
-                        ))
-                    elif neighbour.label in self.eq.variables: # is a variable
-                        ast[(current.label, current.id)][idx] = substitutionDictionary[neighbour.label] # change variable to primitive (number)
-                    else: # substituted value?
-                        pass
-                else: # plain old DFS
-                    stack.append(Backtracker(
-                        neighbour.label, # label
-                        None, # neighbours
-                        idx, # argumentIdx
-                        current, # prev
-                        neighbour.id # id
-                    ))
-            if (current.label == self.FUNC_NAME) and not hasFunction: # totally substitutable, no functions at all
-                ast[(current.prev.label, current.prev.id)][current.prev.argumentIdx] = self._calculate(ast[(current.label, current.id)])
-                del ast[(current.label, current.id)]
-        return ast # substituted ast
-
     def reverse(self, equationSide, argumentIdx, nodeIds):
         """
         #~ DRAFT ~#

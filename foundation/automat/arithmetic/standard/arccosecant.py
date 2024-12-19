@@ -115,7 +115,7 @@ class Arccosecant(Function):
 
     
 
-    def __calculate(self, v0):
+    def _calculate(self, v0):
         """
         Used to get the numerical value of this function, when all the inputs applied are numerical.
         Also used in substitution method of parent :class:`Function`
@@ -127,6 +127,6 @@ class Arccosecant(Function):
         :return: calculated numerical result
         :rtype: float
         """
-        from math import acos
-        num=1.0/acos(v0)
+        from math import asin
+        num=asin(1.0/v0)
         return num

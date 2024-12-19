@@ -47,8 +47,8 @@
     ]
   },
   "return_calculation": [{
-    "imports": ["from math import sin"],
+    "imports": ["from math import cos"],
     "variableCount": 1,
-    "code": ["num=1.0/sin(v0)"]
+    "code": ["num=1.0/cos(v0)"]
   }]
 }

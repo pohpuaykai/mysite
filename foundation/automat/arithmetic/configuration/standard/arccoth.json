@@ -49,6 +49,6 @@
   "return_calculation": [{
     "imports": ["from math import atanh"],
     "variableCount": 1,
-    "code": ["num=1.0/atanh(v0)"]
+    "code": ["num=atanh(1.0/v0)"]
   }]
 }

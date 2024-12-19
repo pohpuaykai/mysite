@@ -48,6 +48,16 @@ class Equation:
             print('self.totalNodeCount', self.totalNodeCount)
         #############
 
+
+    def getFunctionClass(self, funcName):
+        moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
+        className = Equation.FUNCNAME__CLASSNAME[funcName] # TODO implement
+        import importlib, inspect
+        module_obj = importlib.import_module(f'.{moduleName}', package='foundation.automat.arithmetic.standard')
+        klassName, functionClass = list(filter(lambda tup: tup[0]==className,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
+        globals()[className] = functionClass
+        return functionClass
+
     def makeSubject(self, variable):
         """
         make variable the subject of this equation
@@ -263,22 +273,12 @@ class Equation:
         ops = operationOrderWithIdx
         if self.verbose:
             print('ops', ops)
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_START
-        def getFunctionClass(funcName):
-            moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
-            className = Equation.FUNCNAME__CLASSNAME[funcName] # TODO implement
-            import importlib, inspect
-            module_obj = importlib.import_module(f'.{moduleName}', package='foundation.automat.arithmetic.standard')
-            klassName, functionClass = list(filter(lambda tup: tup[0]==className,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
-            globals()[className] = functionClass
-            return functionClass
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_END
         #apply the reverses
         while len(ops) != 0:
             op = ops.pop(-1) # apply in reverse order (start with the one nearest to =)
             if self.verbose:
                 print('applying op', op)
-            functionClass = getFunctionClass(op['functionName'])
+            functionClass = self.getFunctionClass(op['functionName'])
             (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self, op['id'], verbose=self.verbose).reverse(
                 equationSide, op['argumentIdx'], [op['id'], op['lastId']]
             )
@@ -291,6 +291,120 @@ class Equation:
             self.primitives += primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
         return self.ast
+
+
+
+    def substituteValue(self, substitutionDictionary):
+        """
+        #~ DRAFT ~#
+
+        substituteDictionary is mapping from variable to primitives (numbers), 
+        self.equation.ast, and then substitute each variable under each sub-AST using substituteDictionary
+
+        :param substitutionDictionary: mapping from variable (str) to numbers
+        :type substitutionDictionary: dict[str, float]
+        """
+        #error-checking
+        if len(substitutionDictionary) == 0:
+            raise Exception("Did not input substitution")
+        for variableStr, value in substitutionDictionary.items():
+            if variableStr not in self.variables:
+                raise Exception("Function not in equation")
+        from foundation.automat.common import isNum
+        def _recursiveSubsituteValue(bt): # put in BackTracker for Storage, then DFS BackTracker to put in AST format
+            ##########
+            # print(bt)
+            ##########
+            node = (bt.label, bt.id)
+            nodeName, nodeId = bt.label, bt.id
+            children = self.ast.get(node, [])
+            if len(children) == 0: # is leaf
+                nodeName = substitutionDictionary.get(nodeName, nodeName)
+                ############
+                # print('return0')
+                ############
+                return Backtracker(
+                    nodeName,
+                    [],
+                    None,
+                    None,
+                    nodeId
+                )
+            else:
+                childBts = []
+                substitutedChildren = []
+                allPrimitives = True # number-like
+                for child in children:
+                    childName, childId = child
+                    childBt = _recursiveSubsituteValue(Backtracker(
+                        childName,
+                        [],#filled by recursion if possible
+                        None,
+                        None, 
+                        childId
+                    ))
+                    childBts.append(childBt)
+                    substitutedChildName = childBt.label
+                    substitutedChildId = childBt.id
+                    substitutedChildren.append(substitutedChildName)
+                    if not isNum(str(substitutedChildName)):
+                        allPrimitives = False
+                if allPrimitives:
+                    functionClass = self.getFunctionClass(nodeName)
+                    floatifiedChildren = list(map(lambda primitiveStr: float(primitiveStr), substitutedChildren))
+                    # import pdb;pdb.set_trace()
+                    num = functionClass(self, nodeId, verbose=self.verbose)._calculate(*floatifiedChildren)
+                    ############
+                    # print('return1')
+                    ############
+                    return Backtracker(
+                        str(num),
+                        [],
+                        None,
+                        None,
+                        nodeId
+                    )
+                else:
+                    ############
+                    # print('return2')
+                    ############
+                    return Backtracker(
+                        str(nodeName),
+                        childBts,
+                        None,
+                        None,
+                        nodeId
+                    )
+        rootBt = _recursiveSubsituteValue(Backtracker(
+            '=',
+            self.ast.get(('=', 0)),
+            None,
+            None,
+            0
+        ))
+        newNodeId = 0
+        oldId__newId = {}
+        ast = {}
+        stack = [rootBt]
+        while len(stack) > 0:
+            currentBt = stack.pop()
+            stack += currentBt.neighbours
+            if len(currentBt.neighbours) > 0:
+                def childG(newId, neighbours):
+                    for neighbour in neighbours:
+                        yield (neighbour.label, newId) # yield because parents will always have the smaller id (they born first)
+                        oldId__newId[newId] = neighbour.id
+                        newId += 1
+
+                # children = []
+                # for childBt in currentBt.neighbours:
+                #     children.append((childBt.label, childBt.id))
+                newId = oldId__newId.get(currentBt.id, newNodeId)
+                if newId == newNodeId:
+                    newNodeId+=1
+                ast[(currentBt.label, currentBt.id)] = [child for child in childG(newNodeId,  currentBt.neighbours)]
+        return ast # substituted ast
+
 
 
     def linearEliminationBySubstitution(self, eq, variable):

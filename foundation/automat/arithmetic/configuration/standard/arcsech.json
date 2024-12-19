@@ -47,8 +47,8 @@
     ]
   },
   "return_calculation": [{
-    "imports": ["from math import asinh"],
+    "imports": ["from math import acosh"],
     "variableCount": 1,
-    "code": ["num=1.0/asinh(v0)"]
+    "code": ["num=acosh(1.0/v0)"]
   }]
 }

@@ -47,8 +47,8 @@
     ]
   },
   "return_calculation": [{
-    "imports": ["from math import acos"],
+    "imports": ["from math import asin"],
     "variableCount": 1,
-    "code": ["num=1.0/acos(v0)"]
+    "code": ["num=asin(1.0/v0)"]
   }]
 }

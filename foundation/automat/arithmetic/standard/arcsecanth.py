@@ -115,7 +115,7 @@ class Arcsecanth(Function):
 
     
 
-    def __calculate(self, v0):
+    def _calculate(self, v0):
         """
         Used to get the numerical value of this function, when all the inputs applied are numerical.
         Also used in substitution method of parent :class:`Function`
@@ -127,6 +127,6 @@ class Arcsecanth(Function):
         :return: calculated numerical result
         :rtype: float
         """
-        from math import asinh
-        num=1.0/asinh(v0)
+        from math import acosh
+        num=acosh(1.0/v0)
         return num
