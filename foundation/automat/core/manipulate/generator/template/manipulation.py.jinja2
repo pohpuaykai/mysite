@@ -1,0 +1,11 @@
+{% for import in imports %}
+{{import}}
+{% endfor %}
+
+class {{className}}(Manipulate):
+    """
+
+    """
+
+    def __init__(self, equation, verbose):
+        super().__init__(equation, idInAst, verbose=verbose)

@@ -116,7 +116,6 @@ class Function:#(metaclass=FunctionHook):
 
     def reverse(self, equationSide, argumentIdx, nodeIds):
         """
-        #~ DRAFT ~#
         make argumentIdx the subject of the subAST
 
         :param argumentIdx: the index of the argument of self(this function) to make into the subject of the formula

@@ -1,0 +1,12 @@
+---
+className: "Multiplynegative"
+type: "essential"
+manipulations:
+    - 0
+        type: "regex"
+        vor:
+            scheme: '(* "-1" $0)'
+            return: '(- 0 $0)'
+        hin:
+            scheme: '(- 0 $0)'
+            return: '(* "-1" $0)'

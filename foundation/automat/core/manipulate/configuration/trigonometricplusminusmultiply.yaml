@@ -1,0 +1,37 @@
+---
+className: "Trigonometricplusminusmultiply"
+type: "trigonometric_standard"
+#TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
+manipulations:
+    - 0
+        type: "regex"
+        vor:
+            scheme: "(sin (+ $0 $1))"
+            return: "(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
+        hin:
+            scheme: "(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
+            return: "(sin (+ $0 $1))"
+    - 1
+        type: "regex"
+        vor:
+            scheme: "(sin (- $0 $1))"
+            return: "(- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
+        hin:
+            scheme: "(- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
+            return: "(sin (- $0 $1))"
+    - 2
+        type: "regex"
+        vor:
+            scheme: "(cos (+ $0 $1))"
+            return: "(- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))"
+        hin:
+            scheme: "(- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))"
+            return: "(cos (+ $0 $1))"
+    - 3
+        type: "regex"
+        vor:
+            scheme: "(cos (- $0 $1))"
+            return: "(+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))"
+        hin:
+            scheme: "(+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))"
+            return: "(cos (- $0 $1))"

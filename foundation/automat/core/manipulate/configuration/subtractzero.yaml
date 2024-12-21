@@ -1,0 +1,20 @@
+---
+className: "Subtractzero"
+type: "essential"
+manipulations:
+    - 0
+        type: "regex"
+        vor:
+            scheme: "(- '0' %)"
+            return: "%"
+        hin:
+            scheme: "-%P"
+            return: "(- '0' %)"
+    - 1
+        type: "regex"
+        vor:
+            scheme: "(- % '0')"
+            return: "%"
+        hin:
+            scheme: "-%P"
+            return: "(- % '0')" # % is equivalent to * in PyRegex
