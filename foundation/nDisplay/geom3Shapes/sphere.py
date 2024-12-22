@@ -4,6 +4,7 @@ https://stackoverflow.com/questions/5988686/creating-a-3d-sphere-in-opengl-using
 
 http://jerome.jouvie.free.fr/opengl-tutorials/Tutorial7.php  <<< has 'cut-and-paste code' for sphere... but pyGame library does not have those functions?
 """
+import OpenGL.GL as gl
 import OpenGL.GLU as glu
 
 def sphere(radius, slices, rings, drawStyle):

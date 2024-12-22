@@ -1,5 +1,5 @@
+import OpenGL.GL as gl
 import OpenGL.GLU as glu
-
 
 def disk(internalRadius, externalRadius, slices, rings, drawStyle):
     diskQ = glu.gluNewQuadric()

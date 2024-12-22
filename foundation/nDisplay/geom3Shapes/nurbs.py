@@ -89,11 +89,11 @@ def nurbsSurface(sKnots, tKnots, control, type):
     :type type: GLenum(type)
     """
     nurbs = glu.gluNewNurbsRenderer()
-    glu.gluBeginCurve(nurb)
-    glu.gluNurbsCurve(nurb, sKnots, tKnots, control, type)
+    glu.gluBeginSurface(nurbs)
+    glu.gluNurbsSurface(nurbs,sKnots, tKnots, control, type)
     """
     argTypes of gluNurbsCurve (raw OpenGL) can be found here: Lib/site-packages/OpenGL/raw/GLU/__init__.py
     argNames of glu.gluNurbsCurve can be found in OpenGL/GLU/glunurbs.py
 
     """
-    glu.gluEndCurve(nurb)
+    glu.gluEndSurface(nurbs)

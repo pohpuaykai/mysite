@@ -1,5 +1,6 @@
 from foundation.nDisplay.core.stage import Stage
 
+from foundation.nDisplay.geom3Shapes.cuboid import cube
 
 def test__shapesTest__stage(verbose=False):
     print('running dev test for stage.py...')
@@ -57,7 +58,6 @@ def test__shapesTest__stage(verbose=False):
     (0,1,1),
     )
     #END: drawing cube
-    from foundation.nDisplay.geom3Shapes.cuboid import cube
     def piece():
         cube(vertices, edges, surfaces, colors)
     metronome = 10

@@ -4,15 +4,18 @@ import pprint
 
 from foundation.nDisplay.core.stage import Stage
 
+from foundation.nDisplay.geom3Shapes.disk import disk
+import OpenGL.GL as gl
+import OpenGL.GLU as glu
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def test__disk__basic(verbose=False):
     #TODO actually a resistor is more like a long long disk?
-    from foundation.nDisplay.geom3Shapes.disk import disk
     def piece():
-        internalRadius = 5.0
-        externalRadius = 9.0
+        internalRadius = 0.5
+        externalRadius = 0.9
         slices = 3
         rings = 3
         drawStyle = glu.GLU_FILL
@@ -26,9 +29,7 @@ def test__disk__basic(verbose=False):
     zFar = 50
     verbose = False
     stage = Stage(width, height, piece, metronome, displayCaption, fieldOfView, zNear, zFar, verbose)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
-    if verbose:
-        pp.pprint(subTree)
+    # print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
 
 
 if __name__=='__main__':

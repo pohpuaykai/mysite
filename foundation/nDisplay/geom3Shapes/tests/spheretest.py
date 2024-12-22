@@ -4,11 +4,14 @@ import pprint
 
 from foundation.nDisplay.core.stage import Stage
 
+from foundation.nDisplay.geom3Shapes.sphere import sphere
+import OpenGL.GL as gl
+import OpenGL.GLU as glu
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def test__sphere__basic(verbose=False):
-    from foundation.nDisplay.geom3Shapes.sphere import sphere
     def piece():
         radius = 0.5
         slices = 20
@@ -25,9 +28,7 @@ def test__sphere__basic(verbose=False):
     verbose = False
     stage = Stage(width, height, piece, metronome, displayCaption, fieldOfView, zNear, zFar, verbose)
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
-    if verbose:
-        pp.pprint(subTree)
+    # print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
 
 
 if __name__=='__main__':

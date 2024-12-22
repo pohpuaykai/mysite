@@ -4,14 +4,17 @@ import pprint
 
 from foundation.nDisplay.core.stage import Stage
 
+from foundation.nDisplay.geom3Shapes.partialdisk import partialDisk
+import OpenGL.GL as gl
+import OpenGL.GLU as glu
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def test__partialdisk__basic(verbose=False):
-    from foundation.nDisplay.geom3Shapes.partialdisk import partialdisk
     def piece():
-        internalRadius = 5.0
-        externalRadius = 9.0
+        internalRadius = 0.5
+        externalRadius = 0.9
         slices = 3
         rings = 3
         startAngle = 0
@@ -27,9 +30,7 @@ def test__partialdisk__basic(verbose=False):
     zFar = 50
     verbose = False
     stage = Stage(width, height, piece, metronome, displayCaption, fieldOfView, zNear, zFar, verbose)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
-    if verbose:
-        pp.pprint(subTree)
+    # print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
 
 
 if __name__=='__main__':

@@ -4,12 +4,15 @@ import pprint
 
 from foundation.nDisplay.core.stage import Stage
 
+from foundation.nDisplay.geom3Shapes.cylinder import cylinder
+import OpenGL.GL as gl
+import OpenGL.GLU as glu
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def test__cylinder__basic(verbose=False):
     #TODO actually a resistor is more like a long long disk?
-    from foundation.nDisplay.geom3Shapes.cylinder import cylinder
     def piece():
         baseRadius = 1
         topRadius = 1
@@ -33,9 +36,7 @@ def test__cylinder__basic(verbose=False):
     zFar = 50
     verbose = False
     stage = Stage(width, height, piece, metronome, displayCaption, fieldOfView, zNear, zFar, verbose)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
-    if verbose:
-        pp.pprint(subTree)
+    # print(inspect.currentframe().f_code.co_name, ' PASSED? ') # visual Human Interaction, hard to ...
 
 
 if __name__=='__main__':
