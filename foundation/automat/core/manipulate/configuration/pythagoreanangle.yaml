@@ -3,11 +3,10 @@ className: "Pythagoreanangle"
 type: "trigonometric_standard"
 #TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
 manipulations:
-    - 0
-        type: "regex"
-        vor:
-            scheme: "(+ ("
-            return: "(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
-        hin:
-            scheme: "(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
-            return: "(sin (+ $0 $1))"
+  - type: "regex"
+    vor:
+      scheme: "(+ ("
+      return: "(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
+    hin:
+      scheme: "(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))"
+      return: "(sin (+ $0 $1))"

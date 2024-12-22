@@ -2,19 +2,17 @@
 className: "Multiplydividecancel"
 type: "essential"
 manipulations:
-    - 0
-        type: "regex"
-        vor:
-            scheme: "(* (/ % $0) $0)"
-            return: "%"
-        hin:
-            scheme: "%"
-            return: "(* (/ % $0) $0)"
-    - 1
-        type: "regex"
-        vor:
-            scheme: "(/ (* % $0) $0)"
-            return: "%"
-        hin:
-            scheme: "%"
-            return: "(/ (* % $0) $0)"
+  - type: "regex"
+    vor:
+      scheme: "(* (/ % $0) $0)"
+      return: "%"
+    hin:
+      scheme: "%"
+      return: "(* (/ % $0) $0)"
+  - type: "regex"
+    vor:
+      scheme: "(/ (* % $0) $0)"
+      return: "%"
+    hin:
+      scheme: "%"
+      return: "(/ (* % $0) $0)"

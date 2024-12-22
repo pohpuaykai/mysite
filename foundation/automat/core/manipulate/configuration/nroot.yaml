@@ -3,44 +3,41 @@ className: "Nroot"
 type: "essential"
 # https://en.wikipedia.org/wiki/Nth_root#Identities_and_properties
 manipulations:
-    - 0
-        type: "regex"
-        vor:
-            scheme: '(nroot $0 (^ $1 $2))'
-            return: '(^ $1 (/ $2 $0))'
-        hin:
-            scheme: "(^ $1 (/ $2 $0))"
-            return: "(nroot $0 (^ $1 $2))"
-    - 1
-        type: "regex"
-        vor:
-            scheme: '(^ (nroot $0 $1) $2)'
-            return: '(nroot $0 (^ $1 $2))'
-        hin:
-            scheme: "(nroot $0 (^ $1 $2))"
-            return: "(^ (nroot $0 $1) $2)"
-    - 2
-        type: "regex"
-        vor:
-            scheme: '(^ (nroot $0 $1) $2)'
-            return: '(^ $1 (/ $2 $0))'
-        hin:
-            scheme: "(^ $1 (/ $2 $0))"
-            return: "(^ (nroot $0 $1) $2)"
-    #below does not work for complex numbers, sqrt(ab) = sqrt(a)sqrt(b)
-    - 3 #Looks like distributivity, maybe can further refactor...
-        type: "regex"
-        vor:
-            scheme: '(nroot $2 (* $0 $1))'
-            return: '(* (nroot $2 $0) (nroot $2 $1))'
-        hin:
-            scheme: "(nroot $2 (* $0 $1))"
-            return: "(* (nroot $2 $0) (nroot $2 $1))"
-    - 4 #Looks like distributivity, maybe can further refactor...
-        type: "regex"
-        vor:
-            scheme: '(nroot $2 (/ $0 $1))'
-            return: '(/ (nroot $2 $0) (nroot $2 $1))'
-        hin:
-            scheme: "(/ (nroot $2 $0) (nroot $2 $1))"
-            return: "(nroot $2 (/ $0 $1))"
+  - type: "regex"
+    vor:
+      scheme: '(nroot $0 (^ $1 $2))'
+      return: '(^ $1 (/ $2 $0))'
+    hin:
+      scheme: "(^ $1 (/ $2 $0))"
+      return: "(nroot $0 (^ $1 $2))"
+  - type: "regex"
+    vor:
+      scheme: '(^ (nroot $0 $1) $2)'
+      return: '(nroot $0 (^ $1 $2))'
+    hin:
+      scheme: "(nroot $0 (^ $1 $2))"
+      return: "(^ (nroot $0 $1) $2)"
+  - type: "regex"
+    vor:
+      scheme: '(^ (nroot $0 $1) $2)'
+      return: '(^ $1 (/ $2 $0))'
+    hin:
+      scheme: "(^ $1 (/ $2 $0))"
+      return: "(^ (nroot $0 $1) $2)"
+#below does not work for complex numbers, sqrt(ab) = sqrt(a)sqrt(b)
+#Looks like distributivity, maybe can further refactor...
+  - type: "regex"
+    vor:
+      scheme: '(nroot $2 (* $0 $1))'
+      return: '(* (nroot $2 $0) (nroot $2 $1))'
+    hin:
+      scheme: "(nroot $2 (* $0 $1))"
+      return: "(* (nroot $2 $0) (nroot $2 $1))"
+#Looks like distributivity, maybe can further refactor...
+  - type: "regex"
+    vor:
+      scheme: '(nroot $2 (/ $0 $1))'
+      return: '(/ (nroot $2 $0) (nroot $2 $1))'
+    hin:
+      scheme: "(/ (nroot $2 $0) (nroot $2 $1))"
+      return: "(nroot $2 (/ $0 $1))"

@@ -3,51 +3,45 @@ className: "Trigonometricequivalence"
 type: "trigonometric_standard"
 #TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
 manipulations:
-    - 0
-        type: "regex"
-        vor:
-            scheme: "(/ (sin $0) (cos $0))"
-            return: "(tan $0)"
-        hin:
-            scheme: "(tan $0)"
-            return: "(/ (sin $0) (cos $0))"
-    - 1
-        type: "regex"
-        vor:
-            scheme: "(/ (cos $0) (sin $0))"
-            return: "(cot $0)"
-        hin:
-            scheme: "(cot $0)"
-            return: "(/ (cos $0) (sin $0))"
-    - 2
-        type: "regex"
-        vor:
-            scheme: "(/ 1 (sin $0))"
-            return: "(cosec $0)"
-        hin:
-            scheme: "(cosec $0)"
-            return: "(/ 1 (sin $0))"
-    - 3
-        type: "regex"
-        vor:
-            scheme: "(/ 1 (cos $0))"
-            return: "(sec $0)"
-        hin:
-            scheme: "(sec $0)"
-            return: "(/ 1 (sec $0))"
-    - 4
-        type: "regex"
-        vor:
-            scheme: "(/ 1 (tan $0))"
-            return: "(cot $0)"
-        hin:
-            scheme: "(cot $0)"
-            return: "(/ 1 (tan $0))"
-    - 5
-        type: "regex"
-        vor:
-            scheme: "(/ 1 (cot $0))"
-            return: "(tan $0)"
-        hin:
-            scheme: "(tan $0)"
-            return: "(/ 1 (cot $0))"
+  - type: "regex"
+    vor:
+      scheme: "(/ (sin $0) (cos $0))"
+      return: "(tan $0)"
+    hin:
+      scheme: "(tan $0)"
+      return: "(/ (sin $0) (cos $0))"
+  - type: "regex"
+    vor:
+      scheme: "(/ (cos $0) (sin $0))"
+      return: "(cot $0)"
+    hin:
+      scheme: "(cot $0)"
+      return: "(/ (cos $0) (sin $0))"
+  - type: "regex"
+    vor:
+      scheme: "(/ 1 (sin $0))"
+      return: "(cosec $0)"
+    hin:
+      scheme: "(cosec $0)"
+      return: "(/ 1 (sin $0))"
+  - type: "regex"
+    vor:
+      scheme: "(/ 1 (cos $0))"
+      return: "(sec $0)"
+    hin:
+      scheme: "(sec $0)"
+      return: "(/ 1 (sec $0))"
+  - type: "regex"
+    vor:
+      scheme: "(/ 1 (tan $0))"
+      return: "(cot $0)"
+    hin:
+      scheme: "(cot $0)"
+      return: "(/ 1 (tan $0))"
+  - type: "regex"
+    vor:
+      scheme: "(/ 1 (cot $0))"
+      return: "(tan $0)"
+    hin:
+      scheme: "(tan $0)"
+      return: "(/ 1 (cot $0))"

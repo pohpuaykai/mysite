@@ -38,6 +38,9 @@ class Equation:
         self._parserName = parserName
         (self.ast, self.functions, self.variables, self.primitives,
          self.totalNodeCount) = Parser(parserName).parse(self._eqs)
+        self.availableStrsFormats = {
+            self._parserName: self._eqs
+        }
         #############
         if self.verbose:
             print('~~~~~~~~~~~~~~~~~~~~INIT')
@@ -583,7 +586,10 @@ class Equation:
         :param format: states the format to be used, to write to a string
         :type format: str
         """
-        return Parser(format).unparse(self.ast)
+        if format not in self.availableStrsFormats:
+            unparsedStr = Parser(format).unparse(self.ast)
+            self.availableStrsFormats[format] = unparsedStr
+        return self.availableStrsFormats[format]
 
 
     def _findCommonFactorOfDistributivePath(self, distributivePath):
