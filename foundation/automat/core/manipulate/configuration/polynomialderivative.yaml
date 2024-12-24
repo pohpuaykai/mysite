@@ -1,0 +1,5 @@
+---
+className: "Polynomialderivative"
+type: "derivative_polynomial"
+manipulations:
+# +, -, *, /, ^, nroot

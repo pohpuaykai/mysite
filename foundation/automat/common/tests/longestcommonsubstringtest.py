@@ -26,6 +26,48 @@ def test__oneTermFactorization__otherDirectionContainment(verbose=False):
 
 
 
+def test__manipulate__simple(verbose=False):
+    schemeFormula0 = '(= a (+ b c))'
+    schemeFormula1 = '(+ $0 $1)'
+    commonSubstring = LongestCommonSubString.lcs(schemeFormula0, schemeFormula1)
+    expected = ['(+ b c)']
+    print('PASSED? ', commonSubstring == expected)
+    if verbose:
+        print(commonSubstring)
+
+
+
+def test__manipulate__sameLevel(verbose=False):
+    schemeFormula0 = '(= (+ a b) (+ c d))'
+    schemeFormula1 = '(+ $0 $1)'
+    commonSubstring = LongestCommonSubString.lcs(schemeFormula0, schemeFormula1)
+    expected = ['(+ a b)', '(+ c d)']
+    print('PASSED? ', commonSubstring == expected)
+    if verbose:
+        print(commonSubstring)
+
+
+def test__manipulate__nested(verbose=False):
+    schemeFormula0 = '(= a (+ (+ b c) d))'
+    schemeFormula1 = '(+ $0 $1)'
+    commonSubstring = LongestCommonSubString.lcs(schemeFormula0, schemeFormula1)
+    expected = ['(+ (+ b c) d)']#, '(+ b c)'] # we only want to return same levels first..., then use a stack to recursively find same pattern within results
+    print('PASSED? ', commonSubstring == expected)
+    if verbose:
+        print(commonSubstring)
+
+
+def test__manipulate__nestedEtSameLevel(verbose=False): # TODO also test for weird variables
+    schemeFormula0 = '(= (+ (+ a b) (+ c d)) (+ (+ e f) (+ g h)))'
+    schemeFormula1 = '(+ $0 $1)'
+    commonSubstring = LongestCommonSubString.lcs(schemeFormula0, schemeFormula1)
+    expected = ['(+ (+ a b) (+ c d))', '(+ (+ e f) (+ g h))'] # we only want to return same levels first..., then use a stack to recursively find same pattern within results
+    print('PASSED? ', commonSubstring == expected)
+    if verbose:
+        print(commonSubstring)
+
+
+
 def test__longCommonString__bloteBespiel(verbose=False):
     schemeFormula0 = 'abbbbbcddd'
     schemeFormula1 = 'bbbbbddd'

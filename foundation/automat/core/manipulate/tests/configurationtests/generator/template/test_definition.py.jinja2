@@ -1,0 +1,14 @@
+
+def {{defName}}(verbose=False):
+    eqs = {{eqs}}
+    eqsType = '{{eqsType}}'
+    eq0 = Equation(eqs, eqsType)
+    ma0 = {{className}}(eq0, verbose=verbose)
+    patternDict = ma0.rawRegexes[{{regexNum}}] # {{regexUsedComment}}
+    if verbose:
+        pp.pprint(patternDict)
+    manipulatedSchemeEquation = ma0.apply(patternDict['{{direction}}']['scheme'], patternDict['{{direction}}']['return'])
+    expected = '' # {{returnRegexUsedComment}}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    if verbose:
+        print(manipulatedSchemeEquation)

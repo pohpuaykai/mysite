@@ -4,15 +4,15 @@ type: "essential"
 manipulations:
   - type: "regex"
     vor:
-      scheme: "(* (/ % $0) $0)"
-      return: "%"
+      scheme: "(* (/ $1 $0) $0)"
+      return: "$1"
     hin:
-      scheme: "%"
-      return: "(* (/ % $0) $0)"
+      scheme: "$1"
+      return: "(* (/ $1 $0) $0)"
   - type: "regex"
     vor:
-      scheme: "(/ (* % $0) $0)"
-      return: "%"
+      scheme: "(/ (* $1 $0) $0)"
+      return: "$1"
     hin:
-      scheme: "%"
-      return: "(/ (* % $0) $0)"
+      scheme: "$1"
+      return: "(/ (* $1 $0) $0)"

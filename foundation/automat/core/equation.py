@@ -53,8 +53,8 @@ class Equation:
 
 
     def getFunctionClass(self, funcName):
-        moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
-        className = Equation.FUNCNAME__CLASSNAME[funcName] # TODO implement
+        moduleName = Equation.FUNCNAME__MODULENAME[funcName]
+        className = Equation.FUNCNAME__CLASSNAME[funcName]
         import importlib, inspect
         module_obj = importlib.import_module(f'.{moduleName}', package='foundation.automat.arithmetic.standard')
         klassName, functionClass = list(filter(lambda tup: tup[0]==className,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
@@ -74,122 +74,15 @@ class Equation:
         if variable not in self.variables:
             raise Exception("Variable Not Available")
         if self.variables[variable] > 1: 
-            #TODO, unable to further handle without more patterns like quadratic, cubic, quartic, AST-equivalence-for-special-substitution-to-make-polynomials-techniques
+            #TODO, unable to further handle without more patterns like quadratic, cubic, quartic, 
             #TODO partial-fractions
             #TODO can put factorisation here
+            #TODO put manipulate here
+            #TODO manipulate: AST-equivalence-for-special-substitution-to-make-polynomials-techniques
             raise Exception("Cannot handle")
 
         if self.verbose:
             print('working on AST:', self.ast)
-
-        #correct but inefficient.... keep it somewhere else? or remove?
-        # op = {}
-        # while len(op) ==0 or op['functionName'] != '=':
-
-        #     #find path from subRoot to variable
-        #     stack = [Backtracker(
-        #         '=', #label
-        #         None, #neighbours
-        #         None, # argumentIdx
-        #         None, #prev
-        #         0, #id
-        #     )]
-        #     found = None
-        #     while len(stack) != 0:
-        #         current = stack.pop()
-        #         if current.label == variable:
-        #             found = current
-        #             break
-        #         currentNode = (current.label, current.id)
-        #         for argumentIdx, (label, idx) in enumerate(self.ast.get(currentNode, [])):
-        #             backtracker = Backtracker(
-        #                 label, #label
-        #                 None, #neighbours
-        #                 argumentIdx, #argumentIdx
-        #                 current, #prev=parent
-        #                 idx
-        #             )
-        #             stack.append(backtracker)
-        #     if found is None:
-        #         raise Exception("No path to variable") # this shouldn't happen, most probably a parser error
-
-        #     #create found backup
-        #     foundBackUp = Backtracker(
-        #         found.label,
-        #         None,
-        #         found.argumentIdx,
-        #         found.prev,
-        #         found.id
-        #     )
-
-        #     # import pdb;pdb.set_trace()
-        #     #backtrack until found.prev is '=', then take found as op
-        #     thePrev = None
-        #     while found.prev.label != '=':
-        #         thePrev = found
-        #         found = found.prev
-        #     if thePrev is None:
-        #         break
-        #     # import pdb;pdb.set_trace()
-        #     op = {
-        #         'functionName':found.label,
-        #         'argumentIdx':thePrev.argumentIdx,#found.argumentIdx,#found.prev.argumentIdx,
-        #         'id':found.id,
-        #         'lastId':found.prev.id
-        #     }
-        #     #find which side subject is on :
-        #     found = foundBackUp
-        #     while found.prev is not None:
-        #         if found.prev.label == '=':
-        #             firstAncestorOfFound = (found.label, found.id)
-        #             if self.verbose:
-        #                 print(firstAncestorOfFound)
-        #             childrenOfEquals = self.ast[('=', 0)]
-        #             firstAncestorOfFoundChildIdx = childrenOfEquals.index(firstAncestorOfFound)
-        #             if firstAncestorOfFoundChildIdx == 0:#left side
-        #                 equationSide = 'L'
-        #             elif firstAncestorOfFoundChildIdx == 1:#right side
-        #                 equationSide = 'R'
-        #             else:
-        #                 raise Exception(f'firstAncestorOfFoundChildIdx: {firstAncestorOfFoundChildIdx}')
-        #         found = found.prev
-        #     if equationSide != 'L' and equationSide != 'R':
-        #         raise Exception(f'equationSide must be L or R, equationSide:{equationSide}')
-        #     #perform the op
-        #     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_START
-        #     def getFunctionClass(funcName):
-        #         moduleName = Equation.FUNCNAME__MODULENAME[funcName] # TODO implement
-        #         className = Equation.FUNCNAME__CLASSNAME[funcName] # TODO implement
-        #         import importlib, inspect
-        #         module_obj = importlib.import_module(f'.{moduleName}', package='foundation.automat.arithmetic.standard')
-        #         klassName, functionClass = list(filter(lambda tup: tup[0]==className,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
-        #         globals()[className] = functionClass
-        #         return functionClass
-        #     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER_END
-        #     if self.verbose:
-        #         print('applying op', op, 'equationSide', equationSide)
-        #     functionClass = getFunctionClass(op['functionName'])
-        #     (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self, verbose=self.verbose).reverse(
-        #         equationSide, op['argumentIdx'], [op['id'], op['lastId']]
-        #     )
-        #     #update the `stat` of self
-        #     self.ast = invertedAst #TODO since equation is changed after each op, we have to recalculate the next op again, after the reversal... and so, we only need to calculate one op at a time... => might it go into an infinity loop?
-        #     for funcName, countChange in functionCountChange.items():
-        #         originalSum = self.functions.get(funcName, 0) + countChange
-        #         self.functions[funcName] = originalSum
-        #     self.primitives = primitiveCountChange
-        #     self.totalNodeCount += totalNodeCountChange
-        #     if self.verbose:
-        #         print('reversed AST: ', self.ast)
-        # return self.ast
-
-
-
-
-
-
-
-
 
         #find path from subRoot to variable
         stack = [Backtracker(
@@ -580,7 +473,6 @@ class Equation:
 
     def toString(self, format):
         """
-        #~ DRAFT ~#
         write the equation to string
 
         :param format: states the format to be used, to write to a string

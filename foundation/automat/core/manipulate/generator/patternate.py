@@ -8,7 +8,6 @@ from foundation.automat import AUTOMAT_MODULE_DIR, info
 
 class Patternate:
     """
-    #~ DRAFT ~#
     generate class files in folder `pattern` from the configuration file
 
     """

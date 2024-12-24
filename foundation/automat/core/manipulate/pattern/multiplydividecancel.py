@@ -12,5 +12,5 @@ class Multiplydividecancel(Manipulate):
         """
 
         """
-        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(* (/ % $0) $0)', 'return': '%'}, 'hin': {'scheme': '%', 'return': '(* (/ % $0) $0)'}}, {'type': 'regex', 'vor': {'scheme': '(/ (* % $0) $0)', 'return': '%'}, 'hin': {'scheme': '%', 'return': '(/ (* % $0) $0)'}}]
+        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(* (/ $1 $0) $0)', 'return': '$1'}, 'hin': {'scheme': '$1', 'return': '(* (/ $1 $0) $0)'}}, {'type': 'regex', 'vor': {'scheme': '(/ (* $1 $0) $0)', 'return': '$1'}, 'hin': {'scheme': '$1', 'return': '(/ (* $1 $0) $0)'}}]
         super().__init__(equation, verbose=verbose)

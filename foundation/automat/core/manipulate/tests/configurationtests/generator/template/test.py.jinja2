@@ -1,0 +1,19 @@
+import inspect
+import pprint
+
+from foundation.automat.core.equation import Equation
+from foundation.automat.core.manipulate.pattern.{{filename}} import {{classname}}
+
+
+pp = pprint.PrettyPrinter(indent=4)
+
+
+    {% for testDefinitionStr in testDefinitionStrs %}
+{{testDefinitionStr}}
+
+    {% endfor %}
+
+
+if __name__=='__main__':
+    {% for testCallStr in testCallStrs %}{{testCallStr}}
+    {% endfor %}
