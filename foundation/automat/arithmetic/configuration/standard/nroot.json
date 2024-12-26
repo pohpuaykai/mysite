@@ -22,7 +22,7 @@
           "@vnV@": ["@item_0_0@", "@item_1_1@"]
         },
       "functionCountAdded": {"@cN_Logarithm@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.logarithm import Logarithm"],
       "equationSide":"R",
@@ -38,7 +38,7 @@
           "@vnV@": ["@item_0_0@", "@item_1_0@"]
         },
       "functionCountAdded": {"@cN_Exponential@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.exponential import Exponential"],
       "equationSide":"R",
@@ -54,7 +54,7 @@
           "@vnV@": ["@item_0_1@", "@item_1_1@"]
         },
       "functionCountAdded": {"@cN_Logarithm@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.logarithm import Logarithm"],
       "equationSide":"L",
@@ -70,7 +70,7 @@
           "@vnV@": ["@item_0_1@", "@item_1_0@"]
         },
       "functionCountAdded": {"@cN_Exponential@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.exponential import Exponential"],
       "equationSide":"L",

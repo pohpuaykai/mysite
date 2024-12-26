@@ -15,7 +15,7 @@ def test__makeSubject2Input__addition0(verbose=False):
     expectedLatexStr = 'a-c=b' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -40,7 +40,7 @@ def test__makeSubject2Input__addition1(verbose=False):
     expectedLatexStr = 'a-b=c' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -65,7 +65,7 @@ def test__makeSubject2Input__subtraction0(verbose=False):
     expectedLatexStr = 'a+c=b' # to be filled in 
     expectedFunctions = {'+': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -90,7 +90,7 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     expectedLatexStr = 'b-a=c' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -115,7 +115,7 @@ def test__makeSubject2Input__multiply0(verbose=False):
     expectedLatexStr = '\\frac{a}{c}=b' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -140,7 +140,7 @@ def test__makeSubject2Input__multiply1(verbose=False):
     expectedLatexStr = '\\frac{a}{b}=c' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -165,7 +165,7 @@ def test__makeSubject2Input__divide0(verbose=False):
     expectedLatexStr = 'ac=b' # to be filled in 
     expectedFunctions = {'*': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -190,7 +190,7 @@ def test__makeSubject2Input__divide1(verbose=False):
     expectedLatexStr = '\\frac{b}{a}=c' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -215,7 +215,7 @@ def test__makeSubject2Input__exponent0(verbose=False):
     expectedLatexStr = '\\sqrt[c]{a}=b' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -240,7 +240,7 @@ def test__makeSubject2Input__exponent1(verbose=False):
     expectedLatexStr = '\\log_b(a)=c' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -265,7 +265,7 @@ def test__makeSubject2Input__nroot0(verbose=False):
     expectedLatexStr = '\\log_a(c)=b' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -290,7 +290,7 @@ def test__makeSubject2Input__nroot1(verbose=False):
     expectedLatexStr = 'a^b=c' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -315,7 +315,7 @@ def test__makeSubject2Input__log0(verbose=False):
     expectedLatexStr = '\\sqrt[a]{c}=b' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -340,7 +340,7 @@ def test__makeSubject2Input__log1(verbose=False):
     expectedLatexStr = 'b^a=c' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -365,7 +365,7 @@ def test__makeSubject1Input__arccosec(verbose=False):
     expectedLatexStr = '\\cosec(a)=b' # to be filled in 
     expectedFunctions = {'cosec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -390,7 +390,7 @@ def test__makeSubject1Input__arccosech(verbose=False):
     expectedLatexStr = '\\cosech(a)=b' # to be filled in 
     expectedFunctions = {'cosech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -415,7 +415,7 @@ def test__makeSubject1Input__arccos(verbose=False):
     expectedLatexStr = '\\cos(a)=b' # to be filled in 
     expectedFunctions = {'cos': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -440,7 +440,7 @@ def test__makeSubject1Input__arccosh(verbose=False):
     expectedLatexStr = '\\cosh(a)=b' # to be filled in 
     expectedFunctions = {'cosh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -465,7 +465,7 @@ def test__makeSubject1Input__arccot(verbose=False):
     expectedLatexStr = '\\cot(a)=b' # to be filled in 
     expectedFunctions = {'cot': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -490,7 +490,7 @@ def test__makeSubject1Input__arccoth(verbose=False):
     expectedLatexStr = '\\coth(a)=b' # to be filled in 
     expectedFunctions = {'coth': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -515,7 +515,7 @@ def test__makeSubject1Input__arcsec(verbose=False):
     expectedLatexStr = '\\sec(a)=b' # to be filled in 
     expectedFunctions = {'sec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -540,7 +540,7 @@ def test__makeSubject1Input__arcsech(verbose=False):
     expectedLatexStr = '\\sech(a)=b' # to be filled in 
     expectedFunctions = {'sech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -565,8 +565,8 @@ def test__makeSubject1Input__arcsin(verbose=False):
     expectedLatexStr = '\\sin(a)=b' # to be filled in 
     expectedFunctions = {'sin': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = None # count
-    expectedTotalNodeCount = None # count
+    expectedPrimitives = {} # count
+    expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
         expectedFunctions == eq0.functions and 
@@ -590,7 +590,7 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     expectedLatexStr = '\\sinh(a)=b' # to be filled in 
     expectedFunctions = {'sinh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -615,7 +615,7 @@ def test__makeSubject1Input__arctan(verbose=False):
     expectedLatexStr = '\\tan(a)=b' # to be filled in 
     expectedFunctions = {'tan': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -640,7 +640,7 @@ def test__makeSubject1Input__arctanh(verbose=False):
     expectedLatexStr = '\\tanh(a)=b' # to be filled in 
     expectedFunctions = {'tanh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -665,7 +665,7 @@ def test__makeSubject1Input__cosec(verbose=False):
     expectedLatexStr = '\\arccosec(a)=b' # to be filled in 
     expectedFunctions = {'arccosec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -690,7 +690,7 @@ def test__makeSubject1Input__cosech(verbose=False):
     expectedLatexStr = '\\arccosech(a)=b' # to be filled in 
     expectedFunctions = {'arccosech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -715,7 +715,7 @@ def test__makeSubject1Input__cos(verbose=False):
     expectedLatexStr = '\\arccos(a)=b' # to be filled in 
     expectedFunctions = {'arccos': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -740,7 +740,7 @@ def test__makeSubject1Input__cosh(verbose=False):
     expectedLatexStr = '\\arccosh(a)=b' # to be filled in 
     expectedFunctions = {'arccosh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -765,7 +765,7 @@ def test__makeSubject1Input__cot(verbose=False):
     expectedLatexStr = '\\arccot(a)=b' # to be filled in 
     expectedFunctions = {'arccot': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -790,7 +790,7 @@ def test__makeSubject1Input__coth(verbose=False):
     expectedLatexStr = '\\arccoth(a)=b' # to be filled in 
     expectedFunctions = {'arccoth': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -815,7 +815,7 @@ def test__makeSubject1Input__sec(verbose=False):
     expectedLatexStr = '\\arcsec(a)=b' # to be filled in 
     expectedFunctions = {'arcsec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -840,7 +840,7 @@ def test__makeSubject1Input__sech(verbose=False):
     expectedLatexStr = '\\arcsech(a)=b' # to be filled in 
     expectedFunctions = {'arcsech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -865,7 +865,7 @@ def test__makeSubject1Input__sin(verbose=False):
     expectedLatexStr = '\\arcsin(a)=b' # to be filled in 
     expectedFunctions = {'arcsin': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -890,7 +890,7 @@ def test__makeSubject1Input__sinh(verbose=False):
     expectedLatexStr = '\\arcsinh(a)=b' # to be filled in 
     expectedFunctions = {'arcsinh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -915,7 +915,7 @@ def test__makeSubject1Input__tan(verbose=False):
     expectedLatexStr = '\\arctan(a)=b' # to be filled in 
     expectedFunctions = {'arctan': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -940,7 +940,7 @@ def test__makeSubject1Input__tanh(verbose=False):
     expectedLatexStr = '\\arctanh(a)=b' # to be filled in 
     expectedFunctions = {'arctanh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -968,7 +968,7 @@ def test__leftSide__addition0(verbose=False):
     expectedLatexStr = 'a=c-b' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -993,7 +993,7 @@ def test__leftSide__addition1(verbose=False):
     expectedLatexStr = 'b=c-a' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1018,7 +1018,7 @@ def test__leftSide__subtraction0(verbose=False):
     expectedLatexStr = 'a=c+b' # to be filled in 
     expectedFunctions = {'+': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1043,7 +1043,7 @@ def test__leftSide__subtraction1(verbose=False):
     expectedLatexStr = 'b=a-c' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1068,7 +1068,7 @@ def test__leftSide__multiply0(verbose=False):
     expectedLatexStr = 'a=\\frac{c}{b}' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1093,7 +1093,7 @@ def test__leftSide__multiply1(verbose=False):
     expectedLatexStr = 'b=\\frac{c}{a}' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1118,7 +1118,7 @@ def test__leftSide__divide0(verbose=False):
     expectedLatexStr = 'a=cb' # to be filled in 
     expectedFunctions = {'*': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1143,7 +1143,7 @@ def test__leftSide__divide1(verbose=False):
     expectedLatexStr = 'b=\\frac{a}{c}' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1168,7 +1168,7 @@ def test__leftSide__exponent0(verbose=False):
     expectedLatexStr = 'a=\\sqrt[b]{c}' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1193,7 +1193,7 @@ def test__leftSide__exponent1(verbose=False):
     expectedLatexStr = 'b=\\log_a(c)' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1218,7 +1218,7 @@ def test__leftSide__nroot0(verbose=False):
     expectedLatexStr = 'a=\\log_c(b)' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1243,7 +1243,7 @@ def test__leftSide__nroot1(verbose=False):
     expectedLatexStr = 'b=c^a' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1268,7 +1268,7 @@ def test__leftSide__log0(verbose=False):
     expectedLatexStr = 'a=\\sqrt[c]{b}' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1293,7 +1293,7 @@ def test__leftSide__log1(verbose=False):
     expectedLatexStr = 'b=a^c' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 5 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1318,7 +1318,7 @@ def test__leftSide__arccosec(verbose=False):
     expectedLatexStr = 'a=\\cosec(b)' # to be filled in 
     expectedFunctions = {'cosec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1343,7 +1343,7 @@ def test__leftSide__arccosech(verbose=False):
     expectedLatexStr = 'a=\\cosech(b)' # to be filled in 
     expectedFunctions = {'cosech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1368,7 +1368,7 @@ def test__leftSide__arccos(verbose=False):
     expectedLatexStr = 'a=\\cos(b)' # to be filled in 
     expectedFunctions = {'cos': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1393,7 +1393,7 @@ def test__leftSide__arccosh(verbose=False):
     expectedLatexStr = 'a=\\cosh(b)' # to be filled in 
     expectedFunctions = {'cosh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1418,7 +1418,7 @@ def test__leftSide__arccot(verbose=False):
     expectedLatexStr = 'a=\\cot(b)' # to be filled in 
     expectedFunctions = {'cot': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1443,7 +1443,7 @@ def test__leftSide__arccoth(verbose=False):
     expectedLatexStr = 'a=\\coth(b)' # to be filled in 
     expectedFunctions = {'coth': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1468,7 +1468,7 @@ def test__leftSide__arcsec(verbose=False):
     expectedLatexStr = 'a=\\sec(b)' # to be filled in 
     expectedFunctions = {'sec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1493,7 +1493,7 @@ def test__leftSide__arcsech(verbose=False):
     expectedLatexStr = 'a=\\sech(b)' # to be filled in 
     expectedFunctions = {'sech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1518,7 +1518,7 @@ def test__leftSide__arcsin(verbose=False):
     expectedLatexStr = 'a=\\sin(b)' # to be filled in 
     expectedFunctions = {'sin': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1543,7 +1543,7 @@ def test__leftSide__arcsinh(verbose=False):
     expectedLatexStr = 'a=\\sinh(b)' # to be filled in 
     expectedFunctions = {'sinh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1568,7 +1568,7 @@ def test__leftSide__arctan(verbose=False):
     expectedLatexStr = 'a=\\tan(b)' # to be filled in 
     expectedFunctions = {'tan': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1593,7 +1593,7 @@ def test__leftSide__arctanh(verbose=False):
     expectedLatexStr = 'a=\\tanh(b)' # to be filled in 
     expectedFunctions = {'tanh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1618,7 +1618,7 @@ def test__leftSide__cosec(verbose=False):
     expectedLatexStr = 'a=\\arccosec(b)' # to be filled in 
     expectedFunctions = {'arccosec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1643,7 +1643,7 @@ def test__leftSide__cosech(verbose=False):
     expectedLatexStr = 'a=\\arccosech(b)' # to be filled in 
     expectedFunctions = {'arccosech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1668,7 +1668,7 @@ def test__leftSide__cos(verbose=False):
     expectedLatexStr = 'a=\\arccos(b)' # to be filled in 
     expectedFunctions = {'arccos': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1693,7 +1693,7 @@ def test__leftSide__cosh(verbose=False):
     expectedLatexStr = 'a=\\arccosh(b)' # to be filled in 
     expectedFunctions = {'arccosh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1718,7 +1718,7 @@ def test__leftSide__cot(verbose=False):
     expectedLatexStr = 'a=\\arccot(b)' # to be filled in 
     expectedFunctions = {'arccot': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1743,7 +1743,7 @@ def test__leftSide__coth(verbose=False):
     expectedLatexStr = 'a=\\arccoth(b)' # to be filled in 
     expectedFunctions = {'arccoth': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1768,7 +1768,7 @@ def test__leftSide__sec(verbose=False):
     expectedLatexStr = 'a=\\arcsec(b)' # to be filled in 
     expectedFunctions = {'arcsec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1793,7 +1793,7 @@ def test__leftSide__sech(verbose=False):
     expectedLatexStr = 'a=\\arcsech(b)' # to be filled in 
     expectedFunctions = {'arcsech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1818,7 +1818,7 @@ def test__leftSide__sin(verbose=False):
     expectedLatexStr = 'a=\\arcsin(b)' # to be filled in 
     expectedFunctions = {'arcsin': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1843,7 +1843,7 @@ def test__leftSide__sinh(verbose=False):
     expectedLatexStr = 'a=\\arcsinh(b)' # to be filled in 
     expectedFunctions = {'arcsinh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1868,7 +1868,7 @@ def test__leftSide__tan(verbose=False):
     expectedLatexStr = 'a=\\arctan(b)' # to be filled in 
     expectedFunctions = {'arctan': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1893,7 +1893,7 @@ def test__leftSide__tanh(verbose=False):
     expectedLatexStr = 'a=\\arctanh(b)' # to be filled in 
     expectedFunctions = {'arctanh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 4 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1990,4 +1990,3 @@ if __name__=='__main__':
     test__leftSide__sinh()
     test__leftSide__tan()
     test__leftSide__tanh()
-

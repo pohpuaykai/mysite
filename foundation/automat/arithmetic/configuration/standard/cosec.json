@@ -22,7 +22,7 @@
           "@vnV@": ["@item_0_0@"]
         },
       "functionCountAdded": {"@cN_Arccosecant@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.arccosecant import Arccosecant"],
       "equationSide":"R",
@@ -38,7 +38,7 @@
           "@vnV@": ["@item_0_1@"]
         },
       "functionCountAdded": {"@cN_Arccosecant@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.arccosecant import Arccosecant"],
       "equationSide":"L",
@@ -47,8 +47,8 @@
     ]
   },
   "return_calculation": [{
-    "imports": ["from math import sin"],
+    "imports": ["from math import cos"],
     "variableCount": 1,
-    "code": ["num=1.0/sin(v0)"]
+    "code": ["num=1.0/cos(v0)"]
   }]
 }

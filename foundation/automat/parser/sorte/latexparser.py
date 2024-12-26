@@ -3368,10 +3368,11 @@ if __name__=='__main__':
                 self.functions[nodeName] = originalCount + 1
             if len(children) == 0:
                 if isNum(str(nodeName)):
-                    self.primitives += 1
-                else:
-                    originalCount = self.variables.get(str(nodeName), 0)
-                    self.variables[str(nodeName)] = originalCount + 1
+                    # self.primitives += 1
+                    self.primitives[str(nodeName)] = self.primitives.get(str(nodeName), 0) + 1
+                else: #TODO refactor to look like above
+                    # originalCount = self.variables.get(str(nodeName), 0)
+                    self.variables[str(nodeName)] = self.variables.get(str(nodeName), 0) + 1
         
 
     def _parse(self):
@@ -3403,7 +3404,7 @@ if __name__=='__main__':
         self.nodeId = 1 # 0 is for =, for _parse, TODO
         self.functions = {}
         self.variables = {}
-        self.primitives = 0
+        self.primitives = {}
         self.totalNodeCount = 0
         self._findInfixAndEnclosingBrackets()
         self._findBackSlashPositions()

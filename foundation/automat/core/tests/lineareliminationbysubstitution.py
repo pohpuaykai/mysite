@@ -19,7 +19,7 @@ def test__basic__moveAdditionAndEquate(verbose=False):
     expectedLatexStr = 'a-c=d-e' # to be filled in 
     expectedFunctions = {'-': 2} # count
     expectedVariables = {'a': 1, 'c': 1, 'd': 1, 'e': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 7 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -56,7 +56,7 @@ def test__hatsukoi__step0(verbose=False):
     expectedLatexStr = 'V_{in} -RI_R=I_{Z_{1}}R_{Z_{1}}' # to be filled in 
     expectedFunctions = {'*': 2, '-': 1} # count
     expectedVariables = {'I_R': 1, 'I_{Z_{1}}': 1, 'R': 1, 'R_{Z_{1}}': 1, 'V_{in}': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 9 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -100,7 +100,7 @@ def test__hatsukoi__step1(verbose=False): # TODO SAME_DIVISOR=> simplication_in_
     'R_{Z_{1}}': 1,
     'V^{Q1}_{BE}': 1,
     'V_{in}': 1} # count
-    expectedPrimitives = 1 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 17 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -144,7 +144,7 @@ def test__hatsukoi__step2(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => s
     'R_{Z1}': 1,
     'V_{BE}': 1,
     'V_{in}': 1} # count
-    expectedPrimitives = 0 # count
+    expectedPrimitives = {} # count
     expectedTotalNodeCount = 17 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 

@@ -18,6 +18,8 @@ class Generator:
         self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
 
     def generateClass(self, toRun=None):
+        from foundation.automat.core.manipulate.tests.configurationtests.generator.testdatum import TEST_DATUM
+
 
         #copied from https://realpython.com/primer-on-jinja-templating/
         environment = Environment(loader=FileSystemLoader(os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'tests', 'configurationtests', 'generator', 'template')))# put in the full directory
@@ -30,6 +32,13 @@ class Generator:
                 config = self._loadYAMLFromFilePath(os.path.join(self.manipulateConfigFileFolder, filename))
                 # if self.verbose:
                 #     info(config)
+                # import pdb;pdb.set_trace()
+                if 'manipulations' not in config or config['manipulations'] is None:
+                    continue
+                # if self.verbose:
+                #     info(config)
+
+                testDatumFirstTag = filename[:filename.index('.yaml')]
 
                 defNameTemplate = lambda infix: f"test__{infix}__configTest"
                 defTemplate = environment.get_template("test_definition.py.jinja2")
@@ -45,15 +54,20 @@ class Generator:
                             defName = defNameTemplate(infix)
                             callStr = f'{defName}(True) # Not tested yet'
                             testCallStrs.append(callStr)
+                            testDatum = TEST_DATUM[testDatumFirstTag][(direction, str(idx))]
+                            inputDatum = testDatum['input']
                             renderedDefNameTemplate = defTemplate.render({
                                 'defName':defName,
-                                'eqs':"'' # fill it in",
+                                'eqs':f"'{inputDatum}' # fill it in",
                                 'eqsType':'scheme',
                                 'regexNum':idx,
                                 'direction':direction,
+                                'filename':f"{config['className'].lower()}",#filename,
+                                'idx':idx,
                                 'regexUsedComment':d['scheme'],
                                 'returnRegexUsedComment':d['return'],
-                                'className':config['className']
+                                'className':config['className'],
+                                'expected':testDatum['expected'],
                             })
                             testDefinitionStrs.append(renderedDefNameTemplate)
 

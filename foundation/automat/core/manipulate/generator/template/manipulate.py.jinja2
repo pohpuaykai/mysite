@@ -8,9 +8,9 @@ class {{className}}(Manipulate):
     """
     TYPE = '{{type}}'
 
-    def __init__(self, equation, verbose):
+    def __init__(self, equation, direction, idx, verbose):
         """
 
         """
         self.rawRegexes = {{manipulations}}
-        super().__init__(equation, verbose=verbose)
+        super().__init__(equation, direction, idx, verbose=verbose)

@@ -29,7 +29,7 @@ FUNC_NAMES = {
         'import':['from math import sin'],
         'code':['num=1.0/sin(v0)'],
         'reverse_import':['from math import asin'],
-        'reverse_code':['num=1.0/asin(v0)']
+        'reverse_code':['num=asin(1.0/v0)']
     },
     "cosec":{
         'class_name':'Cosecant',
@@ -37,7 +37,7 @@ FUNC_NAMES = {
         'import':['from math import cos'],
         'code':['num=1.0/cos(v0)'],
         'reverse_import':['from math import acos'],
-        'reverse_code':['num=1.0/acos(v0)']
+        'reverse_code':['num=acos(1.0/v0)']
     },
     "cot":{
         'class_name':'Cotangent',
@@ -45,7 +45,7 @@ FUNC_NAMES = {
         'import':['from math import tan'],
         'code':['num=1.0/tan(v0)'],
         'reverse_import':['from math import atan'],
-        'reverse_code':['num=1.0/atan(v0)']
+        'reverse_code':['num=atan(1.0/v0)']
     },
     ####Hyperbolic Trigonometric functions
 
@@ -79,7 +79,7 @@ FUNC_NAMES = {
         'import':['from math import sinh'],
         'code':['num=1.0/sinh(v0)'],
         'reverse_import':['from math import asinh'],
-        'reverse_code':['num=1.0/asinh(v0)']
+        'reverse_code':['num=asinh(1.0/v0)']
     },
     "cosech":{
         'class_name':'Cosecanth',
@@ -87,7 +87,7 @@ FUNC_NAMES = {
         'import':['from math import cosh'],
         'code':['num=1.0/cosh(v0)'],
         'reverse_import':['from math import acosh'],
-        'reverse_code':['num=1.0/acosh(v0)']
+        'reverse_code':['num=acosh(1.0/v0)']
     },
     "coth":{
         'class_name':'Cotangenth',
@@ -95,6 +95,6 @@ FUNC_NAMES = {
         'import':['from math import tanh'],
         'code':['num=1.0/tanh(v0)'],
         'reverse_import':['from math import atanh'],
-        'reverse_code':['num=1.0/atanh(v0)']
+        'reverse_code':['num=atanh(1.0/v0)']
     },
 }

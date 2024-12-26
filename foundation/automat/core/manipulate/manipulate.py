@@ -11,7 +11,7 @@ class Manipulate:
 
     """
 
-    def __init__(self, equation, verbose):
+    def __init__(self, equation, direction, idx, verbose=False):
         self.eq = equation
         self.verbose = verbose
         #make and store the scheme string
@@ -19,12 +19,14 @@ class Manipulate:
         from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
         self.grammarParserClass = SchemeGrammarParser
         self.grammarParser = None
+        self.inputGrammar = self.rawRegexes[idx][direction]['scheme']
+        self.outputGrammar = self.rawRegexes[idx][direction]['return']
 
 
-    def initGrammerParser(self, inputGrammar, outputGrammar):
+    def initGrammerParser(self):
         #check if inputGrammar has no variables, 
         #if inputGrammar has no variables, then replace the outputGrammar's variables with variable, that is not in eq
-        self.grammarParser = self.grammarParserClass(inputGrammar, outputGrammar)#memoise the grammarParser TODO
+        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar)#memoise the grammarParser TODO
         # if len(self.grammarParser.variables) == 0:
         if len(set(self.grammarParser.outVariables)) > len(set(self.grammarParser.variables)):
             missingMetaVariables = list(set(self.grammarParser.outVariables) - set(self.grammarParser.variables))
@@ -36,7 +38,7 @@ class Manipulate:
                 varList.append(eVariable)
                 variable_eVariable__tupleList.append((outVariable, eVariable))
             import copy
-            subsitutedOutputGrammar = copy.deepcopy(outputGrammar)
+            subsitutedOutputGrammar = copy.deepcopy(self.outputGrammar)
             for variable, eVariable in variable_eVariable__tupleList:
                 subsitutedOutputGrammar = subsitutedOutputGrammar.replace(variable, eVariable)
             #TODO refactor?
@@ -46,33 +48,33 @@ class Manipulate:
             self.grammarParser.additionalReplacementStrForVariablesDict = dict(variable_eVariable__tupleList)
 
 
-    def outputGrammarHasVariables(self, inputGrammar, outputGrammar):
+    def outputGrammarHasVariables(self):
         if self.grammarParser is None:
-            self.initGrammerParser(inputGrammar, outputGrammar)
+            self.initGrammerParser()
         return len(self.grammarParser.outVariables) > 0
 
 
-    def applicable(self, inputGrammar, outputGrammar):
+    def applicable(self):
         """
         #~ DRAFT ~#
         check if equation is manipulatable with this pattern
         """
         if self.grammarParser is None:
-            self.initGrammerParser(inputGrammar, outputGrammar)
+            self.initGrammerParser()
         self.grammarParser.buildEnclosureTree(self.schemeStr)
         return not self.grammarParser.noMatches
 
 
-    def apply(self, inputGrammar, outputGrammar, ):
+    def apply(self):
         """
         #~ DRAFT ~#
         return manipulated equation
         """
-        if not self.outputGrammarHasVariables(inputGrammar, outputGrammar): # no variables
+        if not self.outputGrammarHasVariables(): # no variables
             if self.verbose:
-                print(f'{outputGrammar} has no grammar')
-            return outputGrammar # output does not depend on input variables, no manipulation needed.
-        if self.applicable(inputGrammar, outputGrammar): # here we have matches
+                print(f'{self.outputGrammar} has no grammar')
+            return self.outputGrammar # output does not depend on input variables, no manipulation needed.
+        if self.applicable(): # here we have matches
             return self.grammarParser.parse(self.schemeStr)
         return self.schemeStr
 

@@ -13,12 +13,12 @@ pp = pprint.PrettyPrinter(indent=4)
 def test__vor0__configTest(verbose=False):
     eqs = '(= a (* "-1" b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'multiplynegative'
+    direction = 'vor'
+    idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Multiplynegative(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # (* "-1" $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
+    ma0 = Multiplynegative(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* "-1" $0)
     expected = '(= a (- 0 b))' # (- 0 $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
@@ -29,12 +29,12 @@ def test__vor0__configTest(verbose=False):
 def test__hin0__configTest(verbose=False):
     eqs = '(= a (- 0 b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'multiplynegative'
+    direction = 'hin'
+    idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Multiplynegative(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # (- 0 $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
+    ma0 = Multiplynegative(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (- 0 $0)
     expected = '(= a (* "-1" b))' # (* "-1" $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:

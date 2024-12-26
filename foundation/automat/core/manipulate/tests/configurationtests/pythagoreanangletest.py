@@ -13,12 +13,12 @@ pp = pprint.PrettyPrinter(indent=4)
 def test__vor0__configTest(verbose=False):
     eqs = '(= a (+ (^ (sin b) 2) (^ (cos b) 2)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'pythagoreanangle'
+    direction = 'vor'
+    idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Pythagoreanangle(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # (+ (^ (sin $0) 2) (^ (cos $0) 2))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
+    ma0 = Pythagoreanangle(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (+ (^ (sin $0) 2) (^ (cos $0) 2))
     expected = '1' # 1
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
@@ -29,12 +29,12 @@ def test__vor0__configTest(verbose=False):
 def test__hin0__configTest(verbose=False):
     eqs = '(= a 1)' # fill it in
     eqsType = 'scheme'
+    #filename = 'pythagoreanangle'
+    direction = 'hin'
+    idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Pythagoreanangle(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # 1
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
+    ma0 = Pythagoreanangle(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # 1
     expected = '(= a (+ (^ (sin v_{0}) 2) (^ (cos v_{0}) 2)))' # (+ (^ (sin $0) 2) (^ (cos $0) 2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:

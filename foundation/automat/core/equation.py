@@ -184,8 +184,13 @@ class Equation:
                 self.functions[funcName] = self.functions.get(funcName, 0) + countChange
                 if self.functions[funcName] == 0:
                     del self.functions[funcName]
-            self.primitives += primitiveCountChange
+            for primitiveName, countChange in primitiveCountChange.items():
+                self.primitives[primitiveName] = self.primitives.get(primitiveName, 0) + countChange
+                if self.primitives[primitiveName] == 0:
+                    del self.primitives[primitiveName]
+            # self.primitives += primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
+            #give hint to Recommend in order to do 'simplification' TODO
         return self.ast
 
 
@@ -461,7 +466,7 @@ class Equation:
 
         #should have no change in primitives
         # import pdb;pdb.set_trace()
-        self.primitives += eq.primitives#mergeCountDictionaries(self.primitives, eqPrimitives)
+        mergeCountDictionaries(self.primitives, eq.primitives)#self.primitives += eq.primitives#
         # import pdb;pdb.set_trace()
         self.totalNodeCount += eq.totalNodeCount - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
         return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount

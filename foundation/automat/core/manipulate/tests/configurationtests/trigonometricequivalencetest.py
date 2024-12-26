@@ -11,15 +11,15 @@ pp = pprint.PrettyPrinter(indent=4)
     
 
 def test__vor0__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (/ (sin b) (cos b)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'vor'
+    idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # (/ (sin $0) (cos $0))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (tan $0)
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (/ (sin $0) (cos $0))
+    expected = '(= a (tan b))' # (tan $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -27,15 +27,15 @@ def test__vor0__configTest(verbose=False):
     
 
 def test__hin0__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (tan b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'hin'
+    idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # (tan $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ (sin $0) (cos $0))
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (tan $0)
+    expected = '(= a (/ (sin b) (cos b)))' # (/ (sin $0) (cos $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -43,15 +43,15 @@ def test__hin0__configTest(verbose=False):
     
 
 def test__vor1__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (/ (cos b) (sin b)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'vor'
+    idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[1] # (/ (cos $0) (sin $0))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (cot $0)
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (/ (cos $0) (sin $0))
+    expected = '(= a (cot b))' # (cot $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -59,15 +59,15 @@ def test__vor1__configTest(verbose=False):
     
 
 def test__hin1__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (cot b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'hin'
+    idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[1] # (cot $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ (cos $0) (sin $0))
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (cot $0)
+    expected = '(= a (/ (cos b) (sin b)))' # (/ (cos $0) (sin $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -75,15 +75,15 @@ def test__hin1__configTest(verbose=False):
     
 
 def test__vor2__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (/ 1 (sin b)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'vor'
+    idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[2] # (/ 1 (sin $0))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (cosec $0)
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (/ 1 (sin $0))
+    expected = '(= a (cosec b))' # (cosec $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -91,15 +91,15 @@ def test__vor2__configTest(verbose=False):
     
 
 def test__hin2__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (cosec b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'hin'
+    idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[2] # (cosec $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ 1 (sin $0))
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (cosec $0)
+    expected = '(= a (/ 1 (sin b)))' # (/ 1 (sin $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -107,15 +107,15 @@ def test__hin2__configTest(verbose=False):
     
 
 def test__vor3__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (/ 1 (cos b)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'vor'
+    idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[3] # (/ 1 (cos $0))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (sec $0)
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (/ 1 (cos $0))
+    expected = '(= a (sec b))' # (sec $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -123,15 +123,15 @@ def test__vor3__configTest(verbose=False):
     
 
 def test__hin3__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (sec b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'hin'
+    idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[3] # (sec $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ 1 (sec $0))
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (sec $0)
+    expected = '(= a (/ 1 (sec b)))' # (/ 1 (sec $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -139,15 +139,15 @@ def test__hin3__configTest(verbose=False):
     
 
 def test__vor4__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (/ 1 (tan b)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'vor'
+    idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[4] # (/ 1 (tan $0))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (cot $0)
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (/ 1 (tan $0))
+    expected = '(= a (cot b))' # (cot $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -155,15 +155,15 @@ def test__vor4__configTest(verbose=False):
     
 
 def test__hin4__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (cot b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'hin'
+    idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[4] # (cot $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ 1 (tan $0))
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (cot $0)
+    expected = '(= a (/ 1 (tan b)))' # (/ 1 (tan $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -171,15 +171,15 @@ def test__hin4__configTest(verbose=False):
     
 
 def test__vor5__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (/ 1 (cot b)))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'vor'
+    idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[5] # (/ 1 (cot $0))
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (tan $0)
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (/ 1 (cot $0))
+    expected = '(= a (tan b))' # (tan $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -187,15 +187,15 @@ def test__vor5__configTest(verbose=False):
     
 
 def test__hin5__configTest(verbose=False):
-    eqs = '' # fill it in
+    eqs = '(= a (tan b))' # fill it in
     eqsType = 'scheme'
+    #filename = 'trigonometricequivalence'
+    direction = 'hin'
+    idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[5] # (tan $0)
-    if verbose:
-        pp.pprint(patternDict)
-    manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ 1 (cot $0))
+    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (tan $0)
+    expected = '(= a (/ 1 (cot b)))' # (/ 1 (cot $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -204,16 +204,16 @@ def test__hin5__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
-    test__vor1__configTest(True) # Not tested yet
-    test__hin1__configTest(True) # Not tested yet
-    test__vor2__configTest(True) # Not tested yet
-    test__hin2__configTest(True) # Not tested yet
-    test__vor3__configTest(True) # Not tested yet
-    test__hin3__configTest(True) # Not tested yet
-    test__vor4__configTest(True) # Not tested yet
-    test__hin4__configTest(True) # Not tested yet
-    test__vor5__configTest(True) # Not tested yet
-    test__hin5__configTest(True) # Not tested yet
+    test__vor0__configTest()
+    test__hin0__configTest()
+    test__vor1__configTest()
+    test__hin1__configTest()
+    test__vor2__configTest()
+    test__hin2__configTest()
+    test__vor3__configTest()
+    test__hin3__configTest()
+    test__vor4__configTest()
+    test__hin4__configTest()
+    test__vor5__configTest()
+    test__hin5__configTest()
     

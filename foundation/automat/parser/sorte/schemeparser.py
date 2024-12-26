@@ -30,9 +30,9 @@ class Schemeparser(Parser):
         :type equationStr: str
         :return: tuple of
             - ast (Abstract Syntax Tree), map, key:tuple(label, id), value:list[tuple[label, id]]
-            - functionsD (map from function_label_str to number of such functions there are in the equation
-            - variablesD (map from variable_label_str to number of such variables there are in the equation
-            - primitives (amount of primitives there are in the equation
+            - functionsD (map from function_label_str to number of such functions there are in the equation)
+            - variablesD (map from variable_label_str to number of such variables there are in the equation)
+            - primitives (map from primitive_label_str to number of such primitives there are in the equation)
             - totalNodeCount (total number of nodes in the ast)
         :rtype: tuple[
             dict[tuple[str, int], list[tuple[str, int]]],
@@ -43,7 +43,7 @@ class Schemeparser(Parser):
         """
         functionsD = {}# function(str) to no_of_such_functions in the ast(int)
         variablesD = {}# variable(str) to no_of_such_variables in the ast(int)
-        primitives = 0#count of the number of primitives in the ast
+        primitives = {}# primitives(str) to no_of_such_primities in the ast(int)
         totalNodeCount = 0# total number of nodes in the ast
         backtrackerRoot = self._recursiveParse(self._eqs, 0) # return pointer to the root ( in process/thread memory)
         if self.verbose:
@@ -62,7 +62,7 @@ class Schemeparser(Parser):
             #do the tabulating
             totalNodeCount += 1
             if isNum(current.label):
-                primitives += 1
+                primitives[current.label] = primitives.get(current.label, 0) + 1
             elif current.label in Schemeparser.FUNC_NAMES: # is a function
                 functionsD[current.label] = functionsD.get(current.label, 0) + 1
             elif current.label != '=': # is a variable

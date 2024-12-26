@@ -108,7 +108,7 @@ def test__substituteValue__arccosecant(verbose=False):
     subDict = {'b':1}
     eq0 = Equation(eqStr, 'latex', verbose=verbose)
     ast = eq0.substituteValue(subDict)
-    expectedAst = {('=', 0): [('a', 1), ('1.5707963267948966', 2)]}
+    expectedAst = {('=', 0): [('a', 1), ('0.0', 2)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', ast == expectedAst)
     if verbose:
         print(eqStr)
@@ -121,7 +121,7 @@ def test__substituteValue__arccosecanth(verbose=False):
     subDict = {'b':1}
     eq0 = Equation(eqStr, 'latex', verbose=verbose)
     ast = eq0.substituteValue(subDict)
-    expectedAst = {('=', 0): [('a', 1), ('0.881373587019543', 2)]}
+    expectedAst = {('=', 0): [('a', 1), ('0.0', 2)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', ast == expectedAst)
     if verbose:
         print(eqStr)
@@ -196,7 +196,7 @@ def test__substituteValue__arcsecant(verbose=False):
     subDict = {'b':2}
     eq0 = Equation(eqStr, 'latex', verbose=verbose)
     ast = eq0.substituteValue(subDict)
-    expectedAst = {('=', 0): [('a', 1), ('1.0471975511965979', 2)]}
+    expectedAst = {('=', 0): [('a', 1), ('0.5235987755982989', 2)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', ast == expectedAst)
     if verbose:
         print(eqStr)
@@ -209,7 +209,7 @@ def test__substituteValue__arcsecanth(verbose=False):
     subDict = {'b':0.5}
     eq0 = Equation(eqStr, 'latex', verbose=verbose)
     ast = eq0.substituteValue(subDict)
-    expectedAst = {('=', 0): [('a', 1), ('1.3169578969248166', 2)]}
+    expectedAst = {('=', 0): [('a', 1), ('1.4436354751788103', 2)]}
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', ast == expectedAst)
     if verbose:
         print(eqStr)

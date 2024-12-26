@@ -22,7 +22,7 @@
           "@vnV@": ["@item_0_0@"]
         },
       "functionCountAdded": {"@cN_Arctangent@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.arctangent import Arctangent"],
       "equationSide":"R",
@@ -38,7 +38,7 @@
           "@vnV@": ["@item_0_1@"]
         },
       "functionCountAdded": {"@cN_Arctangent@.@vfN@": 1, "@cN@.@vfN@": -1},
-      "primitiveCountAdded": 0,
+      "primitiveCountAdded": {},
       "totalNodeCountAdded": 0,
       "imports":["from foundation.automat.arithmetic.standard.arctangent import Arctangent"],
       "equationSide":"L",

@@ -8,9 +8,9 @@ class Multiplynegative(Manipulate):
     """
     TYPE = 'essential'
 
-    def __init__(self, equation, verbose):
+    def __init__(self, equation, direction, idx, verbose):
         """
 
         """
         self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(* "-1" $0)', 'return': '(- 0 $0)'}, 'hin': {'scheme': '(- 0 $0)', 'return': '(* "-1" $0)'}}]
-        super().__init__(equation, verbose=verbose)
+        super().__init__(equation, direction, idx, verbose=verbose)

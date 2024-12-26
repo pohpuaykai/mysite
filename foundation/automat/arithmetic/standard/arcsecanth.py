@@ -68,7 +68,7 @@ class Arcsecanth(Function):
         
         from foundation.automat.arithmetic.standard.secanth import Secanth
         
-        return {key0: {"newKey": key0, "newValue": ((Secanth.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Secanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Secanth.FUNC_NAME: 1, Arcsecanth.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": ((Secanth.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Secanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Secanth.FUNC_NAME: 1, Arcsecanth.FUNC_NAME: -1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Arcsecanth(Function):
         
         from foundation.automat.arithmetic.standard.secanth import Secanth
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Secanth.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Secanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Secanth.FUNC_NAME: 1, Arcsecanth.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Secanth.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Secanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Secanth.FUNC_NAME: 1, Arcsecanth.FUNC_NAME: -1}, {}, 0
 
     
 
@@ -127,6 +127,6 @@ class Arcsecanth(Function):
         :return: calculated numerical result
         :rtype: float
         """
-        from math import acosh
-        num=acosh(1.0/v0)
+        from math import asinh
+        num=asinh(1.0/v0)
         return num

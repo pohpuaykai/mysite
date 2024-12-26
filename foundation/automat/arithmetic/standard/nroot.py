@@ -72,7 +72,7 @@ class Nroot(Function):
         
         from foundation.automat.arithmetic.standard.logarithm import Logarithm
         
-        return {key0: {"newKey": key0, "newValue": ((Logarithm.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Logarithm.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Logarithm.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": ((Logarithm.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Logarithm.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Logarithm.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, {}, 0
 
     
     def _reverseR1(self, replacementDictionary, totalNodeCount):
@@ -115,7 +115,7 @@ class Nroot(Function):
         
         from foundation.automat.arithmetic.standard.exponential import Exponential
         
-        return {key0: {"newKey": key0, "newValue": ((Exponential.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Exponential.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Exponential.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": ((Exponential.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Exponential.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Exponential.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -158,7 +158,7 @@ class Nroot(Function):
         
         from foundation.automat.arithmetic.standard.logarithm import Logarithm
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Logarithm.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Logarithm.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Logarithm.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Logarithm.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Logarithm.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Logarithm.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, {}, 0
 
     
     def _reverseL1(self, replacementDictionary, totalNodeCount):
@@ -201,7 +201,7 @@ class Nroot(Function):
         
         from foundation.automat.arithmetic.standard.exponential import Exponential
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Exponential.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Exponential.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Exponential.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Exponential.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Exponential.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Exponential.FUNC_NAME: 1, Nroot.FUNC_NAME: -1}, {}, 0
 
     
 

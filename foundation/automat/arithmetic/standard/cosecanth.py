@@ -68,7 +68,7 @@ class Cosecanth(Function):
         
         from foundation.automat.arithmetic.standard.arccosecanth import Arccosecanth
         
-        return {key0: {"newKey": key0, "newValue": ((Arccosecanth.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccosecanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccosecanth.FUNC_NAME: 1, Cosecanth.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": ((Arccosecanth.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccosecanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccosecanth.FUNC_NAME: 1, Cosecanth.FUNC_NAME: -1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Cosecanth(Function):
         
         from foundation.automat.arithmetic.standard.arccosecanth import Arccosecanth
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosecanth.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccosecanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arccosecanth.FUNC_NAME: 1, Cosecanth.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosecanth.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccosecanth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arccosecanth.FUNC_NAME: 1, Cosecanth.FUNC_NAME: -1}, {}, 0
 
     
 

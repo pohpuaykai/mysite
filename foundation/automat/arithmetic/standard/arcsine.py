@@ -68,7 +68,7 @@ class Arcsine(Function):
         
         from foundation.automat.arithmetic.standard.sine import Sine
         
-        return {key0: {"newKey": key0, "newValue": ((Sine.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Sine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Sine.FUNC_NAME: 1, Arcsine.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": ((Sine.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Sine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Sine.FUNC_NAME: 1, Arcsine.FUNC_NAME: -1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Arcsine(Function):
         
         from foundation.automat.arithmetic.standard.sine import Sine
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Sine.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Sine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Sine.FUNC_NAME: 1, Arcsine.FUNC_NAME: -1}, 0, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Sine.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Sine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Sine.FUNC_NAME: 1, Arcsine.FUNC_NAME: -1}, {}, 0
 
     
 
