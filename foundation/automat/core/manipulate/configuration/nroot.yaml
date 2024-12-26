@@ -31,8 +31,8 @@ manipulations:
       scheme: '(nroot $2 (* $0 $1))'
       return: '(* (nroot $2 $0) (nroot $2 $1))'
     hin:
-      scheme: "(nroot $2 (* $0 $1))"
-      return: "(* (nroot $2 $0) (nroot $2 $1))"
+      scheme: "(* (nroot $2 $0) (nroot $2 $1))"
+      return: "(nroot $2 (* $0 $1))"
 #Looks like distributivity, maybe can further refactor...
   - type: "regex"
     vor:

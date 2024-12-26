@@ -12,5 +12,5 @@ class Rootbasenegative(Manipulate):
         """
 
         """
-        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(nroot (- 0 %0) %1)', 'return': '(nroot %0 (/ 1 %1))'}, 'hin': {'scheme': '(nroot %0 (/ 1 %1))', 'return': '(nroot (- 0 %0) %1)'}}]
+        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(nroot (- 0 $0) $1)', 'return': '(nroot $0 (/ 1 $1))'}, 'hin': {'scheme': '(nroot $0 (/ 1 $1))', 'return': '(nroot (- 0 $0) $1)'}}]
         super().__init__(equation, verbose=verbose)

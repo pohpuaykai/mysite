@@ -4,8 +4,8 @@ type: "pretty"
 manipulations:
   - type: "regex"
     vor:
-      scheme: "(nroot (- 0 %0) %1)"
-      return: "(nroot %0 (/ 1 %1))"
+      scheme: "(nroot (- 0 $0) $1)"
+      return: "(nroot $0 (/ 1 $1))"
     hin:
-      scheme: "(nroot %0 (/ 1 %1))"
-      return: "(nroot (- 0 %0) %1)"
+      scheme: "(nroot $0 (/ 1 $1))"
+      return: "(nroot (- 0 $0) $1)"

@@ -19,7 +19,7 @@ def test__vor0__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (+ (log $0 $1) (log $0 $2))
+    expected = '(= a (+ (log a b) (log a c)))' # (+ (log $0 $1) (log $0 $2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -35,7 +35,7 @@ def test__hin0__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (log $0 (* $1 $2))
+    expected = '(= a (log b (* c d)))' # (log $0 (* $1 $2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -51,7 +51,7 @@ def test__vor1__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (- (log $0 $1) (log $0 $2))
+    expected = '(= a (- (log b c) (log b d)))' # (- (log $0 $1) (log $0 $2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -67,7 +67,7 @@ def test__hin1__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (log $0 (/ $1 $2))
+    expected = '(= a (log b (/ c d)))' # (log $0 (/ $1 $2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -83,7 +83,7 @@ def test__vor2__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (* $2 (log $0 $1))
+    expected = '(= a (* d (log b c)))' # (* $2 (log $0 $1))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -99,7 +99,7 @@ def test__hin2__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (log $0 (^ $1 $2))
+    expected = '(= a (log c (^ d b)))' # (log $0 (^ $1 $2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -115,7 +115,7 @@ def test__vor3__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (/ (log $0 $2) $1)
+    expected = '(= a (/ (log b d) c))' # (/ (log $0 $2) $1)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -131,7 +131,7 @@ def test__hin3__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (log $0 (nroot $1 $2))
+    expected = '(= a (log b (nroot d c)))' # (log $0 (nroot $1 $2))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -147,7 +147,7 @@ def test__vor4__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (log $0 $1)
+    expected = '(= a (log d c))' # (log $0 $1)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -163,7 +163,7 @@ def test__hin4__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (/ (log $2 $1) (log $2 $0))
+    expected = '(= a (/ (log v_{0} c) (log v_{0} b)))' # (/ (log $2 $1) (log $2 $0))
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -179,7 +179,7 @@ def test__vor5__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # 1
+    expected = '1' # 1
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -195,7 +195,7 @@ def test__hin5__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (log $0 $0)
+    expected = '(= a (log v_{0} v_{0}))' # (log $0 $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -211,7 +211,7 @@ def test__vor6__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # 0
+    expected = '0' # 0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -227,7 +227,7 @@ def test__hin6__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (log $0 1)
+    expected = '(= a (log v_{0} 1))' # (log $0 1)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -236,18 +236,18 @@ def test__hin6__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
-    test__vor1__configTest(True) # Not tested yet
-    test__hin1__configTest(True) # Not tested yet
-    test__vor2__configTest(True) # Not tested yet
-    test__hin2__configTest(True) # Not tested yet
-    test__vor3__configTest(True) # Not tested yet
-    test__hin3__configTest(True) # Not tested yet
-    test__vor4__configTest(True) # Not tested yet
-    test__hin4__configTest(True) # Not tested yet
-    test__vor5__configTest(True) # Not tested yet
-    test__hin5__configTest(True) # Not tested yet
-    test__vor6__configTest(True) # Not tested yet
-    test__hin6__configTest(True) # Not tested yet
+    test__vor0__configTest()
+    test__hin0__configTest()
+    test__vor1__configTest()
+    test__hin1__configTest()
+    test__vor2__configTest()
+    test__hin2__configTest()
+    test__vor3__configTest()
+    test__hin3__configTest()
+    test__vor4__configTest()
+    test__hin4__configTest()
+    test__vor5__configTest()
+    test__hin5__configTest()
+    test__vor6__configTest()
+    test__hin6__configTest()
     

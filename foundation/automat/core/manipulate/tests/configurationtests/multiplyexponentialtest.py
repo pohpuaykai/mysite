@@ -11,7 +11,7 @@ pp = pprint.PrettyPrinter(indent=4)
     
 
 def test__vor0__configTest(verbose=False):
-    eqs = '(= a (* b b))' # fill it in
+    eqs = '(= p (* x x))' # fill it in
     eqsType = 'scheme'
     eq0 = Equation(eqs, eqsType)
     ma0 = Multiplyexponential(eq0, verbose=verbose)
@@ -19,7 +19,7 @@ def test__vor0__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # (^ %0 2)
+    expected = '(= p (^ x 2))' # (^ $0 2)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -27,15 +27,15 @@ def test__vor0__configTest(verbose=False):
     
 
 def test__hin0__configTest(verbose=False):
-    eqs = '(= a (^ b 2))' # fill it in
+    eqs = '(= p (^ x 2))' # fill it in
     eqsType = 'scheme'
     eq0 = Equation(eqs, eqsType)
     ma0 = Multiplyexponential(eq0, verbose=verbose)
-    patternDict = ma0.rawRegexes[0] # (^ %0 2)
+    patternDict = ma0.rawRegexes[0] # (^ $0 2)
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (* $0 $0)
+    expected = '(= p (* x x))' # (* $0 $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -44,6 +44,6 @@ def test__hin0__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
+    test__vor0__configTest()
+    test__hin0__configTest()
     

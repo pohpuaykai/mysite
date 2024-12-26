@@ -5,7 +5,7 @@ manipulations:
   - type: "regex"
     vor:
       scheme: "(* $0 $0)"
-      return: "(^ %0 2)"
+      return: "(^ $0 2)"
     hin:
-      scheme: "(^ %0 2)"
+      scheme: "(^ $0 2)"
       return: "(* $0 $0)"

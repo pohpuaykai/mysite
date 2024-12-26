@@ -19,7 +19,7 @@ def test__vor0__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # $0
+    expected = '(= a b)' # $0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -35,7 +35,7 @@ def test__hin0__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (- "0" $0)
+    expected = '(= (- "0" a) (- "0" a))' # (- "0" $0)
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -51,7 +51,7 @@ def test__vor1__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['vor']['scheme'], patternDict['vor']['return'])
-    expected = '' # $0
+    expected = '(= a b)' # $0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -67,7 +67,7 @@ def test__hin1__configTest(verbose=False):
     if verbose:
         pp.pprint(patternDict)
     manipulatedSchemeEquation = ma0.apply(patternDict['hin']['scheme'], patternDict['hin']['return'])
-    expected = '' # (- $0 "0")
+    expected = '(= (- a "0") (- a "0"))' # (- $0 "0")
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
     if verbose:
         print(manipulatedSchemeEquation)
@@ -76,8 +76,8 @@ def test__hin1__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
-    test__vor1__configTest(True) # Not tested yet
-    test__hin1__configTest(True) # Not tested yet
+    test__vor0__configTest()
+    test__hin0__configTest()
+    test__vor1__configTest()
+    test__hin1__configTest()
     
