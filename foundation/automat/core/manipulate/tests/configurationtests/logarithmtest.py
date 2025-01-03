@@ -3,6 +3,7 @@ import pprint
 
 from foundation.automat.core.equation import Equation
 from foundation.automat.core.manipulate.pattern.logarithm import Logarithm
+from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -19,10 +20,15 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 (* $1 $2))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (+ (log a b) (log a c)))' # (+ (log $0 $1) (log $0 $2))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -35,10 +41,15 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (log $0 $1) (log $0 $2))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log b (* c d)))' # (log $0 (* $1 $2))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -51,10 +62,15 @@ def test__vor1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 (/ $1 $2))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (- (log b c) (log b d)))' # (- (log $0 $1) (log $0 $2))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -67,10 +83,15 @@ def test__hin1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- (log $0 $1) (log $0 $2))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log b (/ c d)))' # (log $0 (/ $1 $2))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -83,10 +104,15 @@ def test__vor2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 (^ $1 $2))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (* d (log b c)))' # (* $2 (log $0 $1))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -99,10 +125,15 @@ def test__hin2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (* $2 (log $0 $1))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log c (^ d b)))' # (log $0 (^ $1 $2))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -115,10 +146,15 @@ def test__vor3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 (nroot $1 $2))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (/ (log b d) c))' # (/ (log $0 $2) $1)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -131,10 +167,15 @@ def test__hin3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ (log $0 $2) $1)
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log b (nroot d c)))' # (log $0 (nroot $1 $2))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -147,10 +188,15 @@ def test__vor4__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ (log $2 $1) (log $2 $0))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log d c))' # (log $0 $1)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -163,10 +209,15 @@ def test__hin4__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 $1)
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (/ (log v_{0} c) (log v_{0} b)))' # (/ (log $2 $1) (log $2 $0))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -179,10 +230,15 @@ def test__vor5__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 $0)
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '1' # 1
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -195,10 +251,15 @@ def test__hin5__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # 1
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log v_{0} v_{0}))' # (log $0 $0)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -211,10 +272,15 @@ def test__vor6__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (log $0 1)
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '0' # 0
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -227,10 +293,15 @@ def test__hin6__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # 0
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (log v_{0} 1))' # (log $0 1)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 

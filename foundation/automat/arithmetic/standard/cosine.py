@@ -68,7 +68,7 @@ class Cosine(Function):
         
         from foundation.automat.arithmetic.standard.arccosine import Arccosine
         
-        return {key0: {"newKey": key0, "newValue": ((Arccosine.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccosine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccosine.FUNC_NAME: 1, Cosine.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Arccosine.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccosine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Cosine.FUNC_NAME: -1, Arccosine.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Cosine(Function):
         
         from foundation.automat.arithmetic.standard.arccosine import Arccosine
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosine.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccosine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arccosine.FUNC_NAME: 1, Cosine.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosine.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccosine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Cosine.FUNC_NAME: -1, Arccosine.FUNC_NAME: 1}, {}, 0
 
     
 
@@ -128,5 +128,5 @@ class Cosine(Function):
         :rtype: float
         """
         from math import cos
-        num=cos(v0)
+        num=sin(v0)
         return num

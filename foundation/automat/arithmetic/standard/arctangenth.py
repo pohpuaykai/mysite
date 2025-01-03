@@ -68,7 +68,7 @@ class Arctangenth(Function):
         
         from foundation.automat.arithmetic.standard.tangenth import Tangenth
         
-        return {key0: {"newKey": key0, "newValue": ((Tangenth.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Tangenth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Tangenth.FUNC_NAME: 1, Arctangenth.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Tangenth.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Tangenth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arctangenth.FUNC_NAME: -1, Tangenth.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Arctangenth(Function):
         
         from foundation.automat.arithmetic.standard.tangenth import Tangenth
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Tangenth.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Tangenth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Tangenth.FUNC_NAME: 1, Arctangenth.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Tangenth.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Tangenth.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arctangenth.FUNC_NAME: -1, Tangenth.FUNC_NAME: 1}, {}, 0
 
     
 
@@ -128,5 +128,5 @@ class Arctangenth(Function):
         :rtype: float
         """
         from math import atanh
-        num=atanh(v0)
+        num=sin(v0)
         return num

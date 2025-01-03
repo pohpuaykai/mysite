@@ -1,0 +1,82 @@
+imports:
+{{imports__toString}}
+init_className:
+  code: '@cN@'
+  full: {{class_name}}
+init_funcName:
+  code: '@fN@'
+  full: {{function_name}}
+init_string_newKey:
+  code: '@vnK@'
+  full: newKey
+init_string_newValue:
+  code: '@vnV@'
+  full: newValue
+init_type:
+  code: '@te@'
+  full: trigonometric
+init_variableName_funcName:
+  code: '@vfN@'
+  full: FUNC_NAME
+init_variableName_key0:
+  code: '@vk0@'
+  full: key0
+init_variableName_key1:
+  code: '@vk1@'
+  full: key1
+init_variableName_replacementDictionary:
+  code: '@vrD@'
+  full: replacementDictionary
+init_variableName_totalNodeCount:
+  code: '@vtN@'
+  full: totalNodeCount
+return_calculation:
+- code:
+  - num=sin(v0)
+  imports:
+{{imports_as_str__toString}}
+  variableCount: 1
+return_reverse:
+  reversedAst:
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - - '@cN_{{reverse_class_name}}@.@vfN@'
+        - '@id_0_1@'
+      - '@item_1_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_{{reverse_class_name}}@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_0_0@'
+    argumentIdx: 0
+    equationSide: R
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_{{reverse_class_name}}@.@vfN@': 1
+    imports:
+    {{reverse_imports__toString}}
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - '@item_1_0@'
+      - - '@cN_{{reverse_class_name}}@.@vfN@'
+        - '@id_0_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_{{reverse_class_name}}@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_0_1@'
+    argumentIdx: 0
+    equationSide: L
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_{{reverse_class_name}}@.@vfN@': 1
+    imports:
+{{reverse_imports__toString}}
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0

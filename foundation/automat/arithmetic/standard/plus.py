@@ -72,7 +72,7 @@ class Plus(Function):
         
         from foundation.automat.arithmetic.standard.minus import Minus
         
-        return {key0: {"newKey": key0, "newValue": ((Minus.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Minus.FUNC_NAME: 1, Plus.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Minus.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Plus.FUNC_NAME: -1, Minus.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseR1(self, replacementDictionary, totalNodeCount):
@@ -115,7 +115,7 @@ class Plus(Function):
         
         from foundation.automat.arithmetic.standard.minus import Minus
         
-        return {key0: {"newKey": key0, "newValue": ((Minus.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Minus.FUNC_NAME: 1, Plus.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Minus.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Plus.FUNC_NAME: -1, Minus.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -158,7 +158,7 @@ class Plus(Function):
         
         from foundation.automat.arithmetic.standard.minus import Minus
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Minus.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Minus.FUNC_NAME: 1, Plus.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Minus.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Plus.FUNC_NAME: -1, Minus.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL1(self, replacementDictionary, totalNodeCount):
@@ -201,7 +201,7 @@ class Plus(Function):
         
         from foundation.automat.arithmetic.standard.minus import Minus
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Minus.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Minus.FUNC_NAME: 1, Plus.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Minus.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Plus.FUNC_NAME: -1, Minus.FUNC_NAME: 1}, {}, 0
 
     
 

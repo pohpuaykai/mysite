@@ -8,7 +8,7 @@ class Exponential(Manipulate):
     """
     TYPE = 'essential'
 
-    def __init__(self, equation, direction, idx, verbose):
+    def __init__(self, equation, direction, idx, verbose=False):
         """
 
         """

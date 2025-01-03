@@ -114,7 +114,29 @@ class Function:#(metaclass=FunctionHook):
         self.idInAst = idInAst
 
 
-    def reverse(self, equationSide, argumentIdx, nodeIds):
+    def preReverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId):
+        """"""
+        ast = deepcopy(self.eq.ast)
+        replacementDictionary = {}
+        for key, value in ast.items():
+            if key[1] in nodeIds:
+                replacementDictionary[key] = value
+
+        if self.verbose:
+            print('replacementDictionary')
+            print(replacementDictionary)
+            print('len(replacementDictionary):', len(replacementDictionary))
+            print('reverses key: ', (equationSide, str(argumentIdx)))
+
+
+        #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
+        (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange) = self.reverses[(equationSide, str(argumentIdx))](
+            replacementDictionary, self.eq.totalNodeCount)
+
+        return invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange, ast, startPos__nodeId
+
+
+    def reverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId):
         """
         make argumentIdx the subject of the subAST
 
@@ -135,23 +157,7 @@ class Function:#(metaclass=FunctionHook):
             int,
             int]
         """
-        ast = deepcopy(self.eq.ast)
-        replacementDictionary = {}
-        for key, value in ast.items():
-            if key[1] in nodeIds:
-                replacementDictionary[key] = value
-
-        if self.verbose:
-            print('replacementDictionary')
-            print(replacementDictionary)
-            print('len(replacementDictionary):', len(replacementDictionary))
-            print('reverses key: ', (equationSide, str(argumentIdx)))
-
-
-        #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
-        (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange) = self.reverses[(equationSide, str(argumentIdx))](
-            replacementDictionary, self.eq.totalNodeCount)
-
+        invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange, ast, altered__startPos__nodeId = self.preReverse(equationSide, argumentIdx, nodeIds, startPos__nodeId)
         if self.verbose:
             print('invertedResults')
             print(invertedResults)
@@ -161,7 +167,7 @@ class Function:#(metaclass=FunctionHook):
             if oldKey in ast: # due to addition of operations, `oldKey` might not exist in ast
                 del ast[oldKey]
             ast[oldValue['newKey']] = list(oldValue['newValue'])
-        return ast, functionCountChange, primitiveCountChange, totalNodeCountChange
+        return ast, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults
 
     def evalFunctor(self):
         """

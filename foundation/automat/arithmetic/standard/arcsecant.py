@@ -68,7 +68,7 @@ class Arcsecant(Function):
         
         from foundation.automat.arithmetic.standard.secant import Secant
         
-        return {key0: {"newKey": key0, "newValue": ((Secant.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Secant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Secant.FUNC_NAME: 1, Arcsecant.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Secant.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Secant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arcsecant.FUNC_NAME: -1, Secant.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Arcsecant(Function):
         
         from foundation.automat.arithmetic.standard.secant import Secant
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Secant.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Secant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Secant.FUNC_NAME: 1, Arcsecant.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Secant.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Secant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arcsecant.FUNC_NAME: -1, Secant.FUNC_NAME: 1}, {}, 0
 
     
 
@@ -128,5 +128,5 @@ class Arcsecant(Function):
         :rtype: float
         """
         from math import asin
-        num=asin(1.0/v0)
+        num=sin(v0)
         return num

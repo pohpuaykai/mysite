@@ -72,7 +72,7 @@ class Divide(Function):
         
         from foundation.automat.arithmetic.standard.multiply import Multiply
         
-        return {key0: {"newKey": key0, "newValue": ((Multiply.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Multiply.FUNC_NAME: 1, Divide.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Multiply.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Divide.FUNC_NAME: -1, Multiply.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseR1(self, replacementDictionary, totalNodeCount):
@@ -156,7 +156,7 @@ class Divide(Function):
         
         from foundation.automat.arithmetic.standard.multiply import Multiply
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Multiply.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Multiply.FUNC_NAME: 1, Divide.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Multiply.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Divide.FUNC_NAME: -1, Multiply.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL1(self, replacementDictionary, totalNodeCount):

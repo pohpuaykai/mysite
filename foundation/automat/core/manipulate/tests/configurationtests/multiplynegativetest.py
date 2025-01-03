@@ -3,6 +3,7 @@ import pprint
 
 from foundation.automat.core.equation import Equation
 from foundation.automat.core.manipulate.pattern.multiplynegative import Multiplynegative
+from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -19,10 +20,15 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Multiplynegative(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (* "-1" $0)
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (- 0 b))' # (- 0 $0)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -35,10 +41,15 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Multiplynegative(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- 0 $0)
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (* "-1" b))' # (* "-1" $0)
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 

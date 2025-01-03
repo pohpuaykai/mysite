@@ -28,6 +28,10 @@ class Equation:
         """
         loads the parser with that name, throws a tantrum if parserName was not found. Also the constructor
 
+        SchemeString is a staple representation of this class.
+        If parserName is not 'scheme', we need to unparse the self.ast to scheme and then store all the statistics, 
+        including startPos__nodeId
+
         :param equationStr: the equation str to be parsed
         :type equationStr: str
         :param parserName: the name of the parser to be used
@@ -36,8 +40,21 @@ class Equation:
         self.verbose = verbose
         self._eqs = equationStr
         self._parserName = parserName
+        self._parser = Parser(parserName)
         (self.ast, self.functions, self.variables, self.primitives,
-         self.totalNodeCount) = Parser(parserName).parse(self._eqs)
+         self.totalNodeCount, self.startPos__nodeId) = self._parser.parse(self._eqs)
+        if parserName.lower() == 'scheme':
+            self.schemeStr = equationStr
+            self.startPos__nodeId = self._parser.startPos__nodeId
+        else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
+            from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
+            schemeparser = Schemeparser(ast=self.ast)
+            self.schemeStr = schemeparser._unparse()
+            schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
+            (self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme,
+            self.totalNodeCountScheme) = schemeparser._parse()
+            self.startPos__nodeId = schemeparser.startPos__nodeId
+            
         self.availableStrsFormats = {
             self._parserName: self._eqs
         }
@@ -49,6 +66,7 @@ class Equation:
             print('self.variables', self.variables)
             print('self.primitives', self.primitives)
             print('self.totalNodeCount', self.totalNodeCount)
+            print('self.startPos__nodeId', self.startPos__nodeId)
         #############
 
 
@@ -61,7 +79,7 @@ class Equation:
         globals()[className] = functionClass
         return functionClass
 
-    def makeSubject(self, variable):
+    def makeSubject(self, variable, simplify=False):
         """
         make variable the subject of this equation
 
@@ -163,23 +181,90 @@ class Equation:
             operationOrderWithIdx.append({
                 'functionName':vorOp['functionName'],
                 'argumentIdx':hinOp['argumentIdx'], # take the child's argumentIdx
-                'id':vorOp['id'],
+                'id':vorOp['id'], #this is the function nodeId
                 'lastId':0 # always going to be equals, after then prevOp....
             })
         ops = operationOrderWithIdx
         if self.verbose:
             print('ops', ops)
+        if simplify:
+            from foundation.automat.core.manipulate.recommend.recommend import Recommend
+            recommend = Recommend(self, verbose=self.verbose)
         #apply the reverses
         while len(ops) != 0:
             op = ops.pop(-1) # apply in reverse order (start with the one nearest to =)
             if self.verbose:
                 print('applying op', op)
             functionClass = self.getFunctionClass(op['functionName'])
-            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange) = functionClass(self, op['id'], verbose=self.verbose).reverse(
-                equationSide, op['argumentIdx'], [op['id'], op['lastId']]
-            )
+            #TODO (optional)since equation is changed after each op, we have to recalculate the next op again, after the reversal... and so, we only need to calculate one op at a time... => might it go into an infinity loop?
+            
+            # (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+            #     equationSide, op['argumentIdx'], [op['id'], op['lastId']]
+            # )
+            # self.ast = invertedAst 
+            #give hint to Recommend in order to do 'simplification' TODO
+            if simplify:
+                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
+                ) #TODO functionClass to make change to SchemeStr & startPos__nodeId too?
+
+                self.ast = invertedAst 
+                ####
+                print('before SIM:')
+                print('invertedAst:', invertedAst)
+                ####
+                simplifiedAst, nodeIdOfPrimitivesRemoved, nodeIdOfVariablesRemoved, nodeIdOfFuncsRemoved = recommend.simplify(hint={'invertedResults':invertedResults})#, 'lastOp':op})
+                if simplifiedAst is not None:
+                    ######
+                    print('ops:')
+                    print(ops)
+                    print('simplifiedAst:')
+                    print(simplifiedAst)
+                    print('nodeIdOfPrimitivesRemoved:')
+                    print(nodeIdOfPrimitivesRemoved)
+                    print('nodeIdOfVariablesRemoved:')
+                    print(nodeIdOfVariablesRemoved)
+                    print('nodeIdOfFuncsRemoved:')
+                    print(nodeIdOfFuncsRemoved)
+                    ######
+                    #need to recalculate path to variable again... because ast changed...
+                    # we can also get `Recommend` to give us the changes made, then we can maybe just alter the ops a bit?
+                    #TODO we do not do this calculation for now...
+                    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    newOps = []
+                    for op in ops:
+                        (preInvertedAst, preFunctionCountChange, prePrimitiveCountChange, preTotalNodeCountChange, preInvertedResults) = functionClass(self, op['id'], verbose=self.verbose).preReverse(
+                            equationSide, op['argumentIdx'], [op['id'], op['lastId']]
+                        )
+                        #################
+                        print(op) # if changes in primitives/variables, op should be modified, instead of removed?
+                        print(preInvertedResults)
+                        print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+                        import pdb;pdb.set_trace()
+                        #################
+                        # then we also remove this nodeId of function from ops...
+                        # those removed might also be primitives or variables
+                        if op['id'] in nodeIdOfFuncsRemoved: 
+                            # another way to do it, is if op fails... then just skip this op, and go to the next op? -> any situation where this might fail?
+                            #if variable/primitive is removed. the reversal of that function containing it, still need to do correct reversal.
+                            #skipping the reversal of that function , will result in incorrect answer. SO WRONG WAY
+                            #TODO another way to do it, is invertedResults then we calculate from the changes...., but it seems, that first way is more efficient?
+                            #preReverse is reading from a dictionary in a class... and then passing it up 2 classes (2 pieces in the tracestack.)
+                            if self.verbose:
+                                print(f"removed {op['functionName']}, {op['id']} from ops")
+                            continue
+                        newOps.append(op)
+                    ops = newOps
+                    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    self.ast = simplifiedAst
+
+            else: #no step-by-step simplification needed, should not raise exception...
+                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+                    equationSide, op['argumentIdx'], [op['id'], op['lastId']]
+                )
+                self.ast = invertedAst 
+
             #update the `stat` of self
-            self.ast = invertedAst #TODO since equation is changed after each op, we have to recalculate the next op again, after the reversal... and so, we only need to calculate one op at a time... => might it go into an infinity loop?
             for funcName, countChange in functionCountChange.items():
                 self.functions[funcName] = self.functions.get(funcName, 0) + countChange
                 if self.functions[funcName] == 0:
@@ -190,7 +275,7 @@ class Equation:
                     del self.primitives[primitiveName]
             # self.primitives += primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
-            #give hint to Recommend in order to do 'simplification' TODO
+
         return self.ast
 
 
@@ -466,12 +551,11 @@ class Equation:
 
         #should have no change in primitives
         # import pdb;pdb.set_trace()
-        mergeCountDictionaries(self.primitives, eq.primitives)#self.primitives += eq.primitives#
+        eqPrimitives = deepcopy(eq.primitives)
+        self.primitives = mergeCountDictionaries(self.primitives, eqPrimitives)#self.primitives += eq.primitives#
         # import pdb;pdb.set_trace()
         self.totalNodeCount += eq.totalNodeCount - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
         return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
-
-
 
 
 
@@ -489,12 +573,13 @@ class Equation:
         return self.availableStrsFormats[format]
 
 
+
     def _findCommonFactorOfDistributivePath(self, distributivePath):
         """
 
         #~ DRAFT ~#
         TODO test
-        current target usage for one-term factorisation
+        current target usage for one-term factorisation: seems to be done by `Manipulate` TODO do something about this...
 
         ~SKETCH~
         1. cut out the subAST of each termNode

@@ -3,6 +3,7 @@ import pprint
 
 from foundation.automat.core.equation import Equation
 from foundation.automat.core.manipulate.pattern.crossmultiply import Crossmultiply
+from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -19,10 +20,15 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Crossmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (/ $0 $1) (/ $2 $3))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (/ (+ (* b e) (* c d)) (* c e)))' # (/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -35,10 +41,15 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Crossmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (+ (/ b c) (/ d e)))' # (+ (/ $0 $1) (/ $2 $3))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 

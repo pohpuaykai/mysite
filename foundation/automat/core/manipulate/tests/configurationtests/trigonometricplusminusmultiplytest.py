@@ -3,6 +3,7 @@ import pprint
 
 from foundation.automat.core.equation import Equation
 from foundation.automat.core.manipulate.pattern.trigonometricplusminusmultiply import Trigonometricplusminusmultiply
+from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -19,10 +20,15 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (sin (+ $0 $1))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (+ (* (sin b) (cos c)) (* (cos b) (sin c))))' # (+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -35,10 +41,15 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (sin (+ b c)))' # (sin (+ $0 $1))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -51,10 +62,15 @@ def test__vor1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (sin (- $0 $1))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (- (* (sin b) (cos c)) (* (cos b) (sin c))))' # (- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -67,10 +83,15 @@ def test__hin1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (sin (- b c)))' # (sin (- $0 $1))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -83,10 +104,15 @@ def test__vor2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (cos (+ $0 $1))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (- (* (cos b) (cos c)) (* (sin b) (sin c))))' # (- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -99,10 +125,15 @@ def test__hin2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (cos (+ b c)))' # (cos (+ $0 $1))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -115,10 +146,15 @@ def test__vor3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (cos (- $0 $1))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (+ (* (cos b) (cos c)) (* (sin b) (sin c))))' # (+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 
@@ -131,10 +167,15 @@ def test__hin3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '(= a (cos (- b c)))' # (cos (- $0 $1))
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)
 
     
 

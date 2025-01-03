@@ -8,7 +8,7 @@ class Rootbasenegative(Manipulate):
     """
     TYPE = 'pretty'
 
-    def __init__(self, equation, direction, idx, verbose):
+    def __init__(self, equation, direction, idx, verbose=False):
         """
 
         """

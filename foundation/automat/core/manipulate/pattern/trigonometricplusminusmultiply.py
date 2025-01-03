@@ -8,7 +8,7 @@ class Trigonometricplusminusmultiply(Manipulate):
     """
     TYPE = 'trigonometric_standard'
 
-    def __init__(self, equation, direction, idx, verbose):
+    def __init__(self, equation, direction, idx, verbose=False):
         """
 
         """

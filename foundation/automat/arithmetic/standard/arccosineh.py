@@ -68,7 +68,7 @@ class Arccosineh(Function):
         
         from foundation.automat.arithmetic.standard.cosineh import Cosineh
         
-        return {key0: {"newKey": key0, "newValue": ((Cosineh.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Cosineh.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Cosineh.FUNC_NAME: 1, Arccosineh.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Cosineh.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Cosineh.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccosineh.FUNC_NAME: -1, Cosineh.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Arccosineh(Function):
         
         from foundation.automat.arithmetic.standard.cosineh import Cosineh
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Cosineh.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Cosineh.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Cosineh.FUNC_NAME: 1, Arccosineh.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Cosineh.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Cosineh.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arccosineh.FUNC_NAME: -1, Cosineh.FUNC_NAME: 1}, {}, 0
 
     
 
@@ -128,5 +128,5 @@ class Arccosineh(Function):
         :rtype: float
         """
         from math import acosh
-        num=acosh(v0)
+        num=sin(v0)
         return num

@@ -1,4 +1,10 @@
+import importlib
+import inspect
+import os
 import re
+
+from foundation.automat import AUTOMAT_MODULE_DIR
+from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
 class Manipulate:
     """
@@ -10,6 +16,25 @@ class Manipulate:
 
 
     """
+
+    _PATTERN_FILENAMES__CLASSNAMES = {}
+
+    @classmethod
+    def PATTERN_FILENAMES__CLASSNAMES(cls):
+        if len(cls._PATTERN_FILENAMES__CLASSNAMES) == 0:
+            module_dir = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'pattern')
+            for module in os.listdir(module_dir):
+                # print('***', module)
+                if module.endswith('.py') and module != '__init__.py':
+                    module_name = module[:-3] # remove .py
+                    module_obj = importlib.import_module(f'.{module_name}', package='foundation.automat.core.manipulate.pattern')
+                    for cls_name, ocls in inspect.getmembers(module_obj, predicate=inspect.isclass):
+                        if cls_name in ['Manipulate']: # skip the parent of all function
+                            continue
+                        cls._PATTERN_FILENAMES__CLASSNAMES[module_name] = cls_name
+        return cls._PATTERN_FILENAMES__CLASSNAMES
+
+
 
     def __init__(self, equation, direction, idx, verbose=False):
         self.eq = equation
@@ -26,7 +51,7 @@ class Manipulate:
     def initGrammerParser(self):
         #check if inputGrammar has no variables, 
         #if inputGrammar has no variables, then replace the outputGrammar's variables with variable, that is not in eq
-        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar)#memoise the grammarParser TODO
+        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, verbose=self.verbose, recordMaking=True)#memoise the grammarParser TODO
         # if len(self.grammarParser.variables) == 0:
         if len(set(self.grammarParser.outVariables)) > len(set(self.grammarParser.variables)):
             missingMetaVariables = list(set(self.grammarParser.outVariables) - set(self.grammarParser.variables))
@@ -65,7 +90,7 @@ class Manipulate:
         return not self.grammarParser.noMatches
 
 
-    def apply(self):
+    def apply(self, toAst=False):
         """
         #~ DRAFT ~#
         return manipulated equation
@@ -74,9 +99,36 @@ class Manipulate:
             if self.verbose:
                 print(f'{self.outputGrammar} has no grammar')
             return self.outputGrammar # output does not depend on input variables, no manipulation needed.
+        # import pdb;pdb.set_trace()
         if self.applicable(): # here we have matches
-            return self.grammarParser.parse(self.schemeStr)
-        return self.schemeStr
+            manipulatedSchemeWord = self.grammarParser.parse(self.schemeStr)
+            
+            if toAst: 
+
+            # # TODO seems unelegant..., but we should not modify self.eq and it also seems unelegant to instantiate Equation again
+            # # TODO perhaps Manipulate should be a object of Equation?
+
+
+                return Schemeparser(equationStr=manipulatedSchemeWord), self.grammarParser.verPosWord, Schemeparser(equationStr=self.inputGrammar), Schemeparser(equationStr=self.outputGrammar)
+
+            #     print(self.grammarParser.verPosWord)
+            #     self.grammarParser.verPosWord 
+            #     from foundation.automat.parser.sorte.schemeparser import Schemeparser
+            #     iParser = Schemeparser(equationStr=self.schemeStr)
+            #     iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount = iParser._parse() # on this parse the nodeIds are completely different than in the original eq
+            #     oParser = Schemeparser(equationStr=manipulatedSchemeWord)
+            #     oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount = oParser._parse() # on this parse the nodeIds are completely different than in the original eq
+            #     #this means we depend on the grammarParser to tell us, what has been removed at what position. TODO
+
+            #     # import pdb;pdb.set_trace()
+            #     return oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount, oParser.startPos__nodeId, \
+            #     iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount, iParser.startPos__nodeId, \
+            #     self.schemeStr, manipulatedSchemeWord
+            return manipulatedSchemeWord
+        return None # pattern unapplicable
+
+
+
 
 
     def giveMeAVariableNotInThisList(self, varList):

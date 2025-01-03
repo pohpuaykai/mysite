@@ -15,10 +15,15 @@ def test__schemeParserTest__add(verbose=False):
     ('=', 0):[('a', 1), ('+', 2)],
     ('+', 2):[('b', 3), ('c', 4)]
     }
+    expected_startPos__nodeId = {1: 0, 3: 1, 6: 2, 8: 3, 10: 4}
     # unparsedStr = parser._unparse()
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', (ast==expected_ast))
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        parser.startPos__nodeId==expected_startPos__nodeId
+    )
     if verbose:
         pp.pprint(parser.ast)
+        pp.pprint(parser.startPos__nodeId)
 
 
 def test__schemeParserTest__harmonicMean(verbose=False):
@@ -29,15 +34,21 @@ def test__schemeParserTest__harmonicMean(verbose=False):
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
     ast = parser.ast
     pp.pprint(ast)
-    expected_ast = {   ('+', 2): [('/', 5), ('/', 6)],
+    expected_ast = {   
+    ('+', 2): [('/', 5), ('/', 6)],
     ('/', 1): [('1', 3), ('a', 4)],
     ('/', 5): [('1', 7), ('b', 8)],
     ('/', 6): [('1', 9), ('c', 10)],
     ('=', 0): [('/', 1), ('+', 2)]}
+    expected_startPos__nodeId = {1: 0, 4: 1, 6: 3, 8: 4, 12: 2, 15: 5, 17: 7, 19: 8, 23: 6, 25: 9, 27: 10}
     # unparsedStr = parser._unparse()
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', (ast==expected_ast))
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        parser.startPos__nodeId==expected_startPos__nodeId
+    )
     if verbose:
         pp.pprint(parser.ast)
+        pp.pprint(parser.startPos__nodeId)
 
 
 def test__schemeParserTest__phasorDiagram(verbose=False):
@@ -55,10 +66,28 @@ def test__schemeParserTest__phasorDiagram(verbose=False):
     ('^', 1): [('e', 3), ('*', 4)],
     ('cos', 5): [('x', 9)],
     ('sin', 11): [('x', 12)]}
+    expected_startPos__nodeId = {   
+    1: 0,
+    4: 1,
+    6: 3,
+    9: 4,
+    11: 7,
+    13: 8,
+    18: 2,
+    21: 5,
+    25: 9,
+    29: 6,
+    31: 10,
+    34: 11,
+    38: 12}
     # unparsedStr = parser._unparse()
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', (ast==expected_ast))
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        parser.startPos__nodeId==expected_startPos__nodeId
+    )
     if verbose:
         pp.pprint(parser.ast)
+        pp.pprint(parser.startPos__nodeId)
 
 
 def test__schemeParserTest__ebersMollModelp1(verbose=False):
@@ -75,8 +104,15 @@ def test__schemeParserTest__ebersMollModelp1(verbose=False):
     ('/', 8): [('V_{BE}', 9), ('V_T', 10)],
     ('=', 0): [('I_E', 1), ('*', 2)],
     ('^', 5): [('e', 7), ('/', 8)]}
+    expected_startPos__nodeId = {1: 0, 3: 1, 8: 2, 10: 3, 18: 4, 21: 5, 23: 7, 26: 8, 28: 9, 35: 10, 41: 6}
     # unparsedStr = parser._unparse()
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', (ast==expected_ast))
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        parser.startPos__nodeId==expected_startPos__nodeId
+    )
+    if verbose:
+        pp.pprint(parser.ast)
+        pp.pprint(parser.startPos__nodeId)
 
 
 def test__schemeParserTest__earlyEffectModel(verbose=False):
@@ -87,19 +123,68 @@ def test__schemeParserTest__earlyEffectModel(verbose=False):
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
     ast = parser.ast
     pp.pprint(ast)
-    expected_ast = {   ('*', 2): [('I_S', 3), ('*', 4)],
+    expected_ast = {   
+    ('*', 2): [('I_S', 3), ('*', 4)],
     ('*', 4): [('^', 5), ('+', 6)],
     ('+', 6): [('1', 9), ('/', 10)],
     ('/', 8): [('V_{BE}', 11), ('V_T', 12)],
     ('/', 10): [('V_{CE}', 13), ('V_A', 14)],
     ('=', 0): [('I_E', 1), ('*', 2)],
     ('^', 5): [('e', 7), ('/', 8)]}
+    expected_startPos__nodeId = {   
+    1: 0,
+    3: 1,
+    8: 2,
+    10: 3,
+    15: 4,
+    18: 5,
+    20: 7,
+    23: 8,
+    25: 11,
+    32: 12,
+    39: 6,
+    41: 9,
+    44: 10,
+    46: 13,
+    53: 14}
     # unparsedStr = parser._unparse()
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', (ast==expected_ast))
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        parser.startPos__nodeId==expected_startPos__nodeId
+    )
+    if verbose:
+        pp.pprint(parser.ast)
+        pp.pprint(parser.startPos__nodeId)
+
+
+def test__makeSubject__linearEliminationBySubstitution(verbose=False):
+    #https://en.wikipedia.org/wiki/Early_effect#Large-signal_model
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = '(= (* I_{R} R) (- (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}) 0))'
+    parser = Schemeparser(equationStr=equationStr, verbose=verbose)
+    ast = parser.ast
+    pp.pprint(ast)
+    expected_ast = {   
+    ('*', 1): [('I_{R}', 3), ('R', 4)],
+    ('*', 7): [('I_{R_{C}}', 9), ('R_{C}', 10)],
+    ('-', 2): [('-', 5), ('0', 6)],
+    ('-', 5): [('*', 7), ('V^{Q1}_{BE}', 8)],
+    ('=', 0): [('*', 1), ('-', 2)]}
+    expected_startPos__nodeId = {1: 0, 4: 1, 6: 3, 12: 4, 16: 2, 19: 5, 22: 7, 24: 9, 34: 10, 41: 8, 54: 6}
+    # unparsedStr = parser._unparse()
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        parser.startPos__nodeId==expected_startPos__nodeId
+    )
+    if verbose:
+        pp.pprint(parser.ast)
+        pp.pprint(parser.startPos__nodeId)
 
 if __name__=='__main__':
-    test__schemeParserTest__add()
-    test__schemeParserTest__harmonicMean()
-    test__schemeParserTest__phasorDiagram()
-    test__schemeParserTest__ebersMollModelp1()
-    test__schemeParserTest__earlyEffectModel()
+    # test__schemeParserTest__add()
+    # test__schemeParserTest__harmonicMean()
+    # test__schemeParserTest__phasorDiagram()
+    # test__schemeParserTest__ebersMollModelp1()
+    # test__schemeParserTest__earlyEffectModel()
+    test__makeSubject__linearEliminationBySubstitution(True)

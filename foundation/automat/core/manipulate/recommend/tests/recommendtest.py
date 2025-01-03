@@ -9,7 +9,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 
-def test__deriveMetaInformation__basic(verbose=False):
+def test__deriveMetaInformation__basic(verbose=False):#TODO does not work
     eqs = '(= a (+ b c))' # fill it in
     eqsType = 'scheme'
     #filename = 'communtativity'

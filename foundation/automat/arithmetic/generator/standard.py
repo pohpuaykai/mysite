@@ -2,6 +2,7 @@ from jinja2 import Environment, FileSystemLoader
 from json import loads
 import os
 import re
+from yaml import safe_load
 
 from foundation.automat import AUTOMAT_MODULE_DIR, info
 from foundation.automat.common import getMatchesOrNone, recursiveNaiveTraverseAndEditToTuple
@@ -46,15 +47,16 @@ class StandardFunctionClassGenerator:
         #copied from https://realpython.com/primer-on-jinja-templating/
         environment = Environment(loader=FileSystemLoader(os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'generator', 'template', 'standard', 'function')))# put in the full directory
         for filename in os.listdir(self.standardConfigFileFolder):
-            if filename.endswith('.json'): # then its good! sei vorsichtung um nicht zu non-configuration-files zu beitragen
-                if toRun is not None and filename != toRun+'.json':
+            if filename.endswith('.yaml'): # then its good! sei vorsichtung um nicht zu non-configuration-files zu beitragen
+                if toRun is not None and filename != toRun+'.yaml':
                     continue # skip this file
                 if verbose:
                     info(f'processing {filename}')
-                JSONfile = open(os.path.join(self.standardConfigFileFolder, filename), 'r')
+                # JSONfile = open(os.path.join(self.standardConfigFileFolder, filename), 'r')
+                YAMLfile = open(os.path.join(self.standardConfigFileFolder, filename), 'r')
 
-                config = loads(JSONfile.read())
-                JSONfile.close()
+                config = safe_load(YAMLfile.read())
+                YAMLfile.close()
                 #get all keys starting with init
                 keysStartingWithInit = list(filter(lambda key: key.startswith('init_'), config.keys()))
                 initSubstitutionDict = {}

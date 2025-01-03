@@ -15,9 +15,12 @@ class Schemeparser(Parser):
             self.verbose = verbose
             self.veryVerbose = veryVerbose
             self.equalTuple = None
-            self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount = self._parse()
+            # self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId = self._parse()
         else:
+            self.equalTuple = None
             self.ast = ast
+            self.verbose = verbose
+            self.veryVerbose = veryVerbose
 
     def _parse(self):
         """
@@ -41,11 +44,12 @@ class Schemeparser(Parser):
             int,
             int]
         """
+        startPos__nodeId = {} # TODO do the same for LatexParser...
         functionsD = {}# function(str) to no_of_such_functions in the ast(int)
         variablesD = {}# variable(str) to no_of_such_variables in the ast(int)
         primitives = {}# primitives(str) to no_of_such_primities in the ast(int)
         totalNodeCount = 0# total number of nodes in the ast
-        backtrackerRoot = self._recursiveParse(self._eqs, 0) # return pointer to the root ( in process/thread memory)
+        backtrackerRoot = self._recursiveParse(self._eqs, 0, 0) # return pointer to the root ( in process/thread memory)
         if self.verbose:
             print('return from _recursiveParse*************')
         ast = {}
@@ -53,6 +57,7 @@ class Schemeparser(Parser):
             print(f'return from _recursiveParse************* initialised ast: {ast}')
         currentId = 0
         stack = [{'bt':backtrackerRoot, 'tid':currentId}]
+        startPos__nodeId[backtrackerRoot.prev] = currentId
         while len(stack) != 0:
             currentBt = stack.pop(0)
             tid = currentBt['tid']
@@ -76,6 +81,7 @@ class Schemeparser(Parser):
             for neighbour in sorted(current.neighbours, key=lambda neigh: neigh.argumentIdx, reverse=False):
                 currentId += 1
                 neighbourNodes.append((neighbour.label, currentId))
+                startPos__nodeId[neighbour.prev] = currentId # neighbour.prev is actually the startPos of neighbour.label. (SORRY FOR THE CONFUSION! refactor if you want, future-me)
                 stack.append({'bt':neighbour, 'tid':currentId})
             currentNode = (current.label, (current.argumentIdx, current.id))
             if self.verbose:
@@ -83,9 +89,9 @@ class Schemeparser(Parser):
             if len(neighbourNodes) > 0: # avoid putting leaves as keys
                 ast[(current.label, tid)] = neighbourNodes
 
-        return ast, functionsD, variablesD, primitives, totalNodeCount
+        return ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId
 
-    def _recursiveParse(self, eqs, level):
+    def _recursiveParse(self, eqs, level, parentStartPosOffset):
         """
         Handles the syntex of 'Scheme', but just stores the tree in the memory stack of the process/thread
 
@@ -97,7 +103,7 @@ class Schemeparser(Parser):
         :rtype: :class:`Backtracker`
         """
         if self.verbose:
-            print(f'recursive level: {level}, eqs: {eqs}')
+            print(f'recursive level: {level}, eqs: {eqs}, parentOffset: {parentStartPosOffset}')
         if (eqs.startswith('(') and not eqs.endswith(')')) or \
                 (not eqs.startswith('(') and eqs.endswith(')')):
             raise Exception('Closing Brackets Mismatch')
@@ -106,41 +112,55 @@ class Schemeparser(Parser):
             strippedEqs = eqs[1:-1] # remove start and end brackets
             #find procedure label and end position of procedure label
             procedureLabel = ''
+            realProcedureStartPos = parentStartPosOffset + 1 # because we stripped the (
             procedureEndPosition = None
             for idx, c in enumerate(strippedEqs):
                 if c == ' ': # is a space...
                     procedureEndPosition = idx
                     break
                 procedureLabel += c
+            realProcedureEndPos = procedureEndPosition + parentStartPosOffset + 1 # because we stripped the (
             argumentsStr = strippedEqs[procedureEndPosition:].strip()
+            #for original_string position calculation
+            amountStrippedOnLeft = len(strippedEqs[procedureEndPosition:]) - len(strippedEqs[procedureEndPosition:].lstrip())
+            argStrStartPos = realProcedureEndPos + amountStrippedOnLeft # absolute beginning of argStr
+            #
             if self.verbose:
-                print(f'argumentsStr: {argumentsStr}')
+                print(f'argumentsStr: {argumentsStr}', 'procedureEndPosition', procedureEndPosition)
             #find individual arguments START
             bracketCounter = 0 #+1 for '(', -1 for ')'
             currentArgumentStr = ''
             arguments = []
-            for c in argumentsStr:
+            argStartPos = argStrStartPos # absolute beginning of each individual argstr
+            argAmountStrippedOnLeft = 0
+            for jc, c in enumerate(argumentsStr):
                 if self.veryVerbose:
-                    print(c, currentArgumentStr, c == ' ', bracketCounter == 0, '<<<<<<<<<<<<<<12<<<<<<<<<')  
+                    print(c, currentArgumentStr, c == ' ', bracketCounter == 0, '<<<<<<<<<<<<<<12<<<<<<<<<', jc)  
                 currentArgumentStr += c
                 if c == '(':
+                    if bracketCounter == 0:
+                        argStartPos = argStrStartPos + jc
                     bracketCounter += 1
                 elif c == ')':
                     bracketCounter -= 1
                 if c == ' ' and bracketCounter == 0: # (brackets are balanced) and this character c is a space
                     if self.veryVerbose:
-                        print(c, currentArgumentStr, c == ' ', bracketCounter == 0, '<<<<<<<<<<<<<<<<<<<<<<<')
+                        print(c, currentArgumentStr, c == ' ', bracketCounter == 0, '<<<<<<<<<<<<<<<<<<<<<<<', jc)
+                    #for original_string position calculation
+                    argAmountStrippedOnLeft = len(currentArgumentStr) - len(currentArgumentStr.lstrip())
                     currentArgumentStr = currentArgumentStr.strip()
                     if len(currentArgumentStr) > 0:
-                        arguments.append(currentArgumentStr)
+                        arguments.append((currentArgumentStr, argStartPos + argAmountStrippedOnLeft))
+                        argStartPos = argStrStartPos + jc + 1 # +1 for the space
                         currentArgumentStr = ''
             if len(currentArgumentStr) > 0: # left-overs, please eat!
-                arguments.append(currentArgumentStr)
+                arguments.append((currentArgumentStr, argStartPos))
             #find individual argumets END
             if self.verbose:
                 print(f'level: {level}, arguments: {arguments}')
             neighbours = []
-            for argumentIdx, backtrackNeighbour in enumerate(map(lambda argu: self._recursiveParse(argu, level+1), arguments)):
+            # for argumentIdx, backtrackNeighbour in enumerate(map(lambda argu: self._recursiveParse(argu, level+1), arguments)):
+            for argumentIdx, backtrackNeighbour in enumerate(map(lambda tup: self._recursiveParse(tup[0], level+1, tup[1]), arguments)):
                 if self.verbose:
                     print(f'recursive level: {level}, eqs: {eqs}, argumentIdx: {argumentIdx}, id: {backtrackNeighbour.id}, label: {backtrackNeighbour.label}')
                 backtrackNeighbour.argumentIdx = argumentIdx
@@ -149,7 +169,8 @@ class Schemeparser(Parser):
                 procedureLabel, # label
                 neighbours, # neighbours
                 0,#  argumentIdx, will be set by calling process (self._recursiveParse)
-                None, #prev, not used
+                #+1 for the openBracket (
+                realProcedureStartPos, #used as the startPos of procedureLabel, (SORRY FOR THE CONFUSION! refactor if you want, future-me)
                 level, #id,   (depthId)
             )
             #for backtrackNeighbour in neighbours:
@@ -160,13 +181,12 @@ class Schemeparser(Parser):
                 eqs, # label
                 [], # neighbours
                 0, # not used, argumentIdx
-                None, # not used, prev
+                parentStartPosOffset, #used as the startPos of eqs , (SORRY FOR THE CONFUSION! refactor if you want, future-me)
                 level # not used, id
             )
         return rootNode
 
     def _findEqualTuple(self):
-        self.equalTuple = None
         for keyTuple in self.ast.keys():
             if keyTuple[0] == '=':
                 self.equalTuple = keyTuple

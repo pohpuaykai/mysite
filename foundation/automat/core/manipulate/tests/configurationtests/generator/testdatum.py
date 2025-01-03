@@ -297,20 +297,20 @@ TEST_DATUM = {
     },
     "subtractzero": {
         ('vor', '0'): {
-            "input": "(= a (- \"0\" b))",
+            "input": "(= a (- 0 b))",
             "expected": "(= a b)"
         },
         ('hin', '0'): {
             "input": "(= a a)",
-            "expected": "(= (- \"0\" a) (- \"0\" a))"
+            "expected": "(= (- 0 a) (- 0 a))"
         },
         ('vor', '1'): {
-            "input": "(= a (- b \"0\"))",
+            "input": "(= a (- b 0))",
             "expected": "(= a b)"
         },
         ('hin', '1'): {
             "input": "(= a a)",
-            "expected": "(= (- a \"0\") (- a \"0\"))"
+            "expected": "(= (- a 0) (- a 0))"
         }
     },
     "trigonometricequivalence": {

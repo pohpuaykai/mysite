@@ -8,7 +8,12 @@ def {{defName}}(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = {{className}}(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # {{regexUsedComment}}
+    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
     expected = '{{expected}}' # {{returnRegexUsedComment}}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected == manipulatedSchemeEquation)
+    expectedAst = Schemeparser(equationStr=expected).ast
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
     if verbose:
         print(manipulatedSchemeEquation)
+        print(manipulatedAst)

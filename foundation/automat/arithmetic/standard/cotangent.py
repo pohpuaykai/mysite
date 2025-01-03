@@ -68,7 +68,7 @@ class Cotangent(Function):
         
         from foundation.automat.arithmetic.standard.arccotangent import Arccotangent
         
-        return {key0: {"newKey": key0, "newValue": ((Arccotangent.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccotangent.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccotangent.FUNC_NAME: 1, Cotangent.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Arccotangent.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccotangent.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Cotangent.FUNC_NAME: -1, Arccotangent.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Cotangent(Function):
         
         from foundation.automat.arithmetic.standard.arccotangent import Arccotangent
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccotangent.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccotangent.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arccotangent.FUNC_NAME: 1, Cotangent.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccotangent.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccotangent.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Cotangent.FUNC_NAME: -1, Arccotangent.FUNC_NAME: 1}, {}, 0
 
     
 
@@ -128,5 +128,5 @@ class Cotangent(Function):
         :rtype: float
         """
         from math import tan
-        num=1.0/tan(v0)
+        num=sin(v0)
         return num

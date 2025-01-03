@@ -74,7 +74,7 @@ class Latexparser(Parser):
                 '__intraGrenzeSubtreeUe':False,#
                 '__interLevelSubtreeGrafting':False,
                 '_reformatToAST':False,
-                '_latexSpecialCases':False
+                '_latexSpecialCases':True
             }
             def showError(): # TODO this call is very expensive..., maybe write everything to a log file?
                 if self.verbose:
@@ -3167,16 +3167,19 @@ if __name__=='__main__':
             import pdb;pdb.set_trace()
             raise Exception('Equals only have 2 sides')
         #build the AST here...
+        self.latexASTNodeId__startPos = {} # TODO users need to handle implicits (with no len in OG string) in self.alleDing
         nameStartEndToNodeId = {}
         # self.nodeId = 1
         for s in self.alleDing:
             nameStartEndToNodeId[(s['name'], s['startPos'], s['endPos'])] = self.nodeId
+            self.latexASTNodeId__startPos[self.nodeId] = s['position'] if 'position' in s and s['position'] is not None else s['startPos'] # leftOvers have no position #TODO future-me please fix
             self.nodeId += 1
         self.latexAST = {}
         child0Id = nameStartEndToNodeId[(dingsNoParents[0]['name'], dingsNoParents[0]['startPos'], dingsNoParents[0]['endPos'])]
         child1Id = nameStartEndToNodeId[(dingsNoParents[1]['name'], dingsNoParents[1]['startPos'], dingsNoParents[1]['endPos'])]
         # import pdb;pdb.set_trace()
         self.equalTuple = ('=', 0)
+        self.latexASTNodeId__startPos[0] = self.equalPos
         if dingsNoParents[0]['position'] < dingsNoParents[1]['position']:
             self.latexAST[self.equalTuple] = [(dingsNoParents[0]['name'], child0Id), (dingsNoParents[1]['name'], child1Id)]
         else:
@@ -3198,7 +3201,8 @@ if __name__=='__main__':
             pp.pprint(sadchild)
             print("dingsNoParents:")
             print(list(map(lambda d: (d['name'], d['startPos'], d['endPos']), dingsNoParents)))
-
+            print('self.alleDing')
+            print(self.alleDing)
         #############
         for parent in self.alleDing:
             parentId = nameStartEndToNodeId[(parent['name'], parent['startPos'], parent['endPos'])]
@@ -3248,6 +3252,13 @@ if __name__=='__main__':
 
     def _latexSpecialCases(self):
         import copy
+        self.startPos__nodeId = {}
+        latexASTNodeId__startPosc = copy.deepcopy(self.latexASTNodeId__startPos)
+        if self.verbose:
+            print('self.latexASTNodeId__startPos:')
+            print(self.latexASTNodeId__startPos)
+            print('self.latexAST:')
+            print(self.latexAST)
         latexASTCopy = copy.deepcopy(self.latexAST)
         self.ast = {}
         stack = [self.equalTuple]
@@ -3255,14 +3266,18 @@ if __name__=='__main__':
             currentNode = stack.pop()
             nodeName = currentNode[0]
             nodeId = currentNode[1]
+            startPos = latexASTNodeId__startPosc[nodeId]
+
             if nodeName == 'sqrt': # change to nroot
                 nodeName = 'nroot'
                 newNode = (nodeName, nodeId)
                 children = latexASTCopy[currentNode]
                 if len(children) == 1: # is root 2, and we only have the rootant
                     children.insert(0, (2, self.nodeId))
+                    latexASTNodeId__startPosc[self.nodeId] =1 * self.nodeId # does not exist in OG string
                     self.nodeId += 1
                 self.ast[newNode] = children
+                self.startPos__nodeId[startPos] = newNode[1]
                 #replace parent's child too
                 parentNode = None
                 parentChildIndex = None
@@ -3284,8 +3299,10 @@ if __name__=='__main__':
                 newNode = (nodeName, nodeId)
                 children = latexASTCopy[currentNode]
                 children.insert(0, ('e', self.nodeId))
+                latexASTNodeId__startPosc[self.nodeId] =1 * self.nodeId # does not exist in OG string
                 self.nodeId += 1
                 self.ast[newNode] = children
+                self.startPos__nodeId[startPos] = self.nodeId
                 #replace parent's child too
                 parentNode = None
                 parentChildIndex = None
@@ -3306,8 +3323,10 @@ if __name__=='__main__':
                 children = latexASTCopy[currentNode]
                 children = latexASTCopy[currentNode]
                 children.insert(0, (10, self.nodeId))
+                latexASTNodeId__startPosc[self.nodeId] =1 * self.nodeId # does not exist in OG string
                 self.nodeId += 1
                 self.ast[currentNode] = children
+                self.startPos__nodeId[startPos] = self.nodeId
                 stack += latexASTCopy[currentNode]
             elif nodeName == 'frac':
                 nodeName = '/'
@@ -3328,6 +3347,7 @@ if __name__=='__main__':
                     latexASTCopy[parentNode] = children
                 #
                 self.ast[(nodeName, nodeId)] = latexASTCopy[currentNode]
+                self.startPos__nodeId[startPos] = nodeId
                 stack += latexASTCopy[currentNode]
             elif nodeName in self.TRIGOFUNCTION and len(latexASTCopy[currentNode]) == 2: # trig with power
                 powerNode, argNode = latexASTCopy[currentNode]
@@ -3349,10 +3369,13 @@ if __name__=='__main__':
                 #finis replacement de currentNode avec exponentialNode
                 self.nodeId += 1
                 self.ast[exponentialNode] = [currentNode, powerNode]
+                self.startPos__nodeId[-1*startPos] = exponentialNode[1] # this is implicit, does not exist on OG str
                 self.ast[currentNode] = [argNode]
+                self.startPos__nodeId[startPos] = currentNode[1]
                 stack += latexASTCopy[currentNode]
             elif currentNode in latexASTCopy: # latexAST do not contain leaves
                 self.ast[currentNode] = latexASTCopy[currentNode]
+                self.startPos__nodeId[startPos] = currentNode[1]
                 stack += latexASTCopy[currentNode]
 
         #last pass to get the statistics
@@ -3421,7 +3444,7 @@ if __name__=='__main__':
         self._reformatToAST()
         self._latexSpecialCases()
         #TODO Pool multiprocessing with method priorities (Chodai!) -- dependency ha chain desu yo, sou shitara, motto hayaku arimasu ka?
-        return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
+        return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId
 
 
 #################################################################################################unparsing

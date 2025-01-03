@@ -8,7 +8,7 @@ class Logarithmicderivative(Manipulate):
     """
     TYPE = 'derivative_logarithm'
 
-    def __init__(self, equation, direction, idx, verbose):
+    def __init__(self, equation, direction, idx, verbose=False):
         """
 
         """

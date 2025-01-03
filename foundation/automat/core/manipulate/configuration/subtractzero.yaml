@@ -4,15 +4,15 @@ type: "essential"
 manipulations:
   - type: "regex"
     vor:
-      scheme: '(- "0" $0)'
+      scheme: '(- 0 $0)'
       return: "$0"
     hin:
       scheme: "$0"
-      return: '(- "0" $0)'
+      return: '(- 0 $0)'
   - type: "regex"
     vor:
-      scheme: '(- $0 "0")'
+      scheme: '(- $0 0)'
       return: "$0"
     hin:
       scheme: "$0"
-      return: '(- $0 "0")'
+      return: '(- $0 0)'

@@ -1,9 +1,10 @@
 from foundation.automat.common.regexshorts import Regexshorts as rs
+from foundation.automat.common.longestcommonsubsequence import LongestCommonSubsequence
 
 class SchemeGrammarParser:
 
 
-    def __init__(self, inputPattern, outputPattern, verbose=False):
+    def __init__(self, inputPattern, outputPattern, verbose=False, recordMaking=False):
         """
         A parser, that will try to match inputPattern with (variables that begin with $ and end with a number).
         and then places the values of those matched variables, into the outputPattern, that also has
@@ -19,12 +20,15 @@ class SchemeGrammarParser:
         self.verbose=False
         self.rawOutputPattern = outputPattern
         self.rawInputPattern = inputPattern
-        self.inputPattern, self.variables, self.inVariablesAndPos = self.prepareRawPattern(self.rawInputPattern)
-        self.outputPattern, self.outVariables, self.outVariablesAndPos = self.prepareRawPattern(self.rawOutputPattern)
+        self.inputPattern, self.variables, self.inVariablesAndPos, self.inVariablesPosSansVarnumList = self.prepareRawPattern(self.rawInputPattern)
+        self.outputPattern, self.outVariables, self.outVariablesAndPos, self.outVariablesPosSansVarnumList = self.prepareRawPattern(self.rawOutputPattern)
         self.calledBuildEnclosure = False
         self.subsitutedOutputGrammar = self.outputPattern
         self.additionalReplacementStrForVariablesDict = {}
 
+
+        self.recordMaking = recordMaking
+        self.patternChanges()
         import pprint
         self.pp = pprint.PrettyPrinter(indent=4)
 
@@ -36,6 +40,29 @@ class SchemeGrammarParser:
         # this inputPattern is not applicable to this schemeword. Note that, if there are no variables in inputPattern, it might still be a match
         # import pdb;pdb.set_trace()
         self.noMatches = (len(self.id__data) == 2) and (self.id__data[0]['w']==self.id__data[1]['w'])
+
+
+    def patternChanges(self):
+        """
+        ~This is never used~
+
+        calculates 
+        self.iUnmatchedFrags and self.oUnmatchedFrags
+        which are string fragments of 
+        rawInputPattern (self.iUnmatched) that are not matched with rawOutputPattern
+        rawOutputPattern (self.oUnmatched) that are not matched with rawInputPattern
+
+        self.iUnmatched and self.oUnmatched are list of dictionary with 
+        1. w = the unmatched string fragment
+        2. s = start position of the unmatched string
+        3. e = end position of the unmatched string
+
+        Both lists are sorted by start position
+        """
+        # self.iMatchedFrags, self.oMatchedFrags = LongestCommonSubsequence.lcss(self.rawInputPattern, self.rawOutputPattern) # if put raw pattern, the $ number might confuse lcss, when there is same number as a pattern like (- $0 0)
+        self.iMatchedFrags, self.oMatchedFrags, self.iUnmatchedFrags, self.oUnmatchedFrags, self.rejoinedIFrags, self.rejoinedOFrags = LongestCommonSubsequence.lcssWithUnmatchedRejoined(self.inputPattern, self.outputPattern)
+
+
 
 
     def parse(self, schemeword, nodeIdsToSkip=None):
@@ -102,6 +129,7 @@ class SchemeGrammarParser:
         """
         matchingBrackets = {}
         def getNextBalancedPos(beginPos): # innerClass, for memoisation of matchingBrackets
+            #beginPos = (   ALWAYS
             if beginPos in matchingBrackets:
                 return matchingBrackets[beginPos]
             else: # compute matchingBrackets
@@ -130,6 +158,8 @@ class SchemeGrammarParser:
         # firstSuf = patternSegmentedByDollar[1]
         # import pdb;pdb.set_trace()
         ###########
+        # print('schemeword', schemeword)
+        # print('pattern', pattern)
         # print('firstPre', firstPre)
         ###########
         for sPos in rs.lazyPrefixFinder(firstPre, schemeword):
@@ -164,21 +194,72 @@ class SchemeGrammarParser:
                 #     else: # has no function
                 #         suf = ''
                 # import pdb;pdb.set_trace()
-                if schemeword[start+len(pre)] == '(':
+                #########
+                # print('pre|', pre, '|suf|', suf, '|start+len(pre)|', start+len(pre), '|schemeword[start+len(pre)]|', schemeword[start+len(pre)])
+                # print('len(schemeword) < (start+len(pre))', len(schemeword) < (start+len(pre)))
+                # import pdb;pdb.set_trace()
+                # print("schemeword[start+len(pre)] == '('", schemeword[start+len(pre)] == '(')
+                #########
+                if (start+len(pre)) < len(schemeword) and schemeword[start+len(pre)] == '(':
+                    ##########
+                    # print('0!', i, start, pre)
+                    ##########
+                    #
                     nextPos = getNextBalancedPos(start+len(pre)) + 1 # return None if cannot find
+                    ##########
+                    # print('0!nextPos', nextPos, i, start, pre)
+                    ##########
+                    #next nextPos must match suf TODO
+                    # if 
                 else:#variable, find next place that starts with suf
+                    ##########
+                    # print('1!', i, start, pre)
+
+                    ##########
+                    #get longest string from (start+len(pre)), that does not contain round_brackets nor spaces...
                     try:
-                        nextPos = schemeword[start+len(pre):].index(suf) + (start+len(pre))
+                        subStart = start+len(pre)
+                        subEnd = schemeword[start+len(pre):].index(suf) + (start+len(pre))
+                        for j in range(subStart, subEnd+1):
+                            if (schemeword[j].isspace()) or (schemeword[j] in ['(', ')']):
+                                nextPos = j
+                                break
+                        if nextPos == subStart:
+                            nextPos = None # empty string
+                        # else:#next nextPos must match suf TODO
+
+                    ##########
+                        # print('1!nextPos', nextPos, i, start, pre)
+
+                    ##########
                     except:
                         nextPos = None
+                    # try:
+                    #     nextPos = schemeword[start+len(pre):].index(suf) + (start+len(pre))
+                    # except:
+                    #     nextPos = None
                 if nextPos is None: # cannot continue with this sPos
                     break # try the next sPos
                 else:
-                    #import pdb;pdb.set_trace()
                     dollarPoss.append((start+len(pre)+chopped, nextPos+chopped))
                     start = nextPos
-            # import pdb;pdb.set_trace()
-            if len(dollarPoss) == len(patternSegmentedByDollar) - 1: # we got all the dollarPoss
+            #here we need to match the suf, the last thing
+            if len(dollarPoss) > 0:
+                schemewordSufStart = dollarPoss[-1][1]-chopped # -chopped because we don't have the complete schemeword
+                schemewordSufEnd = len(schemeword) # otherwise we could have +chopped here
+                schemewordSuf = schemeword[schemewordSufStart:schemewordSufEnd]
+                # print('!0!', schemewordSuf, schemewordSufStart, schemewordSufEnd)
+                # print('!0!', dollarPoss)
+                # import pdb;pdb.set_trace()
+                schemewordSufToMatch = schemewordSuf[:len(suf)]
+            else:
+                schemewordSufToMatch = suf
+            # print(schemewordSufToMatch, '<<schemewordSufToMatch', suf)
+            if schemewordSufToMatch == suf and len(dollarPoss) == len(patternSegmentedByDollar) - 1: # we got all the dollarPoss
+                # import pdb;pdb.set_trace()
+                ######
+                # print('returning: ', (sPos+chopped, start+len(suf)+chopped, dollarPoss), '*****')
+                ######
                 return sPos+chopped, start+len(suf)+chopped, dollarPoss
 
 
@@ -363,7 +444,7 @@ class SchemeGrammarParser:
             })
         enclosureTree = {} # TODO refactor with EnclosureTree?
         import bisect
-        sortKey = 'ms' # 'cms'
+        sortKey = 's' # 'cms'
         for idx, data in id__data.items():
             if data['pid'] is not None:
                 childIds = enclosureTree.get(data['pid'], [])
@@ -372,6 +453,13 @@ class SchemeGrammarParser:
                 else:
                     startPoss = list(map(lambda idd: id__data[idd][sortKey], childIds))
                     mycms = id__data[data['id']][sortKey]
+                    #
+                    # if data['pid'] == 1:
+                    #     print('~~~~')
+                    #     print('mycms', mycms)
+                    #     print(startPoss)
+                    #     print('~~~~')
+                    #
                     positionToInsert = bisect.bisect_left(startPoss, mycms)
                     childIds.insert(positionToInsert, data['id'])
                 enclosureTree[data['pid']] = childIds
@@ -395,7 +483,7 @@ class SchemeGrammarParser:
         :rtype:
         """
         import re
-        import bisect
+        import bisect # TODO repeated imports REFACTOR?
         variables = []
         # rawVariablesPosList = []
         variablesAndPos = []
@@ -408,13 +496,13 @@ class SchemeGrammarParser:
         variables = list(map(lambda t: t[0], variablesAndPos))
         # import pdb;pdb.set_trace()
         pattern = re.sub(r'\$\d+', '$', rawPattern) # remove the numbers
-        #variablesPosList = []
-        # for m in re.finditer('(\$)', pattern):
-        #     variablesPosList.append((m.start(), m.end(), m.group()))
+        variablesPosSansVarnumList = []
+        for m in re.finditer('(\$)', pattern):
+            variablesPosSansVarnumList.append(m.start())
         #rawVariables__variables = dict(zip(rawVariablesPosList, variablesPosList)) # attach to self, if we need this
         #variables__rawVariables = dict(zip(variablesPosList, rawVariablesPosList)) # attach to self, if we need this
         
-        return pattern, variables, variablesAndPos
+        return pattern, variables, variablesAndPos, variablesPosSansVarnumList
 
 
     def manipulate(self, oWord, variables, outputPattern, inputPattern, id__data, enclosureTree, nodeIdsToSkip):
@@ -438,20 +526,155 @@ class SchemeGrammarParser:
         :return:
         :rtype: str
         """
+        relativeShifts = {}
+        nonVariableChanges = {}
+        #key: nodeId
+        #contains list(tuple):(after_this_pos, how_much_offset_to_ad), NOTE: ONLY works for INPUT PATTERN!
+        rootNonMatches_childId__listOfTupStartPosOffset_i = {}
+        # rootNonMatches_startPos__offset = [] #contains tuple:(after_this_pos, how_much_offset_to_add), NOTE: ONLY works for INPUT PATTERN!
+        #key: nodeId
+        #contains list(tuple):(after_this_pos, how_much_offset_to_ad), NOTE: ONLY works for OUTPUT PATTERN!
+        rootNonMatches_childId__listOfTupStartPosOffset = {} 
+        #
+        nodeId__variables__valuesPos = {} # dict of dict, for computation of rootNonMatches_childId__listOfTupStartPosOffset, actually we only need this info, whose direct_parent is a direct_child of the root. TODO further, SPACE-OPTIMISATION
+        verPosWord = []
         import copy
         def _recursiveManipulate(nodeId):
             # BaseCase
             if nodeId not in enclosureTree: # its a leaf
-                return id__data[nodeId]['w']
+                return id__data[nodeId]['w'], id__data[nodeId]['s']
             # RecursiveCase
+            replaceStrsPos = [] # _recursiveManipulate need to return the startPos of replaceStr too.
             replaceStrs = []
             childIds = enclosureTree[nodeId]
             for childId in childIds: 
                 data = id__data[childId]
-                replaceStr = _recursiveManipulate(data['id'])
+                replaceStr, startPos = _recursiveManipulate(data['id'])
                 replaceStrs.append(replaceStr)
-            if id__data[nodeId]['pid'] is None:#it was not matched to any variables, or inputPattern has no variables :)
+                replaceStrsPos.append((replaceStr, startPos))
+            if id__data[nodeId]['pid'] is None:#it was not matched to any variables, or inputPattern has no variables :), according to def findAll, this is the root, starting Node
                 rWord = copy.deepcopy(oWord)
+                if self.recordMaking and len(nodeId__variables__valuesPos) > 0: # for totally no matches: len(nodeId__variables__valuesPos) > 0
+                    #find the nonVariable changes FOR INPUT PATTERN
+                    accumulatedOffset = 0 #this is the end of the first unmatched frag from pos:0
+                    for childId in childIds:
+                        #
+                        rootNonMatches_childId__listOfTupStartPosOffset_i[childId] = []
+                        #
+                        accumulatedOffset += id__data[childId]['s'] # this is the pre-unmatched(inputPattern)
+                        if len(self.inVariablesPosSansVarnumList) > 0: #inputPattern has variables... need the variableToReplaceStr mapping... from grandChild
+                            #add the pre-non-variable(inputPattern) of the first inVariable. -> accumulatedOffset
+                            # if we store every $varToReplacementStr, at everyNode, in a MAP, then this will not be such a big problem.
+                            # import pdb;pdb.set_trace()
+                            var__valuesPosSansVarnum = nodeId__variables__valuesPos[childId] # should be available since we do bottoms up (recursion)
+                            for listIdx, (var, pos) in enumerate(self.inVariablesAndPos):
+
+                                replaceStr, _ = var__valuesPosSansVarnum[self.inVariablesAndPos[listIdx][0]]
+
+                                #add te pre-non-variable(inputPattern) of this inVariable. -> accumulatedOffset
+                                posSansVarnum = self.inVariablesPosSansVarnumList[listIdx]
+                                if listIdx > 0:
+                                    startPosOnPattern = self.inVariablesPosSansVarnumList[listIdx - 1]
+                                else:
+                                    startPosOnPattern = 0
+
+                                preNonVariableOfInputPattern = self.inputPattern[startPosOnPattern:posSansVarnum]
+                                # - max(0, listIdx - 1) number of variables before this 
+                                rootNonMatches_childId__listOfTupStartPosOffset_i[childId].append((startPosOnPattern, accumulatedOffset - max(0, listIdx - 1))) # seems like the offset positions always over by 1... WHY?
+                                #remember to subtract the total number of $ = listIdx
+                                accumulatedOffset += len(replaceStr) + len(preNonVariableOfInputPattern)
+                        else: # inputPattern has no variables, there should be only 1 match for each childId, and its replaceStr=id__data['childId']['w']
+                            rootNonMatches_childId__listOfTupStartPosOffset_i[childId].append((id__data['childId']['s'], accumulatedOffset))
+                            accumulatedOffset += len(id__data['childId']['w'])
+                    #
+                    if len(self.inVariablesPosSansVarnumList) > 0:
+                        startPosOnPattern = self.inVariablesPosSansVarnumList[listIdx]
+                        replaceStr, _ = var__valuesPosSansVarnum[self.inVariablesAndPos[listIdx-1][0]] # value == replaceStr
+                        rootNonMatches_childId__listOfTupStartPosOffset_i[childId].append((startPosOnPattern, accumulatedOffset - max(0, listIdx)))
+                    # else: # what about for no variables
+
+                    #find the nonVariable changes FOR OUTPUT PATTERN
+                    accumulatedOffset = 0# this is the end of the first unmatched frag from pos:0
+                    for childId in childIds:
+                        #
+                        rootNonMatches_childId__listOfTupStartPosOffset[childId] = []
+                        #
+                        accumulatedOffset += id__data[childId]['s'] # this is the pre-unmatched(outputPattern)
+                        if len(self.outVariablesPosSansVarnumList) > 0: #outputPattern has variables... need the variableToReplaceStr mapping... from grandChild
+                            #add the pre-non-variable(outputPattern) of the first outVariable. -> accumulatedOffset
+                            # if we store every $varToReplacementStr, at everyNode, in a MAP, then this will not be such a big problem.
+                            var__valuesPosSansVarnum = nodeId__variables__valuesPos[childId] # should be available since we do bottoms up (recursion)
+                            #
+                            # print(nodeId__variables__valuesPos)
+                            # import pdb;pdb.set_trace()
+                            #
+                            for listIdx, (var, pos) in enumerate(self.outVariablesAndPos):
+                                replaceStr, _ = var__valuesPosSansVarnum[self.outVariablesAndPos[listIdx][0]]
+                                #minusVarLen = 1
+
+
+                                #add the pre-non-variable(outputPattern) of this outVariable. -> accumulatedOffset
+                                posSansVarnum = self.outVariablesPosSansVarnumList[listIdx]
+                                if listIdx > 0:
+                                    startPosOnPattern = self.outVariablesPosSansVarnumList[listIdx - 1]
+                                else:
+                                    startPosOnPattern = 0
+                                
+                                preNonVariableOfOutputPattern = self.outputPattern[startPosOnPattern:posSansVarnum]
+                                # replaceStr, _ = var__valuesPosSansVarnum[var] # value == replaceStr
+                                #appendedTup[0] is the startPos on the self.outputPattern
+                                rootNonMatches_childId__listOfTupStartPosOffset[childId].append((startPosOnPattern,accumulatedOffset - max(0, listIdx - 1))) # seems like the offset positions always over by 1... WHY?
+                                #remember to subtract the total number of $ = listIdx
+                                #
+                                # print('len(preNonVariableOfOutputPattern)', len(preNonVariableOfOutputPattern), preNonVariableOfOutputPattern)
+                                # print('len(replaceStr)', len(replaceStr), replaceStr)
+                                # print('accumulatedOffset', accumulatedOffset)
+                                # print('going to add: ', len(preNonVariableOfOutputPattern), '+', len(replaceStr), '=', len(preNonVariableOfOutputPattern) + len(replaceStr) - 1)
+                                # print('^^^')
+                                #
+                                accumulatedOffset += len(replaceStr) + len(preNonVariableOfOutputPattern) # - minusVarLen # need to add previous replaceStr
+                                #
+                        else: # outputPattern has no variables, there should be only 1 match for each childId, and its replaceStr=id__data['childId']['w']
+                            rootNonMatches_childId__listOfTupStartPosOffset[childId].append((id__data['childId']['s'], accumulatedOffset))
+                            accumulatedOffset += len(id__data['childId']['w'])
+                            # #NOTE THAT BELOW IS ALSO POSSIBLE (and totally independent of accumulatedOffset):
+                            # rootNonMatches_childId__listOfTupStartPosOffset[childId].append((id__data['childId']['s'], id__data['childId']['s']))
+
+                    #
+                    if len(self.outVariablesPosSansVarnumList) > 0:
+                        startPosOnPattern = self.outVariablesPosSansVarnumList[listIdx]
+                        replaceStr, _ = var__valuesPosSansVarnum[self.outVariablesAndPos[listIdx-1][0]] # value == replaceStr
+                        rootNonMatches_childId__listOfTupStartPosOffset[childId].append((startPosOnPattern, accumulatedOffset - max(0, listIdx)))
+                    # else: # what about for no variables
+
+                # print('listIdx', listIdx, self.outVariablesAndPos)
+                # print(self.outVariablesPosSansVarnumList)
+                # print(startPosOnPattern)
+                # print(accumulatedOffset)
+                # print(rootNonMatches_childId__listOfTupStartPosOffset)
+                # import pdb;pdb.set_trace()
+                #
+
+                # id__data[childIds[0]]['s'] # this is the end of the first unmatched from pos:0
+                # #subsequent unmatches will be the strings between the $ in the outputPattern, plus sum(lens(replaceStr_before_this_unmatched))
+                # accumulatedOffset = id__data[childIds[0]]['s']
+                # for listIdx, (var, patternPos) in enumerate(self.outVariablesAndPos): # note that var, is like childId but for OUTPUTPATTERN
+                #     #map var to childId to val?
+                #     val, _ = variables__valuesPos[var] # val is replaceStr
+                #     startPosOnOutputPattern = self.oVariablesPosSansVarnumList[listIdx]
+                #     rootNonMatches_startPosOnOutputPattern__offset.append((startPosOnOutputPattern, accumulatedOffset))
+
+                #     #
+                #     endPos = self.outVariablesPosSansVarnumList[listIdx] # this gives the startPos of var(listIdx) in the outputPattern
+                #     if listIdx > 0:
+                #         startPos = self.outVariablesPosSansVarnumList[listIdx - 1]
+                #     else:
+                #         startPos = 0
+                #     accumulatedOffset += len(val) + (endPos - startPos + 1) - 1#remember to subtract 1 for the $
+                # rootNonMatches_startPosOnOutputPattern__offset.append((accumulatedOffset+len(val), accumulatedOffset+len(val)))
+                #
+
+
                 if len(variables) == 0: #no variables, then we need to replace with outputPattern instead of replaceStr
                     #but first we need to replace the variables in outputPattern first... with variable/s that in not in equation.
                     #and that is handled by Manipulate :)
@@ -460,10 +683,32 @@ class SchemeGrammarParser:
                 # print('no match')
                 # import pdb;pdb.set_trace()
                 childId__replacedStr = dict(zip(childIds, replaceStrs))
-                for childId in reversed(childIds): #have to replace from the back, else, the frontPositions might shift.
+                for listIdx, childId in enumerate(reversed(childIds)): #have to replace from the back, else, the frontPositions might shift.
                     childData = id__data[childId]
+
+                    if self.recordMaking:
+                        var = self.variables[len(self.variables) - listIdx -1]
+                        #also need to find unmatched parts and do offseting later TODO
+                        verPosWord.append({
+                            't':'n', #nomatch(n)/varonly(v)/patrepl(p)
+                            'd':'a', #addition(a)/removal(r)/positional_shift[edit](e)
+                            'n':nodeId, #nodeId where this was done
+                            's':childData['s'], #start position in original string processed, where this change was done
+                            'e':childData['e'], #end position in original string processed, where this change was done
+                            'w':childId__replacedStr[childId], #string involved in the change
+                            'v':var, #associated variable
+                        })
+                        verPosWord.append({
+                            't':'n', #nomatch(n)/varonly(v)/patrepl(p)
+                            'd':'r', #addition(a)/removal(r)/positional_shift[edit](e)
+                            'n':nodeId, #nodeId where this was done
+                            's':childData['s'], #start position in original string processed, where this change was done
+                            'e':childData['e'], #end position in original string processed, where this change was done
+                            'w':rWord[childData['s']:childData['e']], #string involved in the change
+                            'v':var, #associated variable
+                        })
                     rWord = rs.replaceAtPos(rWord, childData['s'], childData['e'], childId__replacedStr[childId])
-                return rWord
+                return rWord, 0 # since the whole oWord was replaced
             else:
 
                 #len(variables) == 1 and len(replaceStrs) == 2
@@ -483,7 +728,7 @@ class SchemeGrammarParser:
                     #check that remainder is zero
                     if len(childIds)%len(variables) != 0:
                         raise Exception('number of matches(childIds) must be a multiple of number of variables')
-                    multiple = len(childIds)//len(variables)
+                    # multiple = len(childIds)//len(variables)
                     #check well-defined
                     variables__valuesPos = {} # dict to check if variable has more than 1 value mapped
                     for i, childId in enumerate(childIds):
@@ -511,19 +756,58 @@ class SchemeGrammarParser:
                     #then the 'w' becomes the template, and the variables are the replaceStr, and replaceStr are (outputPattern with 'ogVariable' replaced)
                     template = copy.deepcopy(id__data[nodeId]['w'])
                     parentStartOffset = id__data[nodeId]['s']
-                    for childId in reversed(childIds):
+                    nodeId__variables__valuesPos[nodeId] = {}
+                    for listIdx, childId in enumerate(reversed(childIds)):
                         data = id__data[childId]
                         # import pdb;pdb.set_trace()
+                        #make a record to return
+                        # verPosWord.append({
+                        #     's':data['s']- parentStartOffset, # start position of the removed word
+                        #     'e':data['e']- parentStartOffset, # 
+                        #     'o':template[data['s']- parentStartOffset: data['e']- parentStartOffset], # removed word
+                        #     'i':op,
+                        #     'nodeId':nodeId
+                        # })
+                        var, posOnInputPattern = self.inVariablesPosSansVarnumList[len(self.variables) - listIdx -1]
+                        if self.recordMaking:
+                            verPosWord.append({
+                                't':'v', #nomatch(n)/varonly(v)/patrepl(p)
+                                'd':'a', #addition(a)/removal(r)/positional_shift[edit](e)
+                                'n':nodeId, #nodeId where this was done
+                                's':data['s'] - parentStartOffset, #start position in original string processed, where this change was done
+                                'e':data['e'] - parentStartOffset, #end position in original string processed, where this change was done
+                                'w':op, #string involved in the change
+                                'v':var, #associated variable
+                            })
+                            verPosWord.append({
+                                't':'v', #nomatch(n)/varonly(v)/patrepl(p)
+                                'd':'r', #addition(a)/removal(r)/positional_shift[edit](e)
+                                'n':nodeId, #nodeId where this was done
+                                's':data['s'] - parentStartOffset, #start position in original string processed, where this change was done
+                                'e':data['e'] - parentStartOffset, #end position in original string processed, where this change was done
+                                'w':template[data['s']- parentStartOffset: data['e']- parentStartOffset], #string involved in the change
+                                'v':var, #associated variable
+                            })
+                        nodeId__variables__valuesPos[nodeId][var] = (op, posOnInputPattern)
+                        #
+                        # print(nodeId__variables__valuesPos)
+                        # import pdb;pdb.set_trace()
+                        #
                         template = rs.replaceAtPos(template, data['s']- parentStartOffset, data['e']- parentStartOffset, op)
-                    return template
+                    return template, parentStartOffset # = id__data[nodeId]['s']
                 else:
-                    ##################check if there is a match to all variables
+                    ##################check if there is a match to all variables TODO REFACTOR_SAME(1)
                     variables__valuesPos = {} # dict to check if variable has more than 1 value mapped
+                    variables__valuesPosNoVarnum = {}
                     #check if same variable has been mapped to more than 1 value <<< this is not well-defined
                     for varIdx in range(0, len(self.variables)):
                         #very convienent that replaceStrs(values) and self.variables are already aligned in list order :)
-                        variable, pos = self.inVariablesAndPos[varIdx]
+                        variable, pos = self.inVariablesAndPos[varIdx] #TODO can be refactored to self.inVariablesPosSansVarnumList
                         value = replaceStrs[varIdx]
+                        #
+                        posSansVarnum = self.inVariablesPosSansVarnumList[varIdx]
+                        variables__valuesPosNoVarnum[variable] = (value, posSansVarnum)
+                        #
                         existingValuePos = variables__valuesPos.get(variable, (None, None))
                         existingValue, existingPos = existingValuePos
                         if existingValue is not None and existingValue != value: 
@@ -531,29 +815,614 @@ class SchemeGrammarParser:
                             raise Exception(f'{existingValue} was assigned to {variable} at position {existingPos}, and now {value} is being assigned to the same {variable} again. Not well-defined')
                         variables__valuesPos[variable] = (value, pos)
                     ##################
+
+                    nodeId__variables__valuesPos[nodeId] = variables__valuesPosNoVarnum
+                    #
+                    # print(nodeId__variables__valuesPos)
+                    # import pdb;pdb.set_trace()
+                    #
                     if nodeId in nodeIdsToSkip:
                         op = copy.deepcopy(inputPattern)
+                        currentVariablesToReplacement = dict(zip(variables, replaceStrs))
+                        currentVariablesToReplacement.update(self.additionalReplacementStrForVariablesDict)
+                        # print('skippp', nodeId, op)
+                        #actually no change here... no need to replace, can just return... lol you waste computation
+                        #TODO optimise
                     else:
                         op = copy.deepcopy(outputPattern)
-                    # import pdb;pdb.set_trace()
+                        currentVariablesToReplacement = dict(zip(variables, replaceStrs))
+                        currentVariablesToReplacement.update(self.additionalReplacementStrForVariablesDict)
+                        # print('NO skippp', nodeId, op)
+
+                        if self.recordMaking:
+                            #changes in variables from input to output, TODO
+                            # self.inVariablesAndPos
+                            # self.outVariablesAndPos
+                            #1. variables from output might appear more than it appear in output than input
+                            #2. variables from output might appear less than it appear in output than input
+                            #3. variables from input might appear more than it appear in input than output
+                            #4. variables from input might appear less than it appear in input than output
+                            #5. self.oUnmatchedFrags - added (static)
+                            #6. self.iUnmatchedFrags - removed (static)
+                            iVars__count = {}
+                            for var, pos in self.inVariablesAndPos:
+                                iVars__count[var] = iVars__count.get(var, 0) + 1
+                            oVars__count = {}
+                            for var, pos in self.outVariablesAndPos:
+                                oVars__count[var] = oVars__count.get(var, 0) + 1
+                            allUniqueVars = set(map(lambda t: t[0], self.inVariablesAndPos)).union(map(lambda t: t[0], self.outVariablesAndPos))
+
+                            #for iCount == oCount
+                            #precalculate the mapping for amount of change in position for each var that was only transposed
+                            #amount of character shifted
+                            subtractVarIdxLenAccumulator = 0
+                            iVarPosIdxInOGSansVarNumList = []
+                            for idx, (varStr, patternPos) in enumerate(self.inVariablesAndPos):
+                                iVarPosIdxInOGSansVarNumList.append((varStr, patternPos - subtractVarIdxLenAccumulator, idx))
+                                varIdStr = rs.getMatchesOrNone('\$(\d+)', varStr)[0]
+                                subtractVarIdxLenAccumulator += len(varIdStr)
+                            subtractVarIdxLenAccumulator = 0
+                            oVarPosIdxInOGSansVarNumList = []
+                            for idx, (varStr, patternPos) in enumerate(self.outVariablesAndPos):
+                                oVarPosIdxInOGSansVarNumList.append((varStr, patternPos - subtractVarIdxLenAccumulator, idx))
+                                varIdStr = rs.getMatchesOrNone('\$(\d+)', varStr)[0]
+                                subtractVarIdxLenAccumulator += len(varIdStr)
+                            iVar__posIdxInOGList = {}
+                            for var0, pos, idx in iVarPosIdxInOGSansVarNumList:
+                                iVar__posIdxInOGList[var0] = (pos, idx)
+                            oVar__posIdxInOGList = {}
+                            for var0, pos, idx in oVarPosIdxInOGSansVarNumList:
+                                oVar__posIdxInOGList[var0] = (pos, idx)
+                            var__oPositionMinusIPosition = {}
+                            for var0 in allUniqueVars:
+                                if iVars__count.get(var0, 0) == oVars__count.get(var0, 0):
+                                    #
+                                    # print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+                                    # print(var0, currentVariablesToReplacement[var0])
+                                    # print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+                                    #
+                                    iPatternPos, iOGListIdx = iVar__posIdxInOGList[var0]
+                                    oPatternPos, oOGListIdx = oVar__posIdxInOGList[var0]
+                                    #also need to add the 1.preNonVariables, 2. at each var
+                                    totalLenBeforeVar0InRIPattern = 0 
+                                    if len(iVarPosIdxInOGSansVarNumList) > 0 and len(iVarPosIdxInOGSansVarNumList[:iOGListIdx]) == 0: # we still need to add preNonVariable
+                                        totalLenBeforeVar0InRIPattern = len(self.inputPattern[0:iVarPosIdxInOGSansVarNumList[0][1]])
+                                    prevIPatternStartPos = 0
+                                    # print('iTotal before loop', totalLenBeforeVar0InRIPattern)
+                                    for iVar, iPrevPos, iidx in iVarPosIdxInOGSansVarNumList[:iOGListIdx]: # vars before var0 in iPattern
+                                        iNextPos = iPrevPos
+                                        if iidx + 1 <= len(iVarPosIdxInOGSansVarNumList[:iOGListIdx]):
+                                            _, iNextPos, _ = iVarPosIdxInOGSansVarNumList[iidx+1]
+                                        # import pdb;pdb.set_trace()
+                                        # if iidx > 0:
+                                        #     prevVar = iVarPosIdxInOGSansVarNumList[iidx-1][0]
+                                        #     replacedStr = currentVariablesToReplacement[prevVar]
+                                        # else:
+                                        #     replacedStr = ''
+                                        replacedStr = currentVariablesToReplacement[iVar]
+                                        if iidx > 0:
+                                            preNonVariable = self.inputPattern[prevIPatternStartPos+1:iPrevPos] # get rid of the $
+                                        else:
+                                            preNonVariable = self.inputPattern[prevIPatternStartPos:iPrevPos]
+                                        prevIPatternStartPos = iPrevPos
+                                        # if iidx > 0: # for the second var onwards
+                                        #     prevIPatternStartPos += 1 # we need to add 1 to pos to get rid of the $ from the prev Var
+
+                                        # -1 for the $ on the prev # amount of space, from nextStart to prevEnd in pattern(not realised pattern!)
+                                        # print('iTotal before', totalLenBeforeVar0InRIPattern)
+                                        totalLenBeforeVar0InRIPattern +=  len(preNonVariable) + len(replacedStr)# len(currentVariablesToReplacement[iVar]) + (iNextPos - iPrevPos -1) 
+                                        #
+                                        # print('in iloop')
+                                        # print(iVar)
+                                        # print('replacedStr', replacedStr, 'len', len(replacedStr))
+                                        # print('preNonVariable', preNonVariable, 'len', len(preNonVariable))
+                                        # print('iTotal', totalLenBeforeVar0InRIPattern)
+                                        # import pdb;pdb.set_trace()
+                                    #need to add current preNonVariable
+                                    if len(iVarPosIdxInOGSansVarNumList[:iOGListIdx]) > 0: #last preNonVariable
+                                        iPrevPos = iVarPosIdxInOGSansVarNumList[iOGListIdx][1]
+                                        # print(prevIPatternStartPos, iPrevPos, 'adding at last to input: ', self.inputPattern[prevIPatternStartPos+1:iPrevPos], len(self.inputPattern[prevIPatternStartPos+1:iPrevPos]))
+                                        totalLenBeforeVar0InRIPattern += len(self.inputPattern[prevIPatternStartPos+1:iPrevPos])
+                                    
+                                    totalLenBeforeVar0InROPattern = 0
+                                    if len(oVarPosIdxInOGSansVarNumList) > 0 and len(oVarPosIdxInOGSansVarNumList[:oOGListIdx]) == 0: # we still need to add preNonVariable
+                                        totalLenBeforeVar0InROPattern = len(self.outputPattern[0:oVarPosIdxInOGSansVarNumList[0][1]])
+                                    prevOPatternStartPos = 0
+                                    # print('oTotal before', totalLenBeforeVar0InROPattern)
+                                    for oVar, oPrevPos, oidx in oVarPosIdxInOGSansVarNumList[:oOGListIdx]: # vars before var0 in oPattern
+                                        oNextPos = oPrevPos
+                                        if oidx + 1 <= len(oVarPosIdxInOGSansVarNumList[:oOGListIdx]):
+                                            _, oNextPos, _ = oVarPosIdxInOGSansVarNumList[oidx+1]
+
+                                        # if oidx > 0:
+                                        #     prevVar = oVarPosIdxInOGSansVarNumList[iidx-1][0]
+                                        #     replacedStr = currentVariablesToReplacement[prevVar]
+                                        # else:
+                                        #     replacedStr = ''
+                                        replacedStr = currentVariablesToReplacement[oVar]
+                                        if oidx > 0:
+                                            preNonVariable = self.outputPattern[prevOPatternStartPos+1:oPrevPos]
+                                        else:
+                                            preNonVariable = self.outputPattern[prevOPatternStartPos:oPrevPos]
+                                        # preNonVariable = self.outputPattern[prevOPatternStartPos+1:oPrevPos]
+                                        prevOPatternStartPos = oPrevPos
+                                        # if oidx > 0: # for the second var onwards
+                                        #     prevOPatternStartPos += 1 # we need to add 1 to pos to get rid of the $ from the prev Var
+
+                                        #
+                                        # -1 for the $ on the prev # amount of space, from nextStart to prevEnd in pattern(not realised pattern!)
+                                        totalLenBeforeVar0InROPattern +=  len(preNonVariable) + len(replacedStr)# len(currentVariablesToReplacement[oVar]) + (oNextPos - oPrevPos -1) 
+                                        # print('in oloop')
+                                        # print(oVar)
+                                        # print('replacedStr', replacedStr, 'len', len(replacedStr))
+                                        # print('preNonVariable', preNonVariable, 'len', len(preNonVariable))
+                                        # print('oTotal', totalLenBeforeVar0InROPattern)
+                                        # import pdb;pdb.set_trace()
+                                    #need to add current preNonVariable
+                                    if len(oVarPosIdxInOGSansVarNumList[:oOGListIdx]) > 0: #last preNonVariable
+                                        oPrevPos = oVarPosIdxInOGSansVarNumList[oOGListIdx][1]
+                                        # print(prevOPatternStartPos,oPrevPos, 'adding at last to output: ', self.outputPattern[prevOPatternStartPos+1:oPrevPos], len(self.outputPattern[prevOPatternStartPos+1:oPrevPos]))
+                                        totalLenBeforeVar0InROPattern += len(self.outputPattern[prevOPatternStartPos+1:oPrevPos])
+
+                                    var__oPositionMinusIPosition[var0] = totalLenBeforeVar0InROPattern - totalLenBeforeVar0InRIPattern
+                                    ###
+                                    # print('^^^')
+                                    # print(var0)
+                                    # print(currentVariablesToReplacement[var0])
+                                    # print(totalLenBeforeVar0InRIPattern)
+                                    # print(totalLenBeforeVar0InROPattern)
+                                    # print('change:', var__oPositionMinusIPosition[var0])
+                                    # print('^^^')
+                                    # print('variables', variables)
+                                    # print('self.outVariables', self.outVariables)
+                                    # print('childIds', childIds)
+                                    ###
+                                    # var__oPositionMinusIPosition[var0] = totalLenBeforeVar0InRIPattern - totalLenBeforeVar0InROPattern
+                                    # import pdb;pdb.set_trace()
+                            currentVariablesToChildIds = dict(zip(variables, childIds))
+                            # currentVariablesToChildIds = dict(zip(self.outVariables, childIds))
+                            ###
+                            # print('currentVariablesToChildIds', currentVariablesToChildIds)
+                            # print('var__oPositionMinusIPosition')
+                            # print(var__oPositionMinusIPosition)
+                            ###
+
+
+                            # for iCount <> oCount.
+                            iVarPosIdxInOGList = [(t[0], t[1], idx) for idx, t in enumerate(self.inVariablesAndPos)] # t[0] is $102, t[1] is pos
+                            oVarPosIdxInOGList = [(t[0], t[1], idx) for idx, t in enumerate(self.outVariablesAndPos)]
+
+
+
+                            for var in allUniqueVars:
+                                iCount = iVars__count.get(var, 0)
+                                oCount = oVars__count.get(var, 0)
+                                if iCount > oCount: # removed
+                                    #need to add a row in verPosWord for each (iCount - oCount)
+                                    #take out the first (iCount - oCount) of var from self.inVariablesAndPos, we just take in ascending order of Pos
+                                    varWithPosAndIdx = list(filter(lambda t: t[0]==var, iVarPosIdxInOGList))[:(iCount - oCount)]
+                                    # replaceStrsPos
+                                    for v, pos, idxInOGList in varWithPosAndIdx: #note that v==var (since we filtered for var)
+                                        #replaceStrsPos is aligned with inVariablesAndPos 
+                                        replaceStr, startPosInOriginalWord = replaceStrsPos[idxInOGList]
+                                        verPosWord.append({
+                                            't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                                            'd':'r', #addition(a)/removal(r)/positional_shift[edit](e)
+                                            'n':nodeId, #nodeId where this was done
+                                            #removed from old String
+                                            's':startPosInOriginalWord, #start position in original string processed, where this change was done
+                                            'e':startPosInOriginalWord+len(replaceStr), #end position in original string processed, where this change was done
+                                            'w':replaceStr, #string involved in the change
+                                            'v':var, #associated variable
+                                        })
+                                elif iCount < oCount: # added
+                                    #additions positions only make sense in the outputStr, since additions might not even inputPattern...
+                                    #need to add a row in verPosWord for each (oCount - iCount)
+                                    #take out the first (oCount - iCount) of var from self.outVariablesAndPos, we just take in ascending order of Pos
+                                    varWithPosAndIdx = list(filter(lambda t: t[0]==var, oVarPosIdxInOGList))[:(oCount - iCount)]
+                                    for v, pos, idxInOGList in varWithPosAndIdx: #note that v==var (since we filtered for var)
+                                        #replaceStrsPos is not aligned with outVariables...
+                                        value, _ = variables__valuesPos[v]
+                                        verPosWord.append({
+                                            't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                                            'd':'a', #addition(a)/removal(r)/positional_shift[edit](e)
+                                            'n':nodeId, #nodeId where this was done
+                                            #added to new String TODO can we make this to absolute position
+                                            's':pos, #relative( to outPattern) start position in new string processed, where this change was done
+                                            'e':pos+len(replaceStr), #relative( to outPattern) end position in new string processed, where this change was done
+                                            'w':value, #string involved in the change
+                                            'v':var, #associated variable
+                                        })
+                                else: # what if there is only a positional shift, but no change in number of variables between inVariables and outVariables
+
+                                    # print('IIIIIII AMMMMMMM HEREEREREREEEE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', iCount, oCount)
+                                    #then there will be difference in order between iVarPosIdxInOGList and [('$1', 3, 0), ('$0', 6, 1)]
+                                    # oVarPos__idxInOGList = {}
+                                    # for var, pos, idx in self.oVarPosIdxInOGList:
+                                    #     oVarPos__idxInOGList[(var, pos)] = idx
+                                    #match and find positional differences
+                                    varWithPosAndIdx = list(filter(lambda t: t[0]==var, oVarPosIdxInOGList))
+                                    #need to subtract sum of len of numberId(v) of all the v before var (to get absolute position)
+                                    for oVar, oPos, oIdx in varWithPosAndIdx:
+                                        # print('~0')
+                                        iPos, iIdx = iVar__posIdxInOGList[oVar]
+                                        # print('~1', 'posDiff:', oPos, iPos, 'idxDiff:', oIdx, iIdx)
+                                        # if oIdx != iIdx: # position was shifted..., TODO but this is only in the variablelist. if position of variable was shifted in the actual, but not in variable list, this will not be detected.
+                                        if oPos != iPos:
+                                            # print('~2')
+                                            #replaceStrsPos is aligned with inVariablesAndPos 
+                                            # replaceStr, startPosInOriginalWord = replaceStrsPos[oIdx] # comes from input
+                                            # print('~3')
+                                            # replacedStr, _ = replaceStrsPos[iidx]
+                                            replacedStr = currentVariablesToReplacement[oVar] # should be the same as currentVariablesToReplacement[iVar]
+
+                                            # import pdb;pdb.set_trace()
+                                            # verPosWord.append({
+                                            #     't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                                            #     'd':'e', #addition(a)/removal(r)/positional_shift[edit](e)
+                                            #     'n':nodeId, #nodeId where this was done
+                                            #     #NOT THE RIGHT LABELs....TODO do something about it?
+                                            #     's':startPosInOriginalWord, #start position in original string processed, where this change was done
+                                            #     #'e' need to subtract sum of len(arg) before this in the outPattern
+                                            #     #original + positionalChangeWithinSubString + (sumOfParentsChangesInPosition)
+                                            #     #TODO cannot be done in recursion... because the parent's changes are not computed yet, have to DFS enclosureTree, after recursion
+                                            #     'e':startPosInOriginalWord + var__oPositionMinusIPosition[oVar], #end position in original string processed, where this change was done
+
+                                            #     'w':replaceStr, #string involved in the change
+                                            #     'v':var, #associated variable
+                                            # })
+                                            # import pdb;pdb.set_trace()
+                                            associatedChildId = currentVariablesToChildIds[var]
+                                            # print('~4')
+                                            relativeShifts[associatedChildId] = {
+                                            #relativeShifts[(nodeId, var)] = { # nodeId is parentId, 
+                                                'change': var__oPositionMinusIPosition[oVar],
+                                                'replaceStr':replacedStr,
+                                                'var':var
+                                            }
+                                            # print('~5')
+                                            # print(currentVariablesToChildIds)
+                                            # print(var)
+                                            # print(oVar)
+                                            # print(var, associatedChildId, replaceStr, var__oPositionMinusIPosition[oVar])
+                                            # print('associatedChildId')
+                                            # print(associatedChildId)
+                                            # print('replaceStr')
+                                            # print(replaceStr)
+                                            # print('replaceStrsPos')
+                                            # print(replaceStrsPos)
+                                            # print('appended:')
+                                            # print({
+                                            # #relativeShifts[(nodeId, var)] = { # nodeId is parentId, 
+                                            #     'change': var__oPositionMinusIPosition[oVar],
+                                            #     'replaceStr':replaceStr,
+                                            #     'var':var
+                                            # })
+                                            # print(relativeShifts)
+                                            # # import pdb;pdb.set_trace()
+                                            # print('*******')
+
+
+                                    # import pdb;pdb.set_trace()
+
+
+
+
+
+                        
+                            #join all the oUnmatchedFrags and matchedFrags and oVariables of same nodeId -> combinedFrag will be schemeparsable
+                            #join all the iUnmatchedFrags and matchedFrags and iVariables of same nodeId -> combinedFrag will be schemeparsable
+                            #Schemeparsable since 
+                            #1. what remaining (after all these replacements), is schemeparsable
+                            #2. before processing by this, it was schemeparsable
+                            #3. each pattern is schemeparsable
+                            #but is has to correspond to the actual inputoutput (cannot be relative) and also exclude variable changes TODO
+                            #and again, the parent's changes are not calculated at this point in the code.
+                            # we have to use relativeShifts' method, and then DFS after the recursiveParse.
+                            #relatveShifts dictionary keys does not fit this...
+
+                            ###
+
+                            # print(self.rejoinedIFrags)
+                            # print(self.rejoinedOFrags)
+                            # iVarPosIdxInOGSansVarNumList
+                            # ipos__varNumReplaceStr = {}
+                            # for var, patternPos, listPos in iVarPosIdxInOGSansVarNumList:
+                            #     ipos__varNumReplaceStr[patternPos] = currentVariablesToReplacement[var]
+                            # opos__varNumReplaceStr = {}
+                            # for var, patternPos, listPos in oVarPosIdxInOGSansVarNumList:
+                            #     opos__varNumReplaceStr[patternPos] = currentVariablesToReplacement[var]
+                            # def replaceFragVarAndCalculateStartPos(rejoinedFrags, pos__varNumReplaceStr):
+                            #     replacedFrags = []
+                            #     accumulatedPosIncrements = 0
+                            #     accumulatedDollar = 0
+                            #     for frag in rejoinedFrags:
+                            #         newFrag = copy.deepcopy(frag)
+                            #         if '$' in frag['w']:
+                            #             replaceStr = pos__varNumReplaceStr[frag['s']+frag['w'].index('$')]
+                            #             newFrag['os'] = copy.copy(newFrag['s']) # for outputPattern rootNonMatches_startPosOnOutputPattern__offset
+                            #             newFrag['s'] += accumulatedPosIncrements - accumulatedDollar
+                            #             accumulatedPosIncrements += len(replaceStr)
+                            #             newFrag['e'] += accumulatedPosIncrements - accumulatedDollar
+                            #             newFrag['fw'] = newFrag['w'].replace('$', replaceStr)
+                            #             accumulatedDollar += 1
+                            #         else:
+                            #             newFrag['os'] = copy.copy(newFrag['s']) # for outputPattern rootNonMatches_startPosOnOutputPattern__offset
+                            #             newFrag['s'] += accumulatedPosIncrements - accumulatedDollar
+                            #             newFrag['e'] += accumulatedPosIncrements - accumulatedDollar
+                            #             newFrag['fw'] = newFrag['w']
+                            #         # import pdb;pdb.set_trace()
+                            #         replacedFrags.append(newFrag)
+                            #     return replacedFrags
+                            # ###
+                            # print('self.rejoinedIFrags:')
+                            # print(self.rejoinedIFrags)
+                            # print('self.rejoinedOFrags')
+                            # print(self.rejoinedOFrags)
+                            # ###
+                            # for replacedFrag in replaceFragVarAndCalculateStartPos(self.rejoinedIFrags, ipos__varNumReplaceStr):
+                            #     if not replacedFrag['matched']: #input and not(matched) => deletion
+                            #         existingList = nonVariableChanges.get(nodeId, [])
+                            #         existingList.append({#need to subtract the number of $ before this frag from s and e... TODO
+                            #             'd':'r', # actually 'r' is always only from input... 
+                            #             's':replacedFrag['s'],
+                            #             'e':replacedFrag['e'],
+                            #             'w':replacedFrag['w'],
+                            #             'fw':replacedFrag['fw'],
+                            #             # 'f':'i' # from inputPattern
+                            #         })
+                            #         nonVariableChanges[nodeId] = existingList
+                            # for replacedFrag in replaceFragVarAndCalculateStartPos(self.rejoinedOFrags, opos__varNumReplaceStr):
+                            #     if not replacedFrag['matched']: #output and not(matched) => addition
+                            #         existingList =  nonVariableChanges.get(nodeId, [])
+                            #         existingList.append({#need to subtract the number of $ before this frag from s and e... TODO
+                            #             'd':'a', # also 'a' is always only from output...
+                            #             's':replacedFrag['s'],
+                            #             'e':replacedFrag['e'],
+                            #             'w':replacedFrag['w'],
+                            #             'fw':replacedFrag['fw'],
+                            #             'os':replacedFrag['os']
+                            #         })
+                            #         nonVariableChanges[nodeId] = existingList
+                            #         # import pdb;pdb.set_trace()
+
+
+                            ipos__varNumReplaceStr = {}
+                            for var, patternPos, listPos in iVarPosIdxInOGSansVarNumList:
+                                ipos__varNumReplaceStr[patternPos] = currentVariablesToReplacement[var]
+                            opos__varNumReplaceStr = {}
+                            for var, patternPos, listPos in oVarPosIdxInOGSansVarNumList:
+                                opos__varNumReplaceStr[patternPos] = currentVariablesToReplacement[var]
+                            import bisect#TODO refactor
+                            # print('self.rejoinedIFrags', self.rejoinedIFrags)
+                            for frag in self.rejoinedIFrags:
+                                if not frag['matched']: #input and not(matched) => deletion
+                                    #
+                                    idx = bisect.bisect_right(self.inVariablesPosSansVarnumList, frag['s']) - 1 # idx of the variable to start the preNonVariable
+                                    if idx < 0:
+                                        varEndPos = 0
+                                    else:
+                                        varEndPos = self.inVariablesPosSansVarnumList[idx] + 1
+                                    preNonVariable = self.inputPattern[varEndPos:frag['s']]
+                                    # print('frag', frag)
+                                    # print('idx', idx)
+                                    # print('self.inVariablesPosSansVarnumList', self.inVariablesPosSansVarnumList)
+                                    # print('varEndPos', varEndPos)
+                                    # print('preNonVariable|', preNonVariable)
+                                    # import pdb;pdb.set_trace()
+                                    #
+                                    if '$' in frag['w']:
+                                        replaceStr = ipos__varNumReplaceStr[frag['s']+frag['w'].index('$')]
+                                        w = frag['w'].replace('$', replaceStr)
+                                        # ns = frag['s'] -1 + len(replaceStr)
+                                        ne = frag['e'] -1 + len(replaceStr)
+                                        # import pdb;pdb.set_trace() # what should the preNonVariable be? TODD
+                                    else:
+                                        w = frag['w']
+                                        # ns = frag['s']
+                                        ne = frag['e']
+                                    existingList = nonVariableChanges.get(nodeId, [])
+                                    existingList.append({
+                                        'd':'r', # actually 'r' is always only from input...
+                                        's':frag['s'],
+                                        'e':ne,#frag['e'],
+                                        'w':w,#frag['w'],
+                                        'p':preNonVariable # in pattern
+                                    })
+                                    nonVariableChanges[nodeId] = existingList
+                            for frag in self.rejoinedOFrags:
+                                if not frag['matched']: #output and not(matched) => addition
+                                    #
+                                    idx = bisect.bisect_right(self.outVariablesPosSansVarnumList, frag['s']) - 1
+                                    if idx < 0:
+                                        varEndPos = 0
+                                    else:
+                                        varEndPos = self.outVariablesPosSansVarnumList[idx] + 1
+                                    preNonVariable = self.outputPattern[varEndPos:frag['s']]
+                                    # print('self.outVariablesPosSansVarnumList', self.outVariablesPosSansVarnumList)
+                                    # print('varEndPos', varEndPos)
+                                    # print('preNonVariable|', preNonVariable)
+                                    # import pdb;pdb.set_trace()
+                                    #
+                                    if '$' in frag['w']:
+                                        replaceStr = opos__varNumReplaceStr[frag['s']+frag['w'].index('$')]
+                                        w = frag['w'].replace('$', replaceStr)
+                                        # ns = frag['s'] -1 + len(replaceStr)
+                                        ne = frag['e'] -1 + len(replaceStr)
+                                    else:
+                                        w = frag['w']
+                                        # ns = frag['s']
+                                        ne = frag['e']
+                                    existingList = nonVariableChanges.get(nodeId, [])
+                                    existingList.append({
+                                        'd':'a',
+                                        's':frag['s'],
+                                        'e':ne,#frag['e'],
+                                        'w':w,#frag['w']
+                                        'p':preNonVariable # in pattern
+                                    })
+                                    nonVariableChanges[nodeId] = existingList
+
+
+                            # print(nonVariableChanges)
+                            # import pdb;pdb.set_trace()
                     #there might be more unique variables in outputPattern than variables in inputPattern, see #logarithmtest.test__hin4__configTest
                     # if len(set(self.outVariables)) > len(set(self.variables)):
                     #     #then we need to create variables, which should be handled by manipulate.py?
                     #     missingVariables = list(set(self.outVariables) - set(self.variables))
                     #     varList = self.variables
                     #match&not_just_variable_and_space&less_variable_available
-                    currentVariablesToReplacement = dict(zip(variables, replaceStrs))
-                    currentVariablesToReplacement.update(self.additionalReplacementStrForVariablesDict)
+
+
+                    # currentVariablesToReplacement = dict(zip(variables, replaceStrs))
+                    # currentVariablesToReplacement.update(self.additionalReplacementStrForVariablesDict)
                     for variable, replaceStr in currentVariablesToReplacement.items(): # childId are in the order of the variables in inputPattern
                         op = op.replace(variable, replaceStr)
-                    # print('match')
+                    # print('match', op)
                     # import pdb;pdb.set_trace()
-                    return op
+                    return op, id__data[nodeId]['s'] 
         ##############
         # print('*******')
         # import pdb;pdb.set_trace()
         ##############
-        manipulatedSchemeEquationStr = _recursiveManipulate(0) # root__nodeId is always 0
+        manipulatedSchemeEquationStr, replaceStartPos = _recursiveManipulate(0) # root__nodeId is always 0
+
+        ####
+        # import pprint
+        # pp = pprint.PrettyPrinter(indent=4)
+        # print('relativeShifts')
+        # pp.pprint(relativeShifts)
+        # print('enclosureTree')
+        # pp.pprint(enclosureTree)
+        # print('id__data')
+        # pp.pprint(id__data)
+        ####
+        if self.recordMaking:
+            import bisect #TODO refactor
+            stack = [(0, 0)] # TODO nodeId=0 contains non-matched frags too and must be added as offset...
+            while len(stack) > 0:
+                parentNodeId, parentChange = stack.pop()
+                #
+
+                # print(rootNonMatches_startPos__offset)
+                # print('looking for', id__data[parentNodeId]['s'])
+                # print('index in rootNonMatches_startPos__offset:', bisect.bisect_left(
+                    # rootNonMatches_startPos__offset, id__data[parentNodeId]['s'], key=lambda tup: tup[0]))
+                # parentOffsetByNonMatchesOfRoot = rootNonMatches_startPos__offset[bisect.bisect_left(
+                #     rootNonMatches_startPos__offset, id__data[parentNodeId]['s'], key=lambda tup: tup[0])][1]
+                # print("parentOffsetByNonMatchesOfRoot", parentOffsetByNonMatchesOfRoot)
+
+                # print('rootNonMatches_startPos__offset')
+                # print(rootNonMatches_startPos__offset)
+                #
+                #do the non-variable changes
+                for frag in nonVariableChanges.get(parentNodeId, []):
+                    if frag['d'] == 'a': # its take from outputPattern
+                        # print('rootNonMatches_childId__listOfTupStartPosOffset', rootNonMatches_childId__listOfTupStartPosOffset)
+
+                        patternStartPos_offsetTupList = rootNonMatches_childId__listOfTupStartPosOffset[parentNodeId]
+                        # print('patternStartPos_offsetTupList', patternStartPos_offsetTupList)
+                        offsetIdx = bisect.bisect_right(patternStartPos_offsetTupList, frag['s'], key=lambda tup: tup[0]) - 1 #somehow need to minus 1...
+                        # print('offsetIdx', offsetIdx)
+                        s = len(frag['p']) + patternStartPos_offsetTupList[offsetIdx][1]
+                        # print('patternStartPos_offsetTupList', patternStartPos_offsetTupList)
+                        # print('offsetIdx: ', offsetIdx, 'startPos_offsetTup:', patternStartPos_offsetTupList[offsetIdx])
+                        # print('frag s', frag['s'])
+                        # print('frag e', frag['e'])
+                        # print('frag p', len(frag['p']))
+                        # print('offsetted s:', len(frag['p']), '+', patternStartPos_offsetTupList[offsetIdx][1], '=', s)
+                        # print('frag', frag)
+                        # print('~~~~~~~~~~~~~~~~~~~~~~')
+                        verPosWord.append({
+                            't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                            'd':frag['d'], #addition(a)/removal(r)/positional_shift[edit](e)
+                            'n':parentNodeId, #nodeId where this was done
+                            's':s, #relative( to outPattern) start position in new string processed, where this change was done
+                            'e':s+len(frag['w']), #relative( to outPattern) end position in new string processed, where this change was done
+                            'w':frag['w'], #string involved in the change
+                            'v':None, #associated variable
+                        })
+                        # import pdb;pdb.set_trace()
+                    else:# its take from inputPattern
+
+                        patternStartPos_offsetTupList = rootNonMatches_childId__listOfTupStartPosOffset_i[parentNodeId]
+                        # print(frag['s'], 'in', 'patternStartPos_offsetTupList', patternStartPos_offsetTupList)
+                        offsetIdx = bisect.bisect_right(patternStartPos_offsetTupList, frag['s'], key=lambda tup: tup[0]) - 1 #somehow need to minus 1...
+                        # print('offsetIdx', offsetIdx)
+                        s = len(frag['p']) + patternStartPos_offsetTupList[offsetIdx][1]
+                        # print('patternStartPos_offsetTupList', patternStartPos_offsetTupList)
+                        # print('offsetIdx: ', offsetIdx, 'startPos_offsetTup:', patternStartPos_offsetTupList[offsetIdx])
+                        # print('frag s', frag['s'])
+                        # print('frag e', frag['e'])
+                        # print('frag p', len(frag['p']))
+                        # print('offsetted s:', len(frag['p']), '+', patternStartPos_offsetTupList[offsetIdx][1], '=', s)
+                        # print('frag', frag)
+                        # print('~~~~~~~~~~~~~~~~~~~~~~')
+                        # import pdb;pdb.set_trace()
+                        verPosWord.append({
+                            't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                            'd':frag['d'], #addition(a)/removal(r)/positional_shift[edit](e)
+                            'n':parentNodeId, #nodeId where this was done
+                            's':s, #relative( to outPattern) start position in new string processed, where this change was done
+                            'e':s+len(frag['w']), #relative( to outPattern) end position in new string processed, where this change was done
+                            'w':frag['w'], #string involved in the change
+                            'v':None, #associated variable
+                        })
+
+
+                        # offset = parentOffsetByNonMatchesOfRoot
+                        # verPosWord.append({
+                        #     't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                        #     'd':frag['d'], #addition(a)/removal(r)/positional_shift[edit](e)
+                        #     'n':parentNodeId, #nodeId where this was done
+                        #     's':offset+frag['s'], #relative( to outPattern) start position in new string processed, where this change was done
+                        #     'e':offset+frag['e'], #relative( to outPattern) end position in new string processed, where this change was done
+                        #     'w':frag['w'], #string involved in the change
+                        #     'v':None, #associated variable
+                        # })
+                #####
+                # print('####')
+                # print(parentNodeId)
+                # print(parentChange)
+                # print('relativeShifts', relativeShifts)
+                # print('####')
+                #####
+                children = enclosureTree.get(parentNodeId, [])
+                for childNodeId in children:
+                    rsd = relativeShifts.get(childNodeId)
+                    # for var in shiftVariables: # var corresponed to a childNodeId, need to get it from id__data....
+                    #     #d = relativeShifts.get((parentNodeId, var))
+                    change = parentChange
+                    if rsd is not None:
+                        change += rsd['change']
+                        ####
+                        # print('####')
+                        # print('childNodeId', childNodeId)
+                        # print('replaceStr', rsd['replaceStr'])
+                        # print('change', rsd['change'])
+                        # print('parentChange:', parentChange)
+                        # print('s', id__data[childNodeId]['s'])
+                        # print(change)
+                        # print('####')
+                        ####
+
+                        verPosWord.append({
+                            't':'p', #nomatch(n)/varonly(v)/patrepl(p)
+                            'd':'e', #addition(a)/removal(r)/positional_shift[edit](e)
+                            'n':childNodeId, #nodeId where this was done
+                            #NOT THE RIGHT LABELs....TODO do something about it?
+                            's':id__data[childNodeId]['s'], #start position in original string processed, where this change was done
+                            #'e' need to subtract sum of len(arg) before this in the outPattern
+                            #original + positionalChangeWithinSubString + (sumOfParentsChangesInPosition)
+                            #TODO cannot be done in recursion... because the parent's changes are not computed yet, have to DFS enclosureTree, after recursion
+                            'e':id__data[childNodeId]['s'] + change, #end position in original string processed, where this change was done
+
+                            'w':rsd['replaceStr'], #string involved in the change
+                            'v':rsd['var'], #associated variable
+                        })
+                    stack.append((childNodeId, change))
+
+        self.verPosWord = verPosWord
         return manipulatedSchemeEquationStr
 
 

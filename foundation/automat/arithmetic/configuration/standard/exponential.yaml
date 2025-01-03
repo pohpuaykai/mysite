@@ -1,0 +1,128 @@
+imports:
+- from foundation.automat.arithmetic.function import Function
+init_className:
+  code: '@cN@'
+  full: Exponential
+init_funcName:
+  code: '@fN@'
+  full: ^
+init_string_newKey:
+  code: '@vnK@'
+  full: newKey
+init_string_newValue:
+  code: '@vnV@'
+  full: newValue
+init_type:
+  code: '@te@'
+  full: other
+init_variableName_funcName:
+  code: '@vfN@'
+  full: FUNC_NAME
+init_variableName_key0:
+  code: '@vk0@'
+  full: key0
+init_variableName_key1:
+  code: '@vk1@'
+  full: key1
+init_variableName_replacementDictionary:
+  code: '@vrD@'
+  full: replacementDictionary
+init_variableName_totalNodeCount:
+  code: '@vtN@'
+  full: totalNodeCount
+return_calculation:
+- code:
+  - num=pow(v0, v1)
+  imports:
+  - from math import pow
+  variableCount: 2
+return_reverse:
+  reversedAst:
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - - '@cN_Nroot@.@vfN@'
+        - '@id_0_1@'
+      - '@item_1_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_Nroot@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_1_1@'
+      - '@item_0_0@'
+    argumentIdx: 0
+    equationSide: R
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_Nroot@.@vfN@': 1
+    imports:
+    - from foundation.automat.arithmetic.standard.nroot import Nroot
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - - '@cN_Logarithm@.@vfN@'
+        - '@id_0_1@'
+      - '@item_1_1@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_Logarithm@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_1_0@'
+      - '@item_0_0@'
+    argumentIdx: 1
+    equationSide: R
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_Logarithm@.@vfN@': 1
+    imports:
+    - from foundation.automat.arithmetic.standard.logarithm import Logarithm
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - '@item_1_0@'
+      - - '@cN_Nroot@.@vfN@'
+        - '@id_0_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_Nroot@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_1_1@'
+      - '@item_0_1@'
+    argumentIdx: 0
+    equationSide: L
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_Nroot@.@vfN@': 1
+    imports:
+    - from foundation.automat.arithmetic.standard.nroot import Nroot
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - '@item_1_1@'
+      - - '@cN_Logarithm@.@vfN@'
+        - '@id_0_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_Logarithm@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_1_0@'
+      - '@item_0_1@'
+    argumentIdx: 1
+    equationSide: L
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_Logarithm@.@vfN@': 1
+    imports:
+    - from foundation.automat.arithmetic.standard.logarithm import Logarithm
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0

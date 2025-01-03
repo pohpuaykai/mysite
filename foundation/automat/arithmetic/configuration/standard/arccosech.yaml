@@ -1,0 +1,82 @@
+imports:
+- from foundation.automat.arithmetic.function import Function
+init_className:
+  code: '@cN@'
+  full: Arccosecanth
+init_funcName:
+  code: '@fN@'
+  full: arccosech
+init_string_newKey:
+  code: '@vnK@'
+  full: newKey
+init_string_newValue:
+  code: '@vnV@'
+  full: newValue
+init_type:
+  code: '@te@'
+  full: trigonometric
+init_variableName_funcName:
+  code: '@vfN@'
+  full: FUNC_NAME
+init_variableName_key0:
+  code: '@vk0@'
+  full: key0
+init_variableName_key1:
+  code: '@vk1@'
+  full: key1
+init_variableName_replacementDictionary:
+  code: '@vrD@'
+  full: replacementDictionary
+init_variableName_totalNodeCount:
+  code: '@vtN@'
+  full: totalNodeCount
+return_calculation:
+- code:
+  - num=sin(v0)
+  imports:
+  - from math import acosh
+  variableCount: 1
+return_reverse:
+  reversedAst:
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - - '@cN_Cosecanth@.@vfN@'
+        - '@id_0_1@'
+      - '@item_1_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_Cosecanth@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_0_0@'
+    argumentIdx: 0
+    equationSide: R
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_Cosecanth@.@vfN@': 1
+    imports:
+        - from foundation.automat.arithmetic.standard.cosecanth import Cosecanth
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+      '@vnV@':
+      - '@item_1_0@'
+      - - '@cN_Cosecanth@.@vfN@'
+        - '@id_0_0@'
+    '@vk1@':
+      '@vnK@':
+      - '@cN_Cosecanth@.@vfN@'
+      - '@idk_1@'
+      '@vnV@':
+      - '@item_0_1@'
+    argumentIdx: 0
+    equationSide: L
+    functionCountAdded:
+      '@cN@.@vfN@': -1
+      '@cN_Cosecanth@.@vfN@': 1
+    imports:
+    - from foundation.automat.arithmetic.standard.cosecanth import Cosecanth
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0

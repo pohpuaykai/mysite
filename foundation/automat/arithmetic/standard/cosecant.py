@@ -68,7 +68,7 @@ class Cosecant(Function):
         
         from foundation.automat.arithmetic.standard.arccosecant import Arccosecant
         
-        return {key0: {"newKey": key0, "newValue": ((Arccosecant.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccosecant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Arccosecant.FUNC_NAME: 1, Cosecant.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Arccosecant.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arccosecant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Cosecant.FUNC_NAME: -1, Arccosecant.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -111,7 +111,7 @@ class Cosecant(Function):
         
         from foundation.automat.arithmetic.standard.arccosecant import Arccosecant
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosecant.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccosecant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Arccosecant.FUNC_NAME: 1, Cosecant.FUNC_NAME: -1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arccosecant.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arccosecant.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Cosecant.FUNC_NAME: -1, Arccosecant.FUNC_NAME: 1}, {}, 0
 
     
 
@@ -128,5 +128,5 @@ class Cosecant(Function):
         :rtype: float
         """
         from math import cos
-        num=1.0/cos(v0)
+        num=sin(v0)
         return num
