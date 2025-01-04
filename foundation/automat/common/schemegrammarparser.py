@@ -686,7 +686,7 @@ class SchemeGrammarParser:
                 for listIdx, childId in enumerate(reversed(childIds)): #have to replace from the back, else, the frontPositions might shift.
                     childData = id__data[childId]
 
-                    if self.recordMaking:
+                    if self.recordMaking and len(self.variables) > 0:
                         var = self.variables[len(self.variables) - listIdx -1]
                         #also need to find unmatched parts and do offseting later TODO
                         verPosWord.append({
@@ -768,7 +768,11 @@ class SchemeGrammarParser:
                         #     'i':op,
                         #     'nodeId':nodeId
                         # })
-                        var, posOnInputPattern = self.inVariablesPosSansVarnumList[len(self.variables) - listIdx -1]
+                        # print(self.inVariablesPosSansVarnumList)
+                        # print()
+                        # import pdb;pdb.set_trace()
+                        posOnInputPattern = self.inVariablesPosSansVarnumList[len(self.variables) - listIdx -1]
+                        var = self.variables[len(self.variables) - listIdx -1]
                         if self.recordMaking:
                             verPosWord.append({
                                 't':'v', #nomatch(n)/varonly(v)/patrepl(p)

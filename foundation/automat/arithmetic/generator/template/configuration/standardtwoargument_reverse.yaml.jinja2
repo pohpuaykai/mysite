@@ -1,0 +1,25 @@
+
+  - '@vk0@':
+      '@vnK@': '@vk0@'
+{% if equationSide == 'R' %}      '@vnV@':
+      - - '@cN_{{transformed_className}}@.@vfN@'
+        - '@id_{{t00}}@'
+      - '@item_{{t01}}@'
+{% else %}      '@vnV@':
+      - '@item_{{t00}}@'
+      - - '@cN_{{transformed_className}}@.@vfN@'
+        - '@id_{{t01}}@'
+{% endif %}    '@vk1@':
+      '@vnK@':
+      - '@cN_{{transformed_className}}@.@vfN@'
+      - '@idk_1@' # always the same...
+      '@vnV@':
+      - '@item_{{t10}}@'
+      - '@item_{{t11}}@'
+    argumentIdx: {{argumentIdx}}
+    equationSide: {{equationSide}}
+{{functionCountAdd__toString}}
+{{imports__toString}}
+    primitiveCountAdded: {}
+    totalNodeCountAdded: 0
+{{permutation}}

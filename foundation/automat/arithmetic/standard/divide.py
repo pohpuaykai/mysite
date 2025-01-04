@@ -7,11 +7,11 @@ class Divide(Function):
 
     """
     TYPE = 'other'
-    FUNC_NAME = '/'
+    FUNC_NAME = 'divide'
 
     def __init_subclass__(cls, **kwargs):
         kwargs['type'] = 'other'
-        kwargs['funcName'] = '/'
+        kwargs['funcName'] = 'divide'
         super().__init_subclass__(**kwargs)
 
     def __init__(self, equation, idInAst, verbose=False):
@@ -37,7 +37,7 @@ class Divide(Function):
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #1 input, the subject
         replacementDictionary will always have exactly 2 rows, because of the nature of equality.
-        One of the list have this tuple ('/', nodeId) on the #2 argument. Since this is
+        One of the list have this tuple ('divide', nodeId) on the #2 argument. Since this is
         the function that will operate on it.
 
         :param replacementDictionary: 
@@ -72,7 +72,7 @@ class Divide(Function):
         
         from foundation.automat.arithmetic.standard.multiply import Multiply
         
-        return {key0: {"newKey": key0, "newValue": ((Multiply.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Divide.FUNC_NAME: -1, Multiply.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Multiply.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}, permutation: (((0, 0), (0, 1)), ((0, 1), (1, 0)), ((1, 0), (0, 0)), ((1, 1), (1, 1)))}, {Divide.FUNC_NAME: -1, Multiply.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseR1(self, replacementDictionary, totalNodeCount):
@@ -80,7 +80,7 @@ class Divide(Function):
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #2 input, the subject
         replacementDictionary will always have exactly 2 rows, because of the nature of equality.
-        One of the list have this tuple ('/', nodeId) on the #2 argument. Since this is
+        One of the list have this tuple ('divide', nodeId) on the #2 argument. Since this is
         the function that will operate on it.
 
         :param replacementDictionary: 
@@ -113,7 +113,7 @@ class Divide(Function):
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
         
-        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key1][0], replacementDictionary[key0][0])}}, {}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key1][0], replacementDictionary[key0][0])}, permutation: (((0, 0), (0, 1)), ((0, 1), (1, 1)), ((1, 0), (1, 0)), ((1, 1), (0, 0)))}, {}, {}, 0
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount):
@@ -121,7 +121,7 @@ class Divide(Function):
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #1 input, the subject
         replacementDictionary will always have exactly 2 rows, because of the nature of equality.
-        One of the list have this tuple ('/', nodeId) on the #2 argument. Since this is
+        One of the list have this tuple ('divide', nodeId) on the #2 argument. Since this is
         the function that will operate on it.
 
         :param replacementDictionary: 
@@ -156,7 +156,7 @@ class Divide(Function):
         
         from foundation.automat.arithmetic.standard.multiply import Multiply
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Multiply.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Divide.FUNC_NAME: -1, Multiply.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Multiply.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Multiply.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}, permutation: (((0, 0), (1, 0)), ((0, 1), (0, 0)), ((1, 0), (0, 1)), ((1, 1), (1, 1)))}, {Divide.FUNC_NAME: -1, Multiply.FUNC_NAME: 1}, {}, 0
 
     
     def _reverseL1(self, replacementDictionary, totalNodeCount):
@@ -164,7 +164,7 @@ class Divide(Function):
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #2 input, the subject
         replacementDictionary will always have exactly 2 rows, because of the nature of equality.
-        One of the list have this tuple ('/', nodeId) on the #2 argument. Since this is
+        One of the list have this tuple ('divide', nodeId) on the #2 argument. Since this is
         the function that will operate on it.
 
         :param replacementDictionary: 
@@ -197,7 +197,7 @@ class Divide(Function):
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key1][0], replacementDictionary[key0][1])}}, {}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key1][0], replacementDictionary[key0][1])}, permutation: (((0, 0), (1, 1)), ((0, 1), (0, 0)), ((1, 0), (1, 0)), ((1, 1), (0, 1)))}, {}, {}, 0
 
     
 

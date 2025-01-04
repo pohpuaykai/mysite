@@ -9,7 +9,8 @@ def test__schemeParserTest__add(verbose=False):
 
     equationStr = '(= a (+ b c))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
-    ast = parser.ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
     pp.pprint(ast)
     expected_ast = {
     ('=', 0):[('a', 1), ('+', 2)],
@@ -19,11 +20,11 @@ def test__schemeParserTest__add(verbose=False):
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
-        parser.startPos__nodeId==expected_startPos__nodeId
+        startPos__nodeId==expected_startPos__nodeId
     )
     if verbose:
-        pp.pprint(parser.ast)
-        pp.pprint(parser.startPos__nodeId)
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
 
 
 def test__schemeParserTest__harmonicMean(verbose=False):
@@ -32,7 +33,8 @@ def test__schemeParserTest__harmonicMean(verbose=False):
 
     equationStr = '(= (/ 1 a) (+ (/ 1 b) (/ 1 c)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
-    ast = parser.ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
     pp.pprint(ast)
     expected_ast = {   
     ('+', 2): [('/', 5), ('/', 6)],
@@ -44,11 +46,11 @@ def test__schemeParserTest__harmonicMean(verbose=False):
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
-        parser.startPos__nodeId==expected_startPos__nodeId
+        startPos__nodeId==expected_startPos__nodeId
     )
     if verbose:
-        pp.pprint(parser.ast)
-        pp.pprint(parser.startPos__nodeId)
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
 
 
 def test__schemeParserTest__phasorDiagram(verbose=False):
@@ -57,7 +59,8 @@ def test__schemeParserTest__phasorDiagram(verbose=False):
 
     equationStr = '(= (^ e (* i x)) (+ (cos x) (* i (sin x))))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
-    ast = parser.ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
     pp.pprint(ast)
     expected_ast ={   ('*', 4): [('i', 7), ('x', 8)],
     ('*', 6): [('i', 10), ('sin', 11)],
@@ -83,11 +86,11 @@ def test__schemeParserTest__phasorDiagram(verbose=False):
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
-        parser.startPos__nodeId==expected_startPos__nodeId
+        startPos__nodeId==expected_startPos__nodeId
     )
     if verbose:
-        pp.pprint(parser.ast)
-        pp.pprint(parser.startPos__nodeId)
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
 
 
 def test__schemeParserTest__ebersMollModelp1(verbose=False):
@@ -96,7 +99,8 @@ def test__schemeParserTest__ebersMollModelp1(verbose=False):
 
     equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T)) 1)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
-    ast = parser.ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
     pp.pprint(ast)
     expected_ast = {   
     ('*', 2): [('I_{ES}', 3), ('-', 4)],
@@ -108,11 +112,11 @@ def test__schemeParserTest__ebersMollModelp1(verbose=False):
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
-        parser.startPos__nodeId==expected_startPos__nodeId
+        startPos__nodeId==expected_startPos__nodeId
     )
     if verbose:
-        pp.pprint(parser.ast)
-        pp.pprint(parser.startPos__nodeId)
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
 
 
 def test__schemeParserTest__earlyEffectModel(verbose=False):
@@ -121,7 +125,8 @@ def test__schemeParserTest__earlyEffectModel(verbose=False):
 
     equationStr = '(= I_E (* I_S (* (^ e (/ V_{BE} V_T)) (+ 1 (/ V_{CE} V_A)))))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
-    ast = parser.ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
     pp.pprint(ast)
     expected_ast = {   
     ('*', 2): [('I_S', 3), ('*', 4)],
@@ -150,11 +155,11 @@ def test__schemeParserTest__earlyEffectModel(verbose=False):
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
-        parser.startPos__nodeId==expected_startPos__nodeId
+        startPos__nodeId==expected_startPos__nodeId
     )
     if verbose:
-        pp.pprint(parser.ast)
-        pp.pprint(parser.startPos__nodeId)
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
 
 
 def test__makeSubject__linearEliminationBySubstitution(verbose=False):
@@ -163,7 +168,8 @@ def test__makeSubject__linearEliminationBySubstitution(verbose=False):
 
     equationStr = '(= (* I_{R} R) (- (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}) 0))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
-    ast = parser.ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
     pp.pprint(ast)
     expected_ast = {   
     ('*', 1): [('I_{R}', 3), ('R', 4)],
@@ -175,16 +181,16 @@ def test__makeSubject__linearEliminationBySubstitution(verbose=False):
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
-        parser.startPos__nodeId==expected_startPos__nodeId
+        startPos__nodeId==expected_startPos__nodeId
     )
     if verbose:
-        pp.pprint(parser.ast)
-        pp.pprint(parser.startPos__nodeId)
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
 
 if __name__=='__main__':
-    # test__schemeParserTest__add()
-    # test__schemeParserTest__harmonicMean()
-    # test__schemeParserTest__phasorDiagram()
-    # test__schemeParserTest__ebersMollModelp1()
-    # test__schemeParserTest__earlyEffectModel()
-    test__makeSubject__linearEliminationBySubstitution(True)
+    test__schemeParserTest__add()
+    test__schemeParserTest__harmonicMean()
+    test__schemeParserTest__phasorDiagram()
+    test__schemeParserTest__ebersMollModelp1()
+    test__schemeParserTest__earlyEffectModel()
+    # test__makeSubject__linearEliminationBySubstitution(True) # untested because simplify is simply not ready!

@@ -1,0 +1,35 @@
+imports:
+{{imports__toString}}init_className:
+  code: '@cN@'
+  full: {{class_name}}
+init_funcName:
+  code: '@fN@'
+  full: {{function_name}}
+init_string_newKey:
+  code: '@vnK@'
+  full: newKey
+init_string_newValue:
+  code: '@vnV@'
+  full: newValue
+init_type:
+  code: '@te@'
+  full: other
+init_variableName_funcName:
+  code: '@vfN@'
+  full: FUNC_NAME
+init_variableName_key0:
+  code: '@vk0@'
+  full: key0
+init_variableName_key1:
+  code: '@vk1@'
+  full: key1
+init_variableName_replacementDictionary:
+  code: '@vrD@'
+  full: replacementDictionary
+init_variableName_totalNodeCount:
+  code: '@vtN@'
+  full: totalNodeCount
+return_calculation:
+{{return_calculations}}return_reverse:
+  reversedAst:
+{% for reversedAst in reversedAsts %}{{reversedAst}}{% endfor %}

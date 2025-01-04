@@ -8,9 +8,11 @@ def {{defName}}(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = {{className}}(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # {{regexUsedComment}}
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '{{expected}}' # {{returnRegexUsedComment}}
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )

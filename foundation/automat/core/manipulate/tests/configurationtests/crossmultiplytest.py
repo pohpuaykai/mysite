@@ -20,9 +20,11 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Crossmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (/ $0 $1) (/ $2 $3))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (/ (+ (* b e) (* c d)) (* c e)))' # (/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -41,9 +43,11 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Crossmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (+ (/ b c) (/ d e)))' # (+ (/ $0 $1) (/ $2 $3))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -55,6 +59,6 @@ def test__hin0__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest()
-    test__hin0__configTest()
+    test__vor0__configTest(True) # Not tested yet
+    test__hin0__configTest(True) # Not tested yet
     

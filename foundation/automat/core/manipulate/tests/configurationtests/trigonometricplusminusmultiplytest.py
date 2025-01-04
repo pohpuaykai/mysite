@@ -20,9 +20,11 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (sin (+ $0 $1))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (+ (* (sin b) (cos c)) (* (cos b) (sin c))))' # (+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -41,9 +43,11 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (sin (+ b c)))' # (sin (+ $0 $1))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -62,9 +66,11 @@ def test__vor1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (sin (- $0 $1))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (- (* (sin b) (cos c)) (* (cos b) (sin c))))' # (- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -83,9 +89,11 @@ def test__hin1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (sin (- b c)))' # (sin (- $0 $1))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -104,9 +112,11 @@ def test__vor2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (cos (+ $0 $1))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (- (* (cos b) (cos c)) (* (sin b) (sin c))))' # (- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -125,9 +135,11 @@ def test__hin2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (cos (+ b c)))' # (cos (+ $0 $1))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -146,9 +158,11 @@ def test__vor3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (cos (- $0 $1))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (+ (* (cos b) (cos c)) (* (sin b) (sin c))))' # (+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -167,9 +181,11 @@ def test__hin3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Trigonometricplusminusmultiply(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (cos (- b c)))' # (cos (- $0 $1))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -181,12 +197,12 @@ def test__hin3__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest()
-    test__hin0__configTest()
-    test__vor1__configTest()
-    test__hin1__configTest()
-    test__vor2__configTest()
-    test__hin2__configTest()
-    test__vor3__configTest()
-    test__hin3__configTest()
+    test__vor0__configTest(True) # Not tested yet
+    test__hin0__configTest(True) # Not tested yet
+    test__vor1__configTest(True) # Not tested yet
+    test__hin1__configTest(True) # Not tested yet
+    test__vor2__configTest(True) # Not tested yet
+    test__hin2__configTest(True) # Not tested yet
+    test__vor3__configTest(True) # Not tested yet
+    test__hin3__configTest(True) # Not tested yet
     

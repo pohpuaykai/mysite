@@ -20,9 +20,11 @@ def test__vor0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ $0 0)
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '1' # 1
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -41,9 +43,11 @@ def test__hin0__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # 1
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (+ (^ v_{0} 0) (+ (^ v_{0} 0) (^ v_{0} 0))))' # (^ $0 0)
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -62,9 +66,11 @@ def test__vor1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ $0 1)
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a b)' # $0
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -83,9 +89,11 @@ def test__hin1__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # $0
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= (^ a 1) (^ a 1))' # (^ $0 1)
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -104,9 +112,11 @@ def test__vor2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ $0 (+ $1 $2))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (* (^ b c) (^ b d)))' # (* (^ $0 $1) (^ $0 $2))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -125,9 +135,11 @@ def test__hin2__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (* (^ $0 $1) (^ $0 $2))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (^ b (+ c d)))' # (^ $0 (+ $1 $2))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -146,9 +158,11 @@ def test__vor3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ (^ $0 $1) $2)
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (^ b (* c d)))' # (^ $0 (* $1 $2))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -167,9 +181,11 @@ def test__hin3__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ $0 (* $1 $2))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (^ (^ b c) d))' # (^ (^ $0 $1) $2)
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -188,9 +204,11 @@ def test__vor4__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (* (^ $1 $0) (^ $2 $0))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (^ (* b d) c))' # (^ (* $1 $2) $0)
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -209,9 +227,11 @@ def test__hin4__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ (* $1 $2) $0)
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (* (^ b d) (^ c d)))' # (* (^ $1 $0) (^ $2 $0))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -230,9 +250,11 @@ def test__vor5__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (^ $0 (- "0" $1))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (/ "1" (^ b c)))' # (/ "1" (^ $0 $1))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -251,9 +273,11 @@ def test__hin5__configTest(verbose=False):
     eq0 = Equation(eqs, eqsType)
     ma0 = Exponential(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ "1" (^ $0 $1))
-    manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
     expected = '(= a (^ b (- "0" c)))' # (^ $0 (- "0" $1))
-    expectedAst = Schemeparser(equationStr=expected).ast
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
     )
@@ -265,16 +289,16 @@ def test__hin5__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest()
-    test__hin0__configTest()
-    test__vor1__configTest()
-    test__hin1__configTest()
-    test__vor2__configTest()
-    test__hin2__configTest()
-    test__vor3__configTest()
-    test__hin3__configTest()
-    test__vor4__configTest()
-    test__hin4__configTest()
-    test__vor5__configTest()
-    test__hin5__configTest()
+    test__vor0__configTest(True) # Not tested yet
+    test__hin0__configTest(True) # Not tested yet
+    test__vor1__configTest(True) # Not tested yet
+    test__hin1__configTest(True) # Not tested yet
+    test__vor2__configTest(True) # Not tested yet
+    test__hin2__configTest(True) # Not tested yet
+    test__vor3__configTest(True) # Not tested yet
+    test__hin3__configTest(True) # Not tested yet
+    test__vor4__configTest(True) # Not tested yet
+    test__hin4__configTest(True) # Not tested yet
+    test__vor5__configTest(True) # Not tested yet
+    test__hin5__configTest(True) # Not tested yet
     
