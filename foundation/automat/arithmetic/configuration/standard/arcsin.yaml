@@ -59,6 +59,19 @@ return_reverse:
         - from foundation.automat.arithmetic.standard.sine import Sine
     primitiveCountAdded: {}
     totalNodeCountAdded: 0
+    permutation:
+    - - - 0
+        - 0
+      - - 1
+        - 0
+    - - - 0
+        - 1
+      - - 0
+        - 0
+    - - - 1
+        - 0
+      - - 0
+        - 1
   - '@vk0@':
       '@vnK@': '@vk0@'
       '@vnV@':
@@ -80,3 +93,16 @@ return_reverse:
     - from foundation.automat.arithmetic.standard.sine import Sine
     primitiveCountAdded: {}
     totalNodeCountAdded: 0
+    permutation:
+    - - - 0
+        - 0
+      - - 1
+        - 0
+    - - - 0
+        - 1
+      - - 0
+        - 0
+    - - - 1
+        - 0
+      - - 0
+        - 1

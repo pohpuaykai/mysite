@@ -126,6 +126,10 @@ class StandardFunctionClassGenerator:
                     del functionReturns['equationSide']
                     argumentIdx = functionReturns['argumentIdx']
                     del functionReturns['argumentIdx']
+                    #
+                    permutation = dict(recursiveNaiveTraverseAndEditToTuple(reverseReturn['permutation'], lambda x: x))
+                    # import pdb;pdb.set_trace()
+                    #
                     reverseFTemplate = environment.get_template("function_reverse.py.jinja2")
                     renderedReverseFTemplate = reverseFTemplate.render({
                         'idx':argumentIdx,
@@ -142,6 +146,7 @@ class StandardFunctionClassGenerator:
                         'primitivesCountAdded':primitiveCountAdded,
                         'totalNodeCountAdded':totalNodeCountAdded,
                         'reverseFunctionImports':reverseFunctionImports,
+                        'permutation':permutation
                     })
                     returnReversesCode.append(renderedReverseFTemplate)
                     mainTemplateReverseFunctionNames.append(((equationSide, argumentIdx), f'_reverse{equationSide}{argumentIdx}'))
@@ -179,3 +184,4 @@ class StandardFunctionClassGenerator:
             file.write(content)
             if verbose:
                 info(f"written {directory}  {filename}")
+

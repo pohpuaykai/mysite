@@ -131,7 +131,7 @@ class Function:#(metaclass=FunctionHook):
 
         #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
         (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange) = self.reverses[(equationSide, str(argumentIdx))](
-            replacementDictionary, self.eq.totalNodeCount)
+            replacementDictionary, self.eq.totalNodeCount, startPos__nodeId)
 
         return invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange, ast, startPos__nodeId
 

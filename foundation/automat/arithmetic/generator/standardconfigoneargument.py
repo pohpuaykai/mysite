@@ -1,7 +1,7 @@
 import os
 
 from jinja2 import Environment, FileSystemLoader
-from yaml import safe_load
+from yaml import safe_load, dump
 
 from foundation.automat import AUTOMAT_MODULE_DIR
 from foundation.automat.log import info
@@ -17,6 +17,8 @@ class Standardconfigoneargument:
         #copied from https://realpython.com/primer-on-jinja-templating/
         environment = Environment(loader=FileSystemLoader(os.path.join(AUTOMAT_MODULE_DIR, 'arithmetic', 'generator', 'template', 'configuration')))
         template = environment.get_template("standardoneargument.yaml.jinja2")
+
+        permutation = {(0, 0): (1, 0), (0, 1): (0, 0), (1, 0): (0, 1)} #TODO refactor...
 
         for function_name, mapping in FUNC_NAMES.items():
             if toRun is not None and function_name != toRun:
@@ -37,6 +39,10 @@ class Standardconfigoneargument:
                 # imports_as_str=str(mapping['import']).replace("'", '"'),
                 imports_as_str__toString=str(os.linesep.join(map(lambda imports_as_str: cls._template__imports_as_str(imports_as_str), mapping['import']))),
                 code_as_str=str(mapping['code']).replace("'", '"'),
+                permutation=cls.addSpacesBeforeEveryLine(
+                        dump({'permutation':list(map(lambda item: [list(item[0]), list(item[1])], permutation.items()))}),
+                        spacesCount=4
+                    )
             )
             cls.writeToFile(f'{vorfname}.yaml', vorcontent, verbose=verbose)
             hincontent = template.render(
@@ -50,6 +56,10 @@ class Standardconfigoneargument:
                 # imports_as_str=str(mapping['reverse_import']).replace("'", '"'),
                 imports_as_str__toString=str(os.linesep.join(map(lambda imports_as_str: cls._template__imports_as_str(imports_as_str), mapping['reverse_import']))),
                 code_as_str=str(mapping['reverse_code']).replace("'", '"'),
+                permutation=cls.addSpacesBeforeEveryLine(
+                        dump({'permutation':list(map(lambda item: [list(item[0]), list(item[1])], permutation.items()))}),
+                        spacesCount=4
+                    )
             )
             cls.writeToFile(f'{hinfname}.yaml', hincontent, verbose=verbose)
 
@@ -88,3 +98,10 @@ class Standardconfigoneargument:
     @classmethod
     def _template__reverse_imports(cls, reverseImportStr):
         return f'    - {reverseImportStr}'
+
+
+
+    @classmethod
+    def addSpacesBeforeEveryLine(cls, dumpStr, spacesCount):
+        prefixSpaces = ' ' * spacesCount
+        return os.linesep.join([prefixSpaces + line for line in dumpStr.splitlines()])
