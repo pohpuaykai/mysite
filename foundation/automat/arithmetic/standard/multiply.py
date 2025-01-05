@@ -32,7 +32,7 @@ class Multiply(Function):
         }
 
     
-    def _reverseR0(self, replacementDictionary, totalNodeCount):
+    def _reverseR0(self, replacementDictionary, totalNodeCount, startPos__nodeId):
         """
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #1 input, the subject
@@ -69,13 +69,30 @@ class Multiply(Function):
                 key1 = key
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
+
+        permutation = {(0, 0): (0, 1), (0, 1): (1, 0), (1, 0): (0, 0), (1, 1): (1, 1)}
+        from copy import deepcopy
+        newStartPos__nodeId = deepcopy(startPos__nodeId)
+        rowCol__nodeId = {
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
+        }
+        nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
+        for iRowCol, oRowCol in permutation.items():
+            iNodeId = rowCol__nodeId[iRowCol]
+            oNodeId = rowCol__nodeId[oRowCol]
+            startPos = nodeId__startPos[iNodeId]
+            newStartPos__nodeId[startPos] = oNodeId
+
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0, newStartPos__nodeId
 
     
-    def _reverseR1(self, replacementDictionary, totalNodeCount):
+    def _reverseR1(self, replacementDictionary, totalNodeCount, startPos__nodeId):
         """
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #2 input, the subject
@@ -112,13 +129,30 @@ class Multiply(Function):
                 key1 = key
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
+
+        permutation = {(0, 0): (0, 1), (0, 1): (1, 1), (1, 0): (0, 0), (1, 1): (1, 0)}
+        from copy import deepcopy
+        newStartPos__nodeId = deepcopy(startPos__nodeId)
+        rowCol__nodeId = {
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
+        }
+        nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
+        for iRowCol, oRowCol in permutation.items():
+            iNodeId = rowCol__nodeId[iRowCol]
+            oNodeId = rowCol__nodeId[oRowCol]
+            startPos = nodeId__startPos[iNodeId]
+            newStartPos__nodeId[startPos] = oNodeId
+
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Divide.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][1])}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][0])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0, newStartPos__nodeId
 
     
-    def _reverseL0(self, replacementDictionary, totalNodeCount):
+    def _reverseL0(self, replacementDictionary, totalNodeCount, startPos__nodeId):
         """
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #1 input, the subject
@@ -155,13 +189,30 @@ class Multiply(Function):
                 key1 = key
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
+
+        permutation = {(0, 0): (1, 0), (0, 1): (0, 0), (1, 0): (0, 1), (1, 1): (1, 1)}
+        from copy import deepcopy
+        newStartPos__nodeId = deepcopy(startPos__nodeId)
+        rowCol__nodeId = {
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
+        }
+        nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
+        for iRowCol, oRowCol in permutation.items():
+            iNodeId = rowCol__nodeId[iRowCol]
+            oNodeId = rowCol__nodeId[oRowCol]
+            startPos = nodeId__startPos[iNodeId]
+            newStartPos__nodeId[startPos] = oNodeId
+
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][1])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0, newStartPos__nodeId
 
     
-    def _reverseL1(self, replacementDictionary, totalNodeCount):
+    def _reverseL1(self, replacementDictionary, totalNodeCount, startPos__nodeId):
         """
         replacementDictionary are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #2 input, the subject
@@ -198,10 +249,27 @@ class Multiply(Function):
                 key1 = key
         if key0 is None or key1 is None:
             raise Exception("replacementDictionary not according to format")
+
+        permutation = {(0, 0): (1, 1), (0, 1): (0, 0), (1, 0): (0, 1), (1, 1): (1, 0)}
+        from copy import deepcopy
+        newStartPos__nodeId = deepcopy(startPos__nodeId)
+        rowCol__nodeId = {
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
+        }
+        nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
+        for iRowCol, oRowCol in permutation.items():
+            iNodeId = rowCol__nodeId[iRowCol]
+            oNodeId = rowCol__nodeId[oRowCol]
+            startPos = nodeId__startPos[iNodeId]
+            newStartPos__nodeId[startPos] = oNodeId
+
         
         from foundation.automat.arithmetic.standard.divide import Divide
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][1], (Divide.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Divide.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1], replacementDictionary[key1][0])}}, {Multiply.FUNC_NAME: -1, Divide.FUNC_NAME: 1}, {}, 0, newStartPos__nodeId
 
     
 

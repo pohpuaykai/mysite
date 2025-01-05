@@ -128,7 +128,7 @@ class StandardFunctionClassGenerator:
                     del functionReturns['argumentIdx']
                     #
                     permutation = dict(recursiveNaiveTraverseAndEditToTuple(reverseReturn['permutation'], lambda x: x))
-                    # import pdb;pdb.set_trace()
+                    del functionReturns['permutation']
                     #
                     reverseFTemplate = environment.get_template("function_reverse.py.jinja2")
                     renderedReverseFTemplate = reverseFTemplate.render({

@@ -70,10 +70,10 @@ class Sine(Function):
         from copy import deepcopy
         newStartPos__nodeId = deepcopy(startPos__nodeId)
         rowCol__nodeId = {
-            (0, 0):replacementDictionary[key0][0],
-            (0, 1):replacementDictionary[key0][1],
-            (1, 0):replacementDictionary[key1][0],
-            (1, 1):replacementDictionary[key1][1]
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
         }
         nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
         for iRowCol, oRowCol in permutation.items():
@@ -85,7 +85,7 @@ class Sine(Function):
         
         from foundation.automat.arithmetic.standard.arcsine import Arcsine
         
-        return {key0: {"newKey": key0, "newValue": ((Arcsine.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arcsine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}, permutation: (((0, 0), (1, 0)), ((0, 1), (0, 0)), ((1, 0), (0, 1)))}, {Sine.FUNC_NAME: -1, Arcsine.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": ((Arcsine.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Arcsine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0],)}}, {Sine.FUNC_NAME: -1, Arcsine.FUNC_NAME: 1}, {}, 0, newStartPos__nodeId
 
     
     def _reverseL0(self, replacementDictionary, totalNodeCount, startPos__nodeId):
@@ -130,10 +130,10 @@ class Sine(Function):
         from copy import deepcopy
         newStartPos__nodeId = deepcopy(startPos__nodeId)
         rowCol__nodeId = {
-            (0, 0):replacementDictionary[key0][0],
-            (0, 1):replacementDictionary[key0][1],
-            (1, 0):replacementDictionary[key1][0],
-            (1, 1):replacementDictionary[key1][1]
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
         }
         nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
         for iRowCol, oRowCol in permutation.items():
@@ -145,7 +145,7 @@ class Sine(Function):
         
         from foundation.automat.arithmetic.standard.arcsine import Arcsine
         
-        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arcsine.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arcsine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}, permutation: (((0, 0), (1, 0)), ((0, 1), (0, 0)), ((1, 0), (0, 1)))}, {Sine.FUNC_NAME: -1, Arcsine.FUNC_NAME: 1}, {}, 0
+        return {key0: {"newKey": key0, "newValue": (replacementDictionary[key1][0], (Arcsine.FUNC_NAME, replacementDictionary[key0][0][1]))}, key1: {"newKey": (Arcsine.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][1],)}}, {Sine.FUNC_NAME: -1, Arcsine.FUNC_NAME: 1}, {}, 0, newStartPos__nodeId
 
     
 

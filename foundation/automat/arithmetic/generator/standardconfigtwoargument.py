@@ -24,7 +24,9 @@ class Standardconfigtwoargument:
             print(function_name, toRun, function_name!=toRun)
             if toRun is not None and function_name != toRun:
                 continue # skip
-            fname = function_name
+            #default_style=None: Ensures PyYAML quotes the string only when necessary
+            #explicit_end=False: Prevents the ellipsis (...) from being added to the output
+            fname = cls.escapeYAMLSpecialCha(mapping['funcName']) # to escape the - (minus)
             cname = mapping['className']
             importList = ["from foundation.automat.arithmetic.function import Function"]
             reversedAsts = []
@@ -49,9 +51,7 @@ class Standardconfigtwoargument:
                     imports__toString=cls._template__reverseAsts__imports(importStrs),
                     #for startPos__nodeId
                     # needs special care when you deserialise
-                    permutation=
-                    #dump({'permutation':list(map(lambda item: [list(item[0]), list(item[1])], rd['permutation'].items()))})
-                    cls.addSpacesBeforeEveryLine(
+                    permutation=cls.addSpacesBeforeEveryLine(
                         dump({'permutation':list(map(lambda item: [list(item[0]), list(item[1])], rd['permutation'].items()))}),
                         spacesCount=4
                     )
@@ -115,3 +115,11 @@ class Standardconfigtwoargument:
     def addSpacesBeforeEveryLine(cls, dumpStr, spacesCount):
         prefixSpaces = ' ' * spacesCount
         return os.linesep.join([prefixSpaces + line for line in dumpStr.splitlines()])
+
+
+    @classmethod
+    def escapeYAMLSpecialCha(cls, s):
+        s = dump(s, default_style=None, explicit_end=False).strip()
+        if s.endswith('...'):#what if s originally had ...? TODO
+            return s[:-4]
+        return s

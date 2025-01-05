@@ -37,6 +37,7 @@ return_calculation:
   variableCount: 2
 return_reverse:
   reversedAst:
+
   - '@vk0@':
       '@vnK@': '@vk0@'
       '@vnV@':
@@ -46,19 +47,36 @@ return_reverse:
     '@vk1@':
       '@vnK@':
       - '@cN_Plus@.@vfN@'
-      - '@idk_1@'
+      - '@idk_1@' # always the same...
       '@vnV@':
       - '@item_0_0@'
       - '@item_1_1@'
     argumentIdx: 0
     equationSide: R
-    functionCountAdded:
+    functionCountAdded: 
       '@cN@.@vfN@': -1
       '@cN_Plus@.@vfN@': 1
-    imports:
+    imports: 
     - from foundation.automat.arithmetic.standard.plus import Plus
     primitiveCountAdded: {}
     totalNodeCountAdded: 0
+    permutation:
+    - - - 0
+        - 0
+      - - 0
+        - 1
+    - - - 0
+        - 1
+      - - 1
+        - 0
+    - - - 1
+        - 0
+      - - 0
+        - 0
+    - - - 1
+        - 1
+      - - 1
+        - 1
   - '@vk0@':
       '@vnK@': '@vk0@'
       '@vnV@':
@@ -68,7 +86,7 @@ return_reverse:
     '@vk1@':
       '@vnK@':
       - '@cN_Minus@.@vfN@'
-      - '@idk_1@'
+      - '@idk_1@' # always the same...
       '@vnV@':
       - '@item_1_0@'
       - '@item_0_0@'
@@ -78,6 +96,23 @@ return_reverse:
     imports: []
     primitiveCountAdded: {}
     totalNodeCountAdded: 0
+    permutation:
+    - - - 0
+        - 0
+      - - 0
+        - 1
+    - - - 0
+        - 1
+      - - 1
+        - 1
+    - - - 1
+        - 0
+      - - 1
+        - 0
+    - - - 1
+        - 1
+      - - 0
+        - 0
   - '@vk0@':
       '@vnK@': '@vk0@'
       '@vnV@':
@@ -87,19 +122,36 @@ return_reverse:
     '@vk1@':
       '@vnK@':
       - '@cN_Plus@.@vfN@'
-      - '@idk_1@'
+      - '@idk_1@' # always the same...
       '@vnV@':
       - '@item_0_1@'
       - '@item_1_1@'
     argumentIdx: 0
     equationSide: L
-    functionCountAdded:
+    functionCountAdded: 
       '@cN@.@vfN@': -1
       '@cN_Plus@.@vfN@': 1
-    imports:
+    imports: 
     - from foundation.automat.arithmetic.standard.plus import Plus
     primitiveCountAdded: {}
     totalNodeCountAdded: 0
+    permutation:
+    - - - 0
+        - 0
+      - - 1
+        - 0
+    - - - 0
+        - 1
+      - - 0
+        - 0
+    - - - 1
+        - 0
+      - - 0
+        - 1
+    - - - 1
+        - 1
+      - - 1
+        - 1
   - '@vk0@':
       '@vnK@': '@vk0@'
       '@vnV@':
@@ -109,7 +161,7 @@ return_reverse:
     '@vk1@':
       '@vnK@':
       - '@cN_Minus@.@vfN@'
-      - '@idk_1@'
+      - '@idk_1@' # always the same...
       '@vnV@':
       - '@item_1_0@'
       - '@item_0_1@'
@@ -119,3 +171,20 @@ return_reverse:
     imports: []
     primitiveCountAdded: {}
     totalNodeCountAdded: 0
+    permutation:
+    - - - 0
+        - 0
+      - - 1
+        - 1
+    - - - 0
+        - 1
+      - - 0
+        - 0
+    - - - 1
+        - 0
+      - - 1
+        - 0
+    - - - 1
+        - 1
+      - - 0
+        - 1

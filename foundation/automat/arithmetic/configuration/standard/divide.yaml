@@ -5,7 +5,7 @@ init_className:
   full: Divide
 init_funcName:
   code: '@fN@'
-  full: divide
+  full: /
 init_string_newKey:
   code: '@vnK@'
   full: newKey

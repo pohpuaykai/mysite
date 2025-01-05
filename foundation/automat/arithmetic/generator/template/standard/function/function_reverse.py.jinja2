@@ -40,10 +40,10 @@
         from copy import deepcopy
         newStartPos__nodeId = deepcopy(startPos__nodeId)
         rowCol__nodeId = {
-            (0, 0):replacementDictionary[key0][0],
-            (0, 1):replacementDictionary[key0][1],
-            (1, 0):replacementDictionary[key1][0],
-            (1, 1):replacementDictionary[key1][1]
+            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):replacementDictionary[key0][1][1],
+            (1, 0):replacementDictionary[key1][0][1],
+            (1, 1):replacementDictionary[key1][1][1]
         }
         nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
         for iRowCol, oRowCol in permutation.items():
@@ -55,4 +55,4 @@
         {% for import in reverseFunctionImports %}
         {{import}}
         {% endfor %}
-        return {{reversedDict}}, {{functionCountAdded}}, {{primitivesCountAdded}}, {{totalNodeCountAdded}}
+        return {{reversedDict}}, {{functionCountAdded}}, {{primitivesCountAdded}}, {{totalNodeCountAdded}}, newStartPos__nodeId

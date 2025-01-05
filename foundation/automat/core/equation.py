@@ -204,10 +204,10 @@ class Equation:
             # self.ast = invertedAst 
             #give hint to Recommend in order to do 'simplification' TODO
             if simplify:
-                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
                     equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
                 ) #TODO functionClass to make change to SchemeStr & startPos__nodeId too?
-
+                self.startPos__nodeId = startPos__nodeId
                 self.ast = invertedAst 
                 ####
                 print('before SIM:')
@@ -234,7 +234,7 @@ class Equation:
                     newOps = []
                     for op in ops:
                         (preInvertedAst, preFunctionCountChange, prePrimitiveCountChange, preTotalNodeCountChange, preInvertedResults) = functionClass(self, op['id'], verbose=self.verbose).preReverse(
-                            equationSide, op['argumentIdx'], [op['id'], op['lastId']]
+                            equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
                         )
                         #################
                         print(op) # if changes in primitives/variables, op should be modified, instead of removed?
@@ -259,9 +259,10 @@ class Equation:
                     self.ast = simplifiedAst
 
             else: #no step-by-step simplification needed, should not raise exception...
-                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults) = functionClass(self, op['id'], verbose=self.verbose).reverse(
-                    equationSide, op['argumentIdx'], [op['id'], op['lastId']]
+                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
                 )
+                self.startPos__nodeId = startPos__nodeId
                 self.ast = invertedAst 
 
             #update the `stat` of self
