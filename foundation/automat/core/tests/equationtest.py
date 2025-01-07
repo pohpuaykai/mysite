@@ -78,5 +78,5 @@ def test__onetermFactorisation__findDistributivePath0(verbose=False):
 
 
 if __name__=='__main__':
-    # test__onetermFactorisation__findDistributivePath() # not yet pass
+    test__onetermFactorisation__findDistributivePath() # not yet pass
     # test__onetermFactorisation__findDistributivePath0() # not yet pass

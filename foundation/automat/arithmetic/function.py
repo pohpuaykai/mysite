@@ -178,34 +178,67 @@ class Function:#(metaclass=FunctionHook):
 
         from copy import deepcopy # TODO refactor..., imported multiple times
 
+        # print('permutation')
+        # print(permutation)
+
         rowCol__nodeId = {
             (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
             (0, 1):replacementDictionary[key0][1][1],
             (1, 0):replacementDictionary[key1][0][1],
-            (1, 1):replacementDictionary[key1][1][1]
+            # (1, 1):replacementDictionary[key1][1][1] # does not exist for 1arg functions
         }
+        if len(replacementDictionary[key1]) > 1: # there might be 2arg functions
+            rowCol__nodeId[(1, 1)] = replacementDictionary[key1][1][1]
+
+        oRowCol__nodeId = {
+            (0, 0):invertedResults[key0]['newValue'][0][1], # [1], um die ausWeisungen zu bekommen
+            (0, 1):invertedResults[key0]['newValue'][1][1],
+            (1, 0):invertedResults[key1]['newValue'][0][1],
+            # (1, 1):invertedResults[key1]['newValue'][1][1] # does not exist for 1arg functions
+
+        }
+        if len(invertedResults[key1]['newValue']) > 1: # there might be 2arg functions
+            oRowCol__nodeId[(1, 1)] = invertedResults[key1]['newValue'][1][1]
+
+
+        # print("rowCol__nodeId")
+        # print(rowCol__nodeId)
         nodeId__nodeId = {}
         for iRowCol, oRowCol in permutation.items():
             iNodeId = rowCol__nodeId[iRowCol]
-            oNodeId = rowCol__nodeId[oRowCol]
+            # oNodeId = rowCol__nodeId[oRowCol] # for 2 arg?
+            oNodeId = oRowCol__nodeId[iRowCol]
+            # #this does not work 
+            # if len(replacementDictionary[key1]) > 1: 
+            #     oNodeId = oRowCol__nodeId[iRowCol] # for 2 arg?
+            # else:
+            #     oNodeId = oRowCol__nodeId[iRowCol] # for 1 arg?
             nodeId__nodeId[iNodeId] = oNodeId
         #DFS to get the order, TODO technically its ALWAYS going to be 2 rows and 2 items in each row
         #i.e. a SMALL CONSTANT, do we need to invoke DFS? TODO
         stack = [('=', 0)]
         orderList__after = []
+        #
+        # print('nodeId__nodeId')
+        # print(nodeId__nodeId)
+        # print('replacementDictionary')
+        # print(replacementDictionary)
+        #
         while len(stack) > 0:
             current = stack.pop()
             children = replacementDictionary.get(current, [])
             stack += children
-            # print('current', current)
             if len(children) > 0:
                 try:
                     idxInOrderList = orderList__after.index(current[1]) + 1
                 except:
                     idxInOrderList = len(orderList__after)
-
+                # print('current', current, 'children: ', children)
                 for i, child in enumerate(children): # i so that we will insert in order of children after idxInOrderList
+                    # print('putting in ', child[1], 'afmap', nodeId__nodeId[child[1]], 'at', idxInOrderList+i, ' of ', orderList__after)
                     orderList__after.insert(idxInOrderList+i, nodeId__nodeId[child[1]])
+                    # print(orderList__after)
+                    # import pdb;pdb.set_trace()
 
         #all the below calculation, can be done at PARENT LEVEL?
         #get the orderLists before and after permutation OF only the affected 4 nodeIds
@@ -264,10 +297,24 @@ class Function:#(metaclass=FunctionHook):
         nodeIdsContainedBy = list(map(lambda t: t[1], invertedResults[key1]['newValue']))
         indexOfNodeIdContaining = orderList__after.index(nodeIdContaining)
         nodeId__afterLengths = {}
+
+        updated__nodeId__len = nodeId__len
+        #changing the label(key1), might change the len
+        newKey1Label = invertedResults[key1]['newKey'][0]
+        oldKey1Label = key1[0]
+        updated__nodeId__len[key1[1]] += (len(newKey1Label) - len(oldKey1Label))
+        # print(updated__nodeId__len[key1[1]])
+        # import pdb;pdb.set_trace()
+
         #
         # print('orderList__after')
         # print(orderList__after)
         #
+        #labelContaining should be the label of the transformed
+        # print(invertedResults)
+        # import pdb;pdb.set_trace()
+        labelContaining = invertedResults[key1]['newKey'][0]
+        # import pdb;pdb.set_trace()
         for i, nodeId in enumerate(orderList__after):
             totalLen = 0
             skipAddingLengthOfNodeContainingId = False
@@ -284,9 +331,9 @@ class Function:#(metaclass=FunctionHook):
                 if j> indexOfNodeIdContaining and preNodeId in nodeIdsContainedBy and nodeId not in nodeIdsContainedBy:
                     # print('***@',nodeId, 'skipping preNodeId', preNodeId, 'which is the containedBy and nodeId is NOT containedBy', )
                     continue
-                totalLen += nodeId__len[preNodeId] + len(' ')
+                totalLen += updated__nodeId__len[preNodeId] + len(' ')
                 #
-                # print('****', nodeId, 'examining:', preNodeId, 'totalLen:', totalLen, 'justadded:', nodeId__len[preNodeId]+len(' '), 'of preNodeId', preNodeId)
+                # print('****', nodeId, 'examining:', preNodeId, 'totalLen:', totalLen, 'justadded:', updated__nodeId__len[preNodeId]+len(' '), 'of preNodeId', preNodeId)
                 # print()
                 #
             nodeId__afterLengths[nodeId] = totalLen

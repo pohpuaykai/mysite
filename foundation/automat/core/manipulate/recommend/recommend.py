@@ -63,8 +63,8 @@ class Recommend:
                         for direction, d in manipulations.items():
                             if direction in ['type']:
                                 continue
-                            iAst, iFunctions, iVariables, iPrimitives, iTotalNodeCount = Schemeparser(equationStr=d['scheme'])._parse()
-                            oAst, oFunctions, oVariables, oPrimitives, oTotalNodeCount = Schemeparser(equationStr=d['return'])._parse()
+                            iAst, iFunctions, iVariables, iPrimitives, iTotalNodeCount, iStartPos__nodeId = Schemeparser(equationStr=d['scheme'])._parse()
+                            oAst, oFunctions, oVariables, oPrimitives, oTotalNodeCount, oStartPos__nodeId = Schemeparser(equationStr=d['return'])._parse()
                             # if filename == 'subtractzero.yaml':
                             #     print(filename, direction, idx)
                             #     print(iFunctions)
@@ -95,12 +95,14 @@ class Recommend:
                                 'iVariables':iVariables,
                                 'iPrimitives':iPrimitives,
                                 'iTotalNodeCount':iTotalNodeCount,
+                                'iStartPos__nodeId':iStartPos__nodeId,
                                 #o
                                 'oAst':oAst,
                                 'oFunctions':oFunctions,
                                 'oVariables':oVariables,
                                 'oPrimitives':oPrimitives,
                                 'oTotalNodeCount':oTotalNodeCount,
+                                'oStartPos__nodeId':oStartPos__nodeId,
                                 #differences
                                 'type':typey,
                                 'functionsIO':set(iFunctions.keys()) - set(oFunctions.keys()),
@@ -117,6 +119,8 @@ class Recommend:
 
     def _retrieveMetaInformation(self, rederive=False):
         """
+        TODO change to SINGLETON, um this function load faster, so that the loading only done on application load once.
+
         #~ DRAFT ~#
 
 
@@ -257,6 +261,9 @@ class Recommend:
 
                     if returnTup is not None: # successfully applied manipulation
                         manipulatedSchemeWordSchemeParser, verPosWord, iManipulateSchemeParser, oManipulateSchemeParser  = returnTup
+
+                        iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount, iStartPos__nodeId = iManipulateSchemeParser._parse()
+                        oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount, oStartPos__nodeId = oManipulateSchemeParser._parse()
                         if self.verbose:
                             info('successful application')
 
@@ -270,38 +277,39 @@ class Recommend:
                             if changeDict['d'] == 'r': # something was removed from input
 
                                 #
-                                print(self.eq.startPos__nodeId) # this is not updated...., or we just return the positions to equation, then if equations got something, it will recalculate? startPos__nodeId?
+                                print(iStartPos__nodeId)
+                                # print(self.eq.startPos__nodeId) # this is not updated...., or we just return the positions to equation, then if equations got something, it will recalculate? startPos__nodeId?
                                 #
 
-                                for function in iManipulateSchemeParser.functions:
+                                for function in iFunctionsD:#iManipulateSchemeParser.functions:
                                     if function in changeDict['w']:
                                         #find all occurences of function and its startPos, match to nodeId in self.eq.startPos__nodeId
                                         for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
                                             print(changeDict)
                                             print(manipulate.schemeStr)#Wrong one this is the OG...
-                                            nodeId = self.eq.startPos__nodeId[absoluteStartPos]
+                                            nodeId = iStartPos__nodeId[absoluteStartPos]#self.eq.startPos__nodeId[absoluteStartPos]
                                             existingList = type__removalNames__nodeIdList['f'].get(function, [])
                                             existingList.append(nodeId)
                                             type__removalNames__nodeIdList['f'][function] = existingList
 
-                                for variable in iManipulateSchemeParser.variables:
+                                for variable in iVariablesD:#iManipulateSchemeParser.variables:
                                     if variable in changeDict['w']:
                                         #find all occurences of variable and its startPos, match to nodeId in self.eq.startPos__nodeId
                                         for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = self.eq.startPos__nodeId[absoluteStartPos]
+                                            nodeId = iStartPos__nodeId[absoluteStartPos]#self.eq.startPos__nodeId[absoluteStartPos]
                                             existingList = type__removalNames__nodeIdList['v'].get(variable, [])
                                             existingList.append(nodeId)
                                             type__removalNames__nodeIdList['v'][variable] = existingList
 
 
-                                for primitive in iManipulateSchemeParser.primitives:
+                                for primitive in iPrimitives:#iManipulateSchemeParser.primitives:
                                     if primitive in changeDict['w']:
                                         #find all occurences of primitive and its startPos, match to nodeId in self.eq.startPos__nodeId
                                         for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = self.eq.startPos__nodeId[absoluteStartPos]
+                                            nodeId = iStartPos__nodeId[absoluteStartPos]#self.eq.startPos__nodeId[absoluteStartPos]
                                             existingList = type__removalNames__nodeIdList['p'].get(primitive, [])
                                             existingList.append(nodeId)
                                             type__removalNames__nodeIdList['p'][primitive] = existingList
@@ -309,33 +317,33 @@ class Recommend:
 
                             elif changeDict['a'] == 'a': #something was added to output
 
-                                for function in oManipulateSchemeParser.functions:
+                                for function in oFunctionsD:#oManipulateSchemeParser.functions:
                                     if function in changeDict['w']:
                                         #find all occurences of function and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeId
                                         for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeId[absoluteStartPos]
+                                            nodeId = oStartPos__nodeId[absoluteStartPos]#manipulatedSchemeWordSchemeParser.startPos__nodeId[absoluteStartPos]
                                             existingList = type__additioNames__nodeIdList['f'].get(function, [])
                                             existingList.append(nodeId)
                                             type__additioNames__nodeIdList['f'][function] = existingList
 
-                                for variable in oManipulateSchemeParser.variables:
+                                for variable in oVariablesD:#oManipulateSchemeParser.variables:
                                     if variable in changeDict['w']:
                                         #find all occurences of variable and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeId
                                         for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeId[absoluteStartPos]
+                                            nodeId = oStartPos__nodeId[absoluteStartPos]#manipulatedSchemeWordSchemeParser.startPos__nodeId[absoluteStartPos]
                                             existingList = type__additioNames__nodeIdList['v'].get(variable, [])
                                             existingList.append(nodeId)
                                             type__additioNames__nodeIdList['v'][variable] = existingList
 
 
-                                for primitive in oManipulateSchemeParser.primitives:
+                                for primitive in oPrimitives:#oManipulateSchemeParser.primitives:
                                     if primitive in changeDict['w']:
                                         #find all occurences of primitive and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeId
                                         for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeId[absoluteStartPos]
+                                            nodeId = oStartPos__nodeId[absoluteStartPos]#manipulatedSchemeWordSchemeParser.startPos__nodeId[absoluteStartPos]
                                             existingList = type__additioNames__nodeIdList['p'].get(primitive, [])
                                             existingList.append(nodeId)
                                             type__additioNames__nodeIdList['p'][primitive] = existingList

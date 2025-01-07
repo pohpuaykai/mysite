@@ -72,7 +72,7 @@ class Plus(Function):
 
         permutation = {(0, 0): (0, 1), (0, 1): (1, 0), (1, 0): (0, 0), (1, 1): (1, 1)}
 
-        print('in plus.py: ', permutation)
+        
         from foundation.automat.arithmetic.standard.minus import Minus
         
         return {key0: {"newKey": key0, "newValue": ((Minus.FUNC_NAME, replacementDictionary[key0][1][1]), replacementDictionary[key1][0])}, key1: {"newKey": (Minus.FUNC_NAME, key1[1]), "newValue": (replacementDictionary[key0][0], replacementDictionary[key1][1])}}, {Plus.FUNC_NAME: -1, Minus.FUNC_NAME: 1}, {}, 0, permutation, key0, key1

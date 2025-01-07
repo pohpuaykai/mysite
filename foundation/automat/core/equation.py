@@ -51,12 +51,12 @@ class Equation:
         else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
             from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
             self.schemeparser = Schemeparser(ast=self.ast)
-            self.schemeStr = schemeparser._unparse()
-            schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
+            self.schemeStr = self.schemeparser._unparse()
+            self.schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
             (self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme,
-            self.totalNodeCountScheme) = schemeparser._parse()
-            self.startPos__nodeId = schemeparser.startPos__nodeId
-            self.nodeId__len = schemeparser.nodeId__len
+            self.totalNodeCountScheme, self.startPos__nodeId) = self.schemeparser._parse()
+            # self.startPos__nodeId = self.schemeparser.startPos__nodeId
+            self.nodeId__len = self.schemeparser.nodeId__len
             
         self.availableStrsFormats = {
             self._parserName: self._eqs
@@ -734,9 +734,9 @@ class Equation:
             subAST = {}
             stack = [rootNode]
             #
-            print('***', 'in _cutSubASTAtRoot')
-            print(self.ast)
-            print(rootNode)
+            # print('***', 'in _cutSubASTAtRoot')
+            # print(self.ast)
+            # print(rootNode)
             #
             while len(stack) > 0:
                 current = stack.pop()
