@@ -46,14 +46,17 @@ class Equation:
         if parserName.lower() == 'scheme':
             self.schemeStr = equationStr
             self.startPos__nodeId = self._parser.startPos__nodeId
+            self.nodeId__len = self._parser.nodeId__len
+            self.schemeparser = self._parser
         else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
             from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
-            schemeparser = Schemeparser(ast=self.ast)
+            self.schemeparser = Schemeparser(ast=self.ast)
             self.schemeStr = schemeparser._unparse()
             schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
             (self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme,
             self.totalNodeCountScheme) = schemeparser._parse()
             self.startPos__nodeId = schemeparser.startPos__nodeId
+            self.nodeId__len = schemeparser.nodeId__len
             
         self.availableStrsFormats = {
             self._parserName: self._eqs
@@ -205,7 +208,7 @@ class Equation:
             #give hint to Recommend in order to do 'simplification' TODO
             if simplify:
                 (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
-                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
+                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId, self.nodeId__len
                 ) #TODO functionClass to make change to SchemeStr & startPos__nodeId too?
                 self.startPos__nodeId = startPos__nodeId
                 self.ast = invertedAst 
@@ -260,7 +263,7 @@ class Equation:
 
             else: #no step-by-step simplification needed, should not raise exception...
                 (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
-                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
+                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId, self.nodeId__len
                 )
                 self.startPos__nodeId = startPos__nodeId
                 self.ast = invertedAst 
@@ -277,6 +280,8 @@ class Equation:
             # self.primitives += primitiveCountChange
             self.totalNodeCount += totalNodeCountChange
 
+        #need to put the scheme string back
+        self.schemeStr = self.schemeparser.unparse(ast=self.ast)
         return self.ast
 
 
@@ -714,28 +719,29 @@ class Equation:
 
     def _cutSubASTAtRoot(self, rootNode):
         """
-
-        #~ DRAFT ~#
-        TODO test
         current target usage for one-term factorisation
 
-        ~SKETCH~
         Find the rootNode in self.ast, then DFS from there to get subAST
         
-        TODO test
         """
 
         if rootNode not in self.ast: # rootNode might be a leaf(variables/primitives)
-            if rootNode not in self.variables and rootNode not in self.primitives:
+            if rootNode[0] not in self.variables and rootNode[0] not in self.primitives:
                 raise Exception(f'rootNode is not a valid node of AST')
             else:
                 return {rootNode: []} # since rootNode is a leaf, TODO thats not the format that we agreed to
         else: # rootNode is a non-leaf in self.ast, nous DFSons
             subAST = {}
             stack = [rootNode]
+            #
+            print('***', 'in _cutSubASTAtRoot')
+            print(self.ast)
+            print(rootNode)
+            #
             while len(stack) > 0:
                 current = stack.pop()
-                children = self.ast[current]
-                subAST[current] = children
+                children = self.ast.get(current, [])
                 stack += children
+                if len(children) > 0:
+                    subAST[current] = children
             return subAST

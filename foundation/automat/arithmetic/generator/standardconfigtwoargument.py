@@ -31,7 +31,7 @@ class Standardconfigtwoargument:
             importList = ["from foundation.automat.arithmetic.function import Function"]
             reversedAsts = []
             for rd in mapping['reversedAsts']:
-                #
+                #rd['permutation'] is only good for shifting of nodeIds around
                 transformed_className = list(rd['function'].values())[0]
                 if transformed_className.lower() == function_name:
                     convertedClassName = None

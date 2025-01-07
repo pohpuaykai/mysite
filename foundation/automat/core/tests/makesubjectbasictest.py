@@ -12,7 +12,6 @@ def test__makeSubject2Input__addition0(verbose=False):
     before__ast = {('=', 0): [('a', 1), ('+', 2)], ('+', 2): [('b', 3), ('c', 4)]}
     before__startPos__nodeId = {1: 0, 3: 1, 6: 2, 8: 3, 10: 4}
     modifiedAST = eq0.makeSubject('b')
-    # import pdb;pdb.set_trace()
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST)._unparse()
     expectedLatexStr = 'a-c=b' # to be filled in 
@@ -29,7 +28,8 @@ def test__makeSubject2Input__addition0(verbose=False):
         expectedFunctions == eq0.functions and 
         expectedVariables == eq0.variables and 
         expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount
+        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedModifiedAST == modifiedAST
         )
     if verbose:
         print(latexStr)
@@ -37,6 +37,17 @@ def test__makeSubject2Input__addition0(verbose=False):
         print(eq0.variables)
         print(eq0.primitives)
         print(eq0.totalNodeCount)
+        print('********')
+        print('modifiedSchemeStr')
+        print(eq0.schemeStr)
+        print('modifiedAST')
+        print(modifiedAST)
+        print('before _startPos__nodeId')
+        pp.pprint(before__startPos__nodeId)
+        print('after startPos__nodeId')
+        pp.pprint(eq0.startPos__nodeId)
+
+
 
 
 def test__makeSubject2Input__addition1(verbose=False):
@@ -1920,7 +1931,7 @@ def test__leftSide__tanh(verbose=False):
 
 
 if __name__=='__main__':
-    test__makeSubject2Input__addition0()
+    test__makeSubject2Input__addition0(True)
     # test__makeSubject2Input__addition1()
     # test__makeSubject2Input__subtraction0()
     # test__makeSubject2Input__subtraction1()

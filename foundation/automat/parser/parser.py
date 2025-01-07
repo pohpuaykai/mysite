@@ -25,7 +25,7 @@ class Parser(ABC):
         self.parserName = parserName
         self.PARSERNAME_PARSERMODULESTRCLASSSTR = Parser.PARSERNAME_PARSERMODULESTRCLASSSTR
 
-    def parse(self, equationStr):
+    def parse(self, equationStr, verbose=False):
         """
         get the parser class lazily (because of circular import)
         and then initialises it
@@ -52,9 +52,13 @@ class Parser(ABC):
         parserModelStr, parserClassStr = self.PARSERNAME_PARSERMODULESTRCLASSSTR[self.parserName]
         import importlib, inspect
         module_obj = importlib.import_module(f'.{parserModelStr}', package='foundation.automat.parser.sorte')
-        className, parser = list(filter(lambda tup: tup[0]==parserClassStr,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
-        globals()[className] = parser
-        self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId = parser(equationStr=equationStr)._parse()
+        className, parserClass = list(filter(lambda tup: tup[0]==parserClassStr,inspect.getmembers(module_obj, predicate=inspect.isclass)))[0]
+        globals()[className] = parserClass
+        parser = parserClass(equationStr=equationStr, verbose=verbose)
+        self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId = parser._parse()
+        #child class specific TODO
+        if self.parserName == 'scheme':
+            self.nodeId__len = parser.nodeId__len
         return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId
 
     def unparse(self, ast):

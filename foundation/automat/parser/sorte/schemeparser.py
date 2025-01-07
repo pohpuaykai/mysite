@@ -1,5 +1,5 @@
 from foundation.automat.arithmetic.function import Function
-from foundation.automat.common import Backtracker, findAllMatches, isNum, lenOrZero
+from foundation.automat.common import findAllMatches, isNum, lenOrZero
 from foundation.automat.parser.parser import Parser
 
 class Schemeparser(Parser):
@@ -10,6 +10,8 @@ class Schemeparser(Parser):
     FUNC_NAMES = Function.FUNC_NAMES()
 
     def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None):
+        #this attribute is unique to schemeparsers for now
+        self.nodeId__len = {} # TODO have a go on the equationStr, to remove all the excess spaces..., this will give problems to startPos__nodeId and nodeId__len
         if ast is None:
             self._eqs = equationStr
             self.verbose = verbose
@@ -76,6 +78,7 @@ class Schemeparser(Parser):
             #node = (current.label, id)
             #ast[node] = ast.get(node, []) + current.neighbours
             #id += 1
+            self.nodeId__len[tid] = current.length
             thisNodeId = currentId
             neighbourNodes = []
             for neighbour in sorted(current.neighbours, key=lambda neigh: neigh.argumentIdx, reverse=False):
@@ -85,7 +88,7 @@ class Schemeparser(Parser):
                 stack.append({'bt':neighbour, 'tid':currentId})
             currentNode = (current.label, (current.argumentIdx, current.id))
             if self.verbose:
-                print(f'ast: {ast}, currentNode: {currentNode}')
+                print(f'ast: {ast}, currentNode: {currentNode}, thisNodeId: {thisNodeId}, nodeId__len: {self.nodeId__len}')
             if len(neighbourNodes) > 0: # avoid putting leaves as keys
                 ast[(current.label, tid)] = neighbourNodes
 
@@ -171,7 +174,8 @@ class Schemeparser(Parser):
                 0,#  argumentIdx, will be set by calling process (self._recursiveParse)
                 #+1 for the openBracket (
                 realProcedureStartPos, #used as the startPos of procedureLabel, (SORRY FOR THE CONFUSION! refactor if you want, future-me)
-                level, #id,   (depthId)
+                level, #id,   (depthId),
+                len(eqs)
             )
             #for backtrackNeighbour in neighbours:
             #    backtrackNeighbour.prev = rootNode
@@ -182,7 +186,8 @@ class Schemeparser(Parser):
                 [], # neighbours
                 0, # not used, argumentIdx
                 parentStartPosOffset, #used as the startPos of eqs , (SORRY FOR THE CONFUSION! refactor if you want, future-me)
-                level # not used, id
+                level, # not used, id
+                len(eqs)
             )
         return rootNode
 
@@ -226,3 +231,48 @@ class Schemeparser(Parser):
             pp.pprint(self.ast)
             print('*******************')
         return Latexparser(ast=self.ast)._unparse()
+
+
+class Backtracker:
+    """
+    Used in some tree traversal algorithms, allow selected path to be reconstructed.
+    Holds the name of nodes, the neighbours of nodes, prev is the parent of this, id is this id in the whole tree
+    Also used to hold the traversal itself in the memory of this process/thread, so that it can be re-made to a
+    pythonic format (or not).
+
+    TODO should it be a "container" class?... Mixin?
+
+    :param label: name of this Node
+    :type label: str
+    :param neighbours: connections to this Backtracker
+    :type neighbours: list[:class:`Backtracker`]
+    :param argumentIdx: the position of this Node on its parent,which also denotes its position as an argument on
+    its parent as a function
+    :param prev: a BackTracker, denoting the previous link
+    :type prev: :class: `BackTracer`
+    :param id: id of this BackTracker, in the tree
+    :type id: int
+    """
+    def __init__(self, label, neighbours, argumentIdx, prev, id, length):
+        """
+        Just getters and setter. Also the constructor.
+
+        :param label: name of this Node
+        :type label: str
+        :param neighbours: connections to this Node, elements are tuples
+            -item.0 : label
+            -item.1 : id of the node in the tree
+        :type neighbours: list[tuple[str, int]]
+        :param argumentIdx: the position of this Node on its parent,which also denotes its position as an argument on
+        its parent as a function
+        :param prev: a BackTracker, denoting the previous link
+        :type prev: :class: `BackTracer`
+        :param id: id of this Node, in the tree
+        :type id: int
+        """
+        self.label = label
+        self.neighbours = neighbours
+        self.argumentIdx = argumentIdx
+        self.prev = prev
+        self.id = id
+        self.length = length

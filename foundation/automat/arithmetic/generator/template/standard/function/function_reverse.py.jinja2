@@ -1,4 +1,4 @@
-    def _reverse{{equationSide}}{{idx}}(self, {{vReplacementDict}}, {{vTotalNodeCount}}, startPos__nodeId):
+    def _reverse{{equationSide}}{{idx}}(self, {{vReplacementDict}}, {{vTotalNodeCount}}):
         """
         {{vReplacementDict}} are the rows in the AST mapping that needs to be replaced.
         Aim of this function is to make #{{idx+1}} input, the subject
@@ -37,22 +37,8 @@
             raise Exception("{{vReplacementDict}} not according to format")
 
         permutation = {{permutation}}
-        from copy import deepcopy
-        newStartPos__nodeId = deepcopy(startPos__nodeId)
-        rowCol__nodeId = {
-            (0, 0):replacementDictionary[key0][0][1], # [1], um die ausWeisungen zu bekommen
-            (0, 1):replacementDictionary[key0][1][1],
-            (1, 0):replacementDictionary[key1][0][1],
-            (1, 1):replacementDictionary[key1][1][1]
-        }
-        nodeId__startPos = dict(map(lambda t: (t[1],t[0]), startPos__nodeId.items()))
-        for iRowCol, oRowCol in permutation.items():
-            iNodeId = rowCol__nodeId[iRowCol]
-            oNodeId = rowCol__nodeId[oRowCol]
-            startPos = nodeId__startPos[iNodeId]
-            newStartPos__nodeId[startPos] = oNodeId
 
         {% for import in reverseFunctionImports %}
         {{import}}
         {% endfor %}
-        return {{reversedDict}}, {{functionCountAdded}}, {{primitivesCountAdded}}, {{totalNodeCountAdded}}, newStartPos__nodeId
+        return {{reversedDict}}, {{functionCountAdded}}, {{primitivesCountAdded}}, {{totalNodeCountAdded}}, permutation, key0, key1
