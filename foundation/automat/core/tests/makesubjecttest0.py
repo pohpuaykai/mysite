@@ -561,6 +561,9 @@ def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simp
     latexEq = 'I_{R_{C}} R_{C} - V^{Q1}_{BE} - I_{R} R = 0'
     subject = 'I_{R}'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    #
+    print('In makesubjecttest0.py, schemeStr: ', eq0.schemeStr)
+    #
     modifiedAST = eq0.makeSubject(subject, simplify=True) # PIONEER BATCH :)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST, verbose=verbose)._unparse()

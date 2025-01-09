@@ -25,19 +25,19 @@ def test__makeSubject2Input__addition0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -46,7 +46,7 @@ def test__makeSubject2Input__addition0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 
@@ -69,19 +69,19 @@ def test__makeSubject2Input__addition1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -90,7 +90,7 @@ def test__makeSubject2Input__addition1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__subtraction0(verbose=False):
@@ -111,19 +111,19 @@ def test__makeSubject2Input__subtraction0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -132,7 +132,7 @@ def test__makeSubject2Input__subtraction0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__subtraction1(verbose=False):
@@ -153,19 +153,19 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -174,7 +174,7 @@ def test__makeSubject2Input__subtraction1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__multiply0(verbose=False):
@@ -195,19 +195,19 @@ def test__makeSubject2Input__multiply0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -216,7 +216,7 @@ def test__makeSubject2Input__multiply0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__multiply1(verbose=False):
@@ -237,19 +237,19 @@ def test__makeSubject2Input__multiply1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -258,7 +258,7 @@ def test__makeSubject2Input__multiply1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__divide0(verbose=False):
@@ -279,19 +279,19 @@ def test__makeSubject2Input__divide0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -300,7 +300,7 @@ def test__makeSubject2Input__divide0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__divide1(verbose=False):
@@ -321,19 +321,19 @@ def test__makeSubject2Input__divide1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -342,7 +342,7 @@ def test__makeSubject2Input__divide1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__exponent0(verbose=False):
@@ -363,19 +363,19 @@ def test__makeSubject2Input__exponent0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -384,7 +384,7 @@ def test__makeSubject2Input__exponent0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__exponent1(verbose=False):
@@ -405,19 +405,19 @@ def test__makeSubject2Input__exponent1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -426,7 +426,7 @@ def test__makeSubject2Input__exponent1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__nroot0(verbose=False):
@@ -447,19 +447,19 @@ def test__makeSubject2Input__nroot0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -468,7 +468,7 @@ def test__makeSubject2Input__nroot0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__nroot1(verbose=False):
@@ -489,19 +489,19 @@ def test__makeSubject2Input__nroot1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -510,7 +510,7 @@ def test__makeSubject2Input__nroot1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__log0(verbose=False):
@@ -531,19 +531,19 @@ def test__makeSubject2Input__log0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -552,7 +552,7 @@ def test__makeSubject2Input__log0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject2Input__log1(verbose=False):
@@ -573,19 +573,19 @@ def test__makeSubject2Input__log1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -594,7 +594,7 @@ def test__makeSubject2Input__log1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arccosec(verbose=False):
@@ -615,19 +615,19 @@ def test__makeSubject1Input__arccosec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -636,7 +636,7 @@ def test__makeSubject1Input__arccosec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arccosech(verbose=False):
@@ -657,19 +657,19 @@ def test__makeSubject1Input__arccosech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -678,7 +678,7 @@ def test__makeSubject1Input__arccosech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arccos(verbose=False):
@@ -699,19 +699,19 @@ def test__makeSubject1Input__arccos(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -720,7 +720,7 @@ def test__makeSubject1Input__arccos(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arccosh(verbose=False):
@@ -741,19 +741,19 @@ def test__makeSubject1Input__arccosh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -762,7 +762,7 @@ def test__makeSubject1Input__arccosh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arccot(verbose=False):
@@ -783,19 +783,19 @@ def test__makeSubject1Input__arccot(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -804,7 +804,7 @@ def test__makeSubject1Input__arccot(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arccoth(verbose=False):
@@ -825,19 +825,19 @@ def test__makeSubject1Input__arccoth(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -846,7 +846,7 @@ def test__makeSubject1Input__arccoth(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arcsec(verbose=False):
@@ -867,19 +867,19 @@ def test__makeSubject1Input__arcsec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -888,7 +888,7 @@ def test__makeSubject1Input__arcsec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arcsech(verbose=False):
@@ -909,19 +909,19 @@ def test__makeSubject1Input__arcsech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -930,7 +930,7 @@ def test__makeSubject1Input__arcsech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arcsin(verbose=False):
@@ -951,19 +951,19 @@ def test__makeSubject1Input__arcsin(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -972,7 +972,7 @@ def test__makeSubject1Input__arcsin(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arcsinh(verbose=False):
@@ -993,19 +993,19 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1014,7 +1014,7 @@ def test__makeSubject1Input__arcsinh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arctan(verbose=False):
@@ -1035,19 +1035,19 @@ def test__makeSubject1Input__arctan(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1056,7 +1056,7 @@ def test__makeSubject1Input__arctan(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__arctanh(verbose=False):
@@ -1077,19 +1077,19 @@ def test__makeSubject1Input__arctanh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1098,7 +1098,7 @@ def test__makeSubject1Input__arctanh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__cosec(verbose=False):
@@ -1119,19 +1119,19 @@ def test__makeSubject1Input__cosec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1140,7 +1140,7 @@ def test__makeSubject1Input__cosec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__cosech(verbose=False):
@@ -1161,19 +1161,19 @@ def test__makeSubject1Input__cosech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1182,7 +1182,7 @@ def test__makeSubject1Input__cosech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__cos(verbose=False):
@@ -1203,19 +1203,19 @@ def test__makeSubject1Input__cos(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1224,7 +1224,7 @@ def test__makeSubject1Input__cos(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__cosh(verbose=False):
@@ -1245,19 +1245,19 @@ def test__makeSubject1Input__cosh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1266,7 +1266,7 @@ def test__makeSubject1Input__cosh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__cot(verbose=False):
@@ -1287,19 +1287,19 @@ def test__makeSubject1Input__cot(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1308,7 +1308,7 @@ def test__makeSubject1Input__cot(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__coth(verbose=False):
@@ -1329,19 +1329,19 @@ def test__makeSubject1Input__coth(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1350,7 +1350,7 @@ def test__makeSubject1Input__coth(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__sec(verbose=False):
@@ -1371,19 +1371,19 @@ def test__makeSubject1Input__sec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1392,7 +1392,7 @@ def test__makeSubject1Input__sec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__sech(verbose=False):
@@ -1413,19 +1413,19 @@ def test__makeSubject1Input__sech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1434,7 +1434,7 @@ def test__makeSubject1Input__sech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__sin(verbose=False):
@@ -1455,19 +1455,19 @@ def test__makeSubject1Input__sin(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1476,7 +1476,7 @@ def test__makeSubject1Input__sin(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__sinh(verbose=False):
@@ -1497,19 +1497,19 @@ def test__makeSubject1Input__sinh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1518,7 +1518,7 @@ def test__makeSubject1Input__sinh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__tan(verbose=False):
@@ -1539,19 +1539,19 @@ def test__makeSubject1Input__tan(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1560,7 +1560,7 @@ def test__makeSubject1Input__tan(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__makeSubject1Input__tanh(verbose=False):
@@ -1581,19 +1581,19 @@ def test__makeSubject1Input__tanh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1602,7 +1602,7 @@ def test__makeSubject1Input__tanh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 
@@ -1626,19 +1626,19 @@ def test__leftSide__addition0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1647,7 +1647,7 @@ def test__leftSide__addition0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__addition1(verbose=False):
@@ -1668,19 +1668,19 @@ def test__leftSide__addition1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1689,7 +1689,7 @@ def test__leftSide__addition1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__subtraction0(verbose=False):
@@ -1710,19 +1710,19 @@ def test__leftSide__subtraction0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1731,7 +1731,7 @@ def test__leftSide__subtraction0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__subtraction1(verbose=False):
@@ -1752,19 +1752,19 @@ def test__leftSide__subtraction1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1773,7 +1773,7 @@ def test__leftSide__subtraction1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__multiply0(verbose=False):
@@ -1794,19 +1794,19 @@ def test__leftSide__multiply0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1815,7 +1815,7 @@ def test__leftSide__multiply0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__multiply1(verbose=False):
@@ -1836,19 +1836,19 @@ def test__leftSide__multiply1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1857,7 +1857,7 @@ def test__leftSide__multiply1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__divide0(verbose=False):
@@ -1878,19 +1878,19 @@ def test__leftSide__divide0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1899,7 +1899,7 @@ def test__leftSide__divide0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__divide1(verbose=False):
@@ -1920,19 +1920,19 @@ def test__leftSide__divide1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1941,7 +1941,7 @@ def test__leftSide__divide1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__exponent0(verbose=False):
@@ -1962,19 +1962,19 @@ def test__leftSide__exponent0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -1983,7 +1983,7 @@ def test__leftSide__exponent0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__exponent1(verbose=False):
@@ -2004,19 +2004,19 @@ def test__leftSide__exponent1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2025,7 +2025,7 @@ def test__leftSide__exponent1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__nroot0(verbose=False):
@@ -2046,19 +2046,19 @@ def test__leftSide__nroot0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2067,7 +2067,7 @@ def test__leftSide__nroot0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__nroot1(verbose=False):
@@ -2088,19 +2088,19 @@ def test__leftSide__nroot1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2109,7 +2109,7 @@ def test__leftSide__nroot1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__log0(verbose=False):
@@ -2130,19 +2130,19 @@ def test__leftSide__log0(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2151,7 +2151,7 @@ def test__leftSide__log0(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__log1(verbose=False):
@@ -2172,19 +2172,19 @@ def test__leftSide__log1(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2193,7 +2193,7 @@ def test__leftSide__log1(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arccosec(verbose=False):
@@ -2214,19 +2214,19 @@ def test__leftSide__arccosec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2235,7 +2235,7 @@ def test__leftSide__arccosec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arccosech(verbose=False):
@@ -2256,19 +2256,19 @@ def test__leftSide__arccosech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2277,7 +2277,7 @@ def test__leftSide__arccosech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arccos(verbose=False):
@@ -2298,19 +2298,19 @@ def test__leftSide__arccos(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2319,7 +2319,7 @@ def test__leftSide__arccos(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arccosh(verbose=False):
@@ -2340,19 +2340,19 @@ def test__leftSide__arccosh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2361,7 +2361,7 @@ def test__leftSide__arccosh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arccot(verbose=False):
@@ -2382,19 +2382,19 @@ def test__leftSide__arccot(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2403,7 +2403,7 @@ def test__leftSide__arccot(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arccoth(verbose=False):
@@ -2424,19 +2424,19 @@ def test__leftSide__arccoth(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2445,7 +2445,7 @@ def test__leftSide__arccoth(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arcsec(verbose=False):
@@ -2466,19 +2466,19 @@ def test__leftSide__arcsec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2487,7 +2487,7 @@ def test__leftSide__arcsec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arcsech(verbose=False):
@@ -2508,19 +2508,19 @@ def test__leftSide__arcsech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2529,7 +2529,7 @@ def test__leftSide__arcsech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arcsin(verbose=False):
@@ -2550,19 +2550,19 @@ def test__leftSide__arcsin(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2571,7 +2571,7 @@ def test__leftSide__arcsin(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arcsinh(verbose=False):
@@ -2592,19 +2592,19 @@ def test__leftSide__arcsinh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2613,7 +2613,7 @@ def test__leftSide__arcsinh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arctan(verbose=False):
@@ -2634,19 +2634,19 @@ def test__leftSide__arctan(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2655,7 +2655,7 @@ def test__leftSide__arctan(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__arctanh(verbose=False):
@@ -2676,19 +2676,19 @@ def test__leftSide__arctanh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2697,7 +2697,7 @@ def test__leftSide__arctanh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__cosec(verbose=False):
@@ -2718,19 +2718,19 @@ def test__leftSide__cosec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2739,7 +2739,7 @@ def test__leftSide__cosec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__cosech(verbose=False):
@@ -2760,19 +2760,19 @@ def test__leftSide__cosech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2781,7 +2781,7 @@ def test__leftSide__cosech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__cos(verbose=False):
@@ -2802,19 +2802,19 @@ def test__leftSide__cos(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2823,7 +2823,7 @@ def test__leftSide__cos(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__cosh(verbose=False):
@@ -2844,19 +2844,19 @@ def test__leftSide__cosh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2865,7 +2865,7 @@ def test__leftSide__cosh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__cot(verbose=False):
@@ -2886,19 +2886,19 @@ def test__leftSide__cot(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2907,7 +2907,7 @@ def test__leftSide__cot(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__coth(verbose=False):
@@ -2928,19 +2928,19 @@ def test__leftSide__coth(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2949,7 +2949,7 @@ def test__leftSide__coth(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__sec(verbose=False):
@@ -2970,19 +2970,19 @@ def test__leftSide__sec(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -2991,7 +2991,7 @@ def test__leftSide__sec(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__sech(verbose=False):
@@ -3012,19 +3012,19 @@ def test__leftSide__sech(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -3033,7 +3033,7 @@ def test__leftSide__sech(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__sin(verbose=False):
@@ -3054,19 +3054,19 @@ def test__leftSide__sin(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -3075,7 +3075,7 @@ def test__leftSide__sin(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__sinh(verbose=False):
@@ -3096,19 +3096,19 @@ def test__leftSide__sinh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -3117,7 +3117,7 @@ def test__leftSide__sinh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__tan(verbose=False):
@@ -3138,19 +3138,19 @@ def test__leftSide__tan(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -3159,7 +3159,7 @@ def test__leftSide__tan(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 def test__leftSide__tanh(verbose=False):
@@ -3180,19 +3180,19 @@ def test__leftSide__tanh(verbose=False):
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and
-        expectedTotalNodeCount == eq0.totalNodeCount and
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and
+        expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeId
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
         )
     if verbose:
         print(latexStr)
-        print(eq0.functions)
-        print(eq0.variables)
-        print(eq0.primitives)
-        print(eq0.totalNodeCount)
+        print(eq0.functionsScheme)
+        print(eq0.variablesScheme)
+        print(eq0.primitivesScheme)
+        print(eq0.totalNodeCountScheme)
         print('********')
         print('modifiedSchemeStr')
         print(eq0.schemeStr)
@@ -3201,7 +3201,7 @@ def test__leftSide__tanh(verbose=False):
         print('before _startPos__nodeId')
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
-        pp.pprint(eq0.startPos__nodeId)
+        pp.pprint(eq0.startPos__nodeIdScheme)
 
 
 

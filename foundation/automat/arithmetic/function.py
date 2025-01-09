@@ -114,9 +114,9 @@ class Function:#(metaclass=FunctionHook):
         self.idInAst = idInAst
 
 
-    def preReverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId):
+    def preReverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId): # TODO refactor, startPos__nodeId does not need to be passed here, get from self.eq.startPos__nodeIdScheme
         """"""
-        ast = deepcopy(self.eq.ast)
+        ast = deepcopy(self.eq.astScheme)
         replacementDictionary = {}
         for key, value in ast.items():
             if key[1] in nodeIds:
@@ -131,12 +131,12 @@ class Function:#(metaclass=FunctionHook):
 
         #will raise error if function of the node with `nodeId` is not equals to self.FUNC_NAME, handle in child.inverse
         (invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange, permutation, key0, key1) = self.reverses[(equationSide, str(argumentIdx))](
-            replacementDictionary, self.eq.totalNodeCount)
+            replacementDictionary, self.eq.totalNodeCountScheme)
 
         return invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange, ast, permutation, key0, key1, replacementDictionary
 
 
-    def reverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId, nodeId__len):
+    def reverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId, nodeId__len): # TODO refactor, startPos__nodeId&nodeId__len, get from self.eq.
         """
         make argumentIdx the subject of the subAST
 
@@ -168,15 +168,41 @@ class Function:#(metaclass=FunctionHook):
                 del ast[oldKey]
             ast[oldValue['newKey']] = list(oldValue['newValue'])
 
-        altered__startPos__nodeId = self._reverse__startPosRecalculation(permutation, replacementDictionary, ast, key0, key1, startPos__nodeId, invertedResults, nodeId__len)
+        altered__startPos__nodeId, altered__nodeId__len = self._reverse__startPosRecalculation(permutation, replacementDictionary, ast, key0, key1, startPos__nodeId, invertedResults, nodeId__len)
 
 
-        return ast, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, altered__startPos__nodeId
+        return ast, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, altered__startPos__nodeId, altered__nodeId__len
 
 
     def _reverse__startPosRecalculation(self, permutation, replacementDictionary, ast, key0, key1, startPos__nodeId, invertedResults, nodeId__len):
-
+        #all these inputs need not be passed...? get from self? but inconvienent for reuse/testing?
         from copy import deepcopy # TODO refactor..., imported multiple times
+        #TODO nodeId__len might also be changed, if another node is removed from it.
+        #it seems that only key1's length is changed
+        #actually key0's length is also changed, but key0 is always the =. which contains everything. And in reversal, everything does not change.
+        key1ChildrenIdBefore = set(map(lambda t: t[1], replacementDictionary[key1]))
+        key1ChildrenIdAfter = set(map(lambda t: t[1], invertedResults[key1]['newValue']))
+        idsAdded = key1ChildrenIdAfter - key1ChildrenIdBefore
+        idsRemoved = key1ChildrenIdBefore - key1ChildrenIdAfter
+        lenChanged = 0
+        for nodeId in idsRemoved:
+            lenChanged -= nodeId__len[nodeId]
+        for nodeId in idsAdded:
+            lenChanged += nodeId__len[nodeId]
+        nodeId__len__after = deepcopy(nodeId__len)
+        nodeId__len__after[key1[1]] += lenChanged
+
+        updated__nodeId__len = nodeId__len__after
+        #changing the label(key1), might change the len
+        newKey1Label = invertedResults[key1]['newKey'][0]
+        oldKey1Label = key1[0]
+        updated__nodeId__len[key1[1]] += (len(newKey1Label) - len(oldKey1Label))
+        # print(updated__nodeId__len[key1[1]])
+        # import pdb;pdb.set_trace()
+
+        if self.verbose:
+            print('id: ', key1[1], 'lenChanged', lenChanged)
+
 
         # print('permutation')
         # print(permutation)
@@ -252,12 +278,18 @@ class Function:#(metaclass=FunctionHook):
         
         nodeIdContaining = key1[1]
         #
-        # print('replacementDictionary.values()', replacementDictionary)
-        # print('newStartPos__nodeId', newStartPos__nodeId)
-        # print('relevantNodeIds', relevantNodeIds)
-        # print('orderList__after', orderList__after)
-        # print('orderList__before', orderList__before)
-        # print('nodeIdContaining', nodeIdContaining)
+        # print(self.eq)
+        # import pdb;pdb.set_trace()
+        if self.verbose:
+            print('startPos__nodeId', startPos__nodeId)
+            print('sorted__startPos__nodeId__items', sorted__startPos__nodeId__items)
+            print('~~~')
+
+            print('replacementDictionary.values()', replacementDictionary)
+            print('relevantNodeIds', relevantNodeIds)
+            print('orderList__after', orderList__after)
+            print('orderList__before', orderList__before)
+            print('nodeIdContaining', nodeIdContaining)
         #
         #nodeIdsContainedBy(nodeIdContaining)
         nodeIdsContainedBy = list(map(lambda t: t[1], replacementDictionary[key1]))
@@ -289,6 +321,7 @@ class Function:#(metaclass=FunctionHook):
                 # print('****', nodeId, 'examining:', preNodeId, 'totalLen:', totalLen, 'justadded:', nodeId__len[preNodeId]+len(' '), 'of preNodeId', preNodeId)
                 #
             nodeId__beforeLengths[nodeId] = totalLen
+            # print('!***', nodeId__beforeLengths)
         
         
         #also need containment information, that is in the reversedDict..., and also done in the parent like this:
@@ -297,14 +330,6 @@ class Function:#(metaclass=FunctionHook):
         nodeIdsContainedBy = list(map(lambda t: t[1], invertedResults[key1]['newValue']))
         indexOfNodeIdContaining = orderList__after.index(nodeIdContaining)
         nodeId__afterLengths = {}
-
-        updated__nodeId__len = nodeId__len
-        #changing the label(key1), might change the len
-        newKey1Label = invertedResults[key1]['newKey'][0]
-        oldKey1Label = key1[0]
-        updated__nodeId__len[key1[1]] += (len(newKey1Label) - len(oldKey1Label))
-        # print(updated__nodeId__len[key1[1]])
-        # import pdb;pdb.set_trace()
 
         #
         # print('orderList__after')
@@ -334,18 +359,21 @@ class Function:#(metaclass=FunctionHook):
                 totalLen += updated__nodeId__len[preNodeId] + len(' ')
                 #
                 # print('****', nodeId, 'examining:', preNodeId, 'totalLen:', totalLen, 'justadded:', updated__nodeId__len[preNodeId]+len(' '), 'of preNodeId', preNodeId)
-                # print()
+                # import pdb;pdb.set_trace()
                 #
             nodeId__afterLengths[nodeId] = totalLen
             
         #
-        # print('nodeId__beforeLengths:')
-        # print(nodeId__beforeLengths)
-        # print('nodeId__afterLengths:')
-        # print(nodeId__afterLengths)
-        # print('changes:')
-        # for nodeId in nodeId__beforeLengths.keys():
-        #     print(nodeId, ':', nodeId__afterLengths[nodeId],  '-',  nodeId__beforeLengths[nodeId], '=', nodeId__afterLengths[nodeId] - nodeId__beforeLengths[nodeId])
+        if self.verbose:
+            print('~~~~~~')
+            print('nodeId__beforeLengths:')
+            print(nodeId__beforeLengths)
+            print('nodeId__afterLengths:')
+            print(nodeId__afterLengths)
+            print('changes:')
+            for nodeId in nodeId__beforeLengths.keys():
+                print(nodeId, ':', nodeId__afterLengths[nodeId],  '-',  nodeId__beforeLengths[nodeId], '=', nodeId__afterLengths[nodeId] - nodeId__beforeLengths[nodeId])
+            print('~~~~~')
         #
 
         #but every other node that is contained in A, B, and C are shifted by that amount... and 
@@ -366,17 +394,18 @@ class Function:#(metaclass=FunctionHook):
         #
         for node in flattenedChildrenOfReplacementDictionary:
             startPosChange = nodeId__afterLengths[node[1]] - nodeId__beforeLengths[node[1]]
+            #
+            # print('startPosChange')
+            # print(startPosChange)
+            # print('node', node)
+            #
             if node == key1: # key1 is the function Node , and it contains the other two , we don't want this change to propagate to children of key1
                 newStartPos = nodeId__startPos[node[1]] + startPosChange
                 newStartPos__nodeId[newStartPos] = node[1]
                 continue
             #all the shifts below node should be = startPosChange
-            #
-            # print('startPosChange')
-            # print(startPosChange)
-            #
             subAST = self.eq._cutSubASTAtRoot(node)
-            listOfChildren = list(subAST.values())
+            listOfChildren = list(subAST.values()) + [[node]] # children will not include root, so we need to use +[node] to add back the node
             if len(sum(listOfChildren, [])) == 0:
                 listOfChildren = [list(subAST.keys())]
             # print('listOfChildren')
@@ -386,13 +415,17 @@ class Function:#(metaclass=FunctionHook):
                 for childNode in children:
                     newStartPos = nodeId__startPos[childNode[1]] + startPosChange
                     newStartPos__nodeId[newStartPos] = childNode[1]
+                    #
+                    # print('!!!!')
+                    # print(newStartPos, childNode[1])
+                    #
 
         #add back everything that was not touched.
         touchedNodeIds = newStartPos__nodeId.values()
         for startPos, nodeId in startPos__nodeId.items():
             if nodeId not in touchedNodeIds:
                 newStartPos__nodeId[startPos] = nodeId
-        return newStartPos__nodeId # need to add back the equals.
+        return newStartPos__nodeId, updated__nodeId__len # need to add back the equals.
 
 
 
@@ -408,12 +441,12 @@ class Function:#(metaclass=FunctionHook):
         """
         #prevent circular import
         from foundation.automat.arithmetic.sfunctor import FUNCTOR_NAMES_TO_CLASS
-        queue = [self.ast] # TODO need to insert the root.... of the AST.... which i did not put in...
+        queue = [self.astScheme] # TODO need to insert the root.... of the AST.... which i did not put in...
         while len(queue) != 0:
             current = queue.pop()
             if current.label in FUNCTOR_NAMES_TO_CLASS: 
-                neighbours = self.ast[current.label]
+                neighbours = self.astScheme[current.label]
                 subroot = neighbours[0]
                 withrespectto = neighbours[1]
-                self.ast = FUNCTOR_NAMES_TO_CLASS[current.label]._calculate(subroot, withrespectto)
+                self.astScheme = FUNCTOR_NAMES_TO_CLASS[current.label]._calculate(subroot, withrespectto)
                 # put which neighbours in queue again?

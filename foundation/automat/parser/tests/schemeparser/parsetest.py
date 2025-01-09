@@ -222,7 +222,7 @@ def test__makeSubject__linearEliminationBySubstitution(verbose=False):
     ('-', 5): [('*', 7), ('V^{Q1}_{BE}', 8)],
     ('=', 0): [('*', 1), ('-', 2)]}
     expected_startPos__nodeId = {1: 0, 4: 1, 6: 3, 12: 4, 16: 2, 19: 5, 22: 7, 24: 9, 34: 10, 41: 8, 54: 6}
-    expected_nodeId__len = None
+    expected_nodeId__len = {0: 57, 1: 11, 2: 41, 3: 5, 4: 1, 5: 35, 6: 1, 7: 19, 8: 11, 9: 9, 10: 5}
     # unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         ast==expected_ast and \
@@ -235,10 +235,39 @@ def test__makeSubject__linearEliminationBySubstitution(verbose=False):
         pp.pprint(parser.nodeId__len)
 
 
+def test__makeSubject__linearEliminationBySubstitution0(verbose=False):
+    #https://en.wikipedia.org/wiki/Early_effect#Large-signal_model
+    pp = pprint.PrettyPrinter(indent=4)
+
+    equationStr = '(= (- (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}) (* I_{R} R)) 0)'
+    parser = Schemeparser(equationStr=equationStr, verbose=verbose)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    # ast = parser.ast
+    # pp.pprint(ast)
+    expected_ast = {   
+    ('*', 4): [('I_{R}', 7), ('R', 8)],
+    ('*', 5): [('I_{R_{C}}', 9), ('R_{C}', 10)],
+    ('-', 1): [('-', 3), ('*', 4)],
+    ('-', 3): [('*', 5), ('V^{Q1}_{BE}', 6)],
+    ('=', 0): [('-', 1), ('0', 2)]}
+    expected_startPos__nodeId = {1: 0, 4: 1, 7: 3, 10: 5, 12: 9, 22: 10, 29: 6, 43: 4, 45: 7, 51: 8, 55: 2}
+    expected_nodeId__len = {0: 57, 1: 51, 2: 1, 3: 35, 4: 11, 5: 19, 6: 11, 7: 5, 8: 1, 9: 9, 10: 5}
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        ast==expected_ast and \
+        startPos__nodeId==expected_startPos__nodeId and \
+        parser.nodeId__len==expected_nodeId__len
+    )
+    if verbose:
+        pp.pprint(ast)
+        pp.pprint(startPos__nodeId)
+        pp.pprint(parser.nodeId__len)
+
+
 if __name__=='__main__':
-    test__schemeParserTest__add()
-    test__schemeParserTest__harmonicMean()
-    test__schemeParserTest__phasorDiagram()
-    test__schemeParserTest__ebersMollModelp1()
-    test__schemeParserTest__earlyEffectModel()
-    # test__makeSubject__linearEliminationBySubstitution(True) # untested because simplify is simply not ready!
+    # test__schemeParserTest__add()
+    # test__schemeParserTest__harmonicMean()
+    # test__schemeParserTest__phasorDiagram()
+    # test__schemeParserTest__ebersMollModelp1()
+    # test__schemeParserTest__earlyEffectModel()
+    test__makeSubject__linearEliminationBySubstitution(True)
+    # test__makeSubject__linearEliminationBySubstitution0()

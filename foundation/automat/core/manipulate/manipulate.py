@@ -40,7 +40,7 @@ class Manipulate:
         self.eq = equation
         self.verbose = verbose
         #make and store the scheme string
-        self.schemeStr = equation.toString('scheme')
+        self.schemeStr = equation.schemeStr#equation.toString('scheme')
         from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
         self.grammarParserClass = SchemeGrammarParser
         self.grammarParser = None
@@ -56,7 +56,7 @@ class Manipulate:
         if len(set(self.grammarParser.outVariables)) > len(set(self.grammarParser.variables)):
             missingMetaVariables = list(set(self.grammarParser.outVariables) - set(self.grammarParser.variables))
             variable_eVariable__tupleList = []
-            varList = list(self.eq.variables.keys())
+            varList = list(self.eq.variablesScheme.keys())
             # for outVariable in self.grammarParser.outVariables:
             for outVariable in missingMetaVariables:
                 eVariable = self.giveMeAVariableNotInThisList(varList)
@@ -86,6 +86,9 @@ class Manipulate:
         """
         if self.grammarParser is None:
             self.initGrammerParser()
+        #
+        print('self.schemeStr', self.schemeStr)
+        #
         self.grammarParser.buildEnclosureTree(self.schemeStr)
         return not self.grammarParser.noMatches
 

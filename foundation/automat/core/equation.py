@@ -32,6 +32,10 @@ class Equation:
         If parserName is not 'scheme', we need to unparse the self.ast to scheme and then store all the statistics, 
         including startPos__nodeId
 
+        In this `Equation`, for all calculations, we will use the *Scheme version. Like if we want to use 
+        ast, we will use the self.astScheme, instead of self.ast (which might be derived from other parsers, and 
+        have different ids, ....)
+
         :param equationStr: the equation str to be parsed
         :type equationStr: str
         :param parserName: the name of the parser to be used
@@ -48,15 +52,22 @@ class Equation:
             self.startPos__nodeId = self._parser.startPos__nodeId
             self.nodeId__len = self._parser.nodeId__len
             self.schemeparser = self._parser
+            self.astScheme = self.ast
+            self.functionsScheme = self.functions
+            self.variablesScheme = self.variables
+            self.primitivesScheme = self.primitives
+            self.totalNodeCountScheme = self.totalNodeCount
+            self.startPos__nodeIdScheme = self._parser.startPos__nodeId
+            self.nodeId__lenScheme = self._parser.nodeId__len
         else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
             from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
             self.schemeparser = Schemeparser(ast=self.ast)
             self.schemeStr = self.schemeparser._unparse()
             self.schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
             (self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme,
-            self.totalNodeCountScheme, self.startPos__nodeId) = self.schemeparser._parse()
+            self.totalNodeCountScheme, self.startPos__nodeIdScheme) = self.schemeparser._parse()
             # self.startPos__nodeId = self.schemeparser.startPos__nodeId
-            self.nodeId__len = self.schemeparser.nodeId__len
+            self.nodeId__lenScheme = self.schemeparser.nodeId__len
             
         self.availableStrsFormats = {
             self._parserName: self._eqs
@@ -64,12 +75,13 @@ class Equation:
         #############
         if self.verbose:
             print('~~~~~~~~~~~~~~~~~~~~INIT')
-            print(self.ast)
-            print('self.functions', self.functions)
-            print('self.variables', self.variables)
-            print('self.primitives', self.primitives)
-            print('self.totalNodeCount', self.totalNodeCount)
-            print('self.startPos__nodeId', self.startPos__nodeId)
+            print(self.astScheme)
+            print('self.functionsScheme', self.functionsScheme)
+            print('self.variablesScheme', self.variablesScheme)
+            print('self.primitivesScheme', self.primitivesScheme)
+            print('self.totalNodeCountScheme', self.totalNodeCountScheme)
+            print('self.startPos__nodeIdScheme', self.startPos__nodeIdScheme)
+            print('self.nodeId__lenScheme', self.nodeId__lenScheme)
         #############
 
 
@@ -86,15 +98,16 @@ class Equation:
         """
         make variable the subject of this equation
 
+
         :param variable:
         :type variable: str
         :return: a new AST that has variable as the subject of the formula
         :rtype: dict[tuple[str, int], list[tuple[str, int]]]
         """
         #error checking
-        if variable not in self.variables:
+        if variable not in self.variablesScheme:
             raise Exception("Variable Not Available")
-        if self.variables[variable] > 1: 
+        if self.variablesScheme[variable] > 1: 
             #TODO, unable to further handle without more patterns like quadratic, cubic, quartic, 
             #TODO partial-fractions
             #TODO can put factorisation here
@@ -103,7 +116,7 @@ class Equation:
             raise Exception("Cannot handle")
 
         if self.verbose:
-            print('working on AST:', self.ast)
+            print('working on AST:', self.astScheme)
 
         #find path from subRoot to variable
         stack = [Backtracker(
@@ -120,7 +133,7 @@ class Equation:
                 found = current
                 break
             currentNode = (current.label, current.id)
-            for argumentIdx, (label, idx) in enumerate(self.ast.get(currentNode, [])):
+            for argumentIdx, (label, idx) in enumerate(self.astScheme.get(currentNode, [])):
                 backtracker = Backtracker(
                     label, #label
                     None, #neighbours
@@ -165,7 +178,7 @@ class Equation:
                 firstAncestorOfFound = (found.label, found.id)
                 if self.verbose:
                     print(firstAncestorOfFound)
-                childrenOfEquals = self.ast[('=', 0)]
+                childrenOfEquals = self.astScheme[('=', 0)]
                 firstAncestorOfFoundChildIdx = childrenOfEquals.index(firstAncestorOfFound)
                 if firstAncestorOfFoundChildIdx == 0:#left side
                     equationSide = 'L'
@@ -194,10 +207,11 @@ class Equation:
             from foundation.automat.core.manipulate.recommend.recommend import Recommend
             recommend = Recommend(self, verbose=self.verbose)
         #apply the reverses
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
         while len(ops) != 0:
             op = ops.pop(-1) # apply in reverse order (start with the one nearest to =)
             if self.verbose:
-                print('applying op', op)
+                print('*****applying op', op)
             functionClass = self.getFunctionClass(op['functionName'])
             #TODO (optional)since equation is changed after each op, we have to recalculate the next op again, after the reversal... and so, we only need to calculate one op at a time... => might it go into an infinity loop?
             
@@ -206,19 +220,29 @@ class Equation:
             # )
             # self.ast = invertedAst 
             #give hint to Recommend in order to do 'simplification' TODO
+            if self.verbose:
+                print('BEFORE nodeId__lenScheme', self.nodeId__lenScheme)
+                print('BEFORE astScheme', self.astScheme)
+                print('BEFORE startPos__nodeIdScheme', self.startPos__nodeIdScheme)
+            (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId, nodeId__len) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+                equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeIdScheme, self.nodeId__lenScheme
+            ) #TODO functionClass to make change to SchemeStr & startPos__nodeId too?
+            self.nodeId__lenScheme = nodeId__len
+            self.startPos__nodeIdScheme = startPos__nodeId
+            self.astScheme = invertedAst
+            self.schemeStr = Schemeparser(ast=self.astScheme)._unparse()
+            if self.verbose:
+                print('AFTER nodeId__lenScheme', self.nodeId__lenScheme)
+                print('AFTER astScheme:', self.astScheme)
+                print('AFTER startPos__nodeIdScheme', self.startPos__nodeIdScheme)
             if simplify:
-                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
-                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId, self.nodeId__len
-                ) #TODO functionClass to make change to SchemeStr & startPos__nodeId too?
-                self.startPos__nodeId = startPos__nodeId
-                self.ast = invertedAst 
-                ####
-                print('before SIM:')
-                print('invertedAst:', invertedAst)
-                ####
                 simplifiedAst, nodeIdOfPrimitivesRemoved, nodeIdOfVariablesRemoved, nodeIdOfFuncsRemoved = recommend.simplify(hint={'invertedResults':invertedResults})#, 'lastOp':op})
                 if simplifiedAst is not None:
                     ######
+                    print('before simplifying:')
+                    print(invertedAst)
+                    print('after simplifying:')
+                    print(simplifiedAst)
                     print('ops:')
                     print(ops)
                     print('simplifiedAst:')
@@ -229,60 +253,70 @@ class Equation:
                     print(nodeIdOfVariablesRemoved)
                     print('nodeIdOfFuncsRemoved:')
                     print(nodeIdOfFuncsRemoved)
+                    import pdb;pdb.set_trace()
+                    """
+                        SO, i need to look at the nodeIdOfFuncsRemoved & invertedAst (before simplification.)
+                        And then manually, remove from invertedAst, what is in nodeIdOfFuncsRemoved? Wow, do that in general? How should the invertedAst be changed?
+                        In this way, the ops, will not be disturbed.... and the original will not be disturbed.
+                        This also means we do not need the simplifiedAst.....?
+                    """
                     ######
                     #need to recalculate path to variable again... because ast changed...
                     # we can also get `Recommend` to give us the changes made, then we can maybe just alter the ops a bit?
                     #TODO we do not do this calculation for now...
                     #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    newOps = []
-                    for op in ops:
-                        (preInvertedAst, preFunctionCountChange, prePrimitiveCountChange, preTotalNodeCountChange, preInvertedResults) = functionClass(self, op['id'], verbose=self.verbose).preReverse(
-                            equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId
-                        )
-                        #################
-                        print(op) # if changes in primitives/variables, op should be modified, instead of removed?
-                        print(preInvertedResults)
-                        print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
-                        import pdb;pdb.set_trace()
-                        #################
-                        # then we also remove this nodeId of function from ops...
-                        # those removed might also be primitives or variables
-                        if op['id'] in nodeIdOfFuncsRemoved: 
-                            # another way to do it, is if op fails... then just skip this op, and go to the next op? -> any situation where this might fail?
-                            #if variable/primitive is removed. the reversal of that function containing it, still need to do correct reversal.
-                            #skipping the reversal of that function , will result in incorrect answer. SO WRONG WAY
-                            #TODO another way to do it, is invertedResults then we calculate from the changes...., but it seems, that first way is more efficient?
-                            #preReverse is reading from a dictionary in a class... and then passing it up 2 classes (2 pieces in the tracestack.)
-                            if self.verbose:
-                                print(f"removed {op['functionName']}, {op['id']} from ops")
-                            continue
-                        newOps.append(op)
-                    ops = newOps
-                    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    self.ast = simplifiedAst
+                    # newOps = []
+                    # for op0 in ops:
+                    #     #TODO refactor the blanks underscores, 
+                    #     (preInvertedAst, preFunctionCountChange, prePrimitiveCountChange, preTotalNodeCountChange,  _, _, _, _, _) = functionClass(self, op0['id'], verbose=self.verbose).preReverse(
+                    #         equationSide, op0['argumentIdx'], [op0['id'], op0['lastId']], self.startPos__nodeIdScheme
+                    #     )
+                    #     #################
+                    #     print('nodeIdOfFuncsRemoved')
+                    #     print(nodeIdOfFuncsRemoved)
+                    #     print(op0) # if changes in primitives/variables, op should be modified, instead of removed?
+                    #     #TODO we need to match the OP's nodeId to nodeIdOfFuncsRemoved
+                    #     print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+                    #     import pdb;pdb.set_trace()
+                    #     #################
+                    #     # then we also remove this nodeId of function from ops...
+                    #     # those removed might also be primitives or variables
+                    #     if op0['id'] in nodeIdOfFuncsRemoved: 
+                    #         # another way to do it, is if op fails... then just skip this op, and go to the next op? -> any situation where this might fail?
+                    #         #if variable/primitive is removed. the reversal of that function containing it, still need to do correct reversal.
+                    #         #skipping the reversal of that function , will result in incorrect answer. SO WRONG WAY
+                    #         #TODO another way to do it, is invertedResults then we calculate from the changes...., but it seems, that first way is more efficient?
+                    #         #preReverse is reading from a dictionary in a class... and then passing it up 2 classes (2 pieces in the tracestack.)
+                    #         if self.verbose:
+                    #             print(f"removed {op0['functionName']}, {op0['id']} from ops")
+                    #         continue
+                    #     newOps.append(op0)
+                    # ops = newOps
+                    # #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    # self.astScheme = simplifiedAst
 
-            else: #no step-by-step simplification needed, should not raise exception...
-                (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
-                    equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId, self.nodeId__len
-                )
-                self.startPos__nodeId = startPos__nodeId
-                self.ast = invertedAst 
+            # else: #no step-by-step simplification needed, should not raise exception...
+            #     (invertedAst, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, startPos__nodeId) = functionClass(self, op['id'], verbose=self.verbose).reverse(
+            #         equationSide, op['argumentIdx'], [op['id'], op['lastId']], self.startPos__nodeId, self.nodeId__len
+            #     )
+            #     self.startPos__nodeId = startPos__nodeId
+            #     self.ast = invertedAst 
 
             #update the `stat` of self
             for funcName, countChange in functionCountChange.items():
-                self.functions[funcName] = self.functions.get(funcName, 0) + countChange
-                if self.functions[funcName] == 0:
-                    del self.functions[funcName]
+                self.functionsScheme[funcName] = self.functionsScheme.get(funcName, 0) + countChange
+                if self.functionsScheme[funcName] == 0:
+                    del self.functionsScheme[funcName]
             for primitiveName, countChange in primitiveCountChange.items():
-                self.primitives[primitiveName] = self.primitives.get(primitiveName, 0) + countChange
-                if self.primitives[primitiveName] == 0:
-                    del self.primitives[primitiveName]
-            # self.primitives += primitiveCountChange
-            self.totalNodeCount += totalNodeCountChange
+                self.primitivesScheme[primitiveName] = self.primitivesScheme.get(primitiveName, 0) + countChange
+                if self.primitivesScheme[primitiveName] == 0:
+                    del self.primitivesScheme[primitiveName]
+            # self.primitivesScheme += primitiveCountChange
+            self.totalNodeCountScheme += totalNodeCountChange
 
         #need to put the scheme string back
-        self.schemeStr = self.schemeparser.unparse(ast=self.ast)
-        return self.ast
+        self.schemeStr = self.schemeparser.unparse(ast=self.astScheme)
+        return self.astScheme
 
 
 
@@ -314,7 +348,7 @@ class Equation:
         if len(substitutionDictionary) == 0:
             raise Exception("Did not input substitution")
         for variableStr, value in substitutionDictionary.items():
-            if variableStr not in self.variables:
+            if variableStr not in self.variablesScheme:
                 raise Exception("Function not in equation")
         from foundation.automat.common import isNum
         def _recursiveSubsituteValue(bt): # put in BackTracker for Storage, then DFS BackTracker to put in AST format
@@ -323,7 +357,7 @@ class Equation:
             ##########
             node = (bt.label, bt.id)
             nodeName, nodeId = bt.label, bt.id
-            children = self.ast.get(node, [])
+            children = self.astScheme.get(node, [])
             if len(children) == 0: # is leaf
                 nodeName = substitutionDictionary.get(nodeName, nodeName)
                 ############
@@ -435,40 +469,40 @@ class Equation:
         if self.verbose:
             import pprint
             pp = pprint.PrettyPrinter(indent=4)
-            print('before makeSubject self.ast totalNodeCount', self.totalNodeCount)
-            print('before makeSubject eq.ast totalNodeCount', eq.totalNodeCount)
+            print('before makeSubject self.astScheme totalNodeCountScheme', self.totalNodeCountScheme)
+            print('before makeSubject eq.astScheme totalNodeCountScheme', eq.totalNodeCountScheme)
 
         self.makeSubject(variable)
         eq.makeSubject(variable)
         if self.verbose:
-            print('after makeSubject self.ast: ', self.ast)
-            print('after makeSubject self.ast totalNodeCount: ', self.totalNodeCount)
-            print('after makeSubject self.ast functions: ', self.functions)
-            print('after makeSubject self.ast variables: ', self.variables)
-            print('after makeSubject self.ast primitives', self.primitives)
-            print('after makeSubject eq.ast:', eq.ast)
-            print('after makeSubject eq.ast totalNodeCount: ', eq.totalNodeCount)
-            print('after makeSubject eq.ast functions: ', eq.functions)
-            print('after makeSubject eq.ast variables: ', eq.variables)
-            print('after makeSubject eq.ast primitives', eq.primitives)
+            print('after makeSubject self.astScheme: ', self.astScheme)
+            print('after makeSubject self.astScheme totalNodeCountScheme: ', self.totalNodeCountScheme)
+            print('after makeSubject self.astScheme functionsScheme: ', self.functionsScheme)
+            print('after makeSubject self.astScheme variablesScheme: ', self.variablesScheme)
+            print('after makeSubject self.astScheme primitivesScheme', self.primitivesScheme)
+            print('after makeSubject eq.astScheme:', eq.astScheme)
+            print('after makeSubject eq.astScheme totalNodeCountScheme: ', eq.totalNodeCountScheme)
+            print('after makeSubject eq.astScheme functionsScheme: ', eq.functionsScheme)
+            print('after makeSubject eq.astScheme variablesScheme: ', eq.variablesScheme)
+            print('after makeSubject eq.astScheme primitivesScheme', eq.primitivesScheme)
 
         #find which side of the = does variable be on
         sideOfVariableOfSelf = None
-        if self.ast[('=', 0)][0][0] == variable:
+        if self.astScheme[('=', 0)][0][0] == variable:
             sideOfVariableOfSelf = 0
-            variableIdInSelf = self.ast[('=', 0)][0][1]
-        elif self.ast[('=', 0)][1][0] == variable:
+            variableIdInSelf = self.astScheme[('=', 0)][0][1]
+        elif self.astScheme[('=', 0)][1][0] == variable:
             sideOfVariableOfSelf = 1
-            variableIdInSelf = self.ast[('=', 0)][1][1]
+            variableIdInSelf = self.astScheme[('=', 0)][1][1]
         else:
             raise Exception(f'{variable} not the subject of self') # something wrong with makeSubject
         sideOfNonVariableOfEq = None
-        if eq.ast[('=', 0)][0][0] == variable:
+        if eq.astScheme[('=', 0)][0][0] == variable:
             sideOfNonVariableOfEq = 1
-            variableIdInEq = eq.ast[('=', 0)][0][1]
-        elif eq.ast[('=', 0)][1][0] == variable:
+            variableIdInEq = eq.astScheme[('=', 0)][0][1]
+        elif eq.astScheme[('=', 0)][1][0] == variable:
             sideOfNonVariableOfEq = 0
-            variableIdInEq = eq.ast[('=', 0)][1][1]
+            variableIdInEq = eq.astScheme[('=', 0)][1][1]
         else:
             raise Exception(f'{variable} not the subject of eq') # something wrong with makeSubject
 
@@ -477,7 +511,7 @@ class Equation:
         stack = [('=', 0)]
         while len(stack) > 0:
             nodeName, nodeId = stack.pop()
-            children = self.ast.get((nodeName, nodeId), [])
+            children = self.astScheme.get((nodeName, nodeId), [])
             stack += children
             if len(children) > 0: # only keeping those with children
                 newChildren = []
@@ -489,10 +523,10 @@ class Equation:
                 if nodeId > variableIdInSelf:
                     nodeId -= 1 # removing 1 variable
                 newAst[(nodeName, nodeId)] = newChildren
-        self.ast = newAst
+        self.astScheme = newAst
 
         from copy import deepcopy
-        eqAst = deepcopy(eq.ast)
+        eqAst = deepcopy(eq.astScheme)
         #rename the ids of eqAst by adding self.totalNodeCount - 1 to all of eqAst
         amountToIncreaseId = self.totalNodeCount - 2 # we will be removing 2 id from eq.ast, = and variable
         newEqAst = {}
@@ -514,22 +548,22 @@ class Equation:
                 # import pdb;pdb.set_trace()
                 newEqAst[(nodeName, nodeId+amountToIncreaseId)] = newChildren
         if self.verbose:
-            print('new self.ast:')
-            pp.pprint(self.ast)
+            print('new self.astScheme:')
+            pp.pprint(self.astScheme)
             print(f'after increasing nodeId by amountToIncreaseId ({amountToIncreaseId}) :')
             pp.pprint(newEqAst)
 
-        self.ast[('=', 0)][sideOfVariableOfSelf] = newEqAst[('=', amountToIncreaseId)][sideOfNonVariableOfEq]
+        self.astScheme[('=', 0)][sideOfVariableOfSelf] = newEqAst[('=', amountToIncreaseId)][sideOfNonVariableOfEq]
         del newEqAst[('=', amountToIncreaseId)]
         if self.verbose:
-            print('updating self.ast: ')
-            pp.pprint(self.ast)
+            print('updating self.astScheme: ')
+            pp.pprint(self.astScheme)
             print('with')
             pp.pprint(newEqAst)
-        self.ast.update(newEqAst)
+        self.astScheme.update(newEqAst)
         if self.verbose:
-            print('updated ast: ')
-            pp.pprint(self.ast)
+            print('updated astScheme: ')
+            pp.pprint(self.astScheme)
         #substitution complete
 
         #update functionCountChange, should have no functionCountChange
@@ -542,26 +576,32 @@ class Equation:
             for key in (set(d1.keys()) - commonKeys):
                 cd0[key] = cd1[key]
             return cd0
-        eqFunctions = deepcopy(eq.functions)
-        self.functions = mergeCountDictionaries(self.functions, eqFunctions)
+        eqFunctions = deepcopy(eq.functionsScheme)
+        self.functionsScheme = mergeCountDictionaries(self.functionsScheme, eqFunctions)
 
         #remove 1 count of variable from a both
-        eqVariable = deepcopy(eq.variables)
+        eqVariable = deepcopy(eq.variablesScheme)
         eqVariable[variable] -= 1
         if eqVariable[variable] == 0:
             del eqVariable[variable]
-        self.variables[variable] -= 1
-        if self.variables[variable] == 0:
-            del self.variables[variable]
-        self.variables = mergeCountDictionaries(self.variables, eqVariable)
+        self.variablesScheme[variable] -= 1
+        if self.variablesScheme[variable] == 0:
+            del self.variablesScheme[variable]
+        self.variablesScheme = mergeCountDictionaries(self.variablesScheme, eqVariable)
 
         #should have no change in primitives
         # import pdb;pdb.set_trace()
-        eqPrimitives = deepcopy(eq.primitives)
-        self.primitives = mergeCountDictionaries(self.primitives, eqPrimitives)#self.primitives += eq.primitives#
+        eqPrimitives = deepcopy(eq.primitivesScheme)
+        self.primitivesScheme = mergeCountDictionaries(self.primitivesScheme, eqPrimitives)#self.primitivesScheme += eq.primitivesScheme#
         # import pdb;pdb.set_trace()
-        self.totalNodeCount += eq.totalNodeCount - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
-        return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount
+        self.totalNodeCountScheme += eq.totalNodeCountScheme - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
+
+
+        #TODO recalculate for startPos__nodeIdScheme
+        #TODO recalculate for nodeId__lenScheme
+
+
+        return self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme, self.totalNodeCountScheme
 
 
 
@@ -643,7 +683,7 @@ class Equation:
         :type baseOpStr: str
         """
         distributionPaths = []
-        astCopy = copy.deepcopy(self.ast)
+        astCopy = copy.deepcopy(self.astScheme)
         foundDistributiveOp = True # so that it goes through the first pass
         while foundDistributiveOp:
             #~~~~~~~~~~~~~STEP1
@@ -682,7 +722,7 @@ class Equation:
 
                 #~~~~~~~~~~~~~STEP3a
                 # distributivePaths.append(terms)
-                distributivePaths = TermsOfBaseOp.findTermsOfBaseOp(self.ast, baseOpStr) #TODO test on equationtest.py 
+                distributivePaths = TermsOfBaseOp.findTermsOfBaseOp(self.astScheme, baseOpStr) #TODO test on equationtest.py 
 
                 #~~~~~~~~~~~~~STEP3b
                 for node in terms:
@@ -725,8 +765,8 @@ class Equation:
         
         """
 
-        if rootNode not in self.ast: # rootNode might be a leaf(variables/primitives)
-            if rootNode[0] not in self.variables and rootNode[0] not in self.primitives:
+        if rootNode not in self.astScheme: # rootNode might be a leaf(variables/primitives)
+            if rootNode[0] not in self.variablesScheme and rootNode[0] not in self.primitivesScheme:
                 raise Exception(f'rootNode is not a valid node of AST')
             else:
                 return {rootNode: []} # since rootNode is a leaf, TODO thats not the format that we agreed to
@@ -740,7 +780,7 @@ class Equation:
             #
             while len(stack) > 0:
                 current = stack.pop()
-                children = self.ast.get(current, [])
+                children = self.astScheme.get(current, [])
                 stack += children
                 if len(children) > 0:
                     subAST[current] = children

@@ -49,6 +49,7 @@ class Latexparser(Parser):
     FUNCTIONNAMES = TRIGOFUNCTION + ['frac', 'sqrt',  'log', 'ln'] + INTEGRALS
 
     def __init__(self, equationStr=None, ast=None, verbose=False, parallelise=False):
+        self.parserName = 'latex'
         if ast is None:
             self._eqs = equationStr
             self.verbose = verbose

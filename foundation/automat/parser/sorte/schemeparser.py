@@ -10,6 +10,7 @@ class Schemeparser(Parser):
     FUNC_NAMES = Function.FUNC_NAMES()
 
     def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None):
+        self.parserName = 'scheme'
         #this attribute is unique to schemeparsers for now
         self.nodeId__len = {} # TODO have a go on the equationStr, to remove all the excess spaces..., this will give problems to startPos__nodeId and nodeId__len
         if ast is None:
@@ -203,18 +204,39 @@ class Schemeparser(Parser):
         :param abstractSyntaxTree:
         :type abstractSyntaxTree:
         """
+        self.startPos__nodeId = {}
         #find the (=, id)
         if self.equalTuple is None:
             self._findEqualTuple()
         if self.equalTuple is None:#noch equalTuple kann nicht finden
             raise Exception('No equal, Invalid Equation String')
-        return self._recursiveUnparse(self.ast, self.equalTuple)
+        return self._recursiveUnparse(self.ast, self.equalTuple, 0)
 
-    def _recursiveUnparse(self, subAST, keyTuple):
+    def _recursiveUnparse(self, subAST, keyTuple, startPos): # calculate nodeId__len(UNTESTED) & startPos__nodeId(UNTESTED)
         if keyTuple not in subAST: # is Leaf
+            self.startPos__nodeId[startPos] = keyTuple[1]
+            self.nodeId__len[keyTuple[1]] = len(keyTuple[0])
             return keyTuple[0] # return the key, discard the ID
-        argumentStr = ' '.join([self._recursiveUnparse(subAST, argumentTuple) for argumentTuple in subAST[keyTuple]])
-        return f"({keyTuple[0]} {argumentStr})"
+        else:
+            startPos += len('(')
+            self.startPos__nodeId[startPos] = keyTuple[1]
+        # argumentStr = ' '.join([self._recursiveUnparse(subAST, argumentTuple) for argumentTuple in subAST[keyTuple]])
+
+        startPos += len(keyTuple[0]) + len(' ')
+        argStrs = []
+        for i, argumentTuple in enumerate(subAST[keyTuple]):
+            argStr = self._recursiveUnparse(subAST, argumentTuple, startPos)
+            # print('startPos', startPos, 'argStr', argStr)
+            startPos += len(argStr)
+            if i < len(subAST[keyTuple]) -1: #not the last argument in subAST[keyTuple]
+                startPos +=len(' ')
+            argStrs.append(argStr)
+        # print('~~~~~~~~~~~')
+        argumentStr = ' '.join(argStrs)
+        subSchemeStr = f"({keyTuple[0]} {argumentStr})"
+        self.nodeId__len[keyTuple[1]] = len(subSchemeStr)
+        # print(subSchemeStr+'|')
+        return subSchemeStr
 
 
     def _toLatex(self):
