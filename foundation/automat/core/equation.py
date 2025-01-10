@@ -24,7 +24,7 @@ class Equation:
     FUNCNAME__CLASSNAME = Function.FUNCNAME__CLASSNAME()
 
 
-    def __init__(self, equationStr, parserName, verbose=False):
+    def __init__(self, equationStr=None, parserName=None, ast=None, verbose=False):
         """
         loads the parser with that name, throws a tantrum if parserName was not found. Also the constructor
 
@@ -42,32 +42,60 @@ class Equation:
         :type parserName: str
         """
         self.verbose = verbose
-        self._eqs = equationStr
-        self._parserName = parserName
-        self._parser = Parser(parserName)
-        (self.ast, self.functions, self.variables, self.primitives,
-         self.totalNodeCount, self.startPos__nodeId) = self._parser.parse(self._eqs)
-        if parserName.lower() == 'scheme':
-            self.schemeStr = equationStr
-            self.startPos__nodeId = self._parser.startPos__nodeId
-            self.nodeId__len = self._parser.nodeId__len
-            self.schemeparser = self._parser
-            self.astScheme = self.ast
-            self.functionsScheme = self.functions
-            self.variablesScheme = self.variables
-            self.primitivesScheme = self.primitives
-            self.totalNodeCountScheme = self.totalNodeCount
-            self.startPos__nodeIdScheme = self._parser.startPos__nodeId
-            self.nodeId__lenScheme = self._parser.nodeId__len
-        else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
+        if ast is not None: # from ast to str
             from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
+            self.ast = ast
+            self.astScheme = ast
             self.schemeparser = Schemeparser(ast=self.ast)
             self.schemeStr = self.schemeparser._unparse()
-            self.schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
-            (self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme,
-            self.totalNodeCountScheme, self.startPos__nodeIdScheme) = self.schemeparser._parse()
-            # self.startPos__nodeId = self.schemeparser.startPos__nodeId
+            self.functionsScheme = self.schemeparser.functions
+            self.variablesScheme = self.schemeparser.variables
+            self.primitivesScheme = self.schemeparser.primitives
             self.nodeId__lenScheme = self.schemeparser.nodeId__len
+            self.startPos__nodeIdScheme = self.schemeparser.startPos__nodeId
+            self._eqs = self.schemeStr
+            self._parserName = 'scheme'
+            self._parser = self.schemeparser
+
+        else:
+            self._eqs = equationStr
+            self._parserName = parserName
+            self._parser = Parser(parserName)
+            (self.ast, self.functions, self.variables, self.primitives,
+             self.totalNodeCount, self.startPos__nodeId) = self._parser.parse(self._eqs)
+            if parserName.lower() == 'scheme':
+                self.schemeStr = equationStr
+                self.startPos__nodeId = self._parser.startPos__nodeId
+                self.nodeId__len = self._parser.nodeId__len
+                self.schemeparser = self._parser
+                self.astScheme = self.ast
+                self.functionsScheme = self.functions
+                self.variablesScheme = self.variables
+                self.primitivesScheme = self.primitives
+                self.totalNodeCountScheme = self.totalNodeCount
+                self.startPos__nodeIdScheme = self._parser.startPos__nodeId
+                self.nodeId__lenScheme = self._parser.nodeId__len
+            else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
+                from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
+                self.schemeparser = Schemeparser(ast=self.ast)
+                self.schemeStr = self.schemeparser._unparse()
+                self.astScheme = self.ast
+                #TODO test, untested please future-me
+                self.functionsScheme = self.schemeparser.functions
+                self.variablesScheme = self.schemeparser.variables
+                self.primitivesScheme = self.schemeparser.primitives
+                self.nodeId__lenScheme = self.schemeparser.nodeId__len
+                self.startPos__nodeIdScheme = self.schemeparser.startPos__nodeId
+
+            #TODO this can be removed, once we calculate self.functionsScheme, self.variablesScheme, self.primitivesScheme, self.totalNodeCountScheme, self.startPos__nodeIdScheme
+            #in _unparse :)
+            # self.schemeparser._eqs=self.schemeStr # TODO future me please refactor, ugly
+            # (self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme,
+            # self.totalNodeCountScheme, self.startPos__nodeIdScheme) = self.schemeparser._parse()
+            # self.startPos__nodeId = self.schemeparser.startPos__nodeId
+            # self.nodeId__lenScheme = self.schemeparser.nodeId__len
+            #
+            #
             
         self.availableStrsFormats = {
             self._parserName: self._eqs
@@ -260,6 +288,7 @@ class Equation:
                         In this way, the ops, will not be disturbed.... and the original will not be disturbed.
                         This also means we do not need the simplifiedAst.....?
                     """
+                    self._removeNodeIds(nodeIdOfPrimitivesRemoved+nodeIdOfVariablesRemoved+nodeIdOfFuncsRemoved) # this function will auto-update the astScheme, without changing the existing nodeIds on astScheme
                     ######
                     #need to recalculate path to variable again... because ast changed...
                     # we can also get `Recommend` to give us the changes made, then we can maybe just alter the ops a bit?
@@ -785,3 +814,171 @@ class Equation:
                 if len(children) > 0:
                     subAST[current] = children
             return subAST
+
+
+
+    def _removeNodeIds(self, nodeIdsToRemove):
+        """ TODO this might be repeated in Latexparser.... and alot of others, refactor AST into its own class (careful of the Python's internal ast.)
+        #~ DRAFT ~#
+        TODO test
+        nodeId can be a leaf (primitive/variable) or a func (branch having children)
+        
+        generally it does not make sense to remove a single leaf, since the resulting formula will become NOT well-formed.
+        Usually the whole function is removed with some of its associated arguments.
+        And the arguments that remain, are reattached to the removed-function's parent.
+
+
+        ~SKETCH~
+        0. check for noBranchNode => raise Exception
+        1. get a map from childToParent.
+        2. DFS down the astScheme, if both parent and child in nodeIds, then union
+        3. UF.groupingWithFirstInserted will give subtrees with their respective roots
+        4. for each root, 
+            a. find parent, and what idx the root is in the parent
+            b. find all children (not connected in UF)/(not in nodeIds)
+            c. attach b to c
+        5. DFS down, checking for 
+            a. rootId (from 4a), then we start skipping
+            b. childId (from 4b), then we stop skipping
+                i.attach childId to parent(rootId)
+        """
+        branchNodeIds = list(map(lambda t: t[1], self.astScheme.keys()))
+        branchNodes = []
+        leafNodes = []
+        for nodeId in nodeIdsToRemove:  
+            if nodeId in branchNodeIds: # has children
+                branchNodes.append(nodeId)
+            else:
+                leafNodes.append(nodeId)
+        if len(branchNodes) == 0:
+            raise Exception('Trying to only remove primitive/variables, will lead to NOT well-formed formula')
+
+        #Step 1
+        child__parent = {}
+        nodeId__label = {}
+        stack = [('=', 0)]
+        while len(stack) > 0:
+            parent = stack.pop()
+            children = self.astScheme.get(parent, [])
+            stack += children
+            nodeId__label[parent[1]] = parent[0]
+            for child in children:
+                child__parent[child] = parent
+
+        from foundation.automat.common.flattener import Flattener
+        from foundation.automat.common.unionfindbyrankwithpathcompression import UnionFindByRankWithPathCompression
+        childrenNodeIds = []
+        for children in self.astScheme.values():
+            for child in children:
+                childrenNodeIds.append(child[1])
+        allNodeIds = set(branchNodeIds).union(set(childrenNodeIds))
+        #Union all the nodeIds together and get their subRoots
+        uf = UnionFindByRankWithPathCompression(len(allNodeIds))
+        #might need to map to a new Id that is consecutive, and also need the un-map to get the values back
+        #since UF need consecutive IDs, but self.astScheme does not guarantee consecutive IDs
+        allNodeIds = sorted(list(allNodeIds))
+        nodeIds__consec = dict(zip(range(0, len(allNodeIds)), allNodeIds))
+        consec__nodeIds = dict(zip(allNodeIds, range(0, len(allNodeIds))))
+        #
+        # print("nodeIdsToRemove")
+        # print(nodeIdsToRemove)
+        #
+        #Step 2
+        stack = [('=', 0)]
+        while len(stack) > 0:
+            parentNode = stack.pop()
+            children = self.astScheme.get(parentNode, [])
+            stack += children
+            for child in children:
+                # print('parentId:', parentNode[1], 'childId:', child[1])
+                if parentNode[1] in nodeIdsToRemove and child[1] in nodeIdsToRemove:
+                    uf.union(nodeIds__consec[parentNode[1]], nodeIds__consec[child[1]])
+        #Step 3
+        listOfList, listOfInfoDict = uf.groupingWithFirstInserted() # note that listOfList is contained in listOfInfoDict and is not used here
+        listOfInfoDict = list(filter(lambda d: d['earliestJoiner'] in nodeIdsToRemove, listOfInfoDict))
+        #
+        # print("listOfInfoDict")
+        # print(listOfInfoDict)
+        #
+        #Step 4
+        subRootNodeId__leafChildNodeIdsArgIdx = {}
+        for d in listOfInfoDict:
+            subRootNodeId = consec__nodeIds[d['earliestJoiner']]
+            subRootNode = (nodeId__label[subRootNodeId], subRootNodeId)
+            #Step 4a
+            argIdx = None
+            if subRootNode in child__parent: # the =, has no parent
+                parentNode = child__parent[subRootNode] # TODO deal with it
+                childrenOfParentNode = self.astScheme[parentNode]
+                for argIdx, childOfParentNode in enumerate(childrenOfParentNode):
+                    if childOfParentNode[1] == subRootNodeId:
+                        break # we have the argIdx
+            #Step 4b
+            neglectedChildrenNodes = []
+            #get children of d['grouping'] 
+            stack = [(nodeId__label[subRootNodeId], subRootNodeId)]
+            while len(stack) > 0:
+                node = stack.pop()
+                children = self.astScheme.get(node, [])
+                # import pdb;pdb.set_trace()
+                for child in children:
+                    if nodeIds__consec[child[1]] in d['grouping']:
+                        stack.append(child)
+                    else: # not part of the group, the 'neglected-children' of this grouping
+                        neglectedChildrenNodes.append(child)
+            #Step 4c
+            if len(neglectedChildrenNodes) > 1: # i am not sure how to deal with this...yet
+                raise Exception(f'root: {subRootNodeId} has more than 1 children: {neglectedChildrenNodes}')
+            subRootNodeId__leafChildNodeIdsArgIdx[subRootNodeId] = {'argIdx':argIdx, 'leafChildren':neglectedChildrenNodes, 'parentNode':parentNode}
+        #Step 5
+        #
+        # print("subRootNodeId__leafChildNodeIdsArgIdx")
+        # print(subRootNodeId__leafChildNodeIdsArgIdx)
+        #
+        choppedAndRegraftedAST = {}
+        stack = [('=', 0, None)] # the None is which subRoot is this under, if not, then None
+        while len(stack) > 0:
+            currentNodeAndMain = stack.pop()
+            currentNode = (currentNodeAndMain[0], currentNodeAndMain[1])
+            children = self.astScheme.get(currentNode, [])
+            for child in children:
+                stack.append((child[0], child[1], None))
+            if currentNodeAndMain[2] is None: # first check...
+                #
+                # print('****')
+                # print('currentNodeAndMain[1]', currentNodeAndMain[1])
+                # print(subRootNodeId__leafChildNodeIdsArgIdx)
+                # print('in?', currentNodeAndMain[1] in subRootNodeId__leafChildNodeIdsArgIdx)
+                #
+                if currentNodeAndMain[1] in subRootNodeId__leafChildNodeIdsArgIdx:
+                    currentNodeAndMain = list(currentNodeAndMain)
+                    currentNodeAndMain[2] = currentNodeAndMain[1]
+                    currentNodeAndMain = tuple(currentNodeAndMain)
+
+            #
+            # print('****')
+            # print('subRootNodeId')
+            # print(currentNodeAndMain[2])
+            # print('choppedAndRegraftedAST')
+            # print(choppedAndRegraftedAST)
+            # import pdb;pdb.set_trace()
+            #
+            if currentNodeAndMain[2] is not None: # these are the nodes to be skipped(removed)
+                #if we reached the leafChildOf this subtree, we should remove the Main(currentNodeAndMain[2])
+                leafChildNodeIdsArgIdx = subRootNodeId__leafChildNodeIdsArgIdx[currentNodeAndMain[2]]
+                subTreeRootNodeId = currentNodeAndMain[2]
+                # if currentNodeAndMain[1] in leafChildNodeIdsArgIdx['leafChildren']:
+                #     subTreeRootNodeId = None
+                    #attach currentNode to parent of subRootNodeId
+                    #need to remove the child in that argIdx
+                if currentNode[1] not in nodeIdsToRemove:
+                    choppedAndRegraftedAST[leafChildNodeIdsArgIdx['parentNode']][leafChildNodeIdsArgIdx['argIdx']] = currentNode
+                for child in children:
+                    stack.append((child[0], child[1], subTreeRootNodeId))
+            else: # these are the nodes that should be kept
+                #this:
+                #choppedAndRegraftedAST[leafChildNodeIdsArgIdx['parentNode']][leafChildNodeIdsArgIdx['argIdx']] = currentNode
+                #should be done here
+                if len(children) > 0 and currentNode[1] not in nodeIdsToRemove:
+                    choppedAndRegraftedAST[currentNode] = children
+        return choppedAndRegraftedAST

@@ -205,6 +205,9 @@ class Schemeparser(Parser):
         :type abstractSyntaxTree:
         """
         self.startPos__nodeId = {}
+        self.functions = {}
+        self.variables = {}
+        self.primitives = {}
         #find the (=, id)
         if self.equalTuple is None:
             self._findEqualTuple()
@@ -212,14 +215,19 @@ class Schemeparser(Parser):
             raise Exception('No equal, Invalid Equation String')
         return self._recursiveUnparse(self.ast, self.equalTuple, 0)
 
-    def _recursiveUnparse(self, subAST, keyTuple, startPos): # calculate nodeId__len(UNTESTED) & startPos__nodeId(UNTESTED)
+    def _recursiveUnparse(self, subAST, keyTuple, startPos):
         if keyTuple not in subAST: # is Leaf
             self.startPos__nodeId[startPos] = keyTuple[1]
             self.nodeId__len[keyTuple[1]] = len(keyTuple[0])
+            if isNum(keyTuple[0]):
+                self.primitives[keyTuple[0]] = self.primitives.get(keyTuple[0], 0) + 1
+            else: # a variable
+                self.variables[keyTuple[0]] = self.variables.get(keyTuple[0], 0) + 1
             return keyTuple[0] # return the key, discard the ID
         else:
             startPos += len('(')
             self.startPos__nodeId[startPos] = keyTuple[1]
+            self.functions[keyTuple[0]] = self.functions.get(keyTuple[0], 0) + 1
         # argumentStr = ' '.join([self._recursiveUnparse(subAST, argumentTuple) for argumentTuple in subAST[keyTuple]])
 
         startPos += len(keyTuple[0]) + len(' ')

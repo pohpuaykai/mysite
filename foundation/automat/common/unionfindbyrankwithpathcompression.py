@@ -79,6 +79,6 @@ class UnionFindByRankWithPathCompression:
             earliestJoiner = grouping[earliestJoinerIdxOfGrouping]
             listOfInfoDict.append({
                 'grouping':grouping,
-                'earliestJoiner':earliestJoiner
+                'earliestJoiner':earliestJoiner#in the context of a tree, the earliestJoiner is the root of the subtree(grouping)
             })
         return listOfList, listOfInfoDict
