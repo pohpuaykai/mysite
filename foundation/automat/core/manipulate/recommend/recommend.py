@@ -280,8 +280,8 @@ class Recommend:
 
                                 #
                                 # print(iStartPos__nodeId)
-                                print('*********', "self.eq.startPos__nodeIdScheme")
-                                print(self.eq.startPos__nodeIdScheme)
+                                # print('*********', "self.eq.startPos__nodeIdScheme")
+                                # print(self.eq.startPos__nodeIdScheme)
                                 #
 
                                 for function in self.eq.functionsScheme:#iFunctionsD:
@@ -289,8 +289,8 @@ class Recommend:
                                         #find all occurences of function and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
                                         for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
                                             absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            print(changeDict)
-                                            print(manipulate.schemeStr)#Wrong one this is the OG...
+                                            # print(changeDict)
+                                            # print(manipulate.schemeStr)#Wrong one this is the OG...
                                             nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
                                             existingList = type__removalNames__nodeIdList['f'].get(function, [])
                                             existingList.append(nodeId)
@@ -372,7 +372,7 @@ class Recommend:
 
             #if we reach here this means non of the prioritised-simplifyingManipulations worked.
             if self.verbose:
-                info(f'we cannot find a suitable manipulation based on the hint lastOp: {hint["lastOp"]}, will combingSearch')
+                info(f'we cannot find a suitable manipulation based on the hint lastOp: {hint["invertedResults"]}, will combingSearch')
             #for now we return None #self.combingSearch() # then we comb :)
 
 

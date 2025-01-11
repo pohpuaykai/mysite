@@ -87,7 +87,8 @@ class Manipulate:
         if self.grammarParser is None:
             self.initGrammerParser()
         #
-        print('self.schemeStr', self.schemeStr)
+        if self.verbose:
+            print('self.schemeStr', self.schemeStr)
         #
         self.grammarParser.buildEnclosureTree(self.schemeStr)
         return not self.grammarParser.noMatches

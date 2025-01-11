@@ -84,6 +84,7 @@ class Equation:
                 self.functionsScheme = self.schemeparser.functions
                 self.variablesScheme = self.schemeparser.variables
                 self.primitivesScheme = self.schemeparser.primitives
+                self.totalNodeCountScheme = self.totalNodeCount
                 self.nodeId__lenScheme = self.schemeparser.nodeId__len
                 self.startPos__nodeIdScheme = self.schemeparser.startPos__nodeId
 
@@ -264,24 +265,25 @@ class Equation:
                 print('AFTER astScheme:', self.astScheme)
                 print('AFTER startPos__nodeIdScheme', self.startPos__nodeIdScheme)
             if simplify:
-                simplifiedAst, nodeIdOfPrimitivesRemoved, nodeIdOfVariablesRemoved, nodeIdOfFuncsRemoved = recommend.simplify(hint={'invertedResults':invertedResults})#, 'lastOp':op})
-                if simplifiedAst is not None:
+                returnTup = recommend.simplify(hint={'invertedResults':invertedResults})#, 'lastOp':op})
+                if returnTup is not None:
+                    simplifiedAst, nodeIdOfPrimitivesRemoved, nodeIdOfVariablesRemoved, nodeIdOfFuncsRemoved = returnTup
                     ######
-                    print('before simplifying:')
-                    print(invertedAst)
-                    print('after simplifying:')
-                    print(simplifiedAst)
-                    print('ops:')
-                    print(ops)
-                    print('simplifiedAst:')
-                    print(simplifiedAst)
-                    print('nodeIdOfPrimitivesRemoved:')
-                    print(nodeIdOfPrimitivesRemoved)
-                    print('nodeIdOfVariablesRemoved:')
-                    print(nodeIdOfVariablesRemoved)
-                    print('nodeIdOfFuncsRemoved:')
-                    print(nodeIdOfFuncsRemoved)
-                    import pdb;pdb.set_trace()
+                    if self.verbose:
+                        print('before simplifying:')
+                        print(invertedAst)
+                        print('after simplifying:')
+                        print(simplifiedAst)
+                        print('ops:')
+                        print(ops)
+                        print('simplifiedAst:')
+                        print(simplifiedAst)
+                        print('nodeIdOfPrimitivesRemoved:')
+                        print(nodeIdOfPrimitivesRemoved)
+                        print('nodeIdOfVariablesRemoved:')
+                        print(nodeIdOfVariablesRemoved)
+                        print('nodeIdOfFuncsRemoved:')
+                        print(nodeIdOfFuncsRemoved)
                     """
                         SO, i need to look at the nodeIdOfFuncsRemoved & invertedAst (before simplification.)
                         And then manually, remove from invertedAst, what is in nodeIdOfFuncsRemoved? Wow, do that in general? How should the invertedAst be changed?
@@ -819,8 +821,6 @@ class Equation:
 
     def _removeNodeIds(self, nodeIdsToRemove):
         """ TODO this might be repeated in Latexparser.... and alot of others, refactor AST into its own class (careful of the Python's internal ast.)
-        #~ DRAFT ~#
-        TODO test
         nodeId can be a leaf (primitive/variable) or a func (branch having children)
         
         generally it does not make sense to remove a single leaf, since the resulting formula will become NOT well-formed.
@@ -929,7 +929,12 @@ class Equation:
             #Step 4c
             if len(neglectedChildrenNodes) > 1: # i am not sure how to deal with this...yet
                 raise Exception(f'root: {subRootNodeId} has more than 1 children: {neglectedChildrenNodes}')
-            subRootNodeId__leafChildNodeIdsArgIdx[subRootNodeId] = {'argIdx':argIdx, 'leafChildren':neglectedChildrenNodes, 'parentNode':parentNode}
+            subRootNodeId__leafChildNodeIdsArgIdx[subRootNodeId] = {
+                'argIdx':argIdx, 
+                'leafChildren':neglectedChildrenNodes, 
+                'parentNode':parentNode,
+                'done':False
+            }
         #Step 5
         #
         # print("subRootNodeId__leafChildNodeIdsArgIdx")
@@ -971,8 +976,16 @@ class Equation:
                 #     subTreeRootNodeId = None
                     #attach currentNode to parent of subRootNodeId
                     #need to remove the child in that argIdx
-                if currentNode[1] not in nodeIdsToRemove:
+                if currentNode[1] not in nodeIdsToRemove and not leafChildNodeIdsArgIdx['done']: # only want the top of the children not in nodeIdsRemove, not everything.
+                    #the first out of the stack, will be the top of the children not in nodeIdsRemove, since we DFS? -TODO proof
+                    #if so, then once we made a attachment(here) for this leafChildNodeIdsArgIdx, we do not do it anymore :)
+                    #
+                    # print('children: ', choppedAndRegraftedAST[leafChildNodeIdsArgIdx['parentNode']])
+                    # print('argIdx: ', leafChildNodeIdsArgIdx['argIdx'])
+                    # print('currentNode: ', currentNode)
+                    #
                     choppedAndRegraftedAST[leafChildNodeIdsArgIdx['parentNode']][leafChildNodeIdsArgIdx['argIdx']] = currentNode
+                    leafChildNodeIdsArgIdx['done'] = True # to get the top of the children not in nodeIdsRemove
                 for child in children:
                     stack.append((child[0], child[1], subTreeRootNodeId))
             else: # these are the nodes that should be kept

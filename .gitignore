@@ -1,7 +1,7 @@
 **/__pycache__/
 **/.idea/
 db.sqlite3
-#foundation/automat/arithmetic/configuration/standard/
-#foundation/automat/arithmetic/standard/
-#foundation/automat/core/manipulate/pattern
-#foundation/automat/core/manipulate/tests/configurationtests
+foundation/automat/arithmetic/configuration/standard/
+foundation/automat/arithmetic/standard/
+foundation/automat/core/manipulate/pattern
+foundation/automat/core/manipulate/tests/configurationtests
