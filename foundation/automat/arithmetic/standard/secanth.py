@@ -134,5 +134,5 @@ class Secanth(Function):
         :rtype: float
         """
         from math import sinh
-        num=sin(v0)
+        num=1.0/sinh(v0)
         return num

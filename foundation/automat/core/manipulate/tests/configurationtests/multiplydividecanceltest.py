@@ -45,7 +45,7 @@ def test__hin0__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $1
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (* (/ a v_{0}) v_{0}) (* (/ a v_{0}) v_{0}))' # (* (/ $1 $0) $0)
+    expected = '(= (* (/ a v_{0}) v_{0}) (* (/ a v_{1}) v_{1}))' # (* (/ $1 $0) $0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -91,7 +91,7 @@ def test__hin1__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $1
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (/ (* a v_{0}) v_{0}) (/ (* a v_{0}) v_{0}))' # (/ (* $1 $0) $0)
+    expected = '(= (/ (* a v_{0}) v_{0}) (/ (* a v_{1}) v_{1}))' # (/ (* $1 $0) $0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -105,8 +105,8 @@ def test__hin1__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
-    test__vor1__configTest(True) # Not tested yet
-    test__hin1__configTest(True) # Not tested yet
+    test__vor0__configTest() # Not tested yet
+    test__hin0__configTest() # Not tested yet
+    test__vor1__configTest() # Not tested yet
+    test__hin1__configTest() # Not tested yet
     

@@ -32,7 +32,7 @@ init_variableName_totalNodeCount:
   full: totalNodeCount
 return_calculation:
 - code:
-  - num=sin(v0)
+  - num=1.0/tanh(v0)
   imports:
   - from math import tanh
   variableCount: 1

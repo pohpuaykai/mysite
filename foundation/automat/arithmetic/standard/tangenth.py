@@ -134,5 +134,5 @@ class Tangenth(Function):
         :rtype: float
         """
         from math import tanh
-        num=sin(v0)
+        num=tanh(v0)
         return num

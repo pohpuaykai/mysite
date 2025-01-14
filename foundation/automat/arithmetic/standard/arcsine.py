@@ -134,5 +134,5 @@ class Arcsine(Function):
         :rtype: float
         """
         from math import asin
-        num=sin(v0)
+        num=asin(v0)
         return num

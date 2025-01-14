@@ -134,5 +134,5 @@ class Sineh(Function):
         :rtype: float
         """
         from math import sinh
-        num=sin(v0)
+        num=sinh(v0)
         return num

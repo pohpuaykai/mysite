@@ -134,5 +134,5 @@ class Cosineh(Function):
         :rtype: float
         """
         from math import cosh
-        num=sin(v0)
+        num=cosh(v0)
         return num

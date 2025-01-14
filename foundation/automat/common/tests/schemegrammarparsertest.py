@@ -64,7 +64,8 @@ def test__idealNested__addition(verbose=False):
         't': 'n',
         'v': '$1',
         'w': '(+ (+ c d) e)'},
-    {'d': 'e', 'e': 5, 'n': 3, 's': 3, 't': 'p', 'v': '$0', 'w': '(+ d c)'},
+    {'d': 'e', 'e': 5, 'n': 3, 's': 3, 't': 'p', 'v': '$0', 'w': '(+ c d)'}, # before shifted
+    # {'d': 'e', 'e': 5, 'n': 3, 's': 3, 't': 'p', 'v': '$0', 'w': '(+ d c)'}, # after shifted
     {'d': 'e', 'e': 3, 'n': 2, 's': 11, 't': 'p', 'v': '$1', 'w': 'e'},
     {'d': 'e', 'e': 10, 'n': 5, 's': 6, 't': 'p', 'v': '$0', 'w': 'c'},
     {'d': 'e', 'e': 8, 'n': 4, 's': 8, 't': 'p', 'v': '$1', 'w': 'd'}]
@@ -199,7 +200,8 @@ def test__nested__addition(verbose=False):
         'v': '$1',
         'w': '(+ d (+ c b))'},
     {'d': 'e', 'e': 16, 'n': 5, 's': 8, 't': 'p', 'v': '$0', 'w': 'd'},
-    {'d': 'e', 'e': 8, 'n': 2, 's': 10, 't': 'p', 'v': '$1', 'w': '(+ b c)'},
+    {'d': 'e', 'e': 8, 'n': 2, 's': 10, 't': 'p', 'v': '$1', 'w': '(+ c b)'}, # before shifted
+    # {'d': 'e', 'e': 8, 'n': 2, 's': 10, 't': 'p', 'v': '$1', 'w': '(+ b c)'}, # after shifted
     {'d': 'e', 'e': 13, 'n': 4, 's': 13, 't': 'p', 'v': '$0', 'w': 'c'},
     {'d': 'e', 'e': 11, 'n': 3, 's': 15, 't': 'p', 'v': '$1', 'w': 'b'}]
     if verbose:
@@ -243,7 +245,8 @@ def test__nestedSameLevel__addition(verbose=False):
         'w': '(+ (+ c d) e)'},
     {'d': 'a', 'e': 10, 'n': 0, 's': 3, 't': 'n', 'v': '$0', 'w': '(+ b a)'},
     {'d': 'r', 'e': 10, 'n': 0, 's': 3, 't': 'n', 'v': '$0', 'w': '(+ a b)'},
-    {'d': 'e', 'e': 16, 'n': 4, 's': 14, 't': 'p', 'v': '$0', 'w': '(+ d c)'},
+    {'d': 'e', 'e': 16, 'n': 4, 's': 14, 't': 'p', 'v': '$0', 'w': '(+ c d)'},#before shifted
+    # {'d': 'e', 'e': 16, 'n': 4, 's': 14, 't': 'p', 'v': '$0', 'w': '(+ d c)'},# after shifted.
     {'d': 'e', 'e': 14, 'n': 3, 's': 22, 't': 'p', 'v': '$1', 'w': 'e'},
     {'d': 'e', 'e': 21, 'n': 6, 's': 17, 't': 'p', 'v': '$0', 'w': 'c'},
     {'d': 'e', 'e': 19, 'n': 5, 's': 19, 't': 'p', 'v': '$1', 'w': 'd'},
@@ -301,14 +304,18 @@ def test__2deep2wide__addition(verbose=False):
         't': 'n',
         'v': '$0',
         'w': '(+ (+ a b) (+ c d))'},
-    {'d': 'e', 'e': 34, 'n': 6, 's': 26, 't': 'p', 'v': '$0', 'w': '(+ f e)'},
-    {'d': 'e', 'e': 26, 'n': 3, 's': 34, 't': 'p', 'v': '$1', 'w': '(+ h g)'},
+    {'d': 'e', 'e': 34, 'n': 6, 's': 26, 't': 'p', 'v': '$0', 'w': '(+ e f)'}, # before shifted
+    # {'d': 'e', 'e': 34, 'n': 6, 's': 26, 't': 'p', 'v': '$0', 'w': '(+ f e)'}, # after shifted
+    {'d': 'e', 'e': 26, 'n': 3, 's': 34, 't': 'p', 'v': '$1', 'w': '(+ g h)'}, # before shifted
+    # {'d': 'e', 'e': 26, 'n': 3, 's': 34, 't': 'p', 'v': '$1', 'w': '(+ h g)'}, # after shifted
     {'d': 'e', 'e': 31, 'n': 5, 's': 37, 't': 'p', 'v': '$0', 'w': 'g'},
     {'d': 'e', 'e': 29, 'n': 4, 's': 39, 't': 'p', 'v': '$1', 'w': 'h'},
     {'d': 'e', 'e': 39, 'n': 8, 's': 29, 't': 'p', 'v': '$0', 'w': 'e'},
     {'d': 'e', 'e': 37, 'n': 7, 's': 31, 't': 'p', 'v': '$1', 'w': 'f'},
-    {'d': 'e', 'e': 14, 'n': 12, 's': 6, 't': 'p', 'v': '$0', 'w': '(+ b a)'},
-    {'d': 'e', 'e': 6, 'n': 9, 's': 14, 't': 'p', 'v': '$1', 'w': '(+ d c)'},
+    {'d': 'e', 'e': 14, 'n': 12, 's': 6, 't': 'p', 'v': '$0', 'w': '(+ a b)'}, # before shifted
+    # {'d': 'e', 'e': 14, 'n': 12, 's': 6, 't': 'p', 'v': '$0', 'w': '(+ b a)'}, # after shifted
+    {'d': 'e', 'e': 6, 'n': 9, 's': 14, 't': 'p', 'v': '$1', 'w': '(+ c d)'}, # before shifted
+    # {'d': 'e', 'e': 6, 'n': 9, 's': 14, 't': 'p', 'v': '$1', 'w': '(+ d c)'}, # after shifted
     {'d': 'e', 'e': 11, 'n': 11, 's': 17, 't': 'p', 'v': '$0', 'w': 'c'},
     {'d': 'e', 'e': 9, 'n': 10, 's': 19, 't': 'p', 'v': '$1', 'w': 'd'},
     {'d': 'e', 'e': 19, 'n': 14, 's': 9, 't': 'p', 'v': '$0', 'w': 'a'},
@@ -338,7 +345,8 @@ def test__2deep2wideSkip__addition(verbose=False):
     parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= (+ (+ d c) (+ a b)) (+ (+ h g) (+ f e)))'
-    expected_verPosWord = [   {   'd': 'a',
+    expected_verPosWord = [   
+    {   'd': 'a',
         'e': 42,
         'n': 0,
         's': 23,
@@ -366,14 +374,18 @@ def test__2deep2wideSkip__addition(verbose=False):
         't': 'n',
         'v': '$0',
         'w': '(+ (+ a b) (+ c d))'},
-    {'d': 'e', 'e': 34, 'n': 6, 's': 26, 't': 'p', 'v': '$0', 'w': '(+ f e)'},
-    {'d': 'e', 'e': 26, 'n': 3, 's': 34, 't': 'p', 'v': '$1', 'w': '(+ h g)'},
+    {'d': 'e', 'e': 34, 'n': 6, 's': 26, 't': 'p', 'v': '$0', 'w': '(+ e f)'}, # before shifted
+    # {'d': 'e', 'e': 34, 'n': 6, 's': 26, 't': 'p', 'v': '$0', 'w': '(+ f e)'}, # after shifted
+    {'d': 'e', 'e': 26, 'n': 3, 's': 34, 't': 'p', 'v': '$1', 'w': '(+ g h)'}, # before shifted
+    # {'d': 'e', 'e': 26, 'n': 3, 's': 34, 't': 'p', 'v': '$1', 'w': '(+ h g)'}, # after shifted
     {'d': 'e', 'e': 31, 'n': 5, 's': 37, 't': 'p', 'v': '$0', 'w': 'g'},
     {'d': 'e', 'e': 29, 'n': 4, 's': 39, 't': 'p', 'v': '$1', 'w': 'h'},
     {'d': 'e', 'e': 39, 'n': 8, 's': 29, 't': 'p', 'v': '$0', 'w': 'e'},
     {'d': 'e', 'e': 37, 'n': 7, 's': 31, 't': 'p', 'v': '$1', 'w': 'f'},
-    {'d': 'e', 'e': 14, 'n': 12, 's': 6, 't': 'p', 'v': '$0', 'w': '(+ a b)'},
-    {'d': 'e', 'e': 6, 'n': 9, 's': 14, 't': 'p', 'v': '$1', 'w': '(+ d c)'},
+    {'d': 'e', 'e': 14, 'n': 12, 's': 6, 't': 'p', 'v': '$0', 'w': '(+ a b)'}, # before shifted
+    # {'d': 'e', 'e': 14, 'n': 12, 's': 6, 't': 'p', 'v': '$0', 'w': '(+ a b)'}, # after shifted
+    {'d': 'e', 'e': 6, 'n': 9, 's': 14, 't': 'p', 'v': '$1', 'w': '(+ c d)'}, # before shifted
+    # {'d': 'e', 'e': 6, 'n': 9, 's': 14, 't': 'p', 'v': '$1', 'w': '(+ d c)'}, # after shifted
     {'d': 'e', 'e': 11, 'n': 11, 's': 17, 't': 'p', 'v': '$0', 'w': 'c'},
     {'d': 'e', 'e': 9, 'n': 10, 's': 19, 't': 'p', 'v': '$1', 'w': 'd'}]
     if verbose:
@@ -401,7 +413,8 @@ def test__notApplicable__addition(verbose=False):
     parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= a (- (* c (/ 5 10)))) c))'
-    expected_verPosWord = [   {   'd': 'a',
+    expected_verPosWord = [   
+    {   'd': 'a',
         'e': 28,
         'n': 0,
         's': 0,

@@ -59,6 +59,6 @@ def test__hin0__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
+    test__vor0__configTest() # Not tested yet
+    test__hin0__configTest() # Not tested yet
     

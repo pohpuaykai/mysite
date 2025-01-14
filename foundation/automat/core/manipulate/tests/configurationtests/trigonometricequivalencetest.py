@@ -289,16 +289,16 @@ def test__hin5__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
-    test__vor1__configTest(True) # Not tested yet
-    test__hin1__configTest(True) # Not tested yet
-    test__vor2__configTest(True) # Not tested yet
-    test__hin2__configTest(True) # Not tested yet
-    test__vor3__configTest(True) # Not tested yet
-    test__hin3__configTest(True) # Not tested yet
-    test__vor4__configTest(True) # Not tested yet
-    test__hin4__configTest(True) # Not tested yet
-    test__vor5__configTest(True) # Not tested yet
-    test__hin5__configTest(True) # Not tested yet
+    test__vor0__configTest() # Not tested yet
+    test__hin0__configTest() # Not tested yet
+    test__vor1__configTest() # Not tested yet
+    test__hin1__configTest() # Not tested yet
+    test__vor2__configTest() # Not tested yet
+    test__hin2__configTest() # Not tested yet
+    test__vor3__configTest() # Not tested yet
+    test__hin3__configTest() # Not tested yet
+    test__vor4__configTest() # Not tested yet
+    test__hin4__configTest() # Not tested yet
+    test__vor5__configTest() # Not tested yet
+    test__hin5__configTest() # Not tested yet
     

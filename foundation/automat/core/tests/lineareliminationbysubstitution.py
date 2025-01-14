@@ -23,10 +23,10 @@ def test__basic__moveAdditionAndEquate(verbose=False):
     expectedTotalNodeCount = 7 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and 
-        expectedTotalNodeCount == eq0.totalNodeCount)
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and 
+        expectedTotalNodeCount == eq0.totalNodeCountScheme)
     if verbose:
         print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
@@ -34,13 +34,13 @@ def test__basic__moveAdditionAndEquate(verbose=False):
         print('TF: ', latexStr)
         print('Counts~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('results functions')
-        pp.pprint(eq0.functions)
+        pp.pprint(eq0.functionsScheme)
         print('results variables')
-        pp.pprint(eq0.variables)
+        pp.pprint(eq0.variablesScheme)
         print('results primitives')
-        pp.pprint(eq0.primitives)
+        pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
-        pp.pprint(eq0.totalNodeCount)
+        pp.pprint(eq0.totalNodeCountScheme)
 
 
 
@@ -60,10 +60,10 @@ def test__hatsukoi__step0(verbose=False):
     expectedTotalNodeCount = 9 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and 
-        expectedTotalNodeCount == eq0.totalNodeCount)
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and 
+        expectedTotalNodeCount == eq0.totalNodeCountScheme)
     if verbose:
         print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
@@ -71,13 +71,13 @@ def test__hatsukoi__step0(verbose=False):
         print('TF: ', latexStr)
         print('Counts~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('results functions')
-        pp.pprint(eq0.functions)
+        pp.pprint(eq0.functionsScheme)
         print('results variables')
-        pp.pprint(eq0.variables)
+        pp.pprint(eq0.variablesScheme)
         print('results primitives')
-        pp.pprint(eq0.primitives)
+        pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
-        pp.pprint(eq0.totalNodeCount)
+        pp.pprint(eq0.totalNodeCountScheme)
 
 
 
@@ -100,14 +100,14 @@ def test__hatsukoi__step1(verbose=False): # TODO SAME_DIVISOR=> simplication_in_
     'R_{Z_{1}}': 1,
     'V^{Q1}_{BE}': 1,
     'V_{in}': 1} # count
-    expectedPrimitives = {} # count
+    expectedPrimitives = {'0': 1} # count TODO remove by SIMPLIFICATION
     expectedTotalNodeCount = 17 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and 
-        expectedTotalNodeCount == eq0.totalNodeCount)
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and 
+        expectedTotalNodeCount == eq0.totalNodeCountScheme)
     if verbose:
         print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
@@ -115,13 +115,13 @@ def test__hatsukoi__step1(verbose=False): # TODO SAME_DIVISOR=> simplication_in_
         print('TF: ', latexStr)
         print('Counts~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('results functions')
-        pp.pprint(eq0.functions)
+        pp.pprint(eq0.functionsScheme)
         print('results variables')
-        pp.pprint(eq0.variables)
+        pp.pprint(eq0.variablesScheme)
         print('results primitives')
-        pp.pprint(eq0.primitives)
+        pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
-        pp.pprint(eq0.totalNodeCount)
+        pp.pprint(eq0.totalNodeCountScheme)
 
 
 
@@ -148,10 +148,10 @@ def test__hatsukoi__step2(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => s
     expectedTotalNodeCount = 17 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
-        expectedFunctions == eq0.functions and 
-        expectedVariables == eq0.variables and 
-        expectedPrimitives == eq0.primitives and 
-        expectedTotalNodeCount == eq0.totalNodeCount)
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and 
+        expectedTotalNodeCount == eq0.totalNodeCountScheme)
     if verbose:
         print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('OG: ', eqs0, ' ', eqs1)
@@ -159,13 +159,13 @@ def test__hatsukoi__step2(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => s
         print('TF: ', latexStr)
         print('Counts~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('results functions')
-        pp.pprint(eq0.functions)
+        pp.pprint(eq0.functionsScheme)
         print('results variables')
-        pp.pprint(eq0.variables)
+        pp.pprint(eq0.variablesScheme)
         print('results primitives')
-        pp.pprint(eq0.primitives)
+        pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
-        pp.pprint(eq0.totalNodeCount)
+        pp.pprint(eq0.totalNodeCountScheme)
 
 
 

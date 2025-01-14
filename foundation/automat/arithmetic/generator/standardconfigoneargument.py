@@ -38,7 +38,7 @@ class Standardconfigoneargument:
                 reverse_imports__toString=str(os.linesep.join(map(lambda reverseImportStr: cls._template__reverse_imports(reverseImportStr), [f"from foundation.automat.arithmetic.standard.{hincname.lower()} import {hincname}"]))),
                 # imports_as_str=str(mapping['import']).replace("'", '"'),
                 imports_as_str__toString=str(os.linesep.join(map(lambda imports_as_str: cls._template__imports_as_str(imports_as_str), mapping['import']))),
-                code_as_str=str(mapping['code']).replace("'", '"'),
+                code_as_str=str(mapping['code'][0]).replace("'", '"'), # for now, we take default code
                 permutation=cls.addSpacesBeforeEveryLine(
                         dump({'permutation':list(map(lambda item: [list(item[0]), list(item[1])], permutation.items()))}),
                         spacesCount=4
@@ -55,7 +55,7 @@ class Standardconfigoneargument:
                 reverse_imports__toString=str(os.linesep.join(map(lambda reverseImportStr: cls._template__reverse_imports(reverseImportStr), [f"from foundation.automat.arithmetic.standard.{vorcname.lower()} import {vorcname}"]))),
                 # imports_as_str=str(mapping['reverse_import']).replace("'", '"'),
                 imports_as_str__toString=str(os.linesep.join(map(lambda imports_as_str: cls._template__imports_as_str(imports_as_str), mapping['reverse_import']))),
-                code_as_str=str(mapping['reverse_code']).replace("'", '"'),
+                code_as_str=str(mapping['reverse_code'][0]).replace("'", '"'), # for now, we take default code
                 permutation=cls.addSpacesBeforeEveryLine(
                         dump({'permutation':list(map(lambda item: [list(item[0]), list(item[1])], permutation.items()))}),
                         spacesCount=4

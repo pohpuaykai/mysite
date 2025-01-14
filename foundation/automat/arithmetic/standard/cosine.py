@@ -134,5 +134,5 @@ class Cosine(Function):
         :rtype: float
         """
         from math import cos
-        num=sin(v0)
+        num=cos(v0)
         return num

@@ -134,5 +134,5 @@ class Arcsecanth(Function):
         :rtype: float
         """
         from math import asinh
-        num=sin(v0)
+        num=asinh(1.0/v0)
         return num

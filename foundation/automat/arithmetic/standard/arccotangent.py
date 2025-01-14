@@ -134,5 +134,5 @@ class Arccotangent(Function):
         :rtype: float
         """
         from math import atan
-        num=sin(v0)
+        num=atan(1.0/v0)
         return num

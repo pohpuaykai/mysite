@@ -134,5 +134,5 @@ class Arctangenth(Function):
         :rtype: float
         """
         from math import atanh
-        num=sin(v0)
+        num=atanh(v0)
         return num

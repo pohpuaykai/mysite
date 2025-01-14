@@ -501,7 +501,13 @@ class Equation:
             import pprint
             pp = pprint.PrettyPrinter(indent=4)
             print('before makeSubject self.astScheme totalNodeCountScheme', self.totalNodeCountScheme)
+            print('before makeSubject self.astScheme functionsScheme: ', self.functionsScheme)
+            print('before makeSubject self.astScheme variablesScheme: ', self.variablesScheme)
+            print('before makeSubject self.astScheme primitivesScheme', self.primitivesScheme)
             print('before makeSubject eq.astScheme totalNodeCountScheme', eq.totalNodeCountScheme)
+            print('before makeSubject eq.astScheme functionsScheme: ', eq.functionsScheme)
+            print('before makeSubject eq.astScheme variablesScheme: ', eq.variablesScheme)
+            print('before makeSubject eq.astScheme primitivesScheme', eq.primitivesScheme)
 
         self.makeSubject(variable)
         eq.makeSubject(variable)

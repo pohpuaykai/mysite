@@ -134,5 +134,5 @@ class Tangent(Function):
         :rtype: float
         """
         from math import tan
-        num=sin(v0)
+        num=tan(v0)
         return num

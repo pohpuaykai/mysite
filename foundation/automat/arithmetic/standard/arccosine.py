@@ -134,5 +134,5 @@ class Arccosine(Function):
         :rtype: float
         """
         from math import acos
-        num=sin(v0)
+        num=acos(v0)
         return num

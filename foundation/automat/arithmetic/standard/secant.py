@@ -134,5 +134,5 @@ class Secant(Function):
         :rtype: float
         """
         from math import sin
-        num=sin(v0)
+        num=1.0/sin(v0)
         return num

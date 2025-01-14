@@ -134,5 +134,5 @@ class Cotangent(Function):
         :rtype: float
         """
         from math import tan
-        num=sin(v0)
+        num=1.0/tan(v0)
         return num
