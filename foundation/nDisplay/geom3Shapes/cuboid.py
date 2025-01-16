@@ -1,4 +1,5 @@
 import OpenGL.GL as gl
+import random
 
 def cube(vertices, edges, surfaces, colors):
     """
@@ -57,15 +58,19 @@ def cube(vertices, edges, surfaces, colors):
     """
     #surfaces
     gl.glBegin(gl.GL_QUADS)
-    x = 0
+    # x = 0#(2) gives solid colors
     for surface in surfaces:
-        #x = 0
-        gl.glColor3fv(colors[x])
+        x = 0#(1) gives color gradient
+        # gl.glColor3fv(colors[x])
         for vertex in surface:
-            #x += 1
-            #gl.glColor3fv(colors[x])
+            # x += 1#(1) gives color gradient
+            # x+= random.randint(0, len(colors)-1)# this is shimmering.... but not 'continous(gradient) colors'
+
+            # x = x% len(colors)
+            # print(x)
+            gl.glColor3fv(colors[x])
             gl.glVertex3fv(vertices[vertex])
-        x += 1
+        # x += 1#(2) gives solid colors
     gl.glEnd()
 
     #wireframe...

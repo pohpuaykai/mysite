@@ -13,6 +13,21 @@ pp = pprint.PrettyPrinter(indent=4)
 
 def test__cylinder__basic(verbose=False):
     #TODO actually a resistor is more like a long long disk?
+    #colors
+    colors = (
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (0,1,0),
+    (1,1,1),
+    (0,1,1),
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (1,0,0),
+    (1,1,1),
+    (0,1,1),
+    )
     def piece():
         baseRadius = 1
         topRadius = 1
@@ -26,7 +41,7 @@ def test__cylinder__basic(verbose=False):
         #gl.glColor3fv((1, 0, 0)) # colors the inside/outside of the cylinder (1, 0, 0)
         #material has no effect... maybe because no light source...
         #gl.glMaterialfv(gl.GL_FRONT, gl.GL_AMBIENT, [0.7, 0.7, 0.7, 0.5]) #http://jerome.jouvie.free.fr/opengl-tutorials/Tutorial14.php
-        cylinder(baseRadius, topRadius, height, slices, stacks, texture, drawStyle, normals, orientation)
+        cylinder(baseRadius, topRadius, height, slices, stacks, texture, drawStyle, normals, orientation, colors)
     width = 800
     height = 600
     metronome = 10

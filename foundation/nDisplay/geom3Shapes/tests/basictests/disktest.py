@@ -13,13 +13,28 @@ pp = pprint.PrettyPrinter(indent=4)
 
 def test__disk__basic(verbose=False):
     #TODO actually a resistor is more like a long long disk?
+    #colors
+    colors = (
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (0,1,0),
+    (1,1,1),
+    (0,1,1),
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (1,0,0),
+    (1,1,1),
+    (0,1,1),
+    )
     def piece():
         internalRadius = 0.5
         externalRadius = 0.9
         slices = 3
         rings = 3
         drawStyle = glu.GLU_FILL
-        disk(internalRadius, externalRadius, slices, rings, drawStyle)
+        disk(internalRadius, externalRadius, slices, rings, drawStyle, colors)
     width = 800
     height = 600
     metronome = 10

@@ -78,7 +78,37 @@ def test__nurbs__basic(verbose=False):
                     ctlpoints[u][v][2] = -3.0
         return ctlpoints
 
+    """
+https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glMaterial.xml
 
+    face
+    Specifies which face or faces are being updated. Must be one of GL_FRONT, GL_BACK, or GL_FRONT_AND_BACK.
+
+    pname
+    Specifies the material parameter of the face or faces that is being updated. Must be one of GL_AMBIENT, GL_DIFFUSE, GL_SPECULAR, GL_EMISSION, GL_SHININESS, GL_AMBIENT_AND_DIFFUSE, or GL_COLOR_INDEXES.
+
+    params
+    Specifies a pointer to the value or values that pname will be set to.
+    """
+    #gl.glMaterialfv(gl.GL_FRONT, gl.GL_DIFFUSE, np.array([0.7, 0.7, 0.7, 1.0],'f'));
+    #gl.glMaterialfv(gl.GL_FRONT, gl.GL_SPECULAR, np.array([1.0, 1.0, 1.0, 1.0],'f'));
+    #gl.glMaterialfv(gl.GL_FRONT, gl.GL_SHININESS, np.array([100.0],'f'));
+
+    #colors
+    colors = (
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (0,1,0),
+    (1,1,1),
+    (0,1,1),
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (1,0,0),
+    (1,1,1),
+    (0,1,1),
+    )
     def piece():
         # sKnots = []
         
@@ -98,7 +128,7 @@ def test__nurbs__basic(verbose=False):
         tKnots = np.array([0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0], "f")
         control = buildControlPoints()
         type = gl.GL_MAP2_VERTEX_3
-        nurbsSurface(sKnots, tKnots, control, type)
+        nurbsSurface(sKnots, tKnots, control, type, colors)
     width = 800
     height = 600
     metronome = 10

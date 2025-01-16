@@ -12,6 +12,21 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 def test__partialdisk__basic(verbose=False):
+    #colors
+    colors = (
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (0,1,0),
+    (1,1,1),
+    (0,1,1),
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (1,0,0),
+    (1,1,1),
+    (0,1,1),
+    )
     def piece():
         internalRadius = 0.5
         externalRadius = 0.9
@@ -20,7 +35,7 @@ def test__partialdisk__basic(verbose=False):
         startAngle = 0
         angle = 20
         drawStyle = glu.GLU_FILL
-        partialDisk(internalRadius, externalRadius, slices, rings, startAngle, angle, drawStyle)
+        partialDisk(internalRadius, externalRadius, slices, rings, startAngle, angle, drawStyle, colors)
     width = 800
     height = 600
     metronome = 10

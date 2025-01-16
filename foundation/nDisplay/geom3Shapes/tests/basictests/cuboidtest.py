@@ -3,6 +3,7 @@ import pprint
 
 
 from foundation.nDisplay.core.stage import Stage
+from foundation.nDisplay.common.vectordimensioncounter import ColorCounter
 
 from foundation.nDisplay.geom3Shapes.cuboid import cube
 import OpenGL.GL as gl
@@ -52,21 +53,29 @@ def test__cuboid__basic(verbose=False):
     (4,0,3,6)
     )
 
-    #colors
-    colors = (
-    (1,0,0),
-    (0,1,0),
-    (0,0,1),
-    (0,1,0),
-    (1,1,1),
-    (0,1,1),
-    (1,0,0),
-    (0,1,0),
-    (0,0,1),
-    (1,0,0),
-    (1,1,1),
-    (0,1,1),
-    )
+    #colors (jerky colors)
+    # colors = (
+    # (1,0,0),
+    # (0,1,0),
+    # (0,0,1),
+    # (0,1,0),
+    # (1,1,1),
+    # (0,1,1),
+    # (1,0,0),
+    # (0,1,0),
+    # (0,0,1),
+    # (1,0,0),
+    # (1,1,1),
+    # (0,1,1),
+    # )
+    #TODO refactor ....
+    class colorarray:
+        def __init__(self):
+            self.cc = ColorCounter()
+        def __getitem__(self, key):
+            return self.cc.next()
+    #
+    colors = colorarray()
     def piece():
         cube(vertices, edges, surfaces, colors)
     width = 800

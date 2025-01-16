@@ -1,6 +1,11 @@
-import OpenGL.GLU as glu
+import random
 
-def nurbsSurface(sKnots, tKnots, control, type):
+import OpenGL.GLU as glu
+import OpenGL.GL as gl
+
+import numpy as np
+
+def nurbsSurface(sKnots, tKnots, control, type, colors):
     """
     Resources for NURBS
     https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluNurbsCurve.xml
@@ -88,8 +93,57 @@ def nurbsSurface(sKnots, tKnots, control, type):
 
     :type type: GLenum(type)
     """
+    x=0
     nurbs = glu.gluNewNurbsRenderer()
     glu.gluBeginSurface(nurbs)
+    #3 together also does nothing., putting at def piece of nurbstest also does nothing
+    """MIGHT BE BECAUSE OF THESE:
+
+
+        glEnable(GL_AUTO_NORMAL);
+        glEnable(GL_NORMALIZE);
+
+        gluNurbsProperty(self.theNurb, GLU_SAMPLING_TOLERANCE, 25.0);
+        gluNurbsProperty(self.theNurb, GLU_DISPLAY_MODE, GLU_FILL);
+
+
+        [from http://bazaar.launchpad.net/~mcfletch/openglcontext/trunk/view/head:/tests/redbook_surface.py]
+
+        https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glColorMaterial.xml
+        says: glColorMaterial is  prefered to glMaterialfv
+    """
+    # gl.glMaterialfv(gl.GL_FRONT, gl.GL_DIFFUSE, np.array([0.7, 0.7, 0.7, 1.0],'f')); # seems to do nothing, both sides of the nurbs still white
+    # gl.glMaterialfv(gl.GL_FRONT, gl.GL_SPECULAR, np.array([1.0, 1.0, 1.0, 1.0],'f')); # seems to do nothing, both sides of the nurbs still white
+    # gl.glMaterialfv(gl.GL_FRONT, gl.GL_SHININESS, np.array([100.0],'f')); # seems to do nothing, both sides of the nurbs still white.
+    x+= random.randint(0, len(colors)-1)# this is shimmering.... but not 'continous(gradient) colors'
+    x = x% len(colors)
+    """
+controlPoints:
+[[[-3. -3. -3.]
+  [-3. -1. -3.]
+  [-3.  1. -3.]
+  [-3.  3. -3.]]
+
+ [[-1. -3. -3.]
+  [-1. -1.  3.]
+  [-1.  1.  3.]
+  [-1.  3. -3.]]
+
+ [[ 1. -3. -3.]
+  [ 1. -1.  3.]
+  [ 1.  1.  3.]
+  [ 1.  3. -3.]]
+
+ [[ 3. -3. -3.]
+  [ 3. -1. -3.]
+  [ 3.  1. -3.]
+  [ 3.  3. -3.]]]
+    """
+    #gl.glVertex3fv
+    #maybe, use control, sKnots, tKnots as vertices?
+    # print(x)
+    gl.glColor3fv(colors[x])# this is flashing.... but not 'continous(gradient) colors' & cannot use vertices to select source of color change...
+
     glu.gluNurbsSurface(nurbs,sKnots, tKnots, control, type)
     """
     argTypes of gluNurbsCurve (raw OpenGL) can be found here: Lib/site-packages/OpenGL/raw/GLU/__init__.py
