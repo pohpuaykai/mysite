@@ -2,11 +2,14 @@ from copy import deepcopy
 import math
 import sys
 
-import pygame as pg
-import pygame.locals as pl
+import glfw
+import glfw.GLFW as GLFW_CONSTANTS
+#import pygame as pg
+#import pygame.locals as pl
 import OpenGL.GL as gl
 import OpenGL.GLU as glu
 
+from foundation.nDisplay import NDISPLAY_MODULE_DIR
 from foundation.nDisplay.common import convertToPyArray
 from foundation.nDisplay.controlsMapping import KEYBOARD_3D_DISPLAY_CONTROLS as KBCM
 
@@ -61,18 +64,52 @@ class Stage:
         self.resetted = False
         self.resetting = False
         self._initScene()
+        self.window = self._initGLFW(self.width, self.height)
+        #setup input system
+        self._keys = {} # key pressed to bool
+        glfw.set_key_callback(self.window, self._keyCallback)
         #state variables
         self.mouseDown = False
         self.mouseDownPos = None # tuple(x, y)
         self._action()
 
     def _initScene(self):
-        pg.init()
+        #pg.init()
         self._displayInit()
 
+    def _initGLFW(self, SCREEN_WIDTH, SCREEN_HEIGHT): #for clock, mouse, keyboard
+        """
+        Courtesy of Andrew of www.youtube.com/@GetIntoGameDev
+        """
+
+        glfw.init()
+        glfw.window_hint(GLFW_CONSTANTS.GLFW_CONTEXT_VERSION_MAJOR, 3)
+        glfw.window_hint(GLFW_CONSTANTS.GLFW_CONTEXT_VERSION_MINOR, 3)
+        glfw.window_hint(
+            GLFW_CONSTANTS.GLFW_OPENGL_PROFILE, 
+            GLFW_CONSTANTS.GLFW_OPENGL_CORE_PROFILE, 
+        )
+        glfw.window_hint(
+            GLFW_CONSTANTS.GLFW_OPENGL_FORWARD_COMPAT, 
+            GLFW_CONSTANTS.GLFW_TRUE, 
+        )
+        glfw.window_hint(GLFW_CONSTANTS.GLFW_DOUBLEBUFFER, GL_FALSE) # frame rate limiting not sure what is that
+        
+        window = glfw.create_window(SCREEN_WIDTH, SCREEN_HEIGHT, "My Game", None, None) #first None is the monitor, second None, programs showing resources with
+        if not window: # https://pypi.org/project/glfw/
+            glfw.terminate()
+            return
+        glfw.make_context_current(window)
+        #glfw.set_input_mode(
+        #    window,
+        #    GLFW_CONSTANTS.GLFW_CURSOR, 
+        #    GLFW_CONSTANTS.GLFW_CURSOR_HIDDEN
+        #)
+        return window
+
     def _displayInit(self):
-        pg.display.set_mode((self.width, self.height), pg.DOUBLEBUF|pg.OPENGL)
-        pg.display.set_caption(self.displayCaption)
+        #pg.display.set_mode((self.width, self.height), pg.DOUBLEBUF|pg.OPENGL)
+        #pg.display.set_caption(self.displayCaption)
         self.aspectRatio = float(self.width)/float(self.height)
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glLoadIdentity() # remove accumulated transformations
@@ -85,9 +122,303 @@ class Stage:
         gl.glTranslatef(0.0, 0.0, -5) # initial zoom out... TODO configurable/ calculated to give 'BEST initial VIEW of the stage'
 
 
+    def _keyCallback(self, window, key, scancode, action, mods):
+        """ INIT
+        Handle a key event.
+
+        :param window: the window on which the keypress occurred.
+        :type window:
+        :param key: the key which was pressed
+        :type key: 
+        :param scancode: scancode of the key
+        :type scancode:
+        :param action: action of the key event
+        :type action:
+        :param mods: modifiers applied to the event
+        :type mods:
+        """
+        state = False
+        match action:
+            case GLFW_CONSTANTS.GLFW_PRESS:
+                state = True
+            case GLFW_CONSTANTS.GLFW_RELEASE:
+                state = False
+            case _:
+                return
+        self._keys[key] = state
+
+
+    def _keysHandler(self):
+        """RENDER
+        r - right
+        l - left
+        u - up
+        d - down
+        i - in
+        o - out
+
+        r,l,u,d,i,o
+        2^6 = 64
+        00 000000 
+        01 00000o o
+        02 0000i0 i
+        03 0000io 
+        04 000d00 d
+        05 000d0o do
+        06 000di0 di
+        07 000dio d
+        08 00u000 u
+        09 00u00o uo
+        10 00u0i0 ui
+        11 00u0io u
+        12 00ud00 
+        13 00ud0o o
+        14 00udi0 i
+        15 00udio 
+        16 0l0000 l
+        17 0l000o lo
+        18 0l00i0 li
+        19 0l00io l
+        20 0l0d00 ld
+        21 0l0d0o ldo
+        22 0l0di0 ldi
+        23 0l0dio ld
+        24 0lu000 lu
+        25 0lu00o luo
+        26 0lu0i0 lui
+        27 0lu0io lu
+        28 0lud00 l
+        29 0lud0o lo
+        30 0ludi0 li
+        31 0ludio l
+        32 r00000 r
+        33 r0000o ro
+        34 r000i0 ri
+        35 r000io r
+        36 r00d00 rd
+        37 r00d0o rdo
+        38 r00di0 rdi
+        39 r00dio rd
+        40 r0u000 ru
+        41 r0u00o ruo
+        42 r0u0i0 rui
+        43 r0u0io ru
+        44 r0ud00 r
+        45 r0ud0o ro
+        46 r0udi0 ri
+        47 r0udio r
+        48 rl0000 
+        49 rl000o o
+        50 rl00i0 i
+        51 rl00io 
+        52 rl0d00 d
+        53 rl0d0o do
+        54 rl0di0 di
+        55 rl0dio d
+        56 rlu000 u
+        57 rlu00o uo
+        58 rlu0i0 ui
+        59 rlu0io u
+        60 rlud00 
+        61 rlud0o o
+        62 rludi0 i
+        63 rludio 
+
+        perspective change, moving camera instead of object
+        """
+        xMove = 0
+        yMove = 0
+        zMove = 0
+        if self._keys.get(KBCM['screen_down']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_in']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_out']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_in']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_down']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_in']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_out']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_in']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_out']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_up']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_in']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_out']):
+            xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_out']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_down']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_in']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_out']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_in']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_out']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            #zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_up']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            y#Move += KBCM['screen_in_sensitivity']
+            zM#ove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_in']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_out']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_up']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']
+        elif self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_in']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            #yMove -= KBCM['screen_out_sensitivity']
+            yMove += KBCM['screen_in_sensitivity']#
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']#
+        elif self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_out']):
+            #xMove -= KBCM['screen_left_sensitivity']
+            #xMove += KBCM['screen_right_sensitivity']
+            yMove -= KBCM['screen_out_sensitivity']#
+            #yMove += KBCM['screen_in_sensitivity']
+            #zMove -= KBCM['screen_down_sensitivity']
+            zMove += KBCM['screen_up_sensitivity']#
+        #else: #keys cancel out.... 
+
+
     def _action(self):
         """
         ACTION! starts the scene rolling.
+
+        
 
         :param piece:
         :type piece:
@@ -99,38 +430,46 @@ class Stage:
         event: function that runs continuously, dictating what happens on the screen
         metronome: 1/fps (frame per second)
         """
-        clock = pg.time.Clock()
-        running = True
-        while running:
-            for event in pg.event.get():
-                #quit event handling
-                if event.type == pg.QUIT:
-                    running = False
-                #
-                self._mouseHandler(event)
-                self._keyboardHandler(event)
-            if self.resetting:
-                #pg.display.quit() # this closes the window
-                #pg.display.init()
-                #STENCIL is used for storing pixel data coming from reflection of light
-                gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT) # GL_ACCUM_BUFFER_BIT GL_STENCIL_BUFFER_BIT
-                self._displayInit()
-                self.resetting = False
-                if self.verbose:
-                    print('resetted............')
-                self.resetted = True
-            else:
-                if not self.resetted:
-                    gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT) # cannot call glClear while pg.display.init
-                else:
-                    self.resetted = False
-                    if self.verbose:
-                        print('unresetted..............')
-                self.piece()
-                pg.display.flip()
-            clock.tick(self.metronome)#pg.time.wait(metronome)
-        pg.quit()
-        sys.exit() # comes with clean-up from 'finally' # https://www.geeksforgeeks.org/python-exit-commands-quit-exit-sys-exit-and-os-_exit/
+
+        #https://pypi.org/project/glfw/
+        while not glfw.window_should_close(window) \
+            or glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_ESCAPE) == GLFW_CONSTANTS.GLFW_PRESS:
+            self.handleKeys()
+            self.handleMouse()
+            glfw.poll_events()
+            self.piece()
+
+
+        # clock = pg.time.Clock()
+        # running = True
+        # while running:
+        #     for event in pg.event.get():
+        #         #quit event handling
+        #         if event.type == pg.QUIT:
+        #             running = False
+        #         #
+        #         self._mouseHandler(event)
+        #         self._keyboardHandler(event)
+        #     if self.resetting:
+        #         #STENCIL is used for storing pixel data coming from reflection of light
+        #         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT) # GL_ACCUM_BUFFER_BIT GL_STENCIL_BUFFER_BIT
+        #         self._displayInit()
+        #         self.resetting = False
+        #         if self.verbose:
+        #             print('resetted............')
+        #         self.resetted = True
+        #     else:
+        #         if not self.resetted:
+        #             gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT) # cannot call glClear while pg.display.init
+        #         else:
+        #             self.resetted = False
+        #             if self.verbose:
+        #                 print('unresetted..............')
+        #         self.piece()
+        #         pg.display.flip()
+        #     clock.tick(self.metronome)#pg.time.wait(metronome)
+        # pg.quit()
+        # sys.exit() # comes with clean-up from 'finally' # https://www.geeksforgeeks.org/python-exit-commands-quit-exit-sys-exit-and-os-_exit/
         #os.exit(os.EX_OK) # sub-pub for multithreading/processing, wait for other thread/process to finish
 
     def _mouseHandler(self, event):
@@ -171,11 +510,15 @@ class Stage:
                 print(rel, angleF(), xSign, ySign, zSign)
 
     def _keyboardHandler(self, event):
-        """
-
+        """also handle 
+        screen_left & screen_right
+        screen_left & screen_up
+        ...
+        
         :param event:
         :type event:
         """
+
         if event.type == pg.KEYDOWN:
             ## screen related
             if event.key == KBCM['screen_left']:
@@ -270,3 +613,33 @@ class Stage:
         # print('view-----------')
         # pp.pprint(pyView)
 
+
+class Shader:
+    VERTEX_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'vertex.glsl')
+    FRAGMENT_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'fragment.glsl')
+
+    def __init__(self):
+        with open(Shader.VERTEX_SHADER_FILEPATH, 'r') as f:
+            vertex_src = f.readlines()
+
+        with open(Shader.FRAGMENT_SHADER_FILEPATH, 'r') as f:
+            fragment_src = f.readlines()
+
+        self.program = compileProgram( # linkage
+            compileShader(vertex_src, gl.GL_VERTEX_SHADER), #compilation
+            compileShader(fragment_src, gl.GL_FRAGMENT_SHADER)
+        )
+
+
+class StandardStage(Stage):
+
+    def __init__(self, piece):
+        width = 800
+        height = 600
+        metronome = 10
+        displayCaption = "Standard Stage"
+        fieldOfView = 45
+        zNear = 0.1
+        zFar = 50
+        verbose = False
+        super().__init__(width, height, piece, metronome, displayCaption, fieldOfView, zNear, zFar, verbose)
