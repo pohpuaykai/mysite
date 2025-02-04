@@ -12,7 +12,7 @@ class MstKruskal:
         from automat.common.unionfindbyrankwithpathcompression import UnionFindByRankWithPathCompression
         A = set()
         uf = UnionFindByRankWithPathCompression(len(vertexIterable))
-        edgeIterableSortable__sorted = sorted(edgeIterableSortable, key=edgeWeight)
+        edgeIterableSortable__sorted = sorted(edgeIterableSortable, key=lambda edge: edgeWeight[edge])
         for edge in edgeIterableSortable__sorted:
             if uf.find(edge[0]) != uf.find(edge[1]):
                 A = A.add(edge)

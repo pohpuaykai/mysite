@@ -68,9 +68,12 @@ class Stage:
         #setup input system
         self._keys = {} # key pressed to bool
         glfw.set_key_callback(self.window, self._keyCallback)
-        #state variables
-        self.mouseDown = False
-        self.mouseDownPos = None # tuple(x, y)
+        # Sets the mouse button callback
+        mouseNames = list(filter(lambda k: 'glfw_mouse' in k.lower(), dir(GLFW_CONSTANTS)))
+        self._cursorPos = (0, 0)
+        self._mouseButtonsPos = dict(map(lambda mouseName: (mouseName, {}), mouseNames)) # mouseButtons to UP_or_DOWN to tuple(x, y) that is the mouse_position
+        self._mouseButtonsState = {}
+        glfw.set_mouse_button_callback(self.window, self._mouseCallback)
         self._action()
 
     def _initScene(self):
@@ -121,20 +124,90 @@ class Stage:
         )
         gl.glTranslatef(0.0, 0.0, -5) # initial zoom out... TODO configurable/ calculated to give 'BEST initial VIEW of the stage'
 
+    def _mouseCallback(self, window, button, action, mods):
+        """
+        Input args = https://www.glfw.org/docs/3.3/group__input.html#ga0184dcb59f6d85d735503dcaae809727
+
+        :param window:
+        The window that received the event
+        :type window:
+        :param button:
+        The mouse button that was pressed or released
+        :type button:
+        :param action:
+        One of GLFW_PRESS or GLFW_RELEASE. Future releases may add more actions
+        :type action:
+        :param mods:
+        Bit field describing which modifier keys were held down
+        https://www.glfw.org/docs/3.3/group__mods.html
+        Like SHIFT, CONTROL, ALT
+        :type mods:
+        """
+        state = False
+        match action:
+            case GLFW_CONSTANTS.GLFW_PRESS:
+                state = True
+            case GLFW_CONSTANTS.GLFW_RELEASE:
+                state = True
+            case _:
+                return
+        self._mouseButtonsState[key] = state
+        self._mouseButtonsPos[key][action] = glfw.get_cursor_pos(self.window)
+        
+
+    def _mouseHandler(self):
+        """
+        All other unmapped buttons can be found here:
+        list(filter(lambda k: 'mouse' in k.lower(), dir(GLFW_CONSTANTS)))
+
+        NOTICE there is no mouseMotion like in pygame
+        looking into https://github.com/pygame/pygame to see how pg.MOUSEMOTION was implemented
+        """
+        #DRAG should only work WHEN mouseButton is down
+        if self._mouseButtonsState.get(GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT, False) and \
+            self._mouseButtonsPos[GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT][GLFW_CONSTANTS.GLFW_PRESS] and \
+            self._mouseButtonsPos[GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT][GLFW_CONSTANTS.GLFW_RELEASE]:
+            rel = self._mouseButtonsPos
+            #TODO formulas should be configurable.... on a seperate configurable... file?
+            # actually just a magnitude, user can adjust sensitivity 
+            #math.atan(abs(rel[1])/abs(rel[0])) if rel[0] != 0.0 else 0 
+            def angleF(): #TODO UI can be improved, vertical drag up and horizontal drag up a little weird...
+                if rel[0] == 0.0 and rel[1] == 0.0:
+                    return 0
+                elif rel[0] == 0.0:
+                    return 1.0/(KBCM['screen_out_sensitivity']+abs(rel[0]/rel[1]))
+                else:
+                    return 1.0/(KBCM['screen_out_sensitivity']+abs(rel[1]/rel[0]))
+            xSign = abs(rel[0])/rel[0] if rel[0] != 0.0 else 1
+            ySign = abs(rel[1])/rel[1] if rel[1] != 0.0 else 1
+            zSign = abs(rel[0] * rel[1]) / (rel[0] * rel[1]) if rel[0] != 0.0 and rel[1] != 0.0 else 0# could also be 0 if rel[0] == 0.0 or rel[1] == 0.0 else xSign*ySign, depends on the processor, does 'or/==' cost more than multiply? (does logical operators cost more than arithmetic operators (processor specific configurations?)?)
+            originVecVerViewPort = self.getPrickVerViewPort() # TODO needs to change this
+            gl.glRotatef(angleF(), ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
+            if self.verbose:
+                print(rel, angleF(), xSign, ySign, zSign)
+
+
 
     def _keyCallback(self, window, key, scancode, action, mods):
         """ INIT
-        Handle a key event.
+        Input args = https://www.glfw.org/docs/3.3/group__input.html#ga0184dcb59f6d85d735503dcaae809727
 
-        :param window: the window on which the keypress occurred.
+        :param window:
+        The window that received the event.
         :type window:
-        :param key: the key which was pressed
+        :param key:
+        The keyboard key that was pressed or released
         :type key: 
-        :param scancode: scancode of the key
+        :param scancode:
+        The system-specific scancode of the key
         :type scancode:
-        :param action: action of the key event
+        :param action:
+        GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT. Future releases may add more actions
         :type action:
-        :param mods: modifiers applied to the event
+        :param mods:
+        Bit field describing which modifier keys were held down
+        https://www.glfw.org/docs/3.3/group__mods.html
+        Like SHIFT, CONTROL, ALT
         :type mods:
         """
         state = False
@@ -412,6 +485,13 @@ class Stage:
             #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']#
         #else: #keys cancel out.... 
+        #TODO handle reset key:
+        ## screen related
+        # if event.key == KBCM['actor_reset']: #TODO this does not work, not sure why
+        #     self.resetting = True
+        #     if self.verbose:
+        #         print('actor reset')
+
 
 
     def _action(self):
@@ -504,52 +584,52 @@ class Stage:
             xSign = abs(rel[0])/rel[0] if rel[0] != 0.0 else 1
             ySign = abs(rel[1])/rel[1] if rel[1] != 0.0 else 1
             zSign = abs(rel[0] * rel[1]) / (rel[0] * rel[1]) if rel[0] != 0.0 and rel[1] != 0.0 else 0# could also be 0 if rel[0] == 0.0 or rel[1] == 0.0 else xSign*ySign, depends on the processor, does 'or/==' cost more than multiply? (does logical operators cost more than arithmetic operators (processor specific configurations?)?)
-            originVecVerViewPort = self.getPrickVerViewPort()
+            originVecVerViewPort = self.getPrickVerViewPort() # model view
             gl.glRotatef(angleF(), ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
             if self.verbose:
                 print(rel, angleF(), xSign, ySign, zSign)
 
-    def _keyboardHandler(self, event):
-        """also handle 
-        screen_left & screen_right
-        screen_left & screen_up
-        ...
+    # def _keyboardHandler(self, event):
+    #     """also handle 
+    #     screen_left & screen_right
+    #     screen_left & screen_up
+    #     ...
         
-        :param event:
-        :type event:
-        """
+    #     :param event:
+    #     :type event:
+    #     """
 
-        if event.type == pg.KEYDOWN:
-            ## screen related
-            if event.key == KBCM['screen_left']:
-                gl.glTranslatef(-KBCM['screen_left_sensitivity'], 0, 0)
-                if self.verbose:
-                    print("left")
-            if event.key == KBCM['screen_right']:
-                gl.glTranslatef(KBCM['screen_right_sensitivity'], 0, 0)
-                if self.verbose:
-                    print("right")
-            if event.key == KBCM['screen_up']:
-                gl.glTranslatef(0, KBCM['screen_up_sensitivity'], 0)
-                if self.verbose:
-                    print("up")
-            if event.key == KBCM['screen_down']:
-                gl.glTranslatef(0, -KBCM['screen_down_sensitivity'], 0)
-                if self.verbose:
-                    print("down")
-            if event.key == KBCM['screen_in']:
-                gl.glTranslatef(0, 0, KBCM['screen_in_sensitivity'])
-                if self.verbose:
-                    print("in")
-            if event.key == KBCM['screen_out']:
-                gl.glTranslatef(0, 0, -KBCM['screen_out_sensitivity'])
-                if self.verbose:
-                    print("out")
-            ## screen related
-            if event.key == KBCM['actor_reset']: #TODO this does not work, not sure why
-                self.resetting = True
-                if self.verbose:
-                    print('actor reset')
+    #     if event.type == pg.KEYDOWN:
+    #         ## screen related
+    #         if event.key == KBCM['screen_left']:
+    #             gl.glTranslatef(-KBCM['screen_left_sensitivity'], 0, 0)
+    #             if self.verbose:
+    #                 print("left")
+    #         if event.key == KBCM['screen_right']:
+    #             gl.glTranslatef(KBCM['screen_right_sensitivity'], 0, 0)
+    #             if self.verbose:
+    #                 print("right")
+    #         if event.key == KBCM['screen_up']:
+    #             gl.glTranslatef(0, KBCM['screen_up_sensitivity'], 0)
+    #             if self.verbose:
+    #                 print("up")
+    #         if event.key == KBCM['screen_down']:
+    #             gl.glTranslatef(0, -KBCM['screen_down_sensitivity'], 0)
+    #             if self.verbose:
+    #                 print("down")
+    #         if event.key == KBCM['screen_in']:
+    #             gl.glTranslatef(0, 0, KBCM['screen_in_sensitivity'])
+    #             if self.verbose:
+    #                 print("in")
+    #         if event.key == KBCM['screen_out']:
+    #             gl.glTranslatef(0, 0, -KBCM['screen_out_sensitivity'])
+    #             if self.verbose:
+    #                 print("out")
+    #         ## screen related
+    #         if event.key == KBCM['actor_reset']: #TODO this does not work, not sure why
+    #             self.resetting = True
+    #             if self.verbose:
+    #                 print('actor reset')
 
     #GETTERS of stage
     def getPythonicModelViewMatrix(self):
@@ -615,19 +695,40 @@ class Stage:
 
 
 class Shader:
-    VERTEX_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'vertex.glsl')
-    FRAGMENT_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'fragment.glsl')
+    """
+    Courtesy of ChatGPT:
+    Order of shader pipeline:
+    1. Vertex Shader
+    - Processes individual vertices
+    - Transforms vertex positions from object space to clip space (via the model, view, and projection matrices)
+    - Outputs data (e.g., position, normals, texture coordinates) to the next stage.
+    2. Tessellation Shaders (Optional)
+    - If enabled, tesellation control and evaluation shaders refine geometry
+    - Used for subdividing surfaces
+    3. Geometry Shaders (Optional)
+    - Operates on primitives (points, lines, or triangles) output by the vertex shader (or tessellation stage)
+    - Can generate additional geometry (e.g., extrude a triangle into three new triangles).
+    4. Fragment Shader 
+    - Processes fragments (potential pixels) created by rasterizing primitives (triangles, lines, points)
+    - Handles color, lighting, textures, and effects for each pixel.
+    - Output the final color for each fragment
+    5. Post-Processing and Framebuffer Operations
+    - Blends, depth tests, and stencil tests occur here before the final image is rendered to the screen.
+    """
+    VERTEX_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders', 'vertex.glsl')
+    #from the tutorial, the fragment shader computes diffuse, specular... for now we do not need that
+    #FRAGMENT_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders', 'fragment.glsl')
 
     def __init__(self):
         with open(Shader.VERTEX_SHADER_FILEPATH, 'r') as f:
             vertex_src = f.readlines()
 
-        with open(Shader.FRAGMENT_SHADER_FILEPATH, 'r') as f:
-            fragment_src = f.readlines()
+        # with open(Shader.FRAGMENT_SHADER_FILEPATH, 'r') as f:
+        #     fragment_src = f.readlines()
 
         self.program = compileProgram( # linkage
             compileShader(vertex_src, gl.GL_VERTEX_SHADER), #compilation
-            compileShader(fragment_src, gl.GL_FRAGMENT_SHADER)
+            # compileShader(fragment_src, gl.GL_FRAGMENT_SHADER)
         )
 
 
