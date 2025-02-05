@@ -4,6 +4,10 @@ import OpenGL.GL as gl
 import OpenGL.GLU as glu
 
 def disk(internalRadius, externalRadius, slices, rings, drawStyle, colors):
+    """
+
+    #TODO need to convert to Mesh to be compatible
+    """
     x = 0
     diskQ = glu.gluNewQuadric()
     gl.glPushMatrix() # save first position

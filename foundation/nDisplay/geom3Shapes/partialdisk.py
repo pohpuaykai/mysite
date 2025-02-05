@@ -5,6 +5,10 @@ import OpenGL.GLU as glu
 
 
 def partialDisk(internalRadius, externalRadius, slices, rings, startAngle, angle, drawStyle, colors):
+    """
+    #TODO need to convert to Mesh to be compatible
+
+    """
     x = 0
     partialDiskQ = glu.gluNewQuadric()
     gl.glPushMatrix() # save first position

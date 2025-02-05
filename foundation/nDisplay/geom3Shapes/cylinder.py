@@ -6,6 +6,9 @@ import OpenGL.GLU as glu
 
 def cylinder(baseRadius, topRadius, height, slices, stacks, texture, drawStyle, normals, orientation, colors):
     """
+    #TODO need to convert to Mesh to be compatible
+
+
     From http://jerome.jouvie.free.fr/opengl-tutorials/Tutorial7.php
 
     #defines if the shape is textured

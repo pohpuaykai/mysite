@@ -1,4 +1,5 @@
 from copy import deepcopy
+from jinja2 import Environment, FileSystemLoader
 import math
 import sys
 
@@ -74,6 +75,12 @@ class Stage:
         self._mouseButtonsPos = dict(map(lambda mouseName: (mouseName, {}), mouseNames)) # mouseButtons to UP_or_DOWN to tuple(x, y) that is the mouse_position
         self._mouseButtonsState = {}
         glfw.set_mouse_button_callback(self.window, self._mouseCallback)
+
+
+        self.shader = Shader()
+        #get the variables from the shaders
+        self.keyMoveRegId = self.shader.getKeyMoveRegId() # this is for keyHandler
+        self.mouseMoveRegId = self.shader.getMouseMoveRegId() # this is for mouseHandler
         self._action()
 
     def _initScene(self):
@@ -114,8 +121,9 @@ class Stage:
         #pg.display.set_mode((self.width, self.height), pg.DOUBLEBUF|pg.OPENGL)
         #pg.display.set_caption(self.displayCaption)
         self.aspectRatio = float(self.width)/float(self.height)
-        gl.glMatrixMode(gl.GL_MODELVIEW)
-        gl.glLoadIdentity() # remove accumulated transformations
+        #according to ChatGPT, glMatrixMode and glLoadIdentity are old version of OpenGL
+        #gl.glMatrixMode(gl.GL_MODELVIEW)
+        #gl.glLoadIdentity() # remove accumulated transformations
         glu.gluPerspective(
             self.fieldOfView,
             self.aspectRatio,
@@ -157,6 +165,8 @@ class Stage:
 
     def _mouseHandler(self):
         """
+        TODO send vectors to shader
+
         All other unmapped buttons can be found here:
         list(filter(lambda k: 'mouse' in k.lower(), dir(GLFW_CONSTANTS)))
 
@@ -167,7 +177,7 @@ class Stage:
         if self._mouseButtonsState.get(GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT, False) and \
             self._mouseButtonsPos[GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT][GLFW_CONSTANTS.GLFW_PRESS] and \
             self._mouseButtonsPos[GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT][GLFW_CONSTANTS.GLFW_RELEASE]:
-            rel = self._mouseButtonsPos
+            rel = self._mouseButtonsPos[GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT][GLFW_CONSTANTS.GLFW_PRESS]
             #TODO formulas should be configurable.... on a seperate configurable... file?
             # actually just a magnitude, user can adjust sensitivity 
             #math.atan(abs(rel[1])/abs(rel[0])) if rel[0] != 0.0 else 0 
@@ -181,10 +191,12 @@ class Stage:
             xSign = abs(rel[0])/rel[0] if rel[0] != 0.0 else 1
             ySign = abs(rel[1])/rel[1] if rel[1] != 0.0 else 1
             zSign = abs(rel[0] * rel[1]) / (rel[0] * rel[1]) if rel[0] != 0.0 and rel[1] != 0.0 else 0# could also be 0 if rel[0] == 0.0 or rel[1] == 0.0 else xSign*ySign, depends on the processor, does 'or/==' cost more than multiply? (does logical operators cost more than arithmetic operators (processor specific configurations?)?)
-            originVecVerViewPort = self.getPrickVerViewPort() # TODO needs to change this
-            gl.glRotatef(angleF(), ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
+            #originVecVerViewPort = self.getPrickVerViewPort() # TODO needs to change this
+            originVecVerViewPort = self._mouseButtonsPos[GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_LEFT][GLFW_CONSTANTS.GLFW_RELEASE]
+            #gl.glRotatef(angleF(), ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
             if self.verbose:
                 print(rel, angleF(), xSign, ySign, zSign)
+            glUniformMatrix3f(self.keyMoveRegId, ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
 
 
 
@@ -222,7 +234,9 @@ class Stage:
 
 
     def _keysHandler(self):
-        """RENDER
+        """
+        TODO send the vectors to shaders
+        RENDER
         r - right
         l - left
         u - up
@@ -303,186 +317,84 @@ class Stage:
         yMove = 0
         zMove = 0
         if self._keys.get(KBCM['screen_down']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_in']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_out']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_in']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_down']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_in']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_out']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_in']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_out']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_up']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_in']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_left']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_out']):
             xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_out']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_down']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_in']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_down']) and self._keys.get(KBCM['screen_out']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
             zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_in']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_out']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
-            #zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_up']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            y#Move += KBCM['screen_in_sensitivity']
-            zM#ove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_in']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_right']) and self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_out']):
-            #xMove -= KBCM['screen_left_sensitivity']
             xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_up']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']
         elif self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_in']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
-            #yMove -= KBCM['screen_out_sensitivity']
             yMove += KBCM['screen_in_sensitivity']#
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']#
         elif self._keys.get(KBCM['screen_up']) and self._keys.get(KBCM['screen_out']):
-            #xMove -= KBCM['screen_left_sensitivity']
-            #xMove += KBCM['screen_right_sensitivity']
             yMove -= KBCM['screen_out_sensitivity']#
-            #yMove += KBCM['screen_in_sensitivity']
-            #zMove -= KBCM['screen_down_sensitivity']
             zMove += KBCM['screen_up_sensitivity']#
         #else: #keys cancel out.... 
         #TODO handle reset key:
@@ -491,6 +403,8 @@ class Stage:
         #     self.resetting = True
         #     if self.verbose:
         #         print('actor reset')
+        #TODO fill it up probably
+        glUniformMatrix3f(self.keyMoveRegId, xMove, yMove, zMove)
 
 
 
@@ -498,7 +412,9 @@ class Stage:
         """
         ACTION! starts the scene rolling.
 
-        
+        #TODO break down self.piece into
+        #1. Entities
+        #and then pass the entities to shader
 
         :param piece:
         :type piece:
@@ -514,188 +430,17 @@ class Stage:
         #https://pypi.org/project/glfw/
         while not glfw.window_should_close(window) \
             or glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_ESCAPE) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.handleKeys()
-            self.handleMouse()
+            #self.handleKeys()
+            #self.handleMouse()
+            self._mouseHandler()
+            self._keysHandler()
             glfw.poll_events()
             self.piece()
 
-
-        # clock = pg.time.Clock()
-        # running = True
-        # while running:
-        #     for event in pg.event.get():
-        #         #quit event handling
-        #         if event.type == pg.QUIT:
-        #             running = False
-        #         #
-        #         self._mouseHandler(event)
-        #         self._keyboardHandler(event)
-        #     if self.resetting:
-        #         #STENCIL is used for storing pixel data coming from reflection of light
-        #         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT) # GL_ACCUM_BUFFER_BIT GL_STENCIL_BUFFER_BIT
-        #         self._displayInit()
-        #         self.resetting = False
-        #         if self.verbose:
-        #             print('resetted............')
-        #         self.resetted = True
-        #     else:
-        #         if not self.resetted:
-        #             gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT) # cannot call glClear while pg.display.init
-        #         else:
-        #             self.resetted = False
-        #             if self.verbose:
-        #                 print('unresetted..............')
-        #         self.piece()
-        #         pg.display.flip()
-        #     clock.tick(self.metronome)#pg.time.wait(metronome)
-        # pg.quit()
-        # sys.exit() # comes with clean-up from 'finally' # https://www.geeksforgeeks.org/python-exit-commands-quit-exit-sys-exit-and-os-_exit/
-        #os.exit(os.EX_OK) # sub-pub for multithreading/processing, wait for other thread/process to finish
-
-    def _mouseHandler(self, event):
-        """
-
-        :param event:
-        :type event:
-        """
-        if event.type == pg.MOUSEBUTTONDOWN:
-            self.mouseDownPos = pg.mouse.get_pos()
-            self.mouseDown = True
-            if self.verbose:
-                print(self.mouseDownPos, "FIRST mouse button down")
-                self.printModelProjView()
-        if event.type == pg.MOUSEBUTTONUP:
-            self.mouseDown = False
-            if self.verbose:
-                print(self.mouseDown, "mouse button up")
-        if self.mouseDown and event.type == pg.MOUSEMOTION:
-            rel = pg.mouse.get_rel()
-            btn = pg.mouse
-            #TODO formulas should be configurable.... on a seperate configurable... file?
-            # actually just a magnitude, user can adjust sensitivity 
-            #math.atan(abs(rel[1])/abs(rel[0])) if rel[0] != 0.0 else 0 
-            def angleF(): #TODO UI can be improved, vertical drag up and horizontal drag up a little weird...
-                if rel[0] == 0.0 and rel[1] == 0.0:
-                    return 0
-                elif rel[0] == 0.0:
-                    return 1.0/(KBCM['screen_out_sensitivity']+abs(rel[0]/rel[1]))
-                else:
-                    return 1.0/(KBCM['screen_out_sensitivity']+abs(rel[1]/rel[0]))
-            xSign = abs(rel[0])/rel[0] if rel[0] != 0.0 else 1
-            ySign = abs(rel[1])/rel[1] if rel[1] != 0.0 else 1
-            zSign = abs(rel[0] * rel[1]) / (rel[0] * rel[1]) if rel[0] != 0.0 and rel[1] != 0.0 else 0# could also be 0 if rel[0] == 0.0 or rel[1] == 0.0 else xSign*ySign, depends on the processor, does 'or/==' cost more than multiply? (does logical operators cost more than arithmetic operators (processor specific configurations?)?)
-            originVecVerViewPort = self.getPrickVerViewPort() # model view
-            gl.glRotatef(angleF(), ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
-            if self.verbose:
-                print(rel, angleF(), xSign, ySign, zSign)
-
-    # def _keyboardHandler(self, event):
-    #     """also handle 
-    #     screen_left & screen_right
-    #     screen_left & screen_up
-    #     ...
-        
-    #     :param event:
-    #     :type event:
-    #     """
-
-    #     if event.type == pg.KEYDOWN:
-    #         ## screen related
-    #         if event.key == KBCM['screen_left']:
-    #             gl.glTranslatef(-KBCM['screen_left_sensitivity'], 0, 0)
-    #             if self.verbose:
-    #                 print("left")
-    #         if event.key == KBCM['screen_right']:
-    #             gl.glTranslatef(KBCM['screen_right_sensitivity'], 0, 0)
-    #             if self.verbose:
-    #                 print("right")
-    #         if event.key == KBCM['screen_up']:
-    #             gl.glTranslatef(0, KBCM['screen_up_sensitivity'], 0)
-    #             if self.verbose:
-    #                 print("up")
-    #         if event.key == KBCM['screen_down']:
-    #             gl.glTranslatef(0, -KBCM['screen_down_sensitivity'], 0)
-    #             if self.verbose:
-    #                 print("down")
-    #         if event.key == KBCM['screen_in']:
-    #             gl.glTranslatef(0, 0, KBCM['screen_in_sensitivity'])
-    #             if self.verbose:
-    #                 print("in")
-    #         if event.key == KBCM['screen_out']:
-    #             gl.glTranslatef(0, 0, -KBCM['screen_out_sensitivity'])
-    #             if self.verbose:
-    #                 print("out")
-    #         ## screen related
-    #         if event.key == KBCM['actor_reset']: #TODO this does not work, not sure why
-    #             self.resetting = True
-    #             if self.verbose:
-    #                 print('actor reset')
-
-    #GETTERS of stage
-    def getPythonicModelViewMatrix(self):
-        """
-        
-        """
-        model = gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX)
-        return convertToPyArray(deepcopy(model))
-
-
-    def getPythonicProjectionMatrix(self):
-        """
-
-        """
-        proj = gl.glGetDoublev(gl.GL_PROJECTION_MATRIX)
-        return convertToPyArray(deepcopy(proj))
-
-    def getPythonicViewport(self):
-        """
-
-        """
-        view = gl.glGetDoublev(gl.GL_VIEWPORT)
-        return convertToPyArray(deepcopy(view))
-
-
-    def getPrickVerViewPort(self):
-        """
-        Get the prick(vector from origin) towards(ver) me(viewport)
-        """
-        pyModel = self.getPythonicModelViewMatrix()
-        #get the vectors of x-axis, y-axis, z-axis and return a linear combination
-        xAxisVector = [pyModel[0][0], pyModel[1][0], pyModel[2][0]]
-        yAxisVector = [pyModel[0][1], pyModel[1][1], pyModel[2][1]]
-        zAxisVector = [pyModel[0][2], pyModel[1][2], pyModel[2][2]]
-        lcVector = []
-        for idx in range(0, 3):
-            lci = xAxisVector[idx] + yAxisVector[idx] + zAxisVector[idx]
-            lcVector.append(lci)
-        return lcVector
-
-    def printModelProjView(self):
-        """
-        print the states of this stage, 
-        Model
-        Projection
-        View
-        """
-        model = gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX)
-        proj = gl.glGetDoublev(gl.GL_PROJECTION_MATRIX)
-        view = gl.glGetDoublev(gl.GL_VIEWPORT)
-        ####
-        pyModel = convertToPyArray(deepcopy(model))
-        pyProj = convertToPyArray(deepcopy(proj))
-        pyView = convertToPyArray(deepcopy(view))
-        # import pprint
-        # pp = pprint.PrettyPrinter(indent=4)
-        # print('model-------')
-        # pp.pprint(pyModel)
-        # print('projection-------')
-        # pp.pprint(pyProj)
-        # print('view-----------')
-        # pp.pprint(pyView)
-
-
 class Shader:
     """
+    The aim of this class is to coordinate with the shaders
+
     Courtesy of ChatGPT:
     Order of shader pipeline:
     1. Vertex Shader
@@ -716,20 +461,122 @@ class Shader:
     - Blends, depth tests, and stencil tests occur here before the final image is rendered to the screen.
     """
     VERTEX_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders', 'vertex.glsl')
+    GEOMETRY_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders', 'geometry.glsl')
+
     #from the tutorial, the fragment shader computes diffuse, specular... for now we do not need that
     #FRAGMENT_SHADER_FILEPATH = os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders', 'fragment.glsl')
 
     def __init__(self):
+        #TODO refactor into own definition
         with open(Shader.VERTEX_SHADER_FILEPATH, 'r') as f:
             vertex_src = f.readlines()
+
+        with open(Shader.GEOMETRY_SHADER_FILEPATH, 'r') as f:
+            geometry_sec = f.readlines()
 
         # with open(Shader.FRAGMENT_SHADER_FILEPATH, 'r') as f:
         #     fragment_src = f.readlines()
 
-        self.program = compileProgram( # linkage
-            compileShader(vertex_src, gl.GL_VERTEX_SHADER), #compilation
-            # compileShader(fragment_src, gl.GL_FRAGMENT_SHADER)
+
+        #TODO refactor into own definition
+        #initialize opengl
+        glClearColor(0.0, 0.0, 0.0, 1)
+        #heran brauchen wir, fur alpha-transparency of png images
+        #TODO check if this is duplicated
+        glEnable(GL_BLEND)
+        glEnable(GL_DEPTH_TEST) # to check that objects are drawing in front of each other properly
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        #
+        self.shader = compileProgram(
+            Shader.VERTEX_SHADER_FILEPATH, 
+            Shader.GEOMETRY_SHADER_FILEPATH,
+            #Shader.FRAGMENT_SHADER_FILEPATH
         )
+        glUseProgram(self.shader) # for mesh with attributes (wie Triangle), we should declare glUseProgram first
+        #not using textures for now
+        #glUniform1i(glGetUniformLocation(self.shader, "imageTexture"), 0) # setting 1 i(integer) value to "imageTexture" uniform_variable, in fragment.frag, 0 means imageTexture is sampling texture index=0 (in Material class)
+        self.shaderCodeFolderpath = os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders')
+        self.readGLSLTemplateFile()
+
+        #TODO i think this pyrr BS can be done in shaders. And you were doing it halfway
+        #go find the half-done BS in the LEARNING folder
+        projection_transform = pyrr.matrix44.create_perspective_projection(
+            fovy = 45, aspect = 640/480,
+            near = 0.1, far = 50, dtype=np.float32
+        )
+        glUniformMatrix4fv(
+            glGetUniformLocation(self.shader, "projection"),
+            1, GL_FALSE, projection_transform
+        )
+        self.modelMatrixLocation = glGetUniformLocation(self.shader, "model")
+        self.viewMatrixLocation = glGetUniformLocation(self.shader, "view")
+
+        self.cameraPosLoc = glGetUniformLocation(self.shader, "cameraPosition")
+
+    def readGLSLTemplateFile(self):
+        environment = Environment(loader=FileSystemLoader(os.path.join(NDISPLAY_MODULE_DIR, 'core', 'shaders', 'template')))# put in the full directory
+        self.vertexTemplate = environment.get_template("vertex.glsl.jinja2")
+        self.geometryTemplate = environment.get_template("geometry.glsl.jinja2")
+        self.fragmentTemplate = environment.get_template("fragment.glsl.jinja2")
+
+
+    def generateVertexShader(self):
+
+        vertexCode = self.vertexTemplate.render({
+            #TODO fill this up
+        })
+        self.writeShaderCode(vertexCode, VERTEX_SHADER_FILEPATH)
+
+    def generateGeometryShader(self, meshDict):
+        """
+        This code will hold all the init mesh vertices data.
+        Like a Database. Of sorts.
+
+        meshDict is a list of mesh and variable name. Mesh is a list of vec3
+        """
+        vec3 = lambda x, y, z: f"vec3({float(x)},{float(y)},{float(z)})"
+        vec3Array = lambda vecList: f"{{{','.join(map(lambda tu: vec3(tu[0], tu[1], tu[2]), vecList))}}}"
+        def meshDeclaration(listOfVec3, varType, varName):
+            return f"{varType} vec3 {varName}[{len(listOfVec3)}] = {vec3Array(listOfVec3)}"
+
+        #convert meshDict to meshDeclarationList
+        meshDeclarations = []
+        for varname, mesh in meshDict.items():
+            meshDeclarations.append(meshDeclaration(mesh, 'uniform', varname))
+
+        #TODO read the jinja2 template and write the code
+        geometryCode = self.geometryTemplate.render({
+            #TODO put in the variables like
+            #meshDeclarations
+
+            #... others
+        })
+        self.writeShaderCode(geometryCode, GEOMETRY_SHADER_FILEPATH)
+
+
+    def generateFragmentShader(self):
+        """
+        TODO should the color vec3 arrays be here?
+        """
+        fragmentCode = self.fragmentTemplate.render({
+            #TODO fill this up
+        })
+        self.writeShaderCode(fragmentCode, FRAGMENT_SHADER_FILEPATH)
+
+
+
+    def writeShaderCode(self, code, filepath):
+        codefile = open(filepath, 'w')
+        codefile.write(code)
+        codefile.close()
+
+    #def render(self, stage): # a GIANT FOR LOOP, going through All entities, TODO actually this can be totally done on shader code.
+    #TODO copy from class GraphicsEngine, 
+    def getKeyMoveRegId(self):
+        return glGetUniformLocation(self.shader, "") # TODO fill it up with correct var name
+
+    def mouseMoveRegId(self):
+        return glGetUniformLocation(self.shader, "") # TODO fill it up with correct var name
 
 
 class StandardStage(Stage):

@@ -7,6 +7,8 @@ import numpy as np
 
 def nurbsSurface(sKnots, tKnots, control, type, colors):
     """
+    #TODO need to convert to Mesh to be compatible
+    
     Resources for NURBS
     https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluNurbsCurve.xml
     https://stackoverflow.com/questions/13500458/opengl-nurbs-surface

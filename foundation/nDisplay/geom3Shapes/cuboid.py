@@ -3,6 +3,8 @@ import random
 
 def cube(vertices, edges, surfaces, colors):
     """
+    #TODO need to convert to Mesh to be compatible
+    
     vertices = (
         (1, -1, -1),
         (1, 1, -1),

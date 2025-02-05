@@ -10,6 +10,10 @@ import OpenGL.GL as gl
 import OpenGL.GLU as glu
 
 def sphere(radius, slices, rings, drawStyle, colors):
+    """
+    #TODO need to convert to Mesh to be compatible
+
+    """
     x=0
     sphereQ = glu.gluNewQuadric()
     gl.glPushMatrix() # save first position

@@ -19,3 +19,25 @@ void main()
     fragmentPosition = (model * vec4(vertexPos, 1.0)).xyz;
     fragmentNormal = mat3(model) * vertexNormal;
 }
+
+
+#############matrix transformation lib###############
+const float pi = 3.14159265359;
+vec2 pi2 = vec2(pi, pi);
+vec3 pi3 = vec3(pi, pi, pi);
+vec4 pi4 = vec4(pi, pi, pi, pi);
+vec3 GLOBAL_X = vec3(1.0, 0.0, 0.0);
+vec3 GLOBAL_Y = vec3(0.0, 1.0, 0.0);
+vec3 GLOBAL_Z = vec3(0.0, 0.0, 1.0);
+
+float deg2rad(float angle)
+{
+    return angle / (2 * pi);
+}
+
+float rad2deg(float radian)
+{
+    return 2 * pi * radian;
+}
+
+##can we store the whole mesh here?
