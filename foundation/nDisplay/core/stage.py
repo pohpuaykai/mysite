@@ -197,6 +197,7 @@ class Stage:
             if self.verbose:
                 print(rel, angleF(), xSign, ySign, zSign)
             glUniformMatrix3f(self.keyMoveRegId, ySign*originVecVerViewPort[0], xSign*originVecVerViewPort[1], zSign*originVecVerViewPort[2])
+            glDrawArrays(GL_TRIANGLES, 0, self.shader.totalVertexCount)
 
 
 
@@ -405,6 +406,7 @@ class Stage:
         #         print('actor reset')
         #TODO fill it up probably
         glUniformMatrix3f(self.keyMoveRegId, xMove, yMove, zMove)
+        glDrawArrays(GL_TRIANGLES, 0, self.shader.totalVertexCount)
 
 
 
