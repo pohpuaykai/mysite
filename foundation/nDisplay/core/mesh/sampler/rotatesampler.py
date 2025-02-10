@@ -18,6 +18,8 @@ class RotateSampler:
     @classmethod
     def rotateSample(cls, formulaLambda, xStart, xEnd, xStep, dStart, dEnd, dStep):
         """
+        TODO triangles are untested. Please test.
+
         takes a formulaStr, that takes a x, and returns a y, 
         rotates it about x-axis, and gives many points on the surface formed by the rotation
         the points are restricted by the sampling parameters
@@ -33,20 +35,46 @@ class RotateSampler:
         
         """
         #TODO check if [xStart:xEnd:xStep] and [dStart:dEnd:dStep] makes sense
+        triangles = []#return
         vertices = []
-        for x in frange(xStart, xEnd, xStep):
+        vertexCount = 0
+        for xIdx, x in enumerate(frange(xStart, xEnd, xStep)):
             f = formulaLambda(x) * formulaLambda(x)
+            upVertices, doVertices = [], []
+            vertexIdxList = []
             for d in frange(dStart, dEnd, dStep):
                 y_p = math.sqrt((math.atan(d)+1)/(f))#positive y
                 z_p = y_p * math.atan(d)
-                vertices.append((x, y_p, z_p))
-                vertices.append((x, -y_p, -z_p))
+                upVertices.append((x, y_p, z_p))
+                doVertices.append((x, -y_p, -z_p))
+            cVertices = upVertices + reversed(doVertices)
+            vertices += cVertices
+            vertexIdxList = list(range(vertexCount,vertexCount+ len(cVertices)))
+            vertexCount += len(cVertices)
+            #pair with prevVertices
+            if xIdx > 0:# should be with vertexIdx....
+                ppv = zip(prevVertices, cVertices)
                 
-        return vertices
+            #take pairs of zip to form quads
+                quads = []
+                for idx in range(0, len(vertexIdxList)-1):
+                    quads.append([vertexIdxList[idx], vertexIdxList[idx+1]])
+                quads.append([vertexIdxList[-1], vertexIdxList[0]])
+            #divide quads to form triangles
+            for quad in quads:
+                triangles.append([quad[0][0], quad[0][1], quad[1][0]])
+                triangles.append([quad[1][0], quad[1][1], quad[0][1]])
+            #prevVertices=cVertices
+            prevVertices = cVertices
+            return vertices, triangles
+
+
 
     @classmethod
     def rotatePieceWiseSample(cls, *formulaLambdaWithEndPoints):
         """
+        TODO test
+
         :param formulaLambdaWithEndPoints:
         Example (the whole list):
         [
@@ -81,6 +109,9 @@ class RotateSampler:
         ]
         """
         touVertices = []
+        touTriangles = []
         for formulaLambdaWithEndPoint in formulaLambdaWithEndPoints:
-            touVertices.append(rotateSampler(**formulaLambdaWithEndPoint))
-        return touVertices
+            vertices, triangles = rotateSampler(**formulaLambdaWithEndPoint)
+            touVertices += vertices
+            touTriangles += touTriangles
+        return touVertices, touTriangles

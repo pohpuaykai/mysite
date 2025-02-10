@@ -19,7 +19,7 @@ from foundation.nDisplay.controlsMapping import KEYBOARD_3D_DISPLAY_CONTROLS as 
 
 class Stage:
 
-    def __init__(self, width, height, piece, metronome, displayCaption, fieldOfView, zNear, zFar, verbose):
+    def __init__(self, width, height, piece, metronome, listOfMeshes, displayCaption, fieldOfView, zNear, zFar, verbose):
         """
         :param width: width of the viewport (screen of the program)
         :type width: float
@@ -32,6 +32,11 @@ class Stage:
 
         :param metronome: frames-per-second
         :type metronome: float
+        :param listOfMeshes:
+        each 'mesh' is a dictionary with keys~
+            vertices = 
+            indices = 
+        :type listOfMeshes: 
         :param displayCaption: title of the screen
         :type displayCaption: str
 

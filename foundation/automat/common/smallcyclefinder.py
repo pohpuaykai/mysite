@@ -29,7 +29,8 @@ class SmallCycleFinder:#KVL
                 #the other side, would have started with childid
                 
                 cNode = childid
-                while cNode in child__parent:
+                while cNode in child__parent: # TODO what if cNode has more than 1 parent??, then we will form more than 1 cycle...
+                    #TODO those paths that contain nodes, that does not have any other neighbours (isolated), should not be considered again...
                     if cNode not in cycle:# find the earliest common node
                         #previous cNode was the end of the cycle.
                         cycle.append(cNode)
