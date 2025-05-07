@@ -1,4 +1,4 @@
-class BubbleMerge:
+class BubbleMerge:#TODO was created for Latexparser, if no need anymore, please remove... use AST to check dependency and clean code_dependency
 
 
     @classmethod
