@@ -1,19 +1,19 @@
 #toward symbolic gaussian and 
 #simplex tableau (this might just be selecting the smallest ratio, and then adding the ratio to the final result... TODO to investigate and try implementation, if it is the case, then is it correct?) 
 #LU decomposition...(same?)
-from abc import ABC
+from abc import ABC, abstractmethod
 class Group(ABC):
     def _init_(self, identity):
         self.identity = identity
         
-    @abstractclass
+    @abstractmethod
     def otverse(a,b):
         """
         ab
         """
         pass
         
-    @abstractclass
+    @abstractmethod
     def inverse(a,b):
         """
         ab^{-1}

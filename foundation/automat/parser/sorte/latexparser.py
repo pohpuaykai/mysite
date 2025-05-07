@@ -1,28 +1,8 @@
+from foundation.automat.common import BinarySearch
+
 class Latexparser(): # TODO follow the inheritance of _latexparser
     
     """
-    Naive Parser for Latex Strings. More details about 'Latex' format, check
-    https://www.latex-project.org/help/documentation/classes.pdf
-
-    More concise guide to LaTeX mathematical symbols (courtsey of Rice University):
-    https://www.cmor-faculty.rice.edu/~heinken/latex/symbols.pdf
-    offline copy in parser.docs as "symbols.pdf"
-
-    According to :- https://sg.mirrors.cicku.me/ctan/info/symbols/comprehensive/symbols-a4.pdf
-
-    $ % _ } & # {  are special characters, 
-    we will pretend that %, & and # does not exist, since we are not doing matrices for now
-
-    Also according to https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes#Adding_math_to_LaTeX
-    we need to enclose the MATH equation with one of these:
-    1. \[ \]
-    2. $ $
-    3. \begin{displaymath} \end{displaymath}
-    4. \begin{equation} \end{equation}
-
-    But we will assume that there is no need for that now, and only when user execute toString, 
-    will we return with enclosed \[\]
-    
     
     restructuring
     
@@ -242,6 +222,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.symnum_pos_type = None #symbolic number like \\pi, i
         self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4
         self.node_id = 0
+        self.bracketstorage = BracketStorage()
         
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
@@ -263,6 +244,63 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             (m.start(), m.end(), m.group()), 
             re.finditer(r"\\end\{\wmatrix\}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
         self.matrices_pos_type = list(zip(matrixStartTags, reversed(matrixEndTags)))
+
+        #TODO this works like bubble_merge, if bubble_merge is not used anymore, please remove. Or replace this with bubble_merge. easier to analysis
+        """
+        split into list_openTagPos, list_closeTagPos
+        openTagPos__closeTagPos
+        closeTagPos__openTagPos
+        Add new newTag = (openTagPos, closeTagPos)
+        if len(list_openTagPos) == 0:
+            add to both list_openTagPos and list_closeTagPos
+        else:
+            closeInOpenIdx = BS closeTagPos in list_openTagPos
+            openInCloseIdx = BS openTagPos in list_closeTagPos
+
+        ***all i in list_openTagPos, i<closeInOpenIdx will be merged with newTag at_this_point
+        ***all i in list_closeTagPos, openInCloseIdx<i will be merged with newTag at_this_point
+        set__openTagPos = filter(i<closeInOpenIdx, list_openTagPos)
+        set__closeTagPos = filter(openInCloseIdx<i, list_closeTagPos)
+        ***0. existing_open in newTag; 1. existing_close in newTag 2. both 0&1 at_this_point
+        set__embedded = set__openTagPos.intersection(set__closeTagPos)  [2]
+        set__openTagPos = set__openTagPos - set__embedded  [0]
+        set__closeTagPos = set__closeTagPos - set__embedded  [1]
+        
+        [2] #whole_tag_got_EATEN
+        REMOVE set__embedded FROM list_openTagPos; list_closeTagPos; openTagPos__closeTagPos; closeTagPos__openTagPos
+        BSADD openTagPos to list_openTagPos
+        BSADD closeTagPos to list_closeTagPos
+        ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
+        ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
+
+        [0] #opens_got_EATEN
+        REMOVE set__openTagPos FROM list_openTagPos; openTagPos__closeTagPos; closeTagPos__openTagPos
+        IF NOT ALREADY ADDED from [2]:
+            BSADD openTagPos to list_openTagPos
+            ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
+            ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
+
+        [1] #close_got_EATEN
+        REMOVE set__closeTagPos FROM list_closeTagPos; openTagPos__closeTagPos; openTagPos__closeTagPos
+        IF NOT ALREADY ADDED from [2]|[1]:
+            BSADD closeTagPos to list_closeTagPos
+            ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
+            ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
+
+        ***there is NON_OVERLAPPING_NON_REPEATING_INTERVALS: list_openTagPos (sorted), list_closeTagPos (sorted), openTagPos__closeTagPos, closeTagPos__openTagPos at_this_point
+        #we need some way for the user to check if pos is in any of the above intervals
+        #we copy from BracketStorage.getTightestEnclosingPos (should this be refactored into a shared method? TODO)
+
+        Find 
+        closest_close_left_of_pos :
+        closest_open_right_of_pos :
+         in id__tuple_openPos_openBraType_closePos_closeBraType
+         remove all tuple__closePos<=closest_close_left_of_pos
+         remove all tuple__openPos>=closest_open_right_of_pos
+        if empty, there is no enclosing brackets for pos
+        """
+        for (_, startTagEndPos, _), (endTagStartPos, _, _) in self.matrices_pos_type:
+            #TODO
         #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
         #collate all non-overlaping intervals, to removed for leftover-finding
         
@@ -300,7 +338,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             closeBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
             #check if its between matrix_start_end_tag,
             #if so, do not store.
-        # TODO store the bracket...  how to make it short_to_query? WHAT are your queries?
+            self.bracketstorage
         
         
         
@@ -391,52 +429,153 @@ class BracketStorage:
         #Design a datastructure, good for all the above.
         #give an id to each pair of bracket for easy removal (linking the open and close) <<< for enclosure_query too?
         #dict__close_right, key=bracket_type, value=close_bracket_position_list_ascending
-        #dict__close_to_open, key=position_of_close_bracket, value=position_of_open_bracket
+        >>>>>>#dict__close_to_open, key=position_of_close_bracket, value=position_of_open_bracket
         #dict__open_left, key=bracket_type, value=open_bracket_position_list_ascending
-        #dict__open_to_close, key=position_of_open_bracket, value=position_of_close_bracket
+        >>>>>>#dict__open_to_close, key=position_of_open_bracket, value=position_of_close_bracket
         #dict__id_openclosepos, key=id, value=tuple__openPos_closePos
         #dict__type_widthId, key=bracket_type, value=list__tuple__width_id
         #agis GET_ALL
     """
+
+
     closeBraType__sortedPosList = {}
-    closeBraPos__openBraPos = {}
+    #closeBraPos__openBraPos = {}
     openBraType__sortedPosList = {}
-    openBraPos__closeBraPos = {}
-    id__tuple_openPos_closePos = {}
-    braType__list_tuple_width_id = {}
+    #openBraPos__closeBraPos = {}
+    id__tuple_openPos_openBraType_closePos_closeBraType = {}
+    # braType__list_tuple_width_id = {}
+    list_tuple_width_id_openPos_closePos = []
+
+    def __init__(self):
+        self.bracketId = 0
+
+    def _getBracketId(self):
+        import copy
+        newBracketId = copy.copy(self.bracketId)
+        self.bracketId += 1
+        return newBracketId
     
     def insertBracket(self, openBraType, openBraPos, closeBraType, closeBraPos):
         """
+        EXAMPLES OF EACH INPUT
+        openBraType:  (, {, [
+        openBraPos: 3
+        closeBraType: ), }, ]
+        closeBraPos: 6
+
+
         return id
+
+
+        we assume users DO NOT REPEATEDLY ADD SAME BRACKETS
         """
-        pass
+        bracketId = self._getBracketId()
+
+        if openBraType not in openBraType__sortedPosList:
+            openBraType__sortedPosList[openBraType] = []
+
+        if closeBraType not in closeBraType__sortedPosList:
+            closeBraType__sortedPosList[closeBraType] = []
+
+        #binary search to find position to add
+        insertPos = BinarySearch.binarySearchPre(
+            list_tuple_width_id_openPos_closePos,
+            (closeBraPos - openBraPos, bracketId, openPos, closePos),
+            key=lambda tuple_width_id: tuple_width_id[0] # sort by width ascending
+        )
+        list_tuple_width_id_openPos_closePos.insert(insertPos, (closeBraPos - openBraPos, bracketId, openPos, closePos))
+
+        insertPos = BinarySearch.binarySearchPre(openBraType__sortedPosList[openBraType], openBraPos)
+        openBraType__sortedPosList[openBraType].insert(insertPos, openBraPos)
+
+        insertPos = BinarySearch.binarySearchPre(closeBraType__sortedPosList[closeBraType], closeBraType)
+        closeBraType__sortedPosList[closeBraType].insert(insertPos, closeBraPos)
+
+        id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
         
-    def removeBracket(self, id):
-        """"""
-        pass
+
+        
+    def removeBracket(self, bracketId):
+        """
+        """
+        openBraPos, openBraType, closeBraPos, closeBraType = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        del id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+
+        deletePos = BinarySearch.binarySearchPre(openBraType__sortedPosList[openBraType], openBraPos)
+        del openBraType__sortedPosList[deletePos]
+
+        deletePos = BinarySearch.binarySearchPre(closeBraType__sortedPosList[closeBraType], closeBraPos)
+        del closeBraType__sortedPosList[deletePos]
+
+        deletePos = BinarySearch.binarySearchPre(
+            list_tuple_width_id_openPos_closePos,
+            (closeBraPos - openBraPos, bracketId, openPos, closePos),
+            key=lambda tuple_width_id: tuple_width_id[0] # sort by width ascending
+        )
+        del list_tuple_width_id_openPos_closePos[deletePos]
+
     
     def getBraPosImmediateRightOfPos(self, pos, typeOfBracket, open):
         """
         
         open==True, means we are looking for openbracket, else we are looking for closebracket
         """
-        pass
+        #get the right dict
+        if open:
+            theDict__sortedPosList = openBraType__sortedPosList
+        else:
+            theDict__sortedPosList = closeBraType__sortedPosList
+
+        immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
+        return immediateRightIdx
     
     def getBraPosImmediateLeftOfPos(self, pos, typeOfBracket, open):;
         """
         open==True, means we are looking for openbracket, else we are looking for closebracket
         """
-        pass
+        #get the right dict
+        if open:
+            theDict__sortedPosList = openBraType__sortedPosList
+        else:
+            theDict__sortedPosList = closeBraType__sortedPosList
+
+        immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
+        
+        return immediateRightIdx - 1 # 
         
     def getAllBracket(self):
         """
         return all the bracket in tuple (openBraType, openBraPos, closeBraType, closeBraPos)
         """
-        pass
+        return list(id__tuple_openPos_openBraType_closePos_closeBraType.values())
         
-    def getTightestEnclosingPos(self, pos):
+    def getTightestEnclosingPos(self, pos, typeOfBracket):
         """
+        Find 
+        closest_close_left_of_pos :
+        closest_open_right_of_pos :
+         in id__tuple_openPos_openBraType_closePos_closeBraType
+         remove all tuple__closePos<=closest_close_left_of_pos
+         remove all tuple__openPos>=closest_open_right_of_pos
+        if empty, there is no enclosing brackets for pos
+
+        else
+            get all the remaining id, find smallest_width in list_tuple_width_id 
+
         return tightest bracket, that contains pos
         """
-        pass
+        list_tuple_width_id_openPos_closePos
+        closest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False)
+        closest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True)
+        filt__list_tuple_width_id_openPos_closePos = filter(
+            lambda tuple_width_id_openPos_closePos: 
+                closest_close_left_of_pos<tuple_width_id_openPos_closePos[3] and \
+                tuple_width_id_openPos_closePos[2]<closest_open_right_of_pos, 
+            list_tuple_width_id_openPos_closePos)
+        if len(filt__list_tuple_width_id_openPos_closePos) > 0:
+            minWidth, selectedOpenPos, selectedClosePos = float('inf'), None, None
+            for width, bracketId, openPos, closePos in list_tuple_width_id_openPos_closePos:
+                if width < minWidth:
+                    minWidth, selectedOpenPos, selectedClosePos = width, openPos, closePos
+            return selectedOpenPos, selectedClosePos
