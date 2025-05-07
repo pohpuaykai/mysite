@@ -5,6 +5,9 @@ from latexparser import Latexparser
 pp = pprint.PrettyPrinter(indent=4)
 
 #unit tests
+def test__bracketStorage(verbose=False):
+    
+
 def test__remove_space(verbose=False):
     #from https://en.wikipedia.org/wiki/Quaternionic_matrix
     
