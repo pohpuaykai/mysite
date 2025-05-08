@@ -222,11 +222,14 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.symnum_pos_type = None #symbolic number like \\pi, i
         self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4
         self.node_id = 0
+        self.allBrackets = None # all of the bracket STATIC, 
+        self.openBraPos__bracketId = None # STATIC
         self.bracketstorage = BracketStorage()
         self.list_openTagPos = None
         self.list_closeTagPos = None
         self.openTagPos__closeTagPos = None
         self.closeTagPos__openTagPos = None
+        self.occupiedPositions = []
         
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
@@ -397,7 +400,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         added = True
 
 
-                self.list_openTagPos, self.list_closeTagPos, self.openTagPos__closeTagPos, self.closeTagPos__openTagPos = \
+                self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos = \
                 list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos
 
         #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
@@ -417,9 +420,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         if empty, there is no enclosing brackets for pos
         """
 
-        closest_close_left_of_pos = BinarySearch.binarySearchPre(list_closeTagPos, pos) # always gives right_of_pos
+        closest_close_left_of_pos = BinarySearch.binarySearchPre(self.list_closeMatrixTagPos, pos) # always gives right_of_pos
 
-        closest_open_right_of_pos = BinarySearch.binarySearchPre(list_openTagPos, pos) - 1
+        closest_open_right_of_pos = BinarySearch.binarySearchPre(self.list_openMatrixTagPos, pos) - 1
 
         filt__list_tuple_width_id_openPos_closePos = filter(
             lambda tuple_width_id_openPos_closePos: 
@@ -460,17 +463,20 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         for k, templateList in BACKSLASH_EXPECTED_INPUTS.items():
             for template in templateList:
                 brackets.add((template['openBra'] template['closeBra']))
+        self.allBrackets = []
+        self.openBraPos__bracketId = {}
         for openBracket, closeBracket in brackets: # order in which we process the brackets does not matter
             openBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{openBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
             closeBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
             #TODO remove redundant information
-            for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in zip(openBracket_pos_type_list, reversed(closeBracket_pos_type_list)):
+            matchedBrackets = list(zip(openBracket_pos_type_list, reversed(closeBracket_pos_type_list)))
+            self.allBrackets += matchedBrackets
+            for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in matchedBrackets:
                 #check if its between matrix_start_end_tag,
                 if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
                     continue
                 #else, store
                 self.bracketstorage.insertBracket(openBraType, openBraPos, closeBraType, closeBraPos)
-        
         
         
         
@@ -519,28 +525,136 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.symnum_pos_type.append(m.group())
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
+            #BUT preSym could be in ANY ORDER
             for inputTemplate in inputTemplates:
+
+
+
                 #inputTemplate = {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}
-                
-            #use bracketstorage to find pos of inputTemplate 
-            #if braOptional
-                pos = preSymPos<<<<<<<<<
-                self.bracketstorage.getBraPosImmediateRightOfPos(self, pos, inputTemplate['preSym'], True)
+                #find preSym immediateRight of end_of_backslash
+                preSymPos = self.equationStr[m.end():].find(inputTemplate['preSym'])
+                if preSymPos != -1: # something is found
+
+                    """
+
+        2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
+            2b1.^ to the left (power) [only for ASTreeConstructionBODMAS, input of infix] (remove from OTHER_brackets)
+            2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
+
+                    """
+                    if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
+                        self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
+
+                #use bracketstorage to find pos of inputTemplate 
+
+                    """
+
+                    
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+                    if no openBraPos (and no closeBraPos)
+                        if not braOptional:
+                            1 character
+                        [else leave template blank]
+                    else
+                        [fill template <<< need something to put filled template]
+                    """
+                    #TODO what will self.bracketstorage.getBraPosImmediateRightOfPos return if openBra does not exist?
+                    openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['openBra'], True)
+                    #TODO what will self.bracketstorage.getBraPosImmediateRightOfPos return if closeBra does not exist?
+                    closeBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['closeBra'], False)
+                    #REMOVE BACKSLASH_BRACKETS from bracketstorage
+                    self.bracketstorage.removeBracket(openBraPos)
         
         
     def _find_variables_or_numbers(self):
-        pass
+        """
+**** WHAT IF we take out everything that has been found so far AND all of the brackets.
+**** when we get all the variables(without _{}) and numbers,
+**** and then we put the _{} back to the variables that are supposed to have _{}
+
+    4. From equationStr, take out everything we found so far and all the brackets.
+        4a. LeftOverPositions=A\
+            4a1.everything_between_ALL_matrixTags
+            4a1.infix(nameonly)
+            4a2.backslash(name&preSymonlyNOargs) & backslash_variables
+            4a3.ALL BRACKETS
+        4b. scan from left to right,  [N is a number, V is not number]
+            4b1. if we go from N to V, break off, collect collected_variables. this means N is implicitly multiplied by V
+            4b2. else, keep collecting temp.
+        4c. go through all collected_variables and backslash_variables
+            4c1. immediateRight, lookFor _{ , make them part of the variable.
+            4c2. remove variable_brackets _{, from OTHER_brackets
+
+        4d. These are VARIABLES|NUMBERS, also note start_position and length
+
+        """
+        #collate infix|backslash|matrices pos {infix_brackets are not removed, will be a problem if infix_brackets are curly}
+        #backslash_brackets
+        #matrices pos
+        #self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos
+        #self.infixs_pos_type : [(startpos, endpos, group)]
+        self.occupiedPositions
+
         
     def _find_implicit_0(self):
-        pass
+        """
+
+    5. implicit_0 (-)(NOTHING_ELSE?) need to add to the list of all infixes, indicated by length 0. need starting_position
+        5a. left of (nothing|open_brackets) , 
+            5a1. nothing is the left_most of the equationStr
+            5a2. search for open_brackets that have - (+ have no need of implicit_zero)
+
+        """
+        #all openbrackets except Matrices, no need bracketstorage
+        for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in self.allBrackets:
+            if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
+                continue
+            
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
         
     def _find_implicit_multiply(self):
+        """
+    ***OTHER_brackets should only contain right_input_for_^ OR enclosures_for_implicit_multiply OR ORDER_ENCLOSURES[which_op_comes_first, associativity, should_only_enclose_infixes_but_user_can_put_redundant_brackets] at_this_point
+    6. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
+        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS+OTHER_brackets (EVERYTHING EXCEPT INFIX??)
+        6b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
+        6c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
+    ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
+    ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
+    
+        """
         pass
         
     def _find_infixes_width(self):
+        """
+
+    7. get width(start~end) of infixes
+        7a. (by enclosing_brackets) or (by inputs) [tree_building]
+        LOOK immediate LEFT&RIGHT of infix [tree_building] | but if immediate LEFT&RIGHT of infix are redundant_brackets? 
+        then just update as width, and not as inputs
+        7b. Check OTHER_brackets for enclosure that are wider than current_width_of_infix
+        
+        """
         pass
         
     def _match_child_to_parent_input(self):
+        """
+    ***everything has width at_this_point
+    ~~~ASTree construction~~~ by widest enclosing position? there is no need for brackets? 
+    #process those_with_inputs(BACKSLASH&INFIX) by position (left to right)
+    we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
+    1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
+    2. those without children but need to have children : BACKSLASH & INFIXES
+    
+    pop list_2 -> a
+    for each empty input of a ***********specify width for all the types
+        for each item in list_1 ??????
+            we want widest input that fits input_position_of_a break ties with PRIOIRITIZED_INFIX, and then from left_to_right
+        remove selected_item from list_1
+        
+        """
         pass
         
     def _format_to_pyStyledAST(self):
@@ -580,6 +694,7 @@ class BracketStorage:
     id__tuple_openPos_openBraType_closePos_closeBraType = {}
     # braType__list_tuple_width_id = {}
     list_tuple_width_id_openPos_closePos = []
+    openBraPos__bracketId = {}
 
     def __init__(self):
         self.bracketId = 0
@@ -627,12 +742,13 @@ class BracketStorage:
         closeBraType__sortedPosList[closeBraType].insert(insertPos, closeBraPos)
 
         id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
-        
+        openBraPos__bracketId[openBraPos] = bracketId
 
         
-    def removeBracket(self, bracketId):
+    def removeBracket(self, openBraPos):
         """
         """
+        bracketId = openBraPos__bracketId[openBraPos]
         openBraPos, openBraType, closeBraPos, closeBraType = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
         del id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
 
