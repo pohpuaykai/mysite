@@ -223,6 +223,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4
         self.node_id = 0
         self.bracketstorage = BracketStorage()
+        self.list_openTagPos = None
+        self.list_closeTagPos = None
+        self.openTagPos__closeTagPos = None
+        self.closeTagPos__openTagPos = None
         
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
@@ -250,6 +254,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         split into list_openTagPos, list_closeTagPos
         openTagPos__closeTagPos
         closeTagPos__openTagPos
+
         Add new newTag = (openTagPos, closeTagPos)
         if len(list_openTagPos) == 0:
             add to both list_openTagPos and list_closeTagPos
@@ -280,7 +285,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
             ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
 
-        [1] #close_got_EATEN
+        [1] #closes_got_EATEN
         REMOVE set__closeTagPos FROM list_closeTagPos; openTagPos__closeTagPos; openTagPos__closeTagPos
         IF NOT ALREADY ADDED from [2]|[1]:
             BSADD closeTagPos to list_closeTagPos
@@ -299,12 +304,135 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
          remove all tuple__openPos>=closest_open_right_of_pos
         if empty, there is no enclosing brackets for pos
         """
-        for (_, startTagEndPos, _), (endTagStartPos, _, _) in self.matrices_pos_type:
-            #TODO
+        list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos = [], [], {}, {}
+        if len(self.matrices_pos_type) > 0:
+            for (_, startTagEndPos, _), (endTagStartPos, _, _) in self.matrices_pos_type:
+                insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
+                list_openTagPos.insert(insertIdx, startTagEndPos)
+
+                insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
+                list_closeTagPos.insert(insertIdx, endTagStartPos)
+
+                openTag_closeTagPos[startTagEndPos] = endTagStartPos
+                closeTag_openTagPos[endTagStartPos] = startTagEndPos
+
+                set__openTagPos = set(filter(lambda i: i<closeInOpenIdx, list_openTagPos))
+                set__closeTagPos = set(filter(lambda i: openInCloseIdx<i, list_closeTagPos))
+
+                #convert openTagPos to close, and then do intersection, and then 
+                set__openEmbedded = set(map(lambda i: closeTagPos__openTagPos[i], set__closeTagPos)).intersection(set__openTagPos)  #[2]
+                set__closeEmbedded = set(map(lambda i: openTagPos__closeTagPos[i], set__openTagPos)).intersection(set__closeTagPos)  #[2]
+                set__openTagPos = set__openTagPos - set__openEmbedded  #[0]
+                set__closeTagPos = set__closeTagPos - set__closeEmbedded  #[1]
+
+                #[2] #whole_tag_got_EATEN
+                added = False
+                if len(set__openEmbedded) > 0:
+                    # REMOVE set__embedded FROM list_openTagPos; list_closeTagPos; openTagPos__closeTagPos; closeTagPos__openTagPos
+                    for i in set__openEmbedded:
+                        list_openTagPos.remove(i)
+                        if i in openTagPos__closeTagPos:
+                            del openTagPos__closeTagPos[i]
+
+                    for i in set__closeEmbedded:
+                        list_closeTagPos.remove(i)
+                        if i in closeTagPos__openTagPos:
+                            del closeTagPos__openTagPos[i]
+
+                    #BSADD openTagPos to list_openTagPos
+                    insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
+                    list_openTagPos.insert(insertIdx, startTagEndPos)
+
+                    #BSADD closeTagPos to list_closeTagPos
+                    insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
+                    list_closeTagPos.insert(insertIdx, endTagStartPos)
+
+                    #ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
+                    openTagPos__closeTagPos[openTagPos] = closeTagPos
+
+                    #ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
+                    closeTagPos__openTagPos[closeTagPos] = openTagPos
+
+                    added = True
+
+
+                #[0] #opens_got_EATEN
+                if len(set__openTagPos) > 0:
+                    """
+
+        REMOVE set__openTagPos FROM list_openTagPos; openTagPos__closeTagPos; closeTagPos__openTagPos
+        IF NOT ALREADY ADDED from [2]:
+            BSADD openTagPos to list_openTagPos
+            ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
+            ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
+                    """
+                    for i in set__openTagPos:
+                        list_openTagPos.remove(i)
+                        if i in openTagPos__closeTagPos:
+                            del openTagPos__closeTagPos[i]
+                    if not added:
+                        insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
+                        list_openTagPos.insert(insertIdx, startTagEndPos)
+
+                        added = True
+
+                #[1] #closes_got_EATEN
+                if len(set__closeTagPos) > 0:
+                    """
+
+        REMOVE set__closeTagPos FROM list_closeTagPos; openTagPos__closeTagPos; openTagPos__closeTagPos
+        IF NOT ALREADY ADDED from [2]|[1]:
+            BSADD closeTagPos to list_closeTagPos
+            ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
+            ADD (closeTagPos, openTagPos) to closeTagPos__openTagPos
+                    """
+                    for i in set__closeTagPos:
+                        list_closeTagPos.remove(i)
+                        if i in closeTagPos__openTagPos:
+                            del closeTagPos__openTagPos[i]
+                    if not added:
+                        insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
+                        list_closeTagPos.insert(insertIdx, endTagStartPos)
+
+                        added = True
+
+
+                self.list_openTagPos, self.list_closeTagPos, self.openTagPos__closeTagPos, self.closeTagPos__openTagPos = \
+                list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos
+
         #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
         #collate all non-overlaping intervals, to removed for leftover-finding
         
-   
+    def __isPosInMatrixTag(self, pos):
+
+        """
+        copied from bracketstorage: getTightestEnclosingPos
+
+        Find 
+        closest_close_left_of_pos :
+        closest_open_right_of_pos :
+         in id__tuple_openPos_openBraType_closePos_closeBraType
+         remove all tuple__closePos<=closest_close_left_of_pos
+         remove all tuple__openPos>=closest_open_right_of_pos
+        if empty, there is no enclosing brackets for pos
+        """
+
+        closest_close_left_of_pos = BinarySearch.binarySearchPre(list_closeTagPos, pos) # always gives right_of_pos
+
+        closest_open_right_of_pos = BinarySearch.binarySearchPre(list_openTagPos, pos) - 1
+
+        filt__list_tuple_width_id_openPos_closePos = filter(
+            lambda tuple_width_id_openPos_closePos: 
+                closest_close_left_of_pos<self.matrices_pos_type[1][0] and \
+                self.matrices_pos_type[0][1]<closest_open_right_of_pos, 
+            list_tuple_width_id_openPos_closePos)
+        if len(filt__list_tuple_width_id_openPos_closePos) > 0:
+            for (_, startTagEndPos, _), (endTagStartPos, _, _) in list_tuple_width_id_openPos_closePos:
+                if startTagEndPos <= pos and pos <= endTagStartPos:
+                    return True
+        return False
+
+
     def _find_infix(self):
         """
         Again, the same 3 ways as _find_matrices
@@ -327,7 +455,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         2d. check if left&right infixes (put to infix as inputs) (remove from OTHER_brackets)
         """
         #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
-        
         bracketStorage = {}
         brackets = set()
         for k, templateList in BACKSLASH_EXPECTED_INPUTS.items():
@@ -336,9 +463,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         for openBracket, closeBracket in brackets: # order in which we process the brackets does not matter
             openBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{openBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
             closeBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
-            #check if its between matrix_start_end_tag,
-            #if so, do not store.
-            self.bracketstorage
+            #TODO remove redundant information
+            for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in zip(openBracket_pos_type_list, reversed(closeBracket_pos_type_list)):
+                #check if its between matrix_start_end_tag,
+                if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
+                    continue
+                #else, store
+                self.bracketstorage.insertBracket(openBraType, openBraPos, closeBraType, closeBraPos)
         
         
         
@@ -383,14 +514,18 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 continue
             if m.group() in VARIABLENAMESTAKEANARG: # variable_function is actually a variable
                 self.variables_pos_type.append(m.group())
-            inputTemplate = _getExpectedBackslashInputs(m.group())
-            if inputTemplate is None: # number that starts with backslash. like \\pi
+            inputTemplates = _getExpectedBackslashInputs(m.group())
+            if inputTemplates is None: # number that starts with backslash. like \\pi
                 self.symnum_pos_type.append(m.group())
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
-            #inputTemplate = {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}
-            #if i search for same brackets, for every inputTemplate, i go through the same_parts_of_the_equation many...many...times a wasted time?
-            
+            for inputTemplate in inputTemplates:
+                #inputTemplate = {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}
+                
+            #use bracketstorage to find pos of inputTemplate 
+            #if braOptional
+                pos = preSymPos<<<<<<<<<
+                self.bracketstorage.getBraPosImmediateRightOfPos(self, pos, inputTemplate['preSym'], True)
         
         
     def _find_variables_or_numbers(self):
@@ -420,7 +555,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 class BracketStorage:
-    """USE 
+    """
     
         # GET CLOSEST OPENBRACKET OF A TYPE, TO THE RIGHT OF A POSITION <<<_find_backslash 'sREQUEST
         #  IS THERE A - RIGHT OF OPENBRACKETS? <<<_find_implicit_0 'sREQUEST
@@ -565,7 +700,6 @@ class BracketStorage:
 
         return tightest bracket, that contains pos
         """
-        list_tuple_width_id_openPos_closePos
         closest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False)
         closest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True)
         filt__list_tuple_width_id_openPos_closePos = filter(
