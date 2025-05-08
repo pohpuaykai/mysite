@@ -17,6 +17,13 @@ class BinarySearch:
 
 
     @classmethod
+    def binarySearchIdx(cls, sortedList, findMe, approximate=False):
+        s, e = cls.binarySearchAppK(sortedList, findMe)
+        if approximate:
+            return s # if not in list return nearest left
+        return s if sortedList[s] == findMe else -1 # always return -1 if not in list
+
+    @classmethod
     def binarySearchPreK(cls, sortedList, numToInsert):
         """
         assumes that sortedList is sorted ascending

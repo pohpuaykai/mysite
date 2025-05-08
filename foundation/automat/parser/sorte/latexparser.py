@@ -148,30 +148,30 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     ######
     BACKSLASH_EXPECTED_INPUTS = { #all possible returns according to input_type, for easy collating
         '^{}()':[
-                {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}, #exponential
-                {'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'} # angle
+                {'argId':0, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}, #exponential
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'} # angle
         ],
         '()':[
-                {'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
+                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
         ],
         '_{}()':[
-                {'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
-                {'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
+                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
         ],
         '{}{}':[
-                {'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-                {'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
         '[]{}':[
-                {'preSym':'', 'optional':True, 'openBra':'[', 'closeBra':']', 'braOptional':'False'},
-                {'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+                {'argId':0, 'preSym':'', 'optional':True, 'openBra':'[', 'closeBra':']', 'braOptional':'False'},
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
         '_{}^{}{}':[
-                {'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-                {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-                {'preSym':'', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':2, 'preSym':'', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
             ]
-    }
+    }#argId is for ASTree building
     
     def _getExpectedBackslashInputs(funcName):
         """
@@ -343,10 +343,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                             del closeTagPos__openTagPos[i]
 
                     #BSADD openTagPos to list_openTagPos
+                    #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
                     insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
                     list_openTagPos.insert(insertIdx, startTagEndPos)
 
                     #BSADD closeTagPos to list_closeTagPos
+                    #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
                     insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
                     list_closeTagPos.insert(insertIdx, endTagStartPos)
 
@@ -374,6 +376,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         if i in openTagPos__closeTagPos:
                             del openTagPos__closeTagPos[i]
                     if not added:
+                        #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
                         insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
                         list_openTagPos.insert(insertIdx, startTagEndPos)
 
@@ -394,7 +397,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         if i in closeTagPos__openTagPos:
                             del closeTagPos__openTagPos[i]
                     if not added:
-                        insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
+                        #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
+                        insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, endTagStartPos)
                         list_closeTagPos.insert(insertIdx, endTagStartPos)
 
                         added = True
@@ -419,7 +423,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
          remove all tuple__openPos>=closest_open_right_of_pos
         if empty, there is no enclosing brackets for pos
         """
-
+        #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
         closest_close_left_of_pos = BinarySearch.binarySearchPre(self.list_closeMatrixTagPos, pos) # always gives right_of_pos
 
         closest_open_right_of_pos = BinarySearch.binarySearchPre(self.list_openMatrixTagPos, pos) - 1
@@ -525,6 +529,55 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.symnum_pos_type.append(m.group())
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
+
+            #BUT preSym could be in ANY ORDER
+            """
+            split inputTemplate as 2 stacks, compulsoryStack and optionalList (depends on 'optional')
+            while the compulsoryStack is full, 
+                inputTemplate = compulsoryStack.pop()
+                if nextChar == preSym:
+                    find_bracket_get_arg_store
+                else:
+                    for inputTemplate in optionalList:
+                        gotArg = find_bracket_get_arg_store
+                        if gotArg:
+                            optionalList.remove(inputTemplate)
+                            break
+                set_nextChar
+            for inputTemplate in optionalList:
+                gotArg = find_bracket_get_arg_store
+                if gotArg:
+                    optionalList.remove(inputTemplate)
+                    break
+            -----------------------------------------------
+            #find_bracket_get_arg_store
+
+            if nextChar == inputTemplate['openBra']:
+                #get corresponding closePos
+                closeBraPos, closeBraType = self.bracketStorage.getCorrespondingCloseBraPos(nextCharPos)
+                #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
+                #NOTE bracket position if any, store
+                nextCharPos = closeBraPos + len(closeBraType)
+                nextChar = equation[nextCharPos]
+                self.bracketstorage.removeBracket(openBraPos)
+                if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
+                    self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
+            elif inputTemplate['braOptional'] == 'False':
+                raise Exception
+            elif inputTemplate['braOptional'] == 'argLen<2':
+                #TAKEARG as nextCharPos+1, store
+                #NOTE NO_BRACKETS, store
+                nextCharPos += 1
+                nextChar = equation[nextCharPos]
+                self.bracketstorage.removeBracket(openBraPos)
+                if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
+                    self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
+            else:
+                raise Exception('Unhandled')
+            return nextCharPos, nextChar
+            """
+
+
             #BUT preSym could be in ANY ORDER
             for inputTemplate in inputTemplates:
 
@@ -532,6 +585,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                 #inputTemplate = {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}
                 #find preSym immediateRight of end_of_backslash
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                #TODO what if preSymPos went too far?, but preSym can be reorder....
                 preSymPos = self.equationStr[m.end():].find(inputTemplate['preSym'])
                 if preSymPos != -1: # something is found
 
@@ -552,7 +608,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-                    if no openBraPos (and no closeBraPos)
+                    if no openBraPos (and no closeBraPos) HOW TO CHECK with self.bracketstorage.getBraPosImmediateRightOfPos ?
                         if not braOptional:
                             1 character
                         [else leave template blank]
@@ -560,9 +616,18 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         [fill template <<< need something to put filled template]
                     """
                     #TODO what will self.bracketstorage.getBraPosImmediateRightOfPos return if openBra does not exist?
-                    openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['openBra'], True)
+                    #TODO what if getBraPosImmediateRightOfPos gets one that is too far?
+                    preSymEndPos = preSymPos + len(inputTemplate['preSym'])
+                    if self.bracketstorage.exists(preSymEndPos, inputTemplate['openBra'], True): #exist open bracket for preSym
+                        #if exists, then for closeBraPos, we can use getBraPosImmediateRightOf openBraPos
+                    elif not inputTemplate['braOptional']:#not exists open bracket and not optional
+
+                    else: #not exists and is optional
+                    
+
+                    #openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['openBra'], True)
                     #TODO what will self.bracketstorage.getBraPosImmediateRightOfPos return if closeBra does not exist?
-                    closeBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['closeBra'], False)
+                    #closeBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['closeBra'], False)
                     #REMOVE BACKSLASH_BRACKETS from bracketstorage
                     self.bracketstorage.removeBracket(openBraPos)
         
@@ -590,10 +655,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         """
         #collate infix|backslash|matrices pos {infix_brackets are not removed, will be a problem if infix_brackets are curly}
-        #backslash_brackets
-        #matrices pos
+        #backslash_brackets ONLY
+        #matrices pos THE WHOLE MATRIX, not just the tags
         #self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos
-        #self.infixs_pos_type : [(startpos, endpos, group)]
+        #self.infixs_pos_type : [(startpos, endpos, group)], the symbol only
         self.occupiedPositions
 
         
@@ -621,9 +686,16 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS+OTHER_brackets (EVERYTHING EXCEPT INFIX??)
         6b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
         6c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
+        6d. REMOVE all implicit_multiply from OTHER_brackets
     ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
     ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
     
+        """
+        """
+        Rearrange ALL_X_INF in order of startPos (or endPos, egal daran Sie sich nicht uberlappen)
+        process in the above order
+        if there is a infix inbetween, then do not add implicit* 
+        else add implicit*....????? counterexample?
         """
         pass
         
@@ -779,7 +851,7 @@ class BracketStorage:
 
         immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
-        return immediateRightIdx
+        return theDict__sortedPosList[typeOfBracket][immediateRightIdx]
     
     def getBraPosImmediateLeftOfPos(self, pos, typeOfBracket, open):;
         """
@@ -793,8 +865,26 @@ class BracketStorage:
 
         immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
-        return immediateRightIdx - 1 # 
-        
+        return theDict__sortedPosList[typeOfBracket][immediateRightIdx - 1] # 
+
+    def exists(self, bracketPos, typeofBracket, open):
+        """
+        check if a bracket of type typeOfBracket, exists at position in equationStr, bracketPos
+        """
+        # TODO can use this BinarySearch.binarySearchIdx(theDict__sortedPosList[typeOfBracket], pos)
+        #get the right dict
+        if open:
+            theDict__sortedPosList = openBraType__sortedPosList
+        else:
+            theDict__sortedPosList = closeBraType__sortedPosList
+
+        return pos in theDict__sortedPosList[typeOfBracket]
+
+    def getCorrespondingCloseBraPos(self, openBraPos):
+        bracketId = openBraPos__bracketId[openBraPos]
+        (_, _, closePos, closeBraType) = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        return closePos, closeBraType
+
     def getAllBracket(self):
         """
         return all the bracket in tuple (openBraType, openBraPos, closeBraType, closeBraPos)

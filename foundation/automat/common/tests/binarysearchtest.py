@@ -127,7 +127,7 @@ def test__binarySearchApp__intervalsTouchesTest0(verbose=False):
     expected = 0
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
 
 
 
@@ -139,7 +139,30 @@ def test__binarySearchApp__intervalsTouchesTest1(verbose=False):
     expected = 2
     if verbose:
         print(testName, idx)
-    print('PASSED? ', expected == idx)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', expected == idx)
+
+
+def test__binarySearchIdx__itemNotInList(verbose=False):
+    testName = inspect.currentframe().f_code.co_name
+    from random import randint
+    randLenList = list(range(0, randint(4, 36)))
+    findMe = 3.145 #not in the randLenList
+    idx = BinarySearch.binarySearchIdx(randLenList, findMe) # expects no repeats in inputList
+    expected = -1
+    if verbose:
+        print(testName, idx, '==', expected)
+    print(inspect.currentframe().f_code.co_name, 'PASSED?', expected == idx)
+
+def test__binarySearchIdx__itemNotInListApprox(verbose=False):
+    testName = inspect.currentframe().f_code.co_name
+    l = [0, 1, 2, 4, 5]
+    findMe = 3 
+    #always return left
+    idx = BinarySearch.binarySearchIdx(l, findMe, approximate=True) # expects no repeats in inputList
+    expected = 2#2 or 3?
+    if verbose:
+        print(testName, idx, '==', expected)
+    print(inspect.currentframe().f_code.co_name, 'PASSED?', expected == idx)
 
 
 if __name__=='__main__':
@@ -151,6 +174,8 @@ if __name__=='__main__':
     test__binarySearchApp__manySameNumbersLargestIndex()
     test__binarySearchApp__leftMost()
     test__binarySearchApp__rightMost()
-
     test__binarySearchApp__intervalsTouchesTest0()
     test__binarySearchApp__intervalsTouchesTest1()
+    test__binarySearchIdx__itemNotInList()
+
+    test__binarySearchIdx__itemNotInListApprox()
