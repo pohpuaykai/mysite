@@ -83,7 +83,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             5a2. search for open_brackets that have - (+ have no need of implicit_zero)
     ***OTHER_brackets should only contain right_input_for_^ OR enclosures_for_implicit_multiply OR ORDER_ENCLOSURES[which_op_comes_first, associativity, should_only_enclose_infixes_but_user_can_put_redundant_brackets] at_this_point
     6. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
-        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS+OTHER_brackets (EVERYTHING EXCEPT INFIX??)
+        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS (EVERYTHING EXCEPT INFIX and OTHER_brackets??)
         6b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
         6c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
     ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
@@ -683,7 +683,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
     ***OTHER_brackets should only contain right_input_for_^ OR enclosures_for_implicit_multiply OR ORDER_ENCLOSURES[which_op_comes_first, associativity, should_only_enclose_infixes_but_user_can_put_redundant_brackets] at_this_point
     6. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
-        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS+OTHER_brackets (EVERYTHING EXCEPT INFIX??)
+        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS(EVERYTHING EXCEPT INFIX and OTHER_brackets??)
         6b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
         6c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
         6d. REMOVE all implicit_multiply from OTHER_brackets
@@ -695,7 +695,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         Rearrange ALL_X_INF in order of startPos (or endPos, egal daran Sie sich nicht uberlappen)
         process in the above order
         if there is a infix inbetween, then do not add implicit* 
-        else add implicit*....????? counterexample?
+        else add implicit*....????? 
+
+counterexample: if 2 infixes inbetween, implicit* could be added as:
++())(()+
         """
         pass
         
