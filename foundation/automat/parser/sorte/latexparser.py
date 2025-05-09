@@ -170,7 +170,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':2, 'preSym':'', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
-            ]
+            ],
+        '{}': [
+                {'argId':0, 'preSym':'', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+        ]
     }#argId is for ASTree building
     
     def _getExpectedBackslashInputs(funcName):
@@ -201,6 +204,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         if funcName in ['sum', 'prod', 'partial', 'nabla', 'Delta', 'int', 'iint', 'iiint', 'oint', 'oiint']:
             #input_type: _{}^{}{}
             return BACKSLASH_EXPECTED_INPUTS['_{}^{}{}']
+        if funcName in VARIABLENAMESTAKEANARG:
+            #input_type: {}
+            return BACKSLASH_EXPECTED_INPUTS['{}']
     #TODO move this up to BACKSLASH_EXPECTED_INPUTS ??
     VARIABLENAMESTAKEANARG = ['overline', 'underline', 'widehat', 'widetilde', 'overrightarrow', 'overleftarrow', 'overbrace', 'underbrace'
     #Math mode accents
@@ -510,7 +516,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         Again, the same 3 ways as _find_matrices
         1. go character by character
         2. use re.findall<<<<<<<<<
-        3. str.find, chop and str.find, and then match outer \begin\end
+        3. str.find, chop and str.find, and then match outer \\begin\\end
         find the inputs to these backslash using _getExpectedBackslashInputs as template
         Exclude all the backslash_infix
         
@@ -520,13 +526,36 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.variables_pos_type = []
         self.symnum_pos_type = [] #symbolic number like \\pi, i
         for m in re.finditer(r"\\([a-zA-z]+)", self.equationStr):
+            foundType = 'backslash_function'
+            storeTemplate = {
+                'funcName':m.group(),
+                'funcStart':m.start(),
+                'funcEnd':m.end(),
+                'args':[]
+            }
             if m.group() in BACKSLASH_INFIX: # remove the backslash_infix from backslash
                 continue
             if m.group() in VARIABLENAMESTAKEANARG: # variable_function is actually a variable
-                self.variables_pos_type.append(m.group())
+                #self.variables_pos_type.append((m.start(), m.end(), m.group()))
+                foundType = 'backslash_variable'
+                storeTemplate = {
+                    'funcName':m.group(),
+                    'funcStart':m.start(),
+                    'funcEnd':m.end(),
+                    'args':[]
+                }
             inputTemplates = _getExpectedBackslashInputs(m.group())
             if inputTemplates is None: # number that starts with backslash. like \\pi
-                self.symnum_pos_type.append(m.group())
+                #self.symnum_pos_type.append((m.start(), m.end(), m.group()))
+                foundType = 'backslash_num'
+                storeTemplate = {
+                    'funcName':m.group(),
+                    'funcStart':m.start(),
+                    'funcEnd':m.end(),
+                    # 'args':[] #expected no args
+                }
+                self.symnum_pos_type.append(storeTemplate)
+                continue # skip args finding
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
 
@@ -558,39 +587,77 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
                 #NOTE bracket position if any, store
                 nextCharPos = closeBraPos + len(closeBraType)
-                nextChar = equation[nextCharPos]
+                nextChar = equation[nextCharPos] #<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 self.bracketstorage.removeBracket(openBraPos)
                 if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                     self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
             elif inputTemplate['braOptional'] == 'False':
-                raise Exception
+                raise Exception #here is !gotArg
             elif inputTemplate['braOptional'] == 'argLen<2':
                 #TAKEARG as nextCharPos+1, store
                 #NOTE NO_BRACKETS, store
                 nextCharPos += 1
-                nextChar = equation[nextCharPos]
+                nextChar = equation[nextCharPos] #<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 self.bracketstorage.removeBracket(openBraPos)
                 if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                     self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
             else:
-                raise Exception('Unhandled')
-            return nextCharPos, nextChar
+                raise Exception('Unhandled') #here is !gotArg
+            return gotArg, nextCharPos, nextChar
             """
+            compulsoryStack, optionalList = [], []
+            for templatList in inputTemplates:
+                for template in templateList:
+                    if template['optional']:
+                        optionalList.append(template)
+                    else:
+                        compulsoryStack.append(template)
+            nextCharPos = m.end()+len(template['preSym'])
+            nextChar = template['openBra']
+            while len(compulsoryStack) > 0:
+                template = compulsoryStack.pop()
+                if nextChar == template['preSym']:
+                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(m, template, nextChar, nextCharPos)
+                else:
+                    eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, template, nextCharPos, nextChar)
 
+                storeTemplate['args'].append({
+                    'argIdx':inputTemplate['argIdx'],
+                    'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBraPos':nextCharPos, 
+                    'closeBra':closeBraType,
+                    'closeBraPos': closeBraPos
+                })
 
-            #BUT preSym could be in ANY ORDER
-            for inputTemplate in inputTemplates:
-
-
-
-                #inputTemplate = {'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}
-                #find preSym immediateRight of end_of_backslash
-
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                #TODO what if preSymPos went too far?, but preSym can be reorder....
-                preSymPos = self.equationStr[m.end():].find(inputTemplate['preSym'])
-                if preSymPos != -1: # something is found
-
+                if foundType == 'backslash_function':
+                    self.backslash_pos_type.append(storeTemplate)
+                elif foundType == 'backslash_variable':
+                    self.variables_pos_type.append(storeTemplate)
+            eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, nextCharPos, nextChar)
+            storeTemplate['args'].append({
+                'argIdx':inputTemplate['argIdx'],
+                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                'openBraPos':nextCharPos, 
+                'closeBra':closeBraType,
+                'closeBraPos': closeBraPos
+            })
+            def processOptionalList(eOptionalList, template, nextChar, nextCharPos):
+                for template in eOptionalList:
+                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(m, template, nextChar, nextCharPos)
+                    if gotArg:
+                        eOptionalList.remove(template)
+                        break
+                return eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
+            def findBracketGetArgStore(m, template, nextChar, nextCharPos):
+                closeBraPos, closeBraType = None, None
+                if nextChar == template['openBra']: # found bracket
+                    #get corresponding closePos
+                    closeBraPos, closeBraType = self.bracketStorage.getCorrespondingCloseBraPos(nextCharPos)
+                    #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
+                    #NOTE bracket position if any, store
+                    nextCharPos = closeBraPos + len(closeBraType)
+                    self.bracketstorage.removeBracket(openBraPos)
+                    if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                     """
 
         2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
@@ -598,38 +665,26 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
 
                     """
-                    if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
-
-                #use bracketstorage to find pos of inputTemplate 
-
-                    """
-
-                    
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                    if no openBraPos (and no closeBraPos) HOW TO CHECK with self.bracketstorage.getBraPosImmediateRightOfPos ?
-                        if not braOptional:
-                            1 character
-                        [else leave template blank]
-                    else
-                        [fill template <<< need something to put filled template]
-                    """
-                    #TODO what will self.bracketstorage.getBraPosImmediateRightOfPos return if openBra does not exist?
-                    #TODO what if getBraPosImmediateRightOfPos gets one that is too far?
-                    preSymEndPos = preSymPos + len(inputTemplate['preSym'])
-                    if self.bracketstorage.exists(preSymEndPos, inputTemplate['openBra'], True): #exist open bracket for preSym
-                        #if exists, then for closeBraPos, we can use getBraPosImmediateRightOf openBraPos
-                    elif not inputTemplate['braOptional']:#not exists open bracket and not optional
-
-                    else: #not exists and is optional
-                    
-
-                    #openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['openBra'], True)
-                    #TODO what will self.bracketstorage.getBraPosImmediateRightOfPos return if closeBra does not exist?
-                    #closeBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(self, preSymPos, inputTemplate['closeBra'], False)
-                    #REMOVE BACKSLASH_BRACKETS from bracketstorage
+                elif template['braOptional'] == 'False': # no bracket but not neccessary
+                    #log
+                    gotArg = False #raise Exception #here is !gotArg
+                elif template['braOptional'] == 'argLen<2': #no bracket, args of length 1 needed
+                    #TAKEARG as nextCharPos+1, store
+                    #NOTE NO_BRACKETS, store
+                    nextCharPos += 1
+                    #nextChar = equation[nextCharPos] #<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     self.bracketstorage.removeBracket(openBraPos)
+                    if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
+                        self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
+                else:
+                    #log
+                    gotArg = False#raise Exception('Unhandled') #here is !gotArg
+                    if foundType in ['backslash_function', 'backslash_variable']:
+                        raise Exception()
+                return gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
+
+
         
         
     def _find_variables_or_numbers(self):
@@ -660,6 +715,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos
         #self.infixs_pos_type : [(startpos, endpos, group)], the symbol only
         self.occupiedPositions
+        # self.variables_pos_type = None # might already have backslashVar inside.
+        self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4
 
         
     def _find_implicit_0(self):
@@ -676,43 +733,41 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
                 continue
             
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+
+    def _find_infixes_backslashes_backslashvars_width(self):
+        """
+
+    6. get width(start~end) of infixes
+        6a. (by enclosing_brackets) or (by inputs) [tree_building]
+        LOOK immediate LEFT&RIGHT of infix [tree_building] | but if immediate LEFT&RIGHT of infix are redundant_brackets? 
+        then just update as width, and not as inputs
+        6b. Check OTHER_brackets for enclosure that are wider than current_width_of_infix
+        
+        """
+        pass
         
     def _find_implicit_multiply(self):
         """
     ***OTHER_brackets should only contain right_input_for_^ OR enclosures_for_implicit_multiply OR ORDER_ENCLOSURES[which_op_comes_first, associativity, should_only_enclose_infixes_but_user_can_put_redundant_brackets] at_this_point
-    6. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
-        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS(EVERYTHING EXCEPT INFIX and OTHER_brackets??)
-        6b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
-        6c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
-        6d. REMOVE all implicit_multiply from OTHER_brackets
+    7. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
+        7a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS(EVERYTHING EXCEPT INFIX and OTHER_brackets??)
+        7b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
+        7c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
+        7d. REMOVE all implicit_multiply from OTHER_brackets
     ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
     ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
     
         """
         """
-        Rearrange ALL_X_INF in order of startPos (or endPos, egal daran Sie sich nicht uberlappen)
-        process in the above order
-        if there is a infix inbetween, then do not add implicit* 
-        else add implicit*....????? 
-
-counterexample: if 2 infixes inbetween, implicit* could be added as:
-+())(()+
+        Expand everthing(mat|infix|Backslash|variable|number) to it's full width(inclusive of all the enclosing brackets, and for infix it's the inclusive of both side arguments also note for infix if there are enclosing brackets), 
+        sort everything by startpos. Go through everything in pairs(sliding_window).
+        If they Touch each other (in their full width):
+            If one or both are infixes, they must be enclosed in brackets to add implicit*
+            Else add implicit*
         """
         pass
         
-    def _find_infixes_width(self):
-        """
-
-    7. get width(start~end) of infixes
-        7a. (by enclosing_brackets) or (by inputs) [tree_building]
-        LOOK immediate LEFT&RIGHT of infix [tree_building] | but if immediate LEFT&RIGHT of infix are redundant_brackets? 
-        then just update as width, and not as inputs
-        7b. Check OTHER_brackets for enclosure that are wider than current_width_of_infix
-        
-        """
-        pass
         
     def _match_child_to_parent_input(self):
         """
@@ -733,13 +788,35 @@ counterexample: if 2 infixes inbetween, implicit* could be added as:
         pass
         
     def _format_to_pyStyledAST(self):
-        pass
+        """
+
+    go through all items, looking at inputs of each, create nodeId to list[nodeId] dictionary, store as latex tree
+        """
         
     def _convert_to_schemeStyledAST(self):
-        #handle Latex specials
+        """
+
+    ~~~Handle special cases of Latex~~~
+    1. (sqrt a) => (nroot 2 a)
+    2. (ln a) => (log e a)
+    3. (log a) => (log 10 a)
+    4. (frac a b) => (/ a b)
+    5. (TRIG p t) => (^ (TRIG t) p)
+    WHAT ABOUT THE NEW FUNCTIONS?
+    6. 
+    
+        """
         pass
         
     def _get_statistics(self):
+        """
+
+    ~~~Get statistics~~~
+    1. totalNodeCount
+    2. functions count
+    3. primitives count
+    4. variables count
+        """
         pass
 
 
