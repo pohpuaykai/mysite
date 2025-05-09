@@ -1,3 +1,4 @@
+from copy import copy
 from foundation.automat.common import BinarySearch, isNum
 
 class Latexparser(): # TODO follow the inheritance of _latexparser
@@ -237,7 +238,16 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.closeTagPos__openTagPos = None
         self.occupiedPositions = []
         self.backslashNames = None # this is for taking out occupied pos
-        
+    
+    def getNodeId(self):
+        """
+        NodeId Dispenser
+        """
+
+        oNodeId = copy(self.node_id)
+        self.node_id += 1
+        return oNodeId
+
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
         
@@ -250,6 +260,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         3. str.find, chop and str.find, and then match outer \begin\end
         
         """
+        self.matrices_pos_type = []
         import re
         matrixStartTags = list(map(lambda m: 
             (m.start(), m.end(), m.group()), 
@@ -257,10 +268,29 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         matrixEndTags = list(map(lambda m: 
             (m.start(), m.end(), m.group()), 
             re.finditer(r"\\end\{\wmatrix\}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
-        self.matrices_pos_type = list(zip(matrixStartTags, reversed(matrixEndTags)))
+        #self.matrices_pos_type = list(zip(matrixStartTags, reversed(matrixEndTags)))
+        for (startTagStartPos, startTagEndPos, startTag), (endTagStartPos, endTagEndPos, endTag) in zip(matrixStartTags, reversed(matrixEndTags)):
+            self.matrices_pos_type.append(
+                    {
+                        'nodeId':self.getNodeId(),
+                        'funcType':'matrix',
+                        'funcName':startTag,
+                        'funcStart':startTagStartPos,
+                        'funcEnd':endTagEndPos,
+                        'widthStart':startTagStartPos,
+                        'widthEnd':endTagEndPos,
+                                'args':[]
+                    }
+            )
+        """
+        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<also change the unit test
+        """
+
 
         #TODO this works like bubble_merge, if bubble_merge is not used anymore, please remove. Or replace this with bubble_merge. easier to analysis
         """
+        ~~PREPARING FOR CONTAINMENT QUERY~~  __isPosInMatrixTag
+
         split into list_openTagPos, list_closeTagPos
         openTagPos__closeTagPos
         closeTagPos__openTagPos
@@ -452,14 +482,44 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         Again, the same 3 ways as _find_matrices
         1. go character by character
         2. use re.findall <<<<<<<<<
-        3. str.find, chop and str.find, and then match outer \begin\end
+        3. str.find, chop and str.find, and then match outer \\begin\\end
         
         """
         import re
         self.infixs_pos_type = []
         for infix in self.INFIX:
-            infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\{infix}", self.equationStr)))
-            self.infixs_pos_type += infix_pos_type_list
+            infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\{infix\}", self.equationStr)))
+            
+            for start, end, group in infix_pos_type_list:
+                self.infixs_pos_type.append(
+{
+                        'nodeId':self.getNodeId(),
+                        'funcType':'infix',
+                        'funcName':group,
+                        'funcStart':start,
+                        'funcEnd':end,
+                        'widthStart':None,#<<<<<<<<<<<<<<<<<<<<<<<<<UNKNOWN for now, since we do not know the args
+                        'widthEnd':None,#<<<<<<<<<<<<<<<<<<<<<<<<<UNKNOWN for now, since we do not know the args
+                        'args':[
+{
+        'nodeId':None,#just a SLOT
+                'argIdx':0,
+                'openBra':None,
+                'openBraPos':None, 
+                'closeBra':None,
+                'closeBraPos': None
+},
+{
+        'nodeId':None,#just a SLOT
+                'argIdx':1,
+                'openBra':None,
+                'openBraPos':None, 
+                'closeBra':None,
+                'closeBraPos': None
+}
+                                ]
+                    }
+                )
         
     def _find_brackets(self):
         """
@@ -530,10 +590,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         for m in re.finditer(r"\\([a-zA-z]+)", self.equationStr):
             foundType = 'backslash_function'
             storeTemplate = {
+                'nodeId':self.getNodeId(),
                 'funcType':foundType,
                 'funcName':m.group(),
                 'funcStart':m.start(),
                 'funcEnd':m.end(),
+                'widthStart':m.start(),
+                'widthEnd': m.end(),
                 'args':[]
             }
             self.backslashNames.append((m.start(), m.end(), m.group()))
@@ -546,7 +609,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             inputTemplates = _getExpectedBackslashInputs(m.group())
             if inputTemplates is None: # number that starts with backslash. like \\pi
                 #self.symnum_pos_type.append((m.start(), m.end(), m.group()))
-                foundType = 'backslash_num'
+                foundType = 'backslash_number'
                 storeTemplate['funcType'] = foundType
                 self.symnum_pos_type.append(storeTemplate)
                 continue # skip args finding
@@ -614,8 +677,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(m, template, nextChar, nextCharPos)
                 else:
                     eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, template, nextCharPos, nextChar)
-
+                storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<there may be multiple things in the bracket... cannot just add like this. This may not be just 1 ARG
                 storeTemplate['args'].append({
+                    'nodeId':None, # this means that its just a slot, and not precisely filled yet
                     'argIdx':inputTemplate['argIdx'],
                     'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                     'openBraPos':nextCharPos, 
@@ -624,7 +689,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 })
 
             eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, nextCharPos, nextChar)
+            storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<there may be multiple things in the bracket... cannot just add like this. This may not be just 1 ARG
             storeTemplate['args'].append({
+                'nodeId':None, # this means that its just a slot, and not precisely filled yet
                 'argIdx':inputTemplate['argIdx'],
                 'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                 'openBraPos':nextCharPos, 
@@ -667,7 +735,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     #TAKEARG as nextCharPos+1, store
                     #NOTE NO_BRACKETS, store
                     nextCharPos += 1
-                    #nextChar = equation[nextCharPos] #<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     self.bracketstorage.removeBracket(openBraPos)
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
@@ -750,20 +817,31 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 accumulatorType = 'N' if isNume else 'V'
             elif (accumulatorType == 'N' and not isNume) or \
             (leftOverPos != leftOverPos): #break off conditions: 0. going_from_N_to_V. 1. not_consecutive
-                self.variables_pos_type.append( #<<<<<<<<<<<<<<<<<<<<<<<<<<<<dictionary struct?
+                self.variables_pos_type.append(
                     {
-                        accumulator
-                        accumulatorStartPos
-                        accumulatorEndPos
+                        'nodeId':self.getNodeId(),
+                        'funcType':'pure_variable',
+                        'funcName':accumulator,
+                        'funcStart':accumulatorStartPos,
+                        'funcEnd':accumulatorEndPos,
+                        'widthStart':accumulatorStartPos,
+                        'widthEnd':accumulatorEndPos,
+                        'args':[]
                     }
-                )#<<<<<<<<<<<<<<<<<<<<<put here
-                self.number_pos_type( #<<<<<<<<<<<<<<<<<<<<<<<<<<<<dictionary struct?
+                )
+                self.number_pos_type.append(
                     {
-                        accumulator
-                        accumulatorStartPos
-                        accumulatorEndPos
+                        'nodeId':self.getNodeId(),
+                        'funcType':'pure_number',
+                        'funcName':accumulator,
+                        'funcStart':accumulatorStartPos,
+                        'funcEnd':accumulatorEndPos,
+                        'widthStart':accumulatorStartPos,
+                        'widthEnd':accumulatorEndPos,
+                        'args':[]
                     }
-                )#<<<<<<<<<<<<<<<<<<<<<put here
+
+                )
                 #reset
                 accumulator = leftOverChar
                 accumulatorStartPos = leftOverPos
@@ -786,14 +864,59 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             5a2. search for open_brackets that have - (+ have no need of implicit_zero)
 
         """
+        def addImplictMinus():
+            zeroNodeId = self.getNodeId()
+            self.infixs_pos_type.append(
+                {
+                    'nodeId':self.getNodeId(),
+                    'funcType':'infix_implicit',
+                    'funcName':'-',
+                    'funcStart':0,
+                    'funcEnd':0,
+                    'widthStart':0,
+                    'widthEnd':None,#<<<<<<<<<<<<<<<<<<<<<UNKNOWN since argIdx=1 is UNKNOWN
+                    'args':[
+                        {
+                            'nodeId':zeroNodeId,
+                            'argIdx':0,
+                            'openBra':None,
+                            'openBraPos':None, 
+                            'closeBra':None,
+                            'closeBraPos': None
+                        },
+                        {
+                            'nodeId':None,# just a SLOT, not filled in yet
+                            'argIdx':1,
+                            'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                            'openBraPos':None, 
+                            'closeBra':None,
+                            'closeBraPos': None
+                        }
+                    ]
+                }
+            )
+            self.number_pos_type.append(
+                    {
+                        'nodeId':zeroNodeId,
+                        'funcType':'pure_number',
+                        'funcName':'0',
+                        'funcStart':0,
+                        'funcEnd':0,
+                        'widthStart':0,
+                        'widthEnd':0,
+                        'args':[]
+                    }
+            )
+
+
         if self.rawEquationStr[0] in ['-']:
-            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<create and store implict_0
+            addImplictMinus()
         #all openbrackets except Matrices, no need bracketstorage
         for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in self.allBrackets:
             if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
                 continue
             if self.rawEquationStr[openBraPos + 1] in ['-']:
-                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<create and store implict_0
+                addImplictMinus()
 
 
     def _find_infixes_backslashes_backslashvars_width(self):
@@ -821,27 +944,82 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
 
         #
-        for start, end, infixSym in self.infixs_pos_type:
+        for storeTemplate in self.infixs_pos_type:
+"""
+            storeTemplate = {
+                'nodeId':self.getNodeId(),
+                'funcType':'infix',
+                'funcName':m.group(),
+                'funcStart':m.start(),
+                'funcEnd':m.end(),
+                'args':[]
+            }
+
+{
+        'nodeId':self.getNodeId(),
+                'argIdx':inputTemplate['argIdx'],
+                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                'openBraPos':nextCharPos, 
+                'closeBra':closeBraType,
+                'closeBraPos': closeBraPos
+            }
+"""
             #is there openBra left of infixSym?
             openBraType = ')'
             openBraPos = start - len(openBraType)
             if self.bracketstorage.exists(openBraPos, openBraType, False):
                 closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
-                #<<<<<<<<<<<<<<<store in inputs [tree_building]
-            else:#need the start and end of all_other_things...
-                pass
+                #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
+                storeTemplate['args'].append({
+                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'argIdx':0,
+                    'openBra':openBraType,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBraPos':openBraPos, 
+                    'closeBra':closeBraType,
+                    'closeBraPos': closeBraPos
+                })
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<remove this bracket
+                self.bracketstorage.removeBracket(openBraPos)
+            else:#need the start and end of all_other_things...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
+                storeTemplate['args'].append({
+                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'argIdx':0,
+                    'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBraPos':None, 
+                    'closeBra':None,
+                    'closeBraPos': None
+                })
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<remove this bracket
+                self.bracketstorage.removeBracket(openBraPos)
             # is there closeBra right of infixSym?
             closeBraType = '('
             closeBraPos = end + len(closeBraType)
             if self.bracketstorage.exists(closeBraPos, closeBraType, True):
                 openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(closeBraPos)
-                #<<<<<<<<<<<<<<<store in inputs [tree_building]
-            else:#need the start and end of all_other_things...
-                pass
+                #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
+                storeTemplate['args'].append({
+                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'argIdx':1,
+                    'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBraPos':None, 
+                    'closeBra':None,
+                    'closeBraPos': None
+                })
+            else:#need the start and end of all_other_things...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
+                storeTemplate['args'].append({
+                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'argIdx':1,
+                    'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBraPos':None, 
+                    'closeBra':None,
+                    'closeBraPos': None
+                })
 
             #check for wider enclosing brackets, requires the inputs from ABOVE <<<<<<<<<<<<<<<<<<<
             #get all the enclosing brackets (even the repeated ones), delete all but the last enclosing (for finding implicit-multiply)
-
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
         
     def _find_implicit_multiply(self):
         """
@@ -873,6 +1051,26 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
     1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
     2. those without children but need to have children : BACKSLASH & INFIXES
+    (ALL of the BACKSLASH_FUNCTIONS) and (some of the args of INFIXES) will have SLOT like 
+{
+                        'nodeId':self.getNodeId(),
+                                'funcType':'infix',
+                                'funcName':m.group(),
+                                'funcStart':m.start(),
+                                'funcEnd':m.end(),
+                        'widthStart':,
+                        'widthEnd':,
+                                'args':[
+{
+        'nodeId':None, <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<SLOT
+                'argIdx':inputTemplate['argIdx'],
+                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                'openBraPos':nextCharPos, 
+                'closeBra':closeBraType,
+                'closeBraPos': closeBraPos
+            }
+                                ]
+                    }
     
     pop list_2 -> a
     for each empty input of a ***********specify width for all the types
@@ -888,6 +1086,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
     go through all items, looking at inputs of each, create nodeId to list[nodeId] dictionary, store as latex tree
         """
+        pass
         
     def _convert_to_schemeStyledAST(self):
         """
