@@ -1,4 +1,4 @@
-from foundation.automat.common import BinarySearch
+from foundation.automat.common import BinarySearch, isNum
 
 class Latexparser(): # TODO follow the inheritance of _latexparser
     
@@ -236,6 +236,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.openTagPos__closeTagPos = None
         self.closeTagPos__openTagPos = None
         self.occupiedPositions = []
+        self.backslashNames = None # this is for taking out occupied pos
         
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
@@ -522,38 +523,31 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         
         """
         import re
+        self.backslashNames = [] # this is for taking out occupied pos
         self.backslash_pos_type = []
         self.variables_pos_type = []
         self.symnum_pos_type = [] #symbolic number like \\pi, i
         for m in re.finditer(r"\\([a-zA-z]+)", self.equationStr):
             foundType = 'backslash_function'
             storeTemplate = {
+                'funcType':foundType,
                 'funcName':m.group(),
                 'funcStart':m.start(),
                 'funcEnd':m.end(),
                 'args':[]
             }
+            self.backslashNames.append((m.start(), m.end(), m.group()))
             if m.group() in BACKSLASH_INFIX: # remove the backslash_infix from backslash
                 continue
             if m.group() in VARIABLENAMESTAKEANARG: # variable_function is actually a variable
                 #self.variables_pos_type.append((m.start(), m.end(), m.group()))
                 foundType = 'backslash_variable'
-                storeTemplate = {
-                    'funcName':m.group(),
-                    'funcStart':m.start(),
-                    'funcEnd':m.end(),
-                    'args':[]
-                }
+                storeTemplate['funcType'] = foundType
             inputTemplates = _getExpectedBackslashInputs(m.group())
             if inputTemplates is None: # number that starts with backslash. like \\pi
                 #self.symnum_pos_type.append((m.start(), m.end(), m.group()))
                 foundType = 'backslash_num'
-                storeTemplate = {
-                    'funcName':m.group(),
-                    'funcStart':m.start(),
-                    'funcEnd':m.end(),
-                    # 'args':[] #expected no args
-                }
+                storeTemplate['funcType'] = foundType
                 self.symnum_pos_type.append(storeTemplate)
                 continue # skip args finding
             #backslash function at_this_point
@@ -629,10 +623,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     'closeBraPos': closeBraPos
                 })
 
-                if foundType == 'backslash_function':
-                    self.backslash_pos_type.append(storeTemplate)
-                elif foundType == 'backslash_variable':
-                    self.variables_pos_type.append(storeTemplate)
             eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, nextCharPos, nextChar)
             storeTemplate['args'].append({
                 'argIdx':inputTemplate['argIdx'],
@@ -641,6 +631,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 'closeBra':closeBraType,
                 'closeBraPos': closeBraPos
             })
+            if foundType == 'backslash_function':
+                self.backslash_pos_type.append(storeTemplate)
+            elif foundType == 'backslash_variable':
+                self.variables_pos_type.append(storeTemplate)
             def processOptionalList(eOptionalList, template, nextChar, nextCharPos):
                 for template in eOptionalList:
                     gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(m, template, nextChar, nextCharPos)
@@ -700,7 +694,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             4a2.backslash(name&preSymonlyNOargs) & backslash_variables
             4a3.ALL BRACKETS
         4b. scan from left to right,  [N is a number, V is not number]
-            4b1. if we go from N to V, break off, collect collected_variables. this means N is implicitly multiplied by V
+            4b1. if (we go from N to V) and (not consecutive), break off, collect collected_variables. this means N is implicitly multiplied by V
             4b2. else, keep collecting temp.
         4c. go through all collected_variables and backslash_variables
             4c1. immediateRight, lookFor _{ , make them part of the variable.
@@ -714,11 +708,75 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #matrices pos THE WHOLE MATRIX, not just the tags
         #self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos
         #self.infixs_pos_type : [(startpos, endpos, group)], the symbol only
-        self.occupiedPositions
         # self.variables_pos_type = None # might already have backslashVar inside.
-        self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4
+        self.number_pos_type = [] #decimal numbers like 123, 23.2, -3.4
 
-        
+        infixName_occupied = []
+        for start, end, group in self.infixs_pos_type:
+            for pos in range(start, end):
+                infixName_occupied.append(pos)
+        infixName_occupied = sorted(infixName_occupied)
+
+        backslashName_occupied = []
+        for start, end, group in self.backslashNames:
+            for pos in range(start, end):
+                backslashName_occupied.append(pos)
+        backslashName_occupied = sorted(backslashName_occupied)
+
+        bracketSym_occupied = []
+        for (_, openBraPos, _), (closeBraPos, _, _) in self.allBrackets:
+            bracketSym.append(openBraPos)
+            bracketSym.append(closeBraPos)
+        bracketSym_occupied = sorted(bracketSym_occupied)
+
+        leftOverPosList = []
+        for pos in range(0, len(self.rawEquationStr)):
+            if self.__isPosInMatrixTag(pos) or \
+            pos in infixName_occupied or \
+            pos in backslashName_occupied or \
+            pos in bracketSym_occupied:
+            continue # we skip these
+            leftOverPosList.append(pos)
+
+
+        accumulator, accumulatorStartPos, accumulatorEndPos, accumulatorType= None, None, None, None
+        for leftOverPos in leftOverPosList:
+            leftOverChar = self.rawEquationStr[leftOverPos]
+            isNume = isNum(leftOverChar)
+            if accumulatorType is None:
+                accumulator = leftOverChar
+                accumulatorStartPos = leftOverPos
+                accumulatorEndPos = accumulatorStartPos + len(leftOverChar) # len(leftOverChar) should always = 1
+                accumulatorType = 'N' if isNume else 'V'
+            elif (accumulatorType == 'N' and not isNume) or \
+            (leftOverPos != leftOverPos): #break off conditions: 0. going_from_N_to_V. 1. not_consecutive
+                self.variables_pos_type.append( #<<<<<<<<<<<<<<<<<<<<<<<<<<<<dictionary struct?
+                    {
+                        accumulator
+                        accumulatorStartPos
+                        accumulatorEndPos
+                    }
+                )#<<<<<<<<<<<<<<<<<<<<<put here
+                self.number_pos_type( #<<<<<<<<<<<<<<<<<<<<<<<<<<<<dictionary struct?
+                    {
+                        accumulator
+                        accumulatorStartPos
+                        accumulatorEndPos
+                    }
+                )#<<<<<<<<<<<<<<<<<<<<<put here
+                #reset
+                accumulator = leftOverChar
+                accumulatorStartPos = leftOverPos
+                accumulatorEndPos = accumulatorStartPos + len(leftOverChar)
+                accumulatorType = 'N' if isNume else 'V'
+            else: # keep accumulating
+                accumulator += leftOverChar
+                accumulatorEndPos += len(leftOverChar)
+                #startPos same. accumulatorType V->N or pure V or pure N is fine.
+
+
+
+
     def _find_implicit_0(self):
         """
 
@@ -728,24 +786,62 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             5a2. search for open_brackets that have - (+ have no need of implicit_zero)
 
         """
+        if self.rawEquationStr[0] in ['-']:
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<create and store implict_0
         #all openbrackets except Matrices, no need bracketstorage
         for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in self.allBrackets:
             if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
                 continue
-            
+            if self.rawEquationStr[openBraPos + 1] in ['-']:
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<create and store implict_0
 
 
     def _find_infixes_backslashes_backslashvars_width(self):
         """
 
-    6. get width(start~end) of infixes
+    6. get width(start~end) of infixes|backslash_function|backslash_variable
         6a. (by enclosing_brackets) or (by inputs) [tree_building]
         LOOK immediate LEFT&RIGHT of infix [tree_building] | but if immediate LEFT&RIGHT of infix are redundant_brackets? 
         then just update as width, and not as inputs
         6b. Check OTHER_brackets for enclosure that are wider than current_width_of_infix
         
         """
-        pass
+        #backslashes and backslashvars already have all their inputs, so its relatively easier than infixes
+        for storeTemplate in self.backslash_pos_type:# backslash function ONLY, no filter needed
+            storeTemplate['widthStart'] = storeTemplate['funcStart'] # backslash is the start
+            storeTemplate['widthEnd'] = storeTemplate['funcEnd'] # farthest of all the closeBraPos
+            for argTemplate in storeTemplate['args']:
+                storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
+
+        for storeTemplate in self.variables_pos_type: # contains pureVar and backslashVar
+            if storeTemplate['funcType'] in ['backslash_variable']:
+                storeTemplate['widthStart'] = storeTemplate['funcStart'] # backslash is the start
+                storeTemplate['widthEnd'] = storeTemplate['funcEnd'] # farthest of all the closeBraPos
+                for argTemplate in storeTemplate['args']:
+                    storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
+
+        #
+        for start, end, infixSym in self.infixs_pos_type:
+            #is there openBra left of infixSym?
+            openBraType = ')'
+            openBraPos = start - len(openBraType)
+            if self.bracketstorage.exists(openBraPos, openBraType, False):
+                closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+                #<<<<<<<<<<<<<<<store in inputs [tree_building]
+            else:#need the start and end of all_other_things...
+                pass
+            # is there closeBra right of infixSym?
+            closeBraType = '('
+            closeBraPos = end + len(closeBraType)
+            if self.bracketstorage.exists(closeBraPos, closeBraType, True):
+                openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(closeBraPos)
+                #<<<<<<<<<<<<<<<store in inputs [tree_building]
+            else:#need the start and end of all_other_things...
+                pass
+
+            #check for wider enclosing brackets, requires the inputs from ABOVE <<<<<<<<<<<<<<<<<<<
+            #get all the enclosing brackets (even the repeated ones), delete all but the last enclosing (for finding implicit-multiply)
+
         
     def _find_implicit_multiply(self):
         """
@@ -847,6 +943,7 @@ class BracketStorage:
     # braType__list_tuple_width_id = {}
     list_tuple_width_id_openPos_closePos = []
     openBraPos__bracketId = {}
+    closeBraPos__bracketId = {}
 
     def __init__(self):
         self.bracketId = 0
@@ -895,6 +992,7 @@ class BracketStorage:
 
         id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
         openBraPos__bracketId[openBraPos] = bracketId
+        closeBraPos__bracketId[closeBraPos] = bracketId
 
         
     def removeBracket(self, openBraPos):
@@ -916,6 +1014,9 @@ class BracketStorage:
             key=lambda tuple_width_id: tuple_width_id[0] # sort by width ascending
         )
         del list_tuple_width_id_openPos_closePos[deletePos]
+
+        del openBraPos__bracketId[openBraPos]
+        del closeBraPos__bracketId[closeBraPos]
 
     
     def getBraPosImmediateRightOfPos(self, pos, typeOfBracket, open):
@@ -964,6 +1065,11 @@ class BracketStorage:
         bracketId = openBraPos__bracketId[openBraPos]
         (_, _, closePos, closeBraType) = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
         return closePos, closeBraType
+
+    def getCorrespondingOpenBraPos(self, closeBraPos):
+        bracketId = closeBraPos__bracketId[closeBraPos]
+        (openPos, openBraType) = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        return openPos, openBraType
 
     def getAllBracket(self):
         """
