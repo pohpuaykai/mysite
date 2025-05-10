@@ -1,5 +1,11 @@
 from copy import copy
+from enum import Enum
 from foundation.automat.common import BinarySearch, isNum
+
+class BracketType(Enum):
+    ROUND = '(', ')'
+    SQUARE = '[', ']'
+    CURLY = '{', '}'
 
 class Latexparser(): # TODO follow the inheritance of _latexparser
     
@@ -239,6 +245,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.backslashNames = None # this is for taking out occupied pos
         self.widthStart__nodeId = None
         self.widthEnd__nodeId = None
+        self.latexAST = None
     
     def getNodeId(self):
         """
@@ -991,7 +998,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             #is there closeBra left of infixSym?
             closeBraType = ')'
             closeBraPos = storeTemplate['funcStart'] - len(closeBraType)
-            if self.bracketstorage.exists(closeBraPos, closeBraType, False):
+            if self.bracketstorage.exists(closeBraPos, BracketType.ROUND, False):
                 closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(closeBraPos)
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
                 storeTemplate['args'].append({
@@ -1018,7 +1025,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             # is there openBra right of infixSym?
             openBraType = '('
             openBraPos = storeTemplate['funcEnd']# + len(openBraType)
-            if self.bracketstorage.exists(openBraPos, openBraType, True):
+            if self.bracketstorage.exists(openBraPos, BracketType.ROUND, True):
                 openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(openBraPos)
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
                 storeTemplate['args'].append({
@@ -1048,7 +1055,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             nodeId__widthStart = dict(map((tup[1], tup[0]), copy(self.widthStart__nodeId.items())))
             nodeId__widthEnd = dict(map((tup[1], tup[0]), copy(self.widthEnd__nodeId.items())))
             for template in self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type:
-                allEnclosingTouchingBra = self.bracketstorage.getAllEnclosingTouchingBraOfPos(template['funcStart'], '(') #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
+                allEnclosingTouchingBra = self.bracketstorage.getAllEnclosingTouchingBraOfPos(template['funcStart'], BracketType.ROUND) #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
                 #UPDATE widthStart end widthEnd to the widest allEnclosingTouchingBra
                 if len(allEnclosingTouchingBra) > 0:
                     widestWidth = 0
@@ -1169,14 +1176,29 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         remove selected_item from list_1
         
         """
-        alle = self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type
+        self.alle = self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type
         """
         Use BracketStorage to help make faster query for each SLOT.
-        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<make bracketType ENUM first
         self.cpbracketstorage.insert <<<<<<<<<<<<insert all alle the widthstart, widthend as brackets (FAKE brackets, we just need the query)
         self.cpbracketstorage.getWidestEnclosingBra <<<<<< for each SLOT, find the widest for the SLOT (TODO implemented) REMOVE getTightestEnclosingBra?[seems like its never used]
         """
+        default = BracketType.ROUND # FAKE
+        defaultOpen, defaultClose = default #FAKE
+        cpbracketstorage = BracketStorage()
+        bracketId__nodeId = {}
+        for template in self.alle:
+            bracketId = cpbracketstorage.insertBracket(defaultOpen, template['widthStart'], defaultClose, template['widthEnd'])
+            bracketId__nodeId[bracketId] = template['nodeId']
         childNeedy = self.infixs_pos_type+self.backslash_pos_type#filter for those with args SLOT
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHERE IS THE BODMAS?
+        for template in childNeedy:
+            for arg in template['args']:
+                if arg['nodeId'] is None: #This is criterion for a SLOT
+                    #find the widest child, stored in cpbracketstorage
+                    pos = arg['closeBraPos']# pos = arg['openBraPos'] | arg['closeBraPos']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DOES every arg, whence arg['nodeId'] is None, have openBraPos or closeBraPos?
+                    _, _, bracketId = cpbracketstorage.getWidestEnclosingBra(pos, default)
+                    arg['nodeId'] = bracketId__nodeId[bracketId] # TODO is this INPLACE?????
+
 
         
     def _format_to_pyStyledAST(self):
@@ -1184,7 +1206,11 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
     go through all items, looking at inputs of each, create nodeId to list[nodeId] dictionary, store as latex tree
         """
-        pass
+        self.latexAST = {}
+        for template in self.alle:
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<all the args need funcName... or a map from nodeId to funcName.
+            list_tuple_nodeId_argIdx = sorted(map(lambda argTem: (argTem['nodeId'], argTem['argIdx']), template['args']), key=lambda tup: tup[1]) #tup[1] is the argIdx
+            self.latexAST[(template['funcName'], template['nodeId'])] = list(map(lambda tup: tup[0], list_tuple_nodeId_argIdx))
         
     def _convert_to_schemeStyledAST(self):
         """
@@ -1198,6 +1224,20 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     WHAT ABOUT THE NEW FUNCTIONS?
     6. 
     
+    \\integral
+    \\lim  (\\to is an infix)
+    \\sum  (this one has equals = at the base)
+    \\prod  (this one has equals = at the base)
+    \\nabla
+    \\Delta
+    \\partial
+    \\cdot (dot product)
+    (cross product)
+    
+    determinant (simplified as det?? only?)
+    also 
+    \\begin{vmatrix}\\end{vmatrix}
+    \\begin{Vmatrix}\\end{Vmatrix}
         """
         pass
         
@@ -1290,6 +1330,7 @@ class BracketStorage:
         id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
         openBraPos__bracketId[openBraPos] = bracketId
         closeBraPos__bracketId[closeBraPos] = bracketId
+        return bracketId
 
         
     def removeBracket(self, openBraPos):
@@ -1318,14 +1359,18 @@ class BracketStorage:
     
     def getBraPosImmediateRightOfPos(self, pos, typeOfBracket, open):
         """
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
         open==True, means we are looking for openbracket, else we are looking for closebracket
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
         """
         #get the right dict
         if open:
             theDict__sortedPosList = openBraType__sortedPosList
+            typeOfBracket = typeOfBracket[0] # the open version of typeOfBracket
         else:
             theDict__sortedPosList = closeBraType__sortedPosList
+            typeOfBracket = typeOfBracket[1] # the close version of typeOfBracket
 
         immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
@@ -1333,14 +1378,19 @@ class BracketStorage:
     
     def getBraPosImmediateLeftOfPos(self, pos, typeOfBracket, open):;
         """
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
+
         open==True, means we are looking for openbracket, else we are looking for closebracket
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
         """
         #get the right dict
         if open:
             theDict__sortedPosList = openBraType__sortedPosList
+            typeOfBracket = typeOfBracket[0] # the open version of typeOfBracket
         else:
             theDict__sortedPosList = closeBraType__sortedPosList
+            typeOfBracket = typeOfBracket[1] # the close version of typeOfBracket
 
         immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
@@ -1348,15 +1398,19 @@ class BracketStorage:
 
     def exists(self, bracketPos, typeofBracket, open):
         """
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
         check if a bracket of type typeOfBracket, exists at position in equationStr, bracketPos
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
         """
         # TODO can use this BinarySearch.binarySearchIdx(theDict__sortedPosList[typeOfBracket], pos)
         #get the right dict
         if open:
             theDict__sortedPosList = openBraType__sortedPosList
+            typeOfBracket = typeOfBracket[0] # the open version of typeOfBracket
         else:
             theDict__sortedPosList = closeBraType__sortedPosList
+            typeOfBracket = typeOfBracket[1] # the close version of typeOfBracket
 
         return pos in theDict__sortedPosList[typeOfBracket]
 
@@ -1378,7 +1432,6 @@ class BracketStorage:
     
     def getAllEnclosingBraOfPos(self, pos, typeOfBracket):
         """
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
         Find 
         closest_close_left_of_pos :
         closest_open_right_of_pos :
@@ -1390,9 +1443,12 @@ class BracketStorage:
         else
             get all the remaining id, find smallest_width in list_tuple_width_id 
         
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
         """
-        closest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False)#<<<<<<<<<<<<<typeOfBracket -> ENUM
-        closest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True)#<<<<<<<<<<<<<typeOfBracket -> ENUM
+        closest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False)
+        closest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True)
         filt__list_tuple_width_id_openPos_closePos = filter(
             lambda tuple_width_id_openPos_closePos: 
                 closest_close_left_of_pos<tuple_width_id_openPos_closePos[3] and \
@@ -1411,8 +1467,12 @@ class BracketStorage:
         In this case, we will only take 1 & 2. Although 0 also encloses p0, 0 also encloses p1, so we discard 0.
 
         This should solve the problem of users putting many same brackets around the same function|primitive
+
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
         """
-        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)#<<<<<<<<<<<<<typeOfBracket -> ENUM
+        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)
         list_tuple_width_id_openPos_closePos__oC = [] # oC~openBraPos are Consecutive
         prevOpenBraPos = None
         for width, bracketId, openBraPos, closeBraPos in sorted(filt__list_tuple_width_id_openPos_closePos, key=lambda tup: tup[2]):#ascending by openBraPos
@@ -1430,11 +1490,31 @@ class BracketStorage:
         """
 
         return tightest bracket, that contains pos
+
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
         """
-        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)#<<<<<<<<<<<<<typeOfBracket -> ENUM
+        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)
         if len(filt__list_tuple_width_id_openPos_closePos) > 0:
             minWidth, selectedOpenPos, selectedClosePos = float('inf'), None, None
             for width, bracketId, openPos, closePos in list_tuple_width_id_openPos_closePos:
                 if width < minWidth:
                     minWidth, selectedOpenPos, selectedClosePos = width, openPos, closePos
             return selectedOpenPos, selectedClosePos
+
+    def getWidestEnclosingBra(self, pos, typeOfBracket):
+        """
+        
+        return tightest bracket, that contains pos
+
+        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
+        :type typeOfBracket: BracketType Enum
+        """
+        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)
+        if len(filt__list_tuple_width_id_openPos_closePos) > 0:
+            maxWidth, selectedOpenPos, selectedClosePos, selectedBracketId = float('-inf'), None, None, None
+            for width, bracketId, openPos, closePos in list_tuple_width_id_openPos_closePos:
+                if width > maxWidth:
+                    maxWidth, selectedOpenPos, selectedClosePos, selectedBracketId = width, openPos, closePos, bracketId
+            return selectedOpenPos, selectedClosePos, selectedBracketId
