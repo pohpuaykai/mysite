@@ -226,8 +226,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.matrices_pos_type = None
         self.infixs_pos_type = None
         self.variables_pos_type = None
-        self.symnum_pos_type = None #symbolic number like \\pi, i
-        self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4
+        self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4, also contain symbolic number like \\pi, i
         self.node_id = 0
         self.allBrackets = None # all of the bracket STATIC, 
         self.openBraPos__bracketId = None # STATIC
@@ -238,6 +237,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.closeTagPos__openTagPos = None
         self.occupiedPositions = []
         self.backslashNames = None # this is for taking out occupied pos
+        self.widthStart__nodeId = None
+        self.widthEnd__nodeId = None
     
     def getNodeId(self):
         """
@@ -586,7 +587,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.backslashNames = [] # this is for taking out occupied pos
         self.backslash_pos_type = []
         self.variables_pos_type = []
-        self.symnum_pos_type = [] #symbolic number like \\pi, i
+        self.number_pos_type = [] #symbolic number like \\pi, i
         for m in re.finditer(r"\\([a-zA-z]+)", self.equationStr):
             foundType = 'backslash_function'
             storeTemplate = {
@@ -608,10 +609,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 storeTemplate['funcType'] = foundType
             inputTemplates = _getExpectedBackslashInputs(m.group())
             if inputTemplates is None: # number that starts with backslash. like \\pi
-                #self.symnum_pos_type.append((m.start(), m.end(), m.group()))
+                #self.number_pos_type.append((m.start(), m.end(), m.group()))
                 foundType = 'backslash_number'
                 storeTemplate['funcType'] = foundType
-                self.symnum_pos_type.append(storeTemplate)
+                self.number_pos_type.append(storeTemplate)
                 continue # skip args finding
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
@@ -828,7 +829,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         'widthEnd':accumulatorEndPos,
                         'args':[]
                     }
-                )
+                )#<<<<<<<<<<<<<<<<<<<<<<could contain things like i=sqrt(-1), which is a number not a variable, should have its OWN FUNCTYPE, .... ANYTHING ELSE LIKE SUCH?
                 self.number_pos_type.append(
                     {
                         'nodeId':self.getNodeId(),
@@ -943,6 +944,29 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 for argTemplate in storeTemplate['args']:
                     storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
 
+        #(matrices_pos_type|backslash_pos_type|variables_pos_type|number_pos_type) all have widthStart&widthEnd at_this_point
+
+        """
+        Using dictionary for widthStart__nodeId&widthEnd__nodeId is fine, because, 
+
+        _find_infixes_backslashes_backslashvars_width
+        ~got length of infix and position of infix, and inputs has to be immediate next to the infix, all the spaces are removed, so entities has to be touching
+
+        _find_implicit_multiply
+        ~entities have to be immediate next to each other, all the spaces are removed, so entities has to be touching
+
+        _match_child_to_parent_input
+        ~in _find_infixes_backslashes_backslashvars_width, we used the enclosing brackets to ensure that all entities widthStart and widthEnd are extended to the fullest, all the spaces are removed, so SLOT and entities are touching
+
+        All require entities to be touching, so the indexing of dictionary works. (alternative was using BinarySearch on a list)
+        """
+        self.widthStart__nodeId = {}
+        self.widthEnd__nodeId = {}
+        #mixing entities up is ok, since they have the same template
+        #NOTE +self.infixs_pos_type NOT INCLUDED YET!
+        for template in self.matrices_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type:
+            self.widthStart__nodeId[template['widthStart']] = template['nodeId']
+            self.widthEnd__nodeId[template['widthEnd']] = template['nodeId']
         #
         for storeTemplate in self.infixs_pos_type:
 """
@@ -964,11 +988,11 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 'closeBraPos': closeBraPos
             }
 """
-            #is there openBra left of infixSym?
-            openBraType = ')'
-            openBraPos = start - len(openBraType)
-            if self.bracketstorage.exists(openBraPos, openBraType, False):
-                closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+            #is there closeBra left of infixSym?
+            closeBraType = ')'
+            closeBraPos = storeTemplate['funcStart'] - len(closeBraType)
+            if self.bracketstorage.exists(closeBraPos, closeBraType, False):
+                closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(closeBraPos)
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
                 storeTemplate['args'].append({
                     'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
@@ -978,25 +1002,24 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     'closeBra':closeBraType,
                     'closeBraPos': closeBraPos
                 })
-                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<remove this bracket
                 self.bracketstorage.removeBracket(openBraPos)
-            else:#need the start and end of all_other_things...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            else:#no closeBra left of infixSym
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
+                argNodeId = self.widthEnd__nodeId[closeBraPos] # if this throws error, you made AN INDEX MISTAKE with widthEnd or closeBraPos
                 storeTemplate['args'].append({
-                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'nodeId':argNodeId,
                     'argIdx':0,
-                    'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
                     'openBraPos':None, 
                     'closeBra':None,
                     'closeBraPos': None
                 })
-                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<remove this bracket
                 self.bracketstorage.removeBracket(openBraPos)
-            # is there closeBra right of infixSym?
-            closeBraType = '('
-            closeBraPos = end + len(closeBraType)
-            if self.bracketstorage.exists(closeBraPos, closeBraType, True):
-                openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(closeBraPos)
+            # is there openBra right of infixSym?
+            openBraType = '('
+            openBraPos = storeTemplate['funcEnd']# + len(openBraType)
+            if self.bracketstorage.exists(openBraPos, openBraType, True):
+                openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(openBraPos)
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
                 storeTemplate['args'].append({
                     'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
@@ -1006,39 +1029,46 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     'closeBra':None,
                     'closeBraPos': None
                 })
+                self.bracketstorage.removeBracket(openBraPos)
             else:#need the start and end of all_other_things...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
+                argNodeId = self.widthStart__nodeId[openBraPos] # if this throws error, you made AN INDEX MISTAKE with widthStart or openBraPos
+                
                 storeTemplate['args'].append({
-                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'nodeId':argNodeId,
                     'argIdx':1,
-                    'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
                     'openBraPos':None, 
                     'closeBra':None,
                     'closeBraPos': None
                 })
+                self.bracketstorage.removeBracket(openBraPos)
 
             #check for wider enclosing brackets, requires the inputs from ABOVE <<<<<<<<<<<<<<<<<<<
+            #CHECK wider enclosing brackets, for EVERYTHING <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #updating of widthStart and widthEnd for all. ENCLOSING_BRACKET has to be tight, to prevent 2 things going into the same enclosing
             #get all the enclosing brackets (even the repeated ones), delete all but the last enclosing (for finding implicit-multiply)
             #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
+
+        #widthStart__nodeId, widthEnd__nodeId for BS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<UPDATE WITH INFIX DATUM
         
     def _find_implicit_multiply(self):
         """
+
     ***OTHER_brackets should only contain right_input_for_^ OR enclosures_for_implicit_multiply OR ORDER_ENCLOSURES[which_op_comes_first, associativity, should_only_enclose_infixes_but_user_can_put_redundant_brackets] at_this_point
-    7. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
-        7a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS(EVERYTHING EXCEPT INFIX and OTHER_brackets??)
-        7b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
-        7c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
-        7d. REMOVE all implicit_multiply from OTHER_brackets
+
+        Expand everthing(mat|infix|Backslash|variable|number) to it's full width(inclusive of all the enclosing brackets, and for infix it's the inclusive of both side arguments also note for infix if there are enclosing brackets), 
+        sort everything by widthstartpos. Go through everything in pairs(sliding_window).
+        If they Touch each other (in their full width):
+            If one or both are infixes, they must be enclosed in brackets to add implicit* (we included the enclosing into the widthstart&widthend, so no need to check this? just add implicit multiply)
+            Else add implicit*
+
+
+        CHECK for enclosing_brackets for implicit_multiply
+        REMOVE all implicit_multiply from OTHER_brackets
+        UPDATE widthStart__nodeId, widthEnd__nodeId for BS
     ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
     ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
-    
-        """
-        """
-        Expand everthing(mat|infix|Backslash|variable|number) to it's full width(inclusive of all the enclosing brackets, and for infix it's the inclusive of both side arguments also note for infix if there are enclosing brackets), 
-        sort everything by startpos. Go through everything in pairs(sliding_window).
-        If they Touch each other (in their full width):
-            If one or both are infixes, they must be enclosed in brackets to add implicit*
-            Else add implicit*
         """
         pass
         
@@ -1050,7 +1080,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     #process those_with_inputs(BACKSLASH&INFIX) by position (left to right)
     we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
     1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
-    2. those without children but need to have children : BACKSLASH & INFIXES
+    2. those without children but need to have children : BACKSLASH & INFIXES  <<<<<<<<start from the SLOTs with smallest width
     (ALL of the BACKSLASH_FUNCTIONS) and (some of the args of INFIXES) will have SLOT like 
 {
                         'nodeId':self.getNodeId(),
