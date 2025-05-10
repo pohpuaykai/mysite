@@ -148,10 +148,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     open__close = dict(zip(OPEN_BRACKETS, CLOSE_BRACKETS))
 
     ##### PUT BACK LATER
-    #TRIGOFUNCTION = Function.TRIGONOMETRIC_NAMES() # then no need to map between latex and scheme
-    TRIGOFUNCTION = ['arccos', 'cos', 'arcsin', 'sin', 'arctan', 'tan', 
-    'arccsc', 'csc', 'arcsec', 'sec', 'arccot', 'cot', 'arsinh', 'sinh', 'arcosh', 'cosh', 
-    'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
+    TRIGOFUNCTION = Function.TRIGONOMETRIC_NAMES() # then no need to map between latex and scheme
+    # TRIGOFUNCTION = ['arccos', 'cos', 'arcsin', 'sin', 'arctan', 'tan', 
+    # 'arccsc', 'csc', 'arcsec', 'sec', 'arccot', 'cot', 'arsinh', 'sinh', 'arcosh', 'cosh', 
+    # 'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
     ######
     BACKSLASH_EXPECTED_INPUTS = { #all possible returns according to input_type, for easy collating
         '^{}()':[
@@ -264,8 +264,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         
         I can only think of 3 ways to do this? Implement one first, and then later do both, and parallelise
         1. go character by character
-        2. use re.findall, match outer \begin\end <<<<<<<<<< we going with this
-        3. str.find, chop and str.find, and then match outer \begin\end
+        2. use re.findall, match outer \\begin\\end <<<<<<<<<< we going with this
+        3. str.find, chop and str.find, and then match outer \\begin\\end
         
         """
         self.matrices_pos_type = []
@@ -511,6 +511,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         'args':[
 {
         'nodeId':None,#just a SLOT
+        'funcName':None,
                 'argIdx':0,
                 'openBra':None,
                 'openBraPos':None, 
@@ -519,6 +520,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 },
 {
         'nodeId':None,#just a SLOT
+        'funcName':None,
                 'argIdx':1,
                 'openBra':None,
                 'openBraPos':None, 
@@ -689,6 +691,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<there may be multiple things in the bracket... cannot just add like this. This may not be just 1 ARG
                 storeTemplate['args'].append({
                     'nodeId':None, # this means that its just a slot, and not precisely filled yet
+                    'funcName':None, # this means that its just a slot, and not precisely filled yet
                     'argIdx':inputTemplate['argIdx'],
                     'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                     'openBraPos':nextCharPos, 
@@ -701,6 +704,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<there may be multiple things in the bracket... cannot just add like this. This may not be just 1 ARG
             storeTemplate['args'].append({
                 'nodeId':None, # this means that its just a slot, and not precisely filled yet
+                'funcName':None,  # this means that its just a slot, and not precisely filled yet
                 'argIdx':inputTemplate['argIdx'],
                 'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                 'openBraPos':nextCharPos, 
@@ -886,6 +890,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     'args':[
                         {
                             'nodeId':zeroNodeId,
+                            'funcName':'0',
                             'argIdx':0,
                             'openBra':None,
                             'openBraPos':None, 
@@ -894,6 +899,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         },
                         {
                             'nodeId':None,# just a SLOT, not filled in yet
+                            'funcName':None,# just a SLOT, not filled in yet
                             'argIdx':1,
                             'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                             'openBraPos':None, 
@@ -967,13 +973,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         All require entities to be touching, so the indexing of dictionary works. (alternative was using BinarySearch on a list)
         """
-        self.widthStart__nodeId = {}
-        self.widthEnd__nodeId = {}
+        self.widthStart__tuple_nodeId_funcName = {}
+        self.widthEnd__tuple_nodeId_funcName = {}
         #mixing entities up is ok, since they have the same template
         #NOTE +self.infixs_pos_type NOT INCLUDED YET!
         for template in self.matrices_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type:
-            self.widthStart__nodeId[template['widthStart']] = template['nodeId']
-            self.widthEnd__nodeId[template['widthEnd']] = template['nodeId']
+            self.widthStart__tuple_nodeId_funcName[template['widthStart']] = (template['nodeId'], template['funcName'])
+            self.widthEnd__tuple_nodeId_funcName[template['widthEnd']] = (template['nodeId'], template['funcName'])
         #
         for storeTemplate in self.infixs_pos_type:
 """
@@ -1003,6 +1009,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
                 storeTemplate['args'].append({
                     'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'funcName':None, # JUST a SLOT, might have alot of thing in the brackets
                     'argIdx':0,
                     'openBra':openBraType,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                     'openBraPos':openBraPos, 
@@ -1012,9 +1019,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.bracketstorage.removeBracket(openBraPos)
             else:#no closeBra left of infixSym
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
-                argNodeId = self.widthEnd__nodeId[closeBraPos] # if this throws error, you made AN INDEX MISTAKE with widthEnd or closeBraPos
+                argNodeId, argFuncName = self.widthEnd__tuple_nodeId_funcName[closeBraPos] # if this throws error, you made AN INDEX MISTAKE with widthEnd or closeBraPos
                 storeTemplate['args'].append({
                     'nodeId':argNodeId,
+                    'funcName':argFuncName,
                     'argIdx':0,
                     'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
                     'openBraPos':None, 
@@ -1030,6 +1038,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
                 storeTemplate['args'].append({
                     'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                    'funcName':None,
                     'argIdx':1,
                     'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
                     'openBraPos':None, 
@@ -1039,10 +1048,11 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.bracketstorage.removeBracket(openBraPos)
             else:#no openBra right of infixSym
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
-                argNodeId = self.widthStart__nodeId[openBraPos] # if this throws error, you made AN INDEX MISTAKE with widthStart or openBraPos
+                argNodeId, argFuncName = self.widthStart__tuple_nodeId_funcName[openBraPos] # if this throws error, you made AN INDEX MISTAKE with widthStart or openBraPos
                 
                 storeTemplate['args'].append({
                     'nodeId':argNodeId,
+                    'funcName':argFuncName,
                     'argIdx':1,
                     'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
                     'openBraPos':None, 
@@ -1052,8 +1062,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.bracketstorage.removeBracket(openBraPos)
 
             #CHECK wider enclosing brackets, for EVERYTHING 
-            nodeId__widthStart = dict(map((tup[1], tup[0]), copy(self.widthStart__nodeId.items())))
-            nodeId__widthEnd = dict(map((tup[1], tup[0]), copy(self.widthEnd__nodeId.items())))
+            # nodeId__widthStart = dict(map((tup[1], tup[0]), copy(self.widthStart__nodeId.items())))
+            # nodeId__widthEnd = dict(map((tup[1], tup[0]), copy(self.widthEnd__nodeId.items())))
             for template in self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type:
                 allEnclosingTouchingBra = self.bracketstorage.getAllEnclosingTouchingBraOfPos(template['funcStart'], BracketType.ROUND) #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typeOfBracket -> ENUM
                 #UPDATE widthStart end widthEnd to the widest allEnclosingTouchingBra
@@ -1070,12 +1080,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                     template['widthStart'] = widestBra[2]#TODO is this change INPLACE?????
                     template['widthEnd'] = widestBra[3]#TODO is this change INPLACE??????
-                    #UPDATE widthStart__nodeId, widthEnd__nodeId
-                    nodeId__widthEnd[template['nodeId']] = widestBra[3]
-                    nodeId__widthStart[template['nodeId']] = widestBra[2]
-                    self.bracketstorage.removeBracket()
-            self.widthStart__nodeId = dict(map((tup[1], tup[0]), copy(nodeId__widthStart.items())))
-            self.widthEnd__nodeId = dict(map((tup[1], tup[0]), copy(nodeId__widthEnd.items())))
+                    #UPDATE widthStart__nodeId, widthEnd__nodeId <<<<<<<<<<<<<<<<<<<<<<<<<<<<not using any more? no need to maintain this structure. ALSO no need self.
+                    # nodeId__widthEnd[template['nodeId']] = widestBra[3]
+                    # nodeId__widthStart[template['nodeId']] = widestBra[2]
+                    self.bracketstorage.removeBracket(widestBra[2])
+            # self.widthStart__nodeId = dict(map((tup[1], tup[0]), copy(nodeId__widthStart.items())))
+            # self.widthEnd__nodeId = dict(map((tup[1], tup[0]), copy(nodeId__widthEnd.items())))
         #updating of widthStart and widthEnd for all. ENCLOSING_BRACKET has to be tight, to prevent 2 things going into the same enclosing
             #get all the enclosing brackets (even the repeated ones), delete all but the last enclosing (for finding implicit-multiply)
             #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
@@ -1099,7 +1109,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
     ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
         """
-        def addImplictMultiply(funcPos, arg0NodeId, arg1NodeId, arg0WidthStart, arg1WidthEnd):
+        def addImplictMultiply(funcPos, arg0NodeId, arg1NodeId, arg0WidthStart, arg1WidthEnd, arg0FuncName, arg1FuncName):
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #CHECK wider enclosing brackets, for newlyADDEDImplicitMultiply.... TODO this should be refactored same as end of _find_infixes_backslashes_backslashvars_width
+        #REMOVE all implicit_multiply from OTHER_brackets
             self.infixs_pos_type.append(
                 {
                     'nodeId':self.getNodeId(),
@@ -1112,6 +1125,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     'args':[
                         {
                             'nodeId':arg0NodeId,
+                            'funcName':arg0FuncName,#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                             'argIdx':0,
                             'openBra':None,# could be FILLED, but we don't need it, since p|c relationship built
                             'openBraPos':None,# could be FILLED, but we don't need it, since p|c relationship built
@@ -1120,6 +1134,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         },
                         {
                             'nodeId':arg1NodeId,
+                            'funcName':arg1FuncName, #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                             'argIdx':1,
                             'openBra':None,# could be FILLED, but we don't need it, since p|c relationship built
                             'openBraPos':None,# could be FILLED, but we don't need it, since p|c relationship built
@@ -1136,9 +1151,22 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             vorDing = alle[idx]
             hinDing = alle[idx+1]
             if vorDing['widthEnd'] + 1 == hinDing['widthStart']:
-                addImplictMultiply(vorDing['widthEnd'], vorDing['nodeId'], hinDing['nodeId'], vorDing['widthStart'], hinDing['widthEnd'])
+                addImplictMultiply(
+                    vorDing['widthEnd'], 
+                    vorDing['nodeId'], 
+                    hinDing['nodeId'], 
+                    vorDing['widthStart'], 
+                    hinDing['widthEnd'],
+                    vorDing['funcName'],
+                    hinDing['funcName']
+                    )
 
-        
+        """
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        UPDATE widthStart__nodeId, widthEnd__nodeId for BS<<<<<<<<<<<<<<<where else are you using this? it got replaced by cpbracketstorage? nicht wahr?
+        """
+                    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
+
         
     def _match_child_to_parent_input(self):
         """
@@ -1190,14 +1218,24 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             bracketId = cpbracketstorage.insertBracket(defaultOpen, template['widthStart'], defaultClose, template['widthEnd'])
             bracketId__nodeId[bracketId] = template['nodeId']
         childNeedy = self.infixs_pos_type+self.backslash_pos_type#filter for those with args SLOT
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHERE IS THE BODMAS?
+        
         for template in childNeedy:
             for arg in template['args']:
                 if arg['nodeId'] is None: #This is criterion for a SLOT
                     #find the widest child, stored in cpbracketstorage
                     pos = arg['closeBraPos']# pos = arg['openBraPos'] | arg['closeBraPos']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DOES every arg, whence arg['nodeId'] is None, have openBraPos or closeBraPos?
-                    _, _, bracketId = cpbracketstorage.getWidestEnclosingBra(pos, default)
-                    arg['nodeId'] = bracketId__nodeId[bracketId] # TODO is this INPLACE?????
+                    
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHERE IS THE BODMAS? WHEN THERE IS NO BRACKETS to tell you what to do
+        #cpbracketstorage.getWidestEnclosingBra will give no answer? When? ...+...-.../...*...? in this case, cpbracketstorage is blank..
+        #if cpbracketstorage.getWidestEnclosingBra gives None...
+                    answer = cpbracketstorage.getWidestEnclosingBra(pos, default)
+                    if answer is None:
+                        #BODMAS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< anywhere else has BODMAS?
+                        #here your BODMAS, includes ALLL the backslash functions. WOW
+                        pass
+                    else:
+                        _, _, bracketId = answer
+                        arg['nodeId'] = bracketId__nodeId[bracketId] # TODO is this INPLACE?????
 
 
         
@@ -1208,9 +1246,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         self.latexAST = {}
         for template in self.alle:
-            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<all the args need funcName... or a map from nodeId to funcName.
-            list_tuple_nodeId_argIdx = sorted(map(lambda argTem: (argTem['nodeId'], argTem['argIdx']), template['args']), key=lambda tup: tup[1]) #tup[1] is the argIdx
-            self.latexAST[(template['funcName'], template['nodeId'])] = list(map(lambda tup: tup[0], list_tuple_nodeId_argIdx))
+            list_tuple_nodeId_argIdx = sorted(map(lambda argTem: (argTem['nodeId'], argTem['argIdx'], argTem['argFuncName']), template['args']), key=lambda tup: tup[1]) #tup[1] is the argIdx
+            self.latexAST[(template['funcName'], template['nodeId'])] = list(map(lambda tup: (tup[2], tup[0]), list_tuple_nodeId_argIdx)) # tup[2] is argFuncName, tup[0] is nodeId
         
     def _convert_to_schemeStyledAST(self):
         """
@@ -1224,7 +1261,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     WHAT ABOUT THE NEW FUNCTIONS?
     6. 
     
-    \\integral
+    \\int \\iint \\iiint \\oint \\oiint
     \\lim  (\\to is an infix)
     \\sum  (this one has equals = at the base)
     \\prod  (this one has equals = at the base)
