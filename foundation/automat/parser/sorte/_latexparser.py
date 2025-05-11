@@ -6,7 +6,7 @@ from foundation.automat.arithmetic.function import Function
 from foundation.automat.parser.parser import Parser
 
 
-class Latexparser(Parser):
+class _Latexparser(Parser):
     """
     Naive Parser for Latex Strings. More details about 'Latex' format, check
     https://www.latex-project.org/help/documentation/classes.pdf

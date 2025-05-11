@@ -3,7 +3,8 @@ class BinarySearch:
     @classmethod
     def binarySearchPre(cls, sortedList, numToInsert, key=None, breakTie='l'):
         if len(sortedList) == 0:
-            raise Exception('sortedList cannot be empty')
+            # raise Exception('sortedList cannot be empty') # latexparser.py$insertPos = BinarySearch.binarySearchPre(
+            return 0
         if key == None:
             key = lambda x: x
         tookSortedList = list(map(key, sortedList))

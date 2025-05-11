@@ -1,5 +1,7 @@
 from copy import copy
 from enum import Enum
+
+from foundation.automat.arithmetic.function import Function
 from foundation.automat.common import BinarySearch, isNum
 
 class BracketType(Enum):
@@ -223,7 +225,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     'arccsc', 'csc', 'arcsec', 'sec', 'arccot', 'cot', 'arsinh', 'sinh', 'arcosh', 'cosh', 
     'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']"""
     #INTEGRALS = ['int', 'oint', 'iint'] # TODO hikitoru this from sfunctors # remove
-    FUNCTIONNAMES = TRIGOFUNCTION + ['frac', 'sqrt',  'log', 'ln'] + INTEGRALS
+    #FUNCTIONNAMES = TRIGOFUNCTION + ['frac', 'sqrt',  'log', 'ln'] + INTEGRALS # remove?
     EXCLUDE_BACKSLASH = ['\\to']
     
     def __init__(self, equationStr=None, ast=None, verbose=False):
@@ -249,7 +251,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         NodeId Dispenser
         """
-
         oNodeId = copy(self.node_id)
         self.node_id += 1
         return oNodeId
@@ -295,7 +296,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         #TODO this works like bubble_merge, if bubble_merge is not used anymore, please remove. Or replace this with bubble_merge. easier to analysis
         """
-        ~~PREPARING FOR CONTAINMENT QUERY~~  __isPosInMatrixTag
+        ~~PREPARING FOR MATRIX CONTAINMENT QUERY~~  __isPosInMatrixTag
 
         split into list_openTagPos, list_closeTagPos
         openTagPos__closeTagPos
@@ -352,15 +353,17 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos = [], [], {}, {}
         if len(self.matrices_pos_type) > 0:
-            for (_, startTagEndPos, _), (endTagStartPos, _, _) in self.matrices_pos_type:
-                insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
-                list_openTagPos.insert(insertIdx, startTagEndPos)
+            # for (_, startTagEndPos, _), (endTagStartPos, _, _) in self.matrices_pos_type: #should have been startTagStartPos and endTagEndPos
+            for template in self.matrices_pos_type:
+                startTagStartPos, endTagEndPos = self.matrices_pos_type['widthStart'], self.matrices_pos_type['widthEnd']
+                insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagStartPos)
+                list_openTagPos.insert(insertIdx, startTagStartPos)
 
-                insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
-                list_closeTagPos.insert(insertIdx, endTagStartPos)
+                insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagEndPos)
+                list_closeTagPos.insert(insertIdx, endTagEndPos)
 
-                openTag_closeTagPos[startTagEndPos] = endTagStartPos
-                closeTag_openTagPos[endTagStartPos] = startTagEndPos
+                openTag_closeTagPos[startTagStartPos] = endTagEndPos
+                closeTag_openTagPos[endTagEndPos] = startTagStartPos
 
                 set__openTagPos = set(filter(lambda i: i<closeInOpenIdx, list_openTagPos))
                 set__closeTagPos = set(filter(lambda i: openInCloseIdx<i, list_closeTagPos))
@@ -387,13 +390,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                     #BSADD openTagPos to list_openTagPos
                     #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                    insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
-                    list_openTagPos.insert(insertIdx, startTagEndPos)
+                    insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagStartPos)
+                    list_openTagPos.insert(insertIdx, startTagStartPos)
 
                     #BSADD closeTagPos to list_closeTagPos
                     #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                    insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagStartPos)
-                    list_closeTagPos.insert(insertIdx, endTagStartPos)
+                    insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagEndPos)
+                    list_closeTagPos.insert(insertIdx, endTagEndPos)
 
                     #ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
                     openTagPos__closeTagPos[openTagPos] = closeTagPos
@@ -420,8 +423,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                             del openTagPos__closeTagPos[i]
                     if not added:
                         #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                        insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagEndPos)
-                        list_openTagPos.insert(insertIdx, startTagEndPos)
+                        insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagStartPos)
+                        list_openTagPos.insert(insertIdx, startTagStartPos)
 
                         added = True
 
@@ -441,8 +444,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                             del closeTagPos__openTagPos[i]
                     if not added:
                         #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                        insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, endTagStartPos)
-                        list_closeTagPos.insert(insertIdx, endTagStartPos)
+                        insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, endTagEndPos)
+                        list_closeTagPos.insert(insertIdx, endTagEndPos)
 
                         added = True
 
@@ -467,18 +470,15 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         if empty, there is no enclosing brackets for pos
         """
         #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-        closest_close_left_of_pos = BinarySearch.binarySearchPre(self.list_closeMatrixTagPos, pos) # always gives right_of_pos
+        nearest_close_left_of_pos = BinarySearch.binarySearchPre(self.list_closeMatrixTagPos, pos) # always gives right_of_pos
 
-        closest_open_right_of_pos = BinarySearch.binarySearchPre(self.list_openMatrixTagPos, pos) - 1
+        nearest_open_right_of_pos = BinarySearch.binarySearchPre(self.list_openMatrixTagPos, pos) - 1
 
-        filt__list_tuple_width_id_openPos_closePos = filter(
-            lambda tuple_width_id_openPos_closePos: 
-                closest_close_left_of_pos<self.matrices_pos_type[1][0] and \
-                self.matrices_pos_type[0][1]<closest_open_right_of_pos, 
-            list_tuple_width_id_openPos_closePos)
-        if len(filt__list_tuple_width_id_openPos_closePos) > 0:
-            for (_, startTagEndPos, _), (endTagStartPos, _, _) in list_tuple_width_id_openPos_closePos:
-                if startTagEndPos <= pos and pos <= endTagStartPos:
+        filt__list_tuple_openPos_closePos = filter(lambda tup: nearest_close_left_of_pos<tup[1] and tup[0]<nearest_open_right_of_pos, self.openMatrixTagPos__closeMatrixTagPos.items())
+        
+        if len(filt__list_tuple_openPos_closePos) > 0:
+            for openPos, closePos in filt__list_tuple_openPos_closePos:
+                if openPos <= pos and pos <= closePos:
                     return True
         return False
 
@@ -494,7 +494,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         import re
         self.infixs_pos_type = []
         for infix in self.INFIX:
-            infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\{infix\}", self.equationStr)))
+            infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"{infix}", self.equationStr)))
             
             for start, end, group in infix_pos_type_list:
                 self.infixs_pos_type.append(
@@ -534,6 +534,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         
         2a. Keep position of all the brackets as a kind of datastorage, need to get all the 
         DO NOT INCLUDE MATRIX. (remove from OTHER_brackets)
+
+        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2d obsolete
         2d. check if left&right infixes (put to infix as inputs) (remove from OTHER_brackets)
         """
         #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
@@ -541,7 +543,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         brackets = set()
         for k, templateList in BACKSLASH_EXPECTED_INPUTS.items():
             for template in templateList:
-                brackets.add((template['openBra'] template['closeBra']))
+                brackets.add((template['openBra'], template['closeBra']))
         self.allBrackets = []
         self.openBraPos__bracketId = {}
         for openBracket, closeBracket in brackets: # order in which we process the brackets does not matter
@@ -562,7 +564,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     def _find_backslash(self):
         """
         
-        3. find start_position of all the backslashs (sqrt is special), EXCLUDE EXCLUDE_BACKSLASH like \to, because its an infix
+        3. find start_position of all the backslashs (sqrt is special), EXCLUDE EXCLUDE_BACKSLASH like \\to, because its an infix
             3a. their _(if any) and its immediateNextBracket, their ^(if any) and its immediateNextBracket and {} [tree_building]
             3b. remove all the ^ from infixes, that are actually backslash_exponents
             3c. note its end_position, also 
@@ -611,12 +613,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             if m.group() in BACKSLASH_INFIX: # remove the backslash_infix from backslash
                 continue
             if m.group() in VARIABLENAMESTAKEANARG: # variable_function is actually a variable
-                #self.variables_pos_type.append((m.start(), m.end(), m.group()))
                 foundType = 'backslash_variable'
                 storeTemplate['funcType'] = foundType
             inputTemplates = _getExpectedBackslashInputs(m.group())
             if inputTemplates is None: # number that starts with backslash. like \\pi
-                #self.number_pos_type.append((m.start(), m.end(), m.group()))
                 foundType = 'backslash_number'
                 storeTemplate['funcType'] = foundType
                 self.number_pos_type.append(storeTemplate)
@@ -686,7 +686,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 else:
                     eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, template, nextCharPos, nextChar)
                 storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<there may be multiple things in the bracket... cannot just add like this. This may not be just 1 ARG
                 storeTemplate['args'].append({
                     'nodeId':None, # this means that its just a slot, and not precisely filled yet
                     'funcName':None, # this means that its just a slot, and not precisely filled yet
@@ -699,7 +698,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
             eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, nextCharPos, nextChar)
             storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<there may be multiple things in the bracket... cannot just add like this. This may not be just 1 ARG
             storeTemplate['args'].append({
                 'nodeId':None, # this means that its just a slot, and not precisely filled yet
                 'funcName':None,  # this means that its just a slot, and not precisely filled yet
@@ -730,13 +728,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     nextCharPos = closeBraPos + len(closeBraType)
                     self.bracketstorage.removeBracket(openBraPos)
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
-                    """
+                        """
 
-        2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
-            2b1.^ to the left (power) [only for ASTreeConstructionBODMAS, input of infix] (remove from OTHER_brackets)
-            2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
+            2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
+                2b1.^ to the left (power) [only for ASTreeConstructionBODMAS, input of infix] (remove from OTHER_brackets)
+                2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
 
-                    """
+                        """
                         self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
                 elif template['braOptional'] == 'False': # no bracket but not neccessary
                     #log
@@ -812,7 +810,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             pos in infixName_occupied or \
             pos in backslashName_occupied or \
             pos in bracketSym_occupied:
-            continue # we skip these
+                continue # we skip these
             leftOverPosList.append(pos)
 
 
@@ -934,6 +932,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     def _find_infixes_backslashes_backslashvars_width(self):
         """
 
+        AFTER THIS FUNCTION, we should get LARGEST WIDTH of backslashes
+
     6. get width(start~end) of infixes|backslash_function|backslash_variable
         6a. (by enclosing_brackets) or (by inputs) [tree_building]
         LOOK immediate LEFT&RIGHT of infix [tree_building] | but if immediate LEFT&RIGHT of infix are redundant_brackets? 
@@ -980,25 +980,25 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             widthEnd__tuple_nodeId_funcName[template['widthEnd']] = (template['nodeId'], template['funcName'])
         #
         for storeTemplate in self.infixs_pos_type:
-"""
-            storeTemplate = {
-                'nodeId':self.getNodeId(),
-                'funcType':'infix',
-                'funcName':m.group(),
-                'funcStart':m.start(),
-                'funcEnd':m.end(),
-                'args':[]
-            }
+            """
+                        storeTemplate = {
+                            'nodeId':self.getNodeId(),
+                            'funcType':'infix',
+                            'funcName':m.group(),
+                            'funcStart':m.start(),
+                            'funcEnd':m.end(),
+                            'args':[]
+                        }
 
-{
-        'nodeId':self.getNodeId(),
-                'argIdx':inputTemplate['argIdx'],
-                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                'openBraPos':nextCharPos, 
-                'closeBra':closeBraType,
-                'closeBraPos': closeBraPos
-            }
-"""
+            {
+                    'nodeId':self.getNodeId(),
+                            'argIdx':inputTemplate['argIdx'],
+                            'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                            'openBraPos':nextCharPos, 
+                            'closeBra':closeBraType,
+                            'closeBraPos': closeBraPos
+                        }
+            """
             #is there closeBra left of infixSym?
             closeBraType = ')'
             closeBraPos = storeTemplate['funcStart'] - len(closeBraType)
@@ -1104,8 +1104,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         def addImplictMultiply(funcPos, arg0NodeId, arg1NodeId, arg0WidthStart, arg1WidthEnd, arg0FuncName, arg1FuncName):
 
-            implicitMultiply = 
-                {
+            implicitMultiply = {
                     'nodeId':self.getNodeId(),
                     'funcType':'infix_implicit',
                     'funcName':'*',
@@ -1134,7 +1133,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         }
                     ]
                 }
-            implicitMultiply = self.__updateTemplatesToWiderEnclosingBracketsAndRemove([implicitMultiply])[0]
+            implicitMultiply = self.__updateTemplatesToWiderEnclosingBracketsAndRemove([implicitMultiply])[0] # necessary for p|c later
             self.infixs_pos_type.append(implicitMultiply)
 
 
@@ -1222,7 +1221,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 arg['nodeId'] = nodeId# TODO is this INPLACE?????
                 arg['funcName'] = funcName# TODO is this INPLACE?????
         #the self.infixs_pos_type have fixed width. so no need to update the width in the loop. we can bulk update after
-        self.backslash_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.backslash_pos_type)
+        # self.backslash_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.backslash_pos_type) # already done in _find_infixes_backslashes_backslashvars_width
 
         for template in sorted(self.infixs_pos_type, key=lambda infix: Latexparser.INFIX.index(infix)): # should be processed in PRIORITY, no matter where they are. BODMAS
             if arg['nodeId'] is None: #This is criterion for a SLOT
@@ -1314,6 +1313,20 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         pass
 
 
+    def _parse(self):
+        #TODO Pool multiprocessing with method priorities (Chodai!) -- dependency ha chain desu yo, sou shitara, motto hayaku arimasu ka?
+        return self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId
+
+#####################################################
+
+    def _unparse(self): # TODO from AST to LaTeX string... 
+        return self._recursiveUnparse(self.equalTuple)
+
+
+    def _recursiveUnparse(self, keyTuple):
+        pass
+
+
 class BracketStorage:
     """
     
@@ -1334,11 +1347,8 @@ class BracketStorage:
 
 
     closeBraType__sortedPosList = {}
-    #closeBraPos__openBraPos = {}
     openBraType__sortedPosList = {}
-    #openBraPos__closeBraPos = {}
     id__tuple_openPos_openBraType_closePos_closeBraType = {}
-    # braType__list_tuple_width_id = {}
     list_tuple_width_id_openPos_closePos = []
     openBraPos__bracketId = {}
     closeBraPos__bracketId = {}
@@ -1368,74 +1378,80 @@ class BracketStorage:
         """
         bracketId = self._getBracketId()
 
-        if openBraType not in openBraType__sortedPosList:
-            openBraType__sortedPosList[openBraType] = []
+        if openBraType not in self.openBraType__sortedPosList:
+            self.openBraType__sortedPosList[openBraType] = []
 
-        if closeBraType not in closeBraType__sortedPosList:
-            closeBraType__sortedPosList[closeBraType] = []
+        if closeBraType not in self.closeBraType__sortedPosList:
+            self.closeBraType__sortedPosList[closeBraType] = []
 
         #binary search to find position to add
         insertPos = BinarySearch.binarySearchPre(
-            list_tuple_width_id_openPos_closePos,
-            (closeBraPos - openBraPos, bracketId, openPos, closePos),
-            key=lambda tuple_width_id: tuple_width_id[0] # sort by width ascending
+            self.list_tuple_width_id_openPos_closePos,
+            #(closeBraPos - openBraPos, bracketId, openBraPos, closeBraPos),
+            closeBraPos - openBraPos,
+            key=lambda tuple_width_id: tuple_width_id[0] # sort by width ascending, getWidestEnclosingBra might depend on this
         )
-        list_tuple_width_id_openPos_closePos.insert(insertPos, (closeBraPos - openBraPos, bracketId, openPos, closePos))
+        self.list_tuple_width_id_openPos_closePos.insert(insertPos, (closeBraPos - openBraPos, bracketId, openBraPos, closeBraPos))
 
-        insertPos = BinarySearch.binarySearchPre(openBraType__sortedPosList[openBraType], openBraPos)
-        openBraType__sortedPosList[openBraType].insert(insertPos, openBraPos)
+        insertPos = BinarySearch.binarySearchPre(self.openBraType__sortedPosList[openBraType], openBraPos)
+        self.openBraType__sortedPosList[openBraType].insert(insertPos, openBraPos)
 
-        insertPos = BinarySearch.binarySearchPre(closeBraType__sortedPosList[closeBraType], closeBraType)
-        closeBraType__sortedPosList[closeBraType].insert(insertPos, closeBraPos)
+        insertPos = BinarySearch.binarySearchPre(self.closeBraType__sortedPosList[closeBraType], closeBraPos)
+        self.closeBraType__sortedPosList[closeBraType].insert(insertPos, closeBraPos)
 
-        id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
-        openBraPos__bracketId[openBraPos] = bracketId
-        closeBraPos__bracketId[closeBraPos] = bracketId
+        self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
+        self.openBraPos__bracketId[openBraPos] = bracketId
+        self.closeBraPos__bracketId[closeBraPos] = bracketId
         return bracketId
 
         
     def removeBracket(self, openBraPos):
         """
         """
-        bracketId = openBraPos__bracketId[openBraPos]
-        openBraPos, openBraType, closeBraPos, closeBraType = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
-        del id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        bracketId = self.openBraPos__bracketId[openBraPos]
+        openBraPos, openBraType, closeBraPos, closeBraType = self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        del self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
 
-        deletePos = BinarySearch.binarySearchPre(openBraType__sortedPosList[openBraType], openBraPos)
-        del openBraType__sortedPosList[deletePos]
+        deletePos = BinarySearch.binarySearchPre(self.openBraType__sortedPosList[openBraType], openBraPos)
+        del self.openBraType__sortedPosList[openBraType][deletePos]
+        if len(self.openBraType__sortedPosList[openBraType]) == 0:
+            del self.openBraType__sortedPosList[openBraType]
 
-        deletePos = BinarySearch.binarySearchPre(closeBraType__sortedPosList[closeBraType], closeBraPos)
-        del closeBraType__sortedPosList[deletePos]
+        deletePos = BinarySearch.binarySearchPre(self.closeBraType__sortedPosList[closeBraType], closeBraPos)
+        del self.closeBraType__sortedPosList[closeBraType][deletePos]
+        if len(self.closeBraType__sortedPosList[closeBraType]) == 0:
+            del self.closeBraType__sortedPosList[closeBraType]
 
         deletePos = BinarySearch.binarySearchPre(
-            list_tuple_width_id_openPos_closePos,
-            (closeBraPos - openBraPos, bracketId, openPos, closePos),
-            key=lambda tuple_width_id: tuple_width_id[0] # sort by width ascending
+            self.list_tuple_width_id_openPos_closePos,
+            #(closeBraPos - openBraPos, bracketId, openBraPos, closeBraPos),
+            closeBraPos - openBraPos,
+            key=lambda tuple_width_id: tuple_width_id[0] # get width, getWidestEnclosingBra might depend on this
         )
-        del list_tuple_width_id_openPos_closePos[deletePos]
+        del self.list_tuple_width_id_openPos_closePos[deletePos]
 
-        del openBraPos__bracketId[openBraPos]
-        del closeBraPos__bracketId[closeBraPos]
+        del self.openBraPos__bracketId[openBraPos]
+        del self.closeBraPos__bracketId[closeBraPos]
 
     def updateBracket(self, bracketId, openBraType, openBraPos, closeBraType, closeBraPos):
-        oOpenPos, oOpenBraType, oClosePos, oCloseBraType = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
-        del id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
-        id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
+        oOpenBraPos, oOpenBraType, oCloseBraPos, oCloseBraType = self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        del self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId] = (openBraPos, openBraType, closeBraPos, closeBraType)
 
-        replaceIdx = closeBraType__sortedPosList[oCloseBraType].index(oCloseBraPos)
-        closeBraType__sortedPosList[oCloseBraType][replaceIdx] = closeBraPos
+        replaceIdx = self.closeBraType__sortedPosList[oCloseBraType].index(oCloseBraPos)
+        self.closeBraType__sortedPosList[oCloseBraType][replaceIdx] = closeBraPos
 
-        replaceIdx = openBraType__sortedPosList[oOpenBraType].index(oOpenBraPos)
-        openBraType__sortedPosList[oOpenBraType][replaceIdx] = openBraPos
+        replaceIdx = self.openBraType__sortedPosList[oOpenBraType].index(oOpenBraPos)
+        self.openBraType__sortedPosList[oOpenBraType][replaceIdx] = openBraPos
 
-        replaceIdx = list_tuple_width_id_openPos_closePos.index((oClosePos-oOpenPos, bracketId, oOpenPos, oClosePos))
-        list_tuple_width_id_openPos_closePos[replaceIdx] = (closeBraPos-openBraPos, bracketId, openBraPos, closeBraPos)
+        replaceIdx = self.list_tuple_width_id_openPos_closePos.index((oCloseBraPos-oOpenBraPos, bracketId, oOpenBraPos, oCloseBraPos))
+        self.list_tuple_width_id_openPos_closePos[replaceIdx] = (closeBraPos-openBraPos, bracketId, openBraPos, closeBraPos)
 
-        del openBraPos__bracketId[oOpenPos]
-        openBraPos__bracketId[openBraPos] = bracketId
+        del self.openBraPos__bracketId[oOpenBraPos]
+        self.openBraPos__bracketId[openBraPos] = bracketId
 
-        del closeBraPos__bracketId[oClosePos]
-        closeBraPos__bracketId[closeBraPos] = bracketId
+        del self.closeBraPos__bracketId[oCloseBraPos]
+        self.closeBraPos__bracketId[closeBraPos] = bracketId
 
     
     def getBraPosImmediateRightOfPos(self, pos, typeOfBracket, open):
@@ -1447,17 +1463,20 @@ class BracketStorage:
         """
         #get the right dict
         if open:
-            theDict__sortedPosList = openBraType__sortedPosList
-            typeOfBracket = typeOfBracket[0] # the open version of typeOfBracket
+            theDict__sortedPosList = self.openBraType__sortedPosList
+            typeOfBracket = typeOfBracket.value[0] # the open version of typeOfBracket
         else:
-            theDict__sortedPosList = closeBraType__sortedPosList
-            typeOfBracket = typeOfBracket[1] # the close version of typeOfBracket
+            theDict__sortedPosList = self.closeBraType__sortedPosList
+            typeOfBracket = typeOfBracket.value[1] # the close version of typeOfBracket
 
         immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
-        return theDict__sortedPosList[typeOfBracket][immediateRightIdx]
+        braPos = float('inf') # for getAllEnclosingBraOfPos, if there is no such thing
+        if 0 <= immediateRightIdx and immediateRightIdx < len(theDict__sortedPosList[typeOfBracket]):
+            braPos = theDict__sortedPosList[typeOfBracket][immediateRightIdx]
+        return braPos
     
-    def getBraPosImmediateLeftOfPos(self, pos, typeOfBracket, open):;
+    def getBraPosImmediateLeftOfPos(self, pos, typeOfBracket, open):
         """
 
         open==True, means we are looking for openbracket, else we are looking for closebracket
@@ -1467,17 +1486,20 @@ class BracketStorage:
         """
         #get the right dict
         if open:
-            theDict__sortedPosList = openBraType__sortedPosList
-            typeOfBracket = typeOfBracket[0] # the open version of typeOfBracket
+            theDict__sortedPosList = self.openBraType__sortedPosList
+            typeOfBracket = typeOfBracket.value[0] # the open version of typeOfBracket
         else:
-            theDict__sortedPosList = closeBraType__sortedPosList
-            typeOfBracket = typeOfBracket[1] # the close version of typeOfBracket
+            theDict__sortedPosList = self.closeBraType__sortedPosList
+            typeOfBracket = typeOfBracket.value[1] # the close version of typeOfBracket
 
         immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
         
-        return theDict__sortedPosList[typeOfBracket][immediateRightIdx - 1] # 
+        braPos = float('-inf') # for getAllEnclosingBraOfPos, if there is no such thing
+        if 0 <= immediateRightIdx - 1 and immediateRightIdx - 1 < len(theDict__sortedPosList[typeOfBracket]):
+            braPos = theDict__sortedPosList[typeOfBracket][immediateRightIdx - 1]
+        return braPos
 
-    def exists(self, bracketPos, typeofBracket, open):
+    def exists(self, bracketPos, typeOfBracket, open):
         """
         check if a bracket of type typeOfBracket, exists at position in equationStr, bracketPos
 
@@ -1487,29 +1509,29 @@ class BracketStorage:
         # TODO can use this BinarySearch.binarySearchIdx(theDict__sortedPosList[typeOfBracket], pos)
         #get the right dict
         if open:
-            theDict__sortedPosList = openBraType__sortedPosList
-            typeOfBracket = typeOfBracket[0] # the open version of typeOfBracket
+            theDict__sortedPosList = self.openBraType__sortedPosList
+            typeOfBracket = typeOfBracket.value[0] # the open version of typeOfBracket
         else:
-            theDict__sortedPosList = closeBraType__sortedPosList
-            typeOfBracket = typeOfBracket[1] # the close version of typeOfBracket
+            theDict__sortedPosList = self.closeBraType__sortedPosList
+            typeOfBracket = typeOfBracket.value[1] # the close version of typeOfBracket
 
-        return pos in theDict__sortedPosList[typeOfBracket]
+        return bracketPos in theDict__sortedPosList[typeOfBracket]
 
     def getCorrespondingCloseBraPos(self, openBraPos):
-        bracketId = openBraPos__bracketId[openBraPos]
-        (_, _, closePos, closeBraType) = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        bracketId = self.openBraPos__bracketId[openBraPos]
+        (_, _, closePos, closeBraType) = self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
         return closePos, closeBraType
 
     def getCorrespondingOpenBraPos(self, closeBraPos):
-        bracketId = closeBraPos__bracketId[closeBraPos]
-        (openPos, openBraType) = id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+        bracketId = self.closeBraPos__bracketId[closeBraPos]
+        (openPos, openBraType, _, _) = self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
         return openPos, openBraType
 
-    def getAllBracket(self):
+    def getAllBracket(self):#TODO is this ever used? make a AST_dependency diagram... (good place to learn)
         """
         return all the bracket in tuple (openBraType, openBraPos, closeBraType, closeBraPos)
         """
-        return list(id__tuple_openPos_openBraType_closePos_closeBraType.values())
+        return list(self.id__tuple_openPos_openBraType_closePos_closeBraType.values())
     
     def getAllEnclosingBraOfPos(self, pos, typeOfBracket):
         """
@@ -1528,13 +1550,13 @@ class BracketStorage:
         :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
         :type typeOfBracket: BracketType Enum
         """
-        closest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False)
-        closest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True)
+        nearest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False) #no such thing...-inf
+        nearest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True) #no such thing...inf
         filt__list_tuple_width_id_openPos_closePos = filter(
             lambda tuple_width_id_openPos_closePos: 
-                closest_close_left_of_pos<tuple_width_id_openPos_closePos[3] and \
-                tuple_width_id_openPos_closePos[2]<closest_open_right_of_pos, 
-            list_tuple_width_id_openPos_closePos)
+                nearest_close_left_of_pos<tuple_width_id_openPos_closePos[3] and \
+                tuple_width_id_openPos_closePos[2]<nearest_open_right_of_pos, 
+            self.list_tuple_width_id_openPos_closePos)
         return filt__list_tuple_width_id_openPos_closePos
 
     def getAllEnclosingTouchingBraOfPos(self, pos, typeOfBracket):
@@ -1559,12 +1581,14 @@ class BracketStorage:
         for width, bracketId, openBraPos, closeBraPos in sorted(filt__list_tuple_width_id_openPos_closePos, key=lambda tup: tup[2]):#ascending by openBraPos
             if (prevOpenBraPos is None) or (openBraPos - 1 == prevOpenBraPos): # ensure openBraPos are consecutive
                 list_tuple_width_id_openPos_closePos__oC.append((width, bracketId, openBraPos, closeBraPos))
+                prevOpenBraPos = openBraPos
         list_tuple_width_id_openPos_closePos__oCcC = [] # cC~closeBraPos are Consecutive
         prevCloseBraPos = None
         for width, bracketId, openBraPos, closeBraPos in sorted(list_tuple_width_id_openPos_closePos__oC, key=lambda tup: tup[3]): #ascending by closeBraPos
             if (prevCloseBraPos is None) or (closeBraPos - 1 == prevCloseBraPos): # ensure closeBraPos are consecutive
                 list_tuple_width_id_openPos_closePos__oCcC.append((width, bracketId, openBraPos, closeBraPos))
-        return list_tuple_width_id_openPos_closePos_oCcC
+                prevCloseBraPos = closeBraPos
+        return list_tuple_width_id_openPos_closePos__oCcC
 
 
     def getTightestEnclosingPos(self, pos, typeOfBracket): #TODO is this ever used? make a AST_dependency diagram... (good place to learn)
@@ -1579,7 +1603,7 @@ class BracketStorage:
         filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)
         if len(filt__list_tuple_width_id_openPos_closePos) > 0:
             minWidth, selectedOpenPos, selectedClosePos = float('inf'), None, None
-            for width, bracketId, openPos, closePos in list_tuple_width_id_openPos_closePos:
+            for width, bracketId, openPos, closePos in self.list_tuple_width_id_openPos_closePos:
                 if width < minWidth:
                     minWidth, selectedOpenPos, selectedClosePos = width, openPos, closePos
             return selectedOpenPos, selectedClosePos
@@ -1592,10 +1616,10 @@ class BracketStorage:
         :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
         :type typeOfBracket: BracketType Enum
         """
-        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)
-        if len(filt__list_tuple_width_id_openPos_closePos) > 0:
+        list_tuple_width_id_openPos_closePos = list(self.getAllEnclosingBraOfPos(pos, typeOfBracket))#NOTE this is not consecutive
+        if len(list_tuple_width_id_openPos_closePos) > 0:
             maxWidth, selectedOpenPos, selectedClosePos, selectedBracketId = float('-inf'), None, None, None
-            for width, bracketId, openPos, closePos in list_tuple_width_id_openPos_closePos:
+            for width, bracketId, openPos, closePos in self.list_tuple_width_id_openPos_closePos:
                 if width > maxWidth:
                     maxWidth, selectedOpenPos, selectedClosePos, selectedBracketId = width, openPos, closePos, bracketId
             return selectedOpenPos, selectedClosePos, selectedBracketId
