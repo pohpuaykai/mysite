@@ -141,7 +141,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     recursively, call this function on each cell in matrix
     """
     #\cdot is vector dot product  #\times is vector cross product
-    BACKSLASH_INFIX = ['\\times', '\\cdot','\\%','\\to']#vectors op prioritised over backslash
+    BACKSLASH_INFIX = ['\\to', '\\times', '\\cdot','\\%']#vectors op prioritised over backslash
     PRIOIRITIZED_INFIX = [ '^', '/','//', '*', '-', '+']#['^', '/', '*', '-', '+'] 
     INFIX = ['=']+BACKSLASH_INFIX+PRIOIRITIZED_INFIX #the smaller the number the higher the priority
     OPEN_BRACKETS = ['{', '[', '(']
@@ -185,7 +185,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         ]
     }#argId is for ASTree building
     
-    def _getExpectedBackslashInputs(funcName):
+    def _getExpectedBackslashInputs(self, funcName):
         """
         
         preSym is the prefix for the input. 
@@ -195,27 +195,27 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         braOptional is if the openBra and closeBra are optional. (TODO convert to enum? ENUM) 
         
         """
-        if funcName in TRIGOFUNCTION: 
+        if funcName in self.TRIGOFUNCTION: 
             #input_type: ^{}()
-            return BACKSLASH_EXPECTED_INPUTS['^{}()']
+            return self.BACKSLASH_EXPECTED_INPUTS['^{}()']
         if funcName in ['ln', 'det']:  #det is determinant
             #input_type: ()
-            return BACKSLASH_EXPECTED_INPUTS['()']
+            return self.BACKSLASH_EXPECTED_INPUTS['()']
         if funcName in ['log', 'lim']:
             #input_type: _{}()
-            return BACKSLASH_EXPECTED_INPUTS['_{}()']
+            return self.BACKSLASH_EXPECTED_INPUTS['_{}()']
         if funcName in ['frac']:
             #input_type: {}{}
-            return BACKSLASH_EXPECTED_INPUTS['{}{}']
+            return self.BACKSLASH_EXPECTED_INPUTS['{}{}']
         if funcName in ['sqrt']:
             #input_type: []{}
-            return BACKSLASH_EXPECTED_INPUTS['[]{}']
+            return self.BACKSLASH_EXPECTED_INPUTS['[]{}']
         if funcName in ['sum', 'prod', 'partial', 'nabla', 'Delta', 'int', 'iint', 'iiint', 'oint', 'oiint']:
             #input_type: _{}^{}{}
-            return BACKSLASH_EXPECTED_INPUTS['_{}^{}{}']
-        if funcName in VARIABLENAMESTAKEANARG:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{}^{}{}']
+        if funcName in self.VARIABLENAMESTAKEANARG:
             #input_type: {}
-            return BACKSLASH_EXPECTED_INPUTS['{}']
+            return self.BACKSLASH_EXPECTED_INPUTS['{}']
     #TODO move this up to BACKSLASH_EXPECTED_INPUTS ??
     VARIABLENAMESTAKEANARG = ['overline', 'underline', 'widehat', 'widetilde', 'overrightarrow', 'overleftarrow', 'overbrace', 'underbrace'
     #Math mode accents
@@ -270,25 +270,36 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.matrices_pos_type = []
         import re
         matrixStartTags = list(map(lambda m: 
-            (m.start(), m.end(), m.group()), 
-            re.finditer(r"\\begin\{\wmatrix\}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
+            (m.start(), m.end(), m.group(1)), 
+            re.finditer(r"\\begin\{(\wmatrix)\}", self.equationStr))) # the help page guarantees sorted, left-to-right, might be better to sort
+        
+        default = BracketType.ROUND # FAKE TODO rename BracketStorage to more general
+        defaultOpen = default.value[0] #FAKE TODO rename BracketStorage to more general
+        defaultClose = default.value[1] #FAKE TODO rename BracketStorage to more general
+        mbbracketstorage = BracketStorage()
+        for start, end, group in matrixStartTags:
+            mbbracketstorage.insertBracket(defaultOpen, start, defaultClose, end)
+
         matrixEndTags = list(map(lambda m: 
-            (m.start(), m.end(), m.group()), 
-            re.finditer(r"\\end\{\wmatrix\}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
-        #self.matrices_pos_type = list(zip(matrixStartTags, reversed(matrixEndTags)))
-        for (startTagStartPos, startTagEndPos, startTag), (endTagStartPos, endTagEndPos, endTag) in zip(matrixStartTags, reversed(matrixEndTags)):
+            (m.start(), m.end(), m.group(1)), 
+            re.finditer(r"\\end\{(\wmatrix)\}", self.equationStr))) # the help page guarantees sorted, left-to-right, might be better to sort
+        
+        for start, end, group in matrixEndTags:
+            startTagClosePos = mbbracketstorage.getBraPosImmediateLeftOfPos(start, default, False)
+            startTagOpenPos, _ = mbbracketstorage.getCorrespondingOpenBraPos(startTagClosePos)
             self.matrices_pos_type.append(
                     {
                         'nodeId':self.getNodeId(),
                         'funcType':'matrix',
-                        'funcName':startTag,
-                        'funcStart':startTagStartPos,
-                        'funcEnd':endTagEndPos,
-                        'widthStart':startTagStartPos,
-                        'widthEnd':endTagEndPos,
+                        'funcName':group,
+                        'funcStart':startTagOpenPos,
+                        'funcEnd':end,
+                        'widthStart':startTagOpenPos,
+                        'widthEnd':end,
                                 'args':[]
                     }
             )
+
         """
         <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<also change the unit test
         """
@@ -305,9 +316,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         Add new newTag = (openTagPos, closeTagPos)
         if len(list_openTagPos) == 0:
             add to both list_openTagPos and list_closeTagPos
-        else:
-            closeInOpenIdx = BS closeTagPos in list_openTagPos
-            openInCloseIdx = BS openTagPos in list_closeTagPos
+        
+        closeInOpenIdx = BS closeTagPos in list_openTagPos
+        openInCloseIdx = BS openTagPos in list_closeTagPos
 
         ***all i in list_openTagPos, i<closeInOpenIdx will be merged with newTag at_this_point
         ***all i in list_closeTagPos, openInCloseIdx<i will be merged with newTag at_this_point
@@ -353,20 +364,34 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos = [], [], {}, {}
         if len(self.matrices_pos_type) > 0:
-            # for (_, startTagEndPos, _), (endTagStartPos, _, _) in self.matrices_pos_type: #should have been startTagStartPos and endTagEndPos
             for template in self.matrices_pos_type:
-                startTagStartPos, endTagEndPos = self.matrices_pos_type['widthStart'], self.matrices_pos_type['widthEnd']
-                insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagStartPos)
-                list_openTagPos.insert(insertIdx, startTagStartPos)
+                openTagPos, closeTagPos = template['widthStart'], template['widthEnd']
+                openTagPos__closeTagPos[openTagPos] = closeTagPos
+                closeTagPos__openTagPos[closeTagPos] = openTagPos
 
-                insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagEndPos)
-                list_closeTagPos.insert(insertIdx, endTagEndPos)
+            for template in self.matrices_pos_type:
+                openTagPos, closeTagPos = template['widthStart'], template['widthEnd']
+                insertIdx = BinarySearch.binarySearchPre(list_openTagPos, openTagPos)
+                list_openTagPos.insert(insertIdx, openTagPos)
 
-                openTag_closeTagPos[startTagStartPos] = endTagEndPos
-                closeTag_openTagPos[endTagEndPos] = startTagStartPos
+                insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, closeTagPos)
+                list_closeTagPos.insert(insertIdx, closeTagPos)
 
-                set__openTagPos = set(filter(lambda i: i<closeInOpenIdx, list_openTagPos))
-                set__closeTagPos = set(filter(lambda i: openInCloseIdx<i, list_closeTagPos))
+
+                closeInOpenIdx = BinarySearch.binarySearchPre(list_openTagPos, closeTagPos)
+                openInCloseIdx = BinarySearch.binarySearchPre(list_closeTagPos, openTagPos)
+                
+                closeInOpenPos = float('-inf') # means nothing is intersecting with closeTagPos
+                if 0<= closeInOpenIdx and closeInOpenIdx < len(list_openTagPos):
+                    closeInOpenPos = list_openTagPos[closeInOpenIdx]
+
+                openInClosePos = float('inf') # means nothing is intersecting with openTagPos
+                if 0<= openInCloseIdx and openInCloseIdx < len(list_closeTagPos):
+                    openInClosePos = list_closeTagPos[openInCloseIdx]
+
+
+                set__openTagPos = set(filter(lambda pos: pos<closeInOpenPos, list_openTagPos)) #if empty, means nothing in list_openTagPos intersect with closeBra of template
+                set__closeTagPos = set(filter(lambda pos: openInClosePos<pos, list_closeTagPos)) #if empty, means nothing in list_closeTagPos intersect with openBra of template
 
                 #convert openTagPos to close, and then do intersection, and then 
                 set__openEmbedded = set(map(lambda i: closeTagPos__openTagPos[i], set__closeTagPos)).intersection(set__openTagPos)  #[2]
@@ -390,13 +415,15 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                     #BSADD openTagPos to list_openTagPos
                     #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                    insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagStartPos)
-                    list_openTagPos.insert(insertIdx, startTagStartPos)
+                    #<<<<<<<<<<<<<<<<<<<<remove the EATEN tag from list_openTagPos
+                    insertIdx = BinarySearch.binarySearchPre(list_openTagPos, openTagPos)
+                    list_openTagPos.insert(insertIdx, openTagPos)
 
                     #BSADD closeTagPos to list_closeTagPos
                     #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                    insertIdx = BinarySearch.binarySearchApp(list_closeTagPos, endTagEndPos)
-                    list_closeTagPos.insert(insertIdx, endTagEndPos)
+                    #<<<<<<<<<<<<<<<<<<<<remove the EATEN tag from list_closeTagPos
+                    insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, closeTagPos)
+                    list_closeTagPos.insert(insertIdx, closeTagPos)
 
                     #ADD (openTagPos, closeTagPos) to openTagPos__closeTagPos
                     openTagPos__closeTagPos[openTagPos] = closeTagPos
@@ -423,8 +450,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                             del openTagPos__closeTagPos[i]
                     if not added:
                         #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                        insertIdx = BinarySearch.binarySearchApp(list_openTagPos, startTagStartPos)
-                        list_openTagPos.insert(insertIdx, startTagStartPos)
+                        insertIdx = BinarySearch.binarySearchPre(list_openTagPos, openTagPos)
+                        list_openTagPos.insert(insertIdx, openTagPos)
 
                         added = True
 
@@ -444,43 +471,32 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                             del closeTagPos__openTagPos[i]
                     if not added:
                         #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-                        insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, endTagEndPos)
-                        list_closeTagPos.insert(insertIdx, endTagEndPos)
+                        insertIdx = BinarySearch.binarySearchPre(list_closeTagPos, closeTagPos)
+                        list_closeTagPos.insert(insertIdx, closeTagPos)
 
                         added = True
 
 
-                self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos = \
-                list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos
+                # self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos = \
+                # list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos
 
         #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
         #collate all non-overlaping intervals, to removed for leftover-finding
-        
+        #put it all in a new bracketStorage
+        self.mabracketstorageDefault = BracketType.ROUND
+        self.mabracketstorageDefaultOpen = self.mabracketstorageDefault.value[0]
+        self.mabracketstorageDefaultClose = self.mabracketstorageDefault.value[1]
+        self.mabracketstorage = BracketStorage()
+        for openTagPos, closeTagPos in openTagPos__closeTagPos.items():
+            self.mabracketstorage.insertBracket(self.mabracketstorageDefaultOpen, openTagPos, self.mabracketstorageDefaultClose, closeTagPos)
+
+
     def __isPosInMatrixTag(self, pos):
 
         """
-        copied from bracketstorage: getTightestEnclosingPos
-
-        Find 
-        closest_close_left_of_pos :
-        closest_open_right_of_pos :
-         in id__tuple_openPos_openBraType_closePos_closeBraType
-         remove all tuple__closePos<=closest_close_left_of_pos
-         remove all tuple__openPos>=closest_open_right_of_pos
-        if empty, there is no enclosing brackets for pos
+        if there is matrix_tag enclosing pos, then pos is in a matrix_tag
         """
-        #TODO replace with BinarySearch.binarySearchIdx(l, findMe, approximate=True)
-        nearest_close_left_of_pos = BinarySearch.binarySearchPre(self.list_closeMatrixTagPos, pos) # always gives right_of_pos
-
-        nearest_open_right_of_pos = BinarySearch.binarySearchPre(self.list_openMatrixTagPos, pos) - 1
-
-        filt__list_tuple_openPos_closePos = filter(lambda tup: nearest_close_left_of_pos<tup[1] and tup[0]<nearest_open_right_of_pos, self.openMatrixTagPos__closeMatrixTagPos.items())
-        
-        if len(filt__list_tuple_openPos_closePos) > 0:
-            for openPos, closePos in filt__list_tuple_openPos_closePos:
-                if openPos <= pos and pos <= closePos:
-                    return True
-        return False
+        return len(list(self.mabracketstorage.getAllEnclosingBraOfPos(pos, self.mabracketstorageDefault))) > 0
 
 
     def _find_infix(self):
@@ -494,7 +510,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         import re
         self.infixs_pos_type = []
         for infix in self.INFIX:
-            infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"{infix}", self.equationStr)))
+            infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"{re.escape(infix)}", self.equationStr)))
             
             for start, end, group in infix_pos_type_list:
                 self.infixs_pos_type.append(
@@ -599,24 +615,25 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.number_pos_type = [] #symbolic number like \\pi, i
         for m in re.finditer(r"\\([a-zA-z]+)", self.equationStr):
             foundType = 'backslash_function'
+            funcStart, funcEnd, funcName = m.start(), m.end(), m.group(1)
             storeTemplate = {
                 'nodeId':self.getNodeId(),
                 'funcType':foundType,
-                'funcName':m.group(),
-                'funcStart':m.start(),
-                'funcEnd':m.end(),
-                'widthStart':m.start(),
-                'widthEnd': m.end(),
+                'funcName':funcName,
+                'funcStart':funcStart,
+                'funcEnd':funcEnd,
+                'widthStart':funcStart,
+                'widthEnd': funcEnd,
                 'args':[]
             }
-            self.backslashNames.append((m.start(), m.end(), m.group()))
-            if m.group() in BACKSLASH_INFIX: # remove the backslash_infix from backslash
+            self.backslashNames.append((funcStart, funcEnd, funcName))
+            if funcName in self.BACKSLASH_INFIX: # remove the backslash_infix from backslash
                 continue
-            if m.group() in VARIABLENAMESTAKEANARG: # variable_function is actually a variable
+            if funcName in self.VARIABLENAMESTAKEANARG: # variable_function is actually a variable
                 foundType = 'backslash_variable'
                 storeTemplate['funcType'] = foundType
-            inputTemplates = _getExpectedBackslashInputs(m.group())
-            if inputTemplates is None: # number that starts with backslash. like \\pi
+            list_template = self._getExpectedBackslashInputs(funcName)
+            if list_template is None: # number that starts with backslash. like \\pi
                 foundType = 'backslash_number'
                 storeTemplate['funcType'] = foundType
                 self.number_pos_type.append(storeTemplate)
@@ -670,55 +687,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 raise Exception('Unhandled') #here is !gotArg
             return gotArg, nextCharPos, nextChar
             """
-            compulsoryStack, optionalList = [], []
-            for templatList in inputTemplates:
-                for template in templateList:
-                    if template['optional']:
-                        optionalList.append(template)
-                    else:
-                        compulsoryStack.append(template)
-            nextCharPos = m.end()+len(template['preSym'])
-            nextChar = template['openBra']
-            while len(compulsoryStack) > 0:
-                template = compulsoryStack.pop()
-                if nextChar == template['preSym']:
-                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(m, template, nextChar, nextCharPos)
-                else:
-                    eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, template, nextCharPos, nextChar)
-                storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-                storeTemplate['args'].append({
-                    'nodeId':None, # this means that its just a slot, and not precisely filled yet
-                    'funcName':None, # this means that its just a slot, and not precisely filled yet
-                    'argIdx':inputTemplate['argIdx'],
-                    'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                    'openBraPos':nextCharPos, 
-                    'closeBra':closeBraType,
-                    'closeBraPos': closeBraPos
-                })
 
-            eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(optionalList, nextCharPos, nextChar)
-            storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-            storeTemplate['args'].append({
-                'nodeId':None, # this means that its just a slot, and not precisely filled yet
-                'funcName':None,  # this means that its just a slot, and not precisely filled yet
-                'argIdx':inputTemplate['argIdx'],
-                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                'openBraPos':nextCharPos, 
-                'closeBra':closeBraType,
-                'closeBraPos': closeBraPos
-            })
-            if foundType == 'backslash_function':
-                self.backslash_pos_type.append(storeTemplate)
-            elif foundType == 'backslash_variable':
-                self.variables_pos_type.append(storeTemplate)
-            def processOptionalList(eOptionalList, template, nextChar, nextCharPos):
-                for template in eOptionalList:
-                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(m, template, nextChar, nextCharPos)
-                    if gotArg:
-                        eOptionalList.remove(template)
-                        break
-                return eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
-            def findBracketGetArgStore(m, template, nextChar, nextCharPos):
+
+            def findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos):
                 closeBraPos, closeBraType = None, None
                 if nextChar == template['openBra']: # found bracket
                     #get corresponding closePos
@@ -735,7 +706,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
 
                         """
-                        self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
+                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))
                 elif template['braOptional'] == 'False': # no bracket but not neccessary
                     #log
                     gotArg = False #raise Exception #here is !gotArg
@@ -745,13 +716,64 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     nextCharPos += 1
                     self.bracketstorage.removeBracket(openBraPos)
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
-                        self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
+                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
                     if foundType in ['backslash_function', 'backslash_variable']:
                         raise Exception()
                 return gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
+
+
+            def processOptionalList(funcStart, funcEnd, funcName, eOptionalList, template, nextChar, nextCharPos):
+                gotArg, closeBraPos, closeBraType = False, float('inf'), None#if eOptionalList is empty
+                for template in eOptionalList:
+                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
+                    if gotArg:
+                        eOptionalList.remove(template)
+                        break
+                return eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
+
+            compulsoryStack, optionalList = [], []
+            for template in list_template:
+                if template['optional']:
+                    optionalList.append(template)
+                else:
+                    compulsoryStack.append(template)
+            nextCharPos = m.end()+len(template['preSym'])
+            nextChar = template['openBra']
+            while len(compulsoryStack) > 0:
+                template = compulsoryStack.pop()
+                if nextChar == template['preSym']:
+                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
+                else:
+                    eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
+                storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+                storeTemplate['args'].append({
+                    'nodeId':None, # this means that its just a slot, and not precisely filled yet
+                    'funcName':None, # this means that its just a slot, and not precisely filled yet
+                    'argIdx':template['argId'],
+                    'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                    'openBraPos':nextCharPos, 
+                    'closeBra':closeBraType,
+                    'closeBraPos': closeBraPos
+                })
+
+            eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
+            storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+            storeTemplate['args'].append({
+                'nodeId':None, # this means that its just a slot, and not precisely filled yet
+                'funcName':None,  # this means that its just a slot, and not precisely filled yet
+                'argIdx':template['argId'],
+                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                'openBraPos':nextCharPos, 
+                'closeBra':closeBraType,
+                'closeBraPos': closeBraPos
+            })
+            if foundType == 'backslash_function':
+                self.backslash_pos_type.append(storeTemplate)
+            elif foundType == 'backslash_variable':
+                self.variables_pos_type.append(storeTemplate)
 
 
         
@@ -781,7 +803,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #collate infix|backslash|matrices pos {infix_brackets are not removed, will be a problem if infix_brackets are curly}
         #backslash_brackets ONLY
         #matrices pos THE WHOLE MATRIX, not just the tags
-        #self.list_openMatrixTagPos, self.list_closeMatrixTagPos, self.openMatrixTagPos__closeMatrixTagPos, self.closeMatrixTagPos__openMatrixTagPos
         #self.infixs_pos_type : [(startpos, endpos, group)], the symbol only
         # self.variables_pos_type = None # might already have backslashVar inside.
         self.number_pos_type = [] #decimal numbers like 123, 23.2, -3.4
