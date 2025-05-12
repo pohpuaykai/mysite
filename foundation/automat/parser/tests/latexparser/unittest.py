@@ -751,24 +751,38 @@ def test__find_infix0(verbose=False): #TODO infix test for \\to;\\cross;\\cdot
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', parser.infixs_pos_type == expected_infixs_pos_type)
     if verbose:
         print(parser.infixs_pos_type)
-        
+
+def test__find_brackets(verbose=False):
+    #Fourier transform
+    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2} f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}"
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._remove_all_spacing()
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    expected = None
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
+    if verbose:
+        print()
 
 def test__find_backslash0(verbose=False):
     #Fourier transform
     equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2} f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}"
     parser = Latexparser(equationStr, verbose=verbose)
     parser._remove_all_spacing()
-    #parser._find_matrices()
-    #parser._find_infix()
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
     parser._find_backslash()
     expected = None
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print(parser.backslash_pos_type)
-        print(parser.variables_pos_type)
-        print(parser.number_pos_type)
+        print('backslash_pos_type', parser.backslash_pos_type)
+        print('variables_pos_type', parser.variables_pos_type)
+        print('number_pos_type', parser.number_pos_type)
         
 
 def test__find_variables_or_numbers0(verbose=False):
@@ -847,7 +861,8 @@ if __name__=='__main__':
     # test__find_matrices0()
     # test___isPosInMatrixTag0()
     # test__find_infix0()
-    test__find_backslash0(True)
+    test__find_brackets(True)
+    # test__find_backslash0(True)
     #test__find_variables_or_numbers0(True)
     #test__find_implicit_00(True)
     #test__find_implicit_multiply0(True)

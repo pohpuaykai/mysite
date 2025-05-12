@@ -247,7 +247,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.backslashNames = None # this is for taking out occupied pos
         self.latexAST = None
     
-    def getNodeId(self):
+    def getNodeId(self):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
         """
         NodeId Dispenser
         """
@@ -273,6 +273,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             (m.start(), m.end(), m.group(1)), 
             re.finditer(r"\\begin\{(\wmatrix)\}", self.equationStr))) # the help page guarantees sorted, left-to-right, might be better to sort
         
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
         default = BracketType.ROUND # FAKE TODO rename BracketStorage to more general
         defaultOpen = default.value[0] #FAKE TODO rename BracketStorage to more general
         defaultClose = default.value[1] #FAKE TODO rename BracketStorage to more general
@@ -486,12 +487,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.mabracketstorageDefault = BracketType.ROUND
         self.mabracketstorageDefaultOpen = self.mabracketstorageDefault.value[0]
         self.mabracketstorageDefaultClose = self.mabracketstorageDefault.value[1]
-        self.mabracketstorage = BracketStorage()
+        self.mabracketstorage = BracketStorage()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
         for openTagPos, closeTagPos in openTagPos__closeTagPos.items():
             self.mabracketstorage.insertBracket(self.mabracketstorageDefaultOpen, openTagPos, self.mabracketstorageDefaultClose, closeTagPos)
 
 
-    def __isPosInMatrixTag(self, pos):
+    def __isPosInMatrixTag(self, pos):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
 
         """
         if there is matrix_tag enclosing pos, then pos is in a matrix_tag
@@ -613,9 +614,14 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.backslash_pos_type = []
         self.variables_pos_type = []
         self.number_pos_type = [] #symbolic number like \\pi, i
-        for m in re.finditer(r"\\([a-zA-z]+)", self.equationStr):
+        list_backslashReResult = list(map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\([a-zA-Z]+)", self.equationStr)))
+        for funcStart, funcEnd, funcName in list_backslashReResult:
             foundType = 'backslash_function'
-            funcStart, funcEnd, funcName = m.start(), m.end(), m.group(1)
+            # funcStart, funcEnd, funcName = m.start(), m.end(), m.group(1)
+            #
+            print('###', self.equationStr)
+            print(funcName, funcStart, funcEnd)
+            #
             storeTemplate = {
                 'nodeId':self.getNodeId(),
                 'funcType':foundType,
@@ -706,7 +712,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
 
                         """
-                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))
+                        #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient, ENTITIES STORAGE.
+                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
                 elif template['braOptional'] == 'False': # no bracket but not neccessary
                     #log
                     gotArg = False #raise Exception #here is !gotArg
@@ -716,7 +723,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     nextCharPos += 1
                     self.bracketstorage.removeBracket(openBraPos)
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
-                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))
+                        #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient
+                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
@@ -740,13 +748,18 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     optionalList.append(template)
                 else:
                     compulsoryStack.append(template)
-            nextCharPos = m.end()+len(template['preSym'])
-            nextChar = template['openBra']
+            nextCharPos = funcEnd#TODO if preSym is multiChar, then i am fucked
+            nextChar = self.equationStr[nextCharPos]#TODO if preSym is multiChar, then i am fucked
             while len(compulsoryStack) > 0:
                 template = compulsoryStack.pop()
-                if nextChar == template['preSym']:
+                ###
+                print(template)
+                print('nextChar', nextChar)
+                ###
+                if nextChar == template['preSym']: # matched the right nextChar with this COMPULSORYTemplate
                     gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
-                else:
+                else: # did not match the right nextChar with this COMPULSORYTemplate
+                    compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
                     eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
                 storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
                 storeTemplate['args'].append({
@@ -1088,7 +1101,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             self.number_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.number_pos_type)
             #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
 
-    def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE????
+    def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE???? #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
         for template in list_template:
             allEnclosingTouchingBra = self.bracketstorage.getAllEnclosingTouchingBraOfPos(template['funcStart'], BracketType.ROUND)
             if len(allEnclosingTouchingBra) > 0:
@@ -1217,9 +1230,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.cpbracketstorage.insert <<<<<<<<<<<<insert all alle the widthstart, widthend as brackets (FAKE brackets, we just need the query)
         self.cpbracketstorage.getWidestEnclosingBra <<<<<< for each SLOT, find the widest for the SLOT (TODO implemented) REMOVE getTightestEnclosingBra?[seems like its never used]
         """
+
         default = BracketType.ROUND # FAKE TODO rename bracketstorage to more general
         defaultOpen, defaultClose = default #FAKE TODO rename bracketstorage to more general
-        cpbracketstorage = BracketStorage()
+        cpbracketstorage = BracketStorage()#<<<<<<<<<<<<<<<<<<<<< we can change this to entitystorage.
         bracketId__tuple_nodeId_funcName = {}
         nodeId__bracketId = {}
         for template in self.alle:
@@ -1289,7 +1303,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     go through all items, looking at inputs of each, create nodeId to list[nodeId] dictionary, store as latex tree
         """
         self.latexAST = {}
-        for template in self.alle:
+        for template in self.alle:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
             list_tuple_nodeId_argIdx = sorted(map(lambda argTem: (argTem['nodeId'], argTem['argIdx'], argTem['argFuncName']), template['args']), key=lambda tup: tup[1]) #tup[1] is the argIdx
             self.latexAST[(template['funcName'], template['nodeId'])] = list(map(lambda tup: (tup[2], tup[0]), list_tuple_nodeId_argIdx)) # tup[2] is argFuncName, tup[0] is nodeId
         
@@ -1347,6 +1361,26 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     def _recursiveUnparse(self, keyTuple):
         pass
 
+class EntityStorage:
+    """
+    Entity is a node that is found in the equationStr, might or might not, have all its args (might not have widthStart, widthEnd)
+
+    This acts like a database for Entities, allowing CRUD
+
+    WHAT ARE THE QUERIES? THIS WILL DETERMINE THE UNDERLYING DATASTRUCTURE.
+    __updateTemplatesToWiderEnclosingBracketsAndRemove [width updates]
+    containment of a certain type [pos In matrices?]
+    widest entity in [startPos, endPos]
+    StatisticalCounts
+    """
+
+    def insert(self, ):
+        pass
+
+    def widthUpdate(self, )
+
+    def remove(self, ):
+        pass
 
 class BracketStorage:
     """
