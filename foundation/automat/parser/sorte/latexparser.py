@@ -1,5 +1,6 @@
-from copy import copy
+from copy import copy, deepcopy
 from enum import Enum
+import re
 
 from foundation.automat.arithmetic.function import Function
 from foundation.automat.common import BinarySearch, isNum
@@ -8,6 +9,17 @@ class BracketType(Enum):
     ROUND = '(', ')'
     SQUARE = '[', ']'
     CURLY = '{', '}'
+
+class EntityType(Enum):
+    PURE_NUMBER = 'pure_number'
+    IMPLICIT_INFIX = 'implicit_infix'
+    PURE_VARIABLE = 'pure_variable'
+    BACKSLASH_VARIABLE = 'backslash_variable'
+    BACKSLASH_FUNCTION = 'backslash_function'
+    BACKSLASH_NUMBER = 'backslash_number'
+    PURE_INFIX = 'pure_infix'
+    BACKSLASH_INFIX = 'backslash_infix'
+    MATRIX = 'matrix'
 
 class Latexparser(): # TODO follow the inheritance of _latexparser
     
@@ -231,14 +243,15 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     def __init__(self, equationStr=None, ast=None, verbose=False):
         self.rawEquationStr = equationStr
         self.equationStr = None #processed rawEquationStr
-        self.matrices_pos_type = None
-        self.infixs_pos_type = None
-        self.variables_pos_type = None
-        self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4, also contain symbolic number like \\pi, i
-        self.node_id = 0
+        self.matrices_pos_type = None # replace with entitystorage, the collating of intervals (bubble merge) needs work
+        # self.infixs_pos_type = None
+        # self.variables_pos_type = None
+        # self.number_pos_type = None #decimal numbers like 123, 23.2, -3.4, also contain symbolic number like \\pi, i
         self.allBrackets = None # all of the bracket STATIC, 
         self.openBraPos__bracketId = None # STATIC
         self.bracketstorage = BracketStorage()
+        self.entitystorage = EntityStorage()
+        self.mabracketstorage = BracketStorage()
         self.list_openTagPos = None
         self.list_closeTagPos = None
         self.openTagPos__closeTagPos = None
@@ -247,13 +260,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.backslashNames = None # this is for taking out occupied pos
         self.latexAST = None
     
-    def getNodeId(self):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
-        """
-        NodeId Dispenser
-        """
-        oNodeId = copy(self.node_id)
-        self.node_id += 1
-        return oNodeId
 
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
@@ -268,38 +274,43 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         
         """
         self.matrices_pos_type = []
-        import re
-        matrixStartTags = list(map(lambda m: 
-            (m.start(), m.end(), m.group(1)), 
-            re.finditer(r"\\begin\{(\wmatrix)\}", self.equationStr))) # the help page guarantees sorted, left-to-right, might be better to sort
-        
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
-        default = BracketType.ROUND # FAKE TODO rename BracketStorage to more general
-        defaultOpen = default.value[0] #FAKE TODO rename BracketStorage to more general
-        defaultClose = default.value[1] #FAKE TODO rename BracketStorage to more general
-        mbbracketstorage = BracketStorage()
-        for start, end, group in matrixStartTags:
-            mbbracketstorage.insertBracket(defaultOpen, start, defaultClose, end)
+        #skip_bracket_accounting
+        list_tuple_pos_tagType = []
+        startTagEndPos__startTagStartPos = {}
+        endTagStartPos__endTagEndPos = {}
+        for startTagStartPos, startTagEndPos, startTagName in map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\begin\{(\wmatrix)\}", self.equationStr)):
+            startTagEndPos__startTagStartPos[startTagEndPos] = startTagStartPos
+            list_tuple_pos_tagType.append((startTagEndPos, True, startTagName, startTagStartPos)) # True is open
 
-        matrixEndTags = list(map(lambda m: 
-            (m.start(), m.end(), m.group(1)), 
-            re.finditer(r"\\end\{(\wmatrix)\}", self.equationStr))) # the help page guarantees sorted, left-to-right, might be better to sort
-        
-        for start, end, group in matrixEndTags:
-            startTagClosePos = mbbracketstorage.getBraPosImmediateLeftOfPos(start, default, False)
-            startTagOpenPos, _ = mbbracketstorage.getCorrespondingOpenBraPos(startTagClosePos)
-            self.matrices_pos_type.append(
-                    {
-                        'nodeId':self.getNodeId(),
-                        'funcType':'matrix',
-                        'funcName':group,
-                        'funcStart':startTagOpenPos,
-                        'funcEnd':end,
-                        'widthStart':startTagOpenPos,
-                        'widthEnd':end,
-                                'args':[]
-                    }
-            )
+        for endTagStartPos, endTagEndPos, endTagName in map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\end\{(\wmatrix)\}", self.equationStr)):
+            endTagStartPos__endTagEndPos[endTagStartPos] = endTagEndPos
+            list_tuple_pos_tagType.append((endTagStartPos, False, endTagName, endTagEndPos)) # False is close
+
+
+        tagName__openPosStack = {}
+        # print(sorted(list_tuple_pos_tagType, key=lambda tup: tup[0]))
+        for pos, isOpen, tagName, keepPos in sorted(list_tuple_pos_tagType, key=lambda tup: tup[0]): # if pos touch, then sort is bad
+            openPosStack = tagName__openPosStack.get(tagName, [])
+            if isOpen:
+                openPosStack.append(keepPos)
+            else:
+                #found a matchingClose at pos
+                openPos = openPosStack.pop()
+                nodeId = self.entitystorage.insert(tagName, openPos, keepPos, EntityType.MATRIX, None, None, openPos, keepPos)
+                self.matrices_pos_type.append(
+                        {
+                            'nodeId':nodeId,
+                            'funcType':'matrix',
+                            'funcName':tagName,
+                            'funcStart':openPos,
+                            'funcEnd':keepPos,
+                            'widthStart':openPos,
+                            'widthEnd':keepPos,
+                            'args':[]
+                        }
+                )
+            tagName__openPosStack[tagName] = openPosStack
+
 
         """
         <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<also change the unit test
@@ -308,7 +319,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         #TODO this works like bubble_merge, if bubble_merge is not used anymore, please remove. Or replace this with bubble_merge. easier to analysis
         """
-        ~~PREPARING FOR MATRIX CONTAINMENT QUERY~~  __isPosInMatrixTag
+        ~~PREPARING FOR MATRIX CONTAINMENT QUERY~~  isPosInMatrixTag
 
         split into list_openTagPos, list_closeTagPos
         openTagPos__closeTagPos
@@ -363,6 +374,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
          remove all tuple__openPos>=closest_open_right_of_pos
         if empty, there is no enclosing brackets for pos
         """
+
         list_openTagPos, list_closeTagPos, openTagPos__closeTagPos, closeTagPos__openTagPos = [], [], {}, {}
         if len(self.matrices_pos_type) > 0:
             for template in self.matrices_pos_type:
@@ -487,16 +499,18 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.mabracketstorageDefault = BracketType.ROUND
         self.mabracketstorageDefaultOpen = self.mabracketstorageDefault.value[0]
         self.mabracketstorageDefaultClose = self.mabracketstorageDefault.value[1]
-        self.mabracketstorage = BracketStorage()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
+        # self.mabracketstorage = BracketStorage()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage TODO
         for openTagPos, closeTagPos in openTagPos__closeTagPos.items():
             self.mabracketstorage.insertBracket(self.mabracketstorageDefaultOpen, openTagPos, self.mabracketstorageDefaultClose, closeTagPos)
 
 
-    def __isPosInMatrixTag(self, pos):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
+    def isPosInMatrixTag(self, pos):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage TODO 
 
         """
         if there is matrix_tag enclosing pos, then pos is in a matrix_tag
+
         """
+
         return len(list(self.mabracketstorage.getAllEnclosingBraOfPos(pos, self.mabracketstorageDefault))) > 0
 
 
@@ -508,43 +522,44 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         3. str.find, chop and str.find, and then match outer \\begin\\end
         
         """
-        import re
         self.infixs_pos_type = []
         for infix in self.INFIX:
             infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"{re.escape(infix)}", self.equationStr)))
             
             for start, end, group in infix_pos_type_list:
-                self.infixs_pos_type.append(
-{
-                        'nodeId':self.getNodeId(),
-                        'funcType':'infix',
-                        'funcName':group,
-                        'funcStart':start,
-                        'funcEnd':end,
-                        'widthStart':None,#<<<<<<<<<<<<<<<<<<<<<<<<<UNKNOWN for now, since we do not know the args
-                        'widthEnd':None,#<<<<<<<<<<<<<<<<<<<<<<<<<UNKNOWN for now, since we do not know the args
-                        'args':[
-{
-        'nodeId':None,#just a SLOT
-        'funcName':None,
-                'argIdx':0,
-                'openBra':None,
-                'openBraPos':None, 
-                'closeBra':None,
-                'closeBraPos': None
-},
-{
-        'nodeId':None,#just a SLOT
-        'funcName':None,
-                'argIdx':1,
-                'openBra':None,
-                'openBraPos':None, 
-                'closeBra':None,
-                'closeBraPos': None
-}
-                                ]
-                    }
-                )
+                self.entitystorage.insert(group, start, end, EntityType.PURE_INFIX, widthStart=start, widthEnd=end)
+
+#                 self.infixs_pos_type.append(
+# {
+#                         'nodeId':self.getNodeId(),
+#                         'funcType':'infix',
+#                         'funcName':group,
+#                         'funcStart':start,
+#                         'funcEnd':end,
+#                         'widthStart':None,#<<<<<<<<<<<<<<<<<<<<<<<<<UNKNOWN for now, since we do not know the args
+#                         'widthEnd':None,#<<<<<<<<<<<<<<<<<<<<<<<<<UNKNOWN for now, since we do not know the args
+#                         'args':[
+# {
+#         'nodeId':None,#just a SLOT
+#         'funcName':None,
+#                 'argIdx':0,
+#                 'openBra':None,
+#                 'openBraPos':None, 
+#                 'closeBra':None,
+#                 'closeBraPos': None
+# },
+# {
+#         'nodeId':None,#just a SLOT
+#         'funcName':None,
+#                 'argIdx':1,
+#                 'openBra':None,
+#                 'openBraPos':None, 
+#                 'closeBra':None,
+#                 'closeBraPos': None
+# }
+#                                 ]
+#                     }
+#                 )
         
     def _find_brackets(self):
         """
@@ -555,28 +570,47 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2d obsolete
         2d. check if left&right infixes (put to infix as inputs) (remove from OTHER_brackets)
         """
-        #collate all the matrix_start_end_tag, like bubblemerge, then we get many non-overlapping intervals
-        bracketStorage = {}
-        brackets = set()
-        for k, templateList in BACKSLASH_EXPECTED_INPUTS.items():
+
+        #skip_bracket_accounting
+
+        openOrClose__tuple_braType = {}
+        openBraTypes, closeBraTypes = set(), set()
+        for k, templateList in self.BACKSLASH_EXPECTED_INPUTS.items(): # this get all the possible bracket combinations, incase Enum missed out
             for template in templateList:
-                brackets.add((template['openBra'], template['closeBra']))
-        self.allBrackets = []
-        self.openBraPos__bracketId = {}
-        for openBracket, closeBracket in brackets: # order in which we process the brackets does not matter
-            openBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{openBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
-            closeBracket_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr))) # the help page guarantees sorted, right to left, might be better to sort
-            #TODO remove redundant information
-            matchedBrackets = list(zip(openBracket_pos_type_list, reversed(closeBracket_pos_type_list)))
-            self.allBrackets += matchedBrackets
-            for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in matchedBrackets:
-                #check if its between matrix_start_end_tag,
-                if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
-                    continue
-                #else, store
-                self.bracketstorage.insertBracket(openBraType, openBraPos, closeBraType, closeBraPos)
-        
-        
+                # bracketTypes.add((template['openBra'], template['closeBra']))
+                openBraTypes.add(template['openBra'])
+                closeBraTypes.add(template['closeBra'])
+                openOrClose__tuple_braType[template['openBra']] = (template['openBra'], template['closeBra'])
+                openOrClose__tuple_braType[template['closeBra']] = (template['openBra'], template['closeBra'])
+
+        list_tuple_pos_braType_isOpen = [] #skip_list
+        openBracket_pos_type_list = []
+        for openBracket in openBraTypes:
+            openBracket_pos_type_list+=list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{openBracket}", self.equationStr)))
+        for start, end, openBraType in openBracket_pos_type_list:
+            #TODO could have done the self.isPosInMatrixTag() here, which is more efficient?
+            list_tuple_pos_braType_isOpen.append((start, openBraType, True))
+
+
+        closeBracket_pos_type_list = []
+        for closeBracket in closeBraTypes:
+            closeBracket_pos_type_list+=list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr)))
+        for start, end, closeBraType in closeBracket_pos_type_list:
+            list_tuple_pos_braType_isOpen.append((start, closeBraType, False))
+
+        braType__openPosStack = {}
+        for pos, braType, isOpen in sorted(list_tuple_pos_braType_isOpen, key=lambda tup: tup[0]):
+            braType = openOrClose__tuple_braType[braType]#braType could be ( or )
+            openPosStack = braType__openPosStack.get(braType, [])
+            if isOpen: #pos is openPos
+                openPosStack.append(pos)
+            else: #pos is closePos
+                openPos = openPosStack.pop()
+                if self.isPosInMatrixTag(openPos):
+                    continue # skip
+                self.bracketstorage.insertBracket(braType[0], openPos, braType[1], pos)
+            braType__openPosStack[braType] = openPosStack
+
         
     def _find_backslash(self):
         """
@@ -622,28 +656,41 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             print('###', self.equationStr)
             print(funcName, funcStart, funcEnd)
             #
-            storeTemplate = {
-                'nodeId':self.getNodeId(),
-                'funcType':foundType,
-                'funcName':funcName,
-                'funcStart':funcStart,
-                'funcEnd':funcEnd,
-                'widthStart':funcStart,
-                'widthEnd': funcEnd,
-                'args':[]
-            }
+            # storeTemplate = {
+            #     'nodeId':self.getNodeId(),
+            #     'funcType':foundType,
+            #     'funcName':funcName,
+            #     'funcStart':funcStart,
+            #     'funcEnd':funcEnd,
+            #     'widthStart':funcStart,
+            #     'widthEnd': funcEnd,
+            #     'args':[]
+            # }
             self.backslashNames.append((funcStart, funcEnd, funcName))
             if funcName in self.BACKSLASH_INFIX: # remove the backslash_infix from backslash
+                self.entitystorage.remove(funcStart)
                 continue
             if funcName in self.VARIABLENAMESTAKEANARG: # variable_function is actually a variable
                 foundType = 'backslash_variable'
-                storeTemplate['funcType'] = foundType
+                # storeTemplate['funcType'] = foundType
+                self.entitystorage.insert(
+                    funcName, 
+                    funcStart, 
+                    funcEnd, 
+                    EntityType.BACKSLASHVARIABLE, widthStart=funcStart, widthEnd=funcEnd)
             list_template = self._getExpectedBackslashInputs(funcName)
             if list_template is None: # number that starts with backslash. like \\pi
-                foundType = 'backslash_number'
-                storeTemplate['funcType'] = foundType
-                self.number_pos_type.append(storeTemplate)
+                # foundType = 'backslash_number'
+                # storeTemplate['funcType'] = foundType
+                # self.number_pos_type.append(storeTemplate)
+                self.entitystorage.insert(foundType, funcStart, funcEnd, EntityType.BACKSLASH_NUMBER, widthStart=funcStart, widthEnd=funcEnd)
                 continue # skip args finding
+            #type == BACKSLASH_FUNCTION
+            self.entitystorage.insert(
+                funcName, 
+                funcStart, 
+                funcEnd, 
+                EntityType.BACKSLASH_FUNCTION, widthStart=funcStart, widthEnd=funcEnd)
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
 
@@ -713,7 +760,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                         """
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient, ENTITIES STORAGE.
-                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
+                        #self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
+                        self.entitystorage.remove(funcStart)
                 elif template['braOptional'] == 'False': # no bracket but not neccessary
                     #log
                     gotArg = False #raise Exception #here is !gotArg
@@ -724,7 +772,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     self.bracketstorage.removeBracket(openBraPos)
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient
-                        self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
+                        #self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
+                        self.entitystorage.remove(funcStart)
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
@@ -761,32 +810,50 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 else: # did not match the right nextChar with this COMPULSORYTemplate
                     compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
                     eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
-                storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-                storeTemplate['args'].append({
-                    'nodeId':None, # this means that its just a slot, and not precisely filled yet
-                    'funcName':None, # this means that its just a slot, and not precisely filled yet
-                    'argIdx':template['argId'],
-                    'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                    'openBraPos':nextCharPos, 
-                    'closeBra':closeBraType,
-                    'closeBraPos': closeBraPos
-                })
+                
+                #<<<<<<<<<<<<<<<<<<<<
+                self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos) # the entity is not created yet
+                # storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+                self.entitystorage.addUnConfirmedPCrelationship(
+                    funcStart, 
+                    template['argId'], nextChar, nextCharPos, closeBraType, closeBraPos)
+                # storeTemplate['args'].append({
+                #     'nodeId':None, # this means that its just a slot, and not precisely filled yet
+                #     'funcName':None, # this means that its just a slot, and not precisely filled yet
+                #     'argIdx':template['argId'],
+                #     'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                #     'openBraPos':nextCharPos, 
+                #     'closeBra':closeBraType,
+                #     'closeBraPos': closeBraPos
+                # })
 
             eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
-            storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-            storeTemplate['args'].append({
-                'nodeId':None, # this means that its just a slot, and not precisely filled yet
-                'funcName':None,  # this means that its just a slot, and not precisely filled yet
-                'argIdx':template['argId'],
-                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                'openBraPos':nextCharPos, 
-                'closeBra':closeBraType,
-                'closeBraPos': closeBraPos
-            })
-            if foundType == 'backslash_function':
-                self.backslash_pos_type.append(storeTemplate)
-            elif foundType == 'backslash_variable':
-                self.variables_pos_type.append(storeTemplate)
+            self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
+            # storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+            self.entitystorage.addUnConfirmedPCrelationship(
+                funcStart, 
+                template['argId'], nextChar, nextCharPos, closeBraType, closeBraPos)
+            # storeTemplate['args'].append({
+            #     'nodeId':None, # this means that its just a slot, and not precisely filled yet
+            #     'funcName':None,  # this means that its just a slot, and not precisely filled yet
+            #     'argIdx':template['argId'],
+            #     'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+            #     'openBraPos':nextCharPos, 
+            #     'closeBra':closeBraType,
+            #     'closeBraPos': closeBraPos
+            # })
+            #cannot be done here because args are created earlier than here, we add entity at the first opportunity when re find entity
+            # if foundType == 'backslash_function':
+            #     self.backslash_pos_type.append(storeTemplate)
+            #     self.entitystorage.insert(
+            #         funcName, 
+            #         funcStart, 
+            #         funcEnd, 
+            #         EntityType.BACKSLASH_FUNCTION, 
+            #         parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+            # elif foundType == 'backslash_variable':
+            #     self.variables_pos_type.append(storeTemplate)
+            #     self.entitystorage.insert(funcName, funcStart, funcEnd, EntityType.BACKSLASH_VARIABLE, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
 
 
         
@@ -806,7 +873,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         4b. scan from left to right,  [N is a number, V is not number]
             4b1. if (we go from N to V) and (not consecutive), break off, collect collected_variables. this means N is implicitly multiplied by V
             4b2. else, keep collecting temp.
-        4c. go through all collected_variables and backslash_variables
+        4c. go through all collected_variables
             4c1. immediateRight, lookFor _{ , make them part of the variable.
             4c2. remove variable_brackets _{, from OTHER_brackets
 
@@ -818,7 +885,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #matrices pos THE WHOLE MATRIX, not just the tags
         #self.infixs_pos_type : [(startpos, endpos, group)], the symbol only
         # self.variables_pos_type = None # might already have backslashVar inside.
-        self.number_pos_type = [] #decimal numbers like 123, 23.2, -3.4
+        # self.number_pos_type = [] #decimal numbers like 123, 23.2, -3.4
 
         infixName_occupied = []
         for start, end, group in self.infixs_pos_type:
@@ -840,7 +907,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         leftOverPosList = []
         for pos in range(0, len(self.rawEquationStr)):
-            if self.__isPosInMatrixTag(pos) or \
+            if self.isPosInMatrixTag(pos) or \
             pos in infixName_occupied or \
             pos in backslashName_occupied or \
             pos in bracketSym_occupied:
@@ -859,31 +926,35 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 accumulatorType = 'N' if isNume else 'V'
             elif (accumulatorType == 'N' and not isNume) or \
             (leftOverPos != leftOverPos): #break off conditions: 0. going_from_N_to_V. 1. not_consecutive
-                self.variables_pos_type.append(
-                    {
-                        'nodeId':self.getNodeId(),
-                        'funcType':'pure_variable',
-                        'funcName':accumulator,
-                        'funcStart':accumulatorStartPos,
-                        'funcEnd':accumulatorEndPos,
-                        'widthStart':accumulatorStartPos,
-                        'widthEnd':accumulatorEndPos,
-                        'args':[]
-                    }
-                )#<<<<<<<<<<<<<<<<<<<<<<could contain things like i=sqrt(-1), which is a number not a variable, should have its OWN FUNCTYPE, .... ANYTHING ELSE LIKE SUCH?
-                self.number_pos_type.append(
-                    {
-                        'nodeId':self.getNodeId(),
-                        'funcType':'pure_number',
-                        'funcName':accumulator,
-                        'funcStart':accumulatorStartPos,
-                        'funcEnd':accumulatorEndPos,
-                        'widthStart':accumulatorStartPos,
-                        'widthEnd':accumulatorEndPos,
-                        'args':[]
-                    }
+                # self.variables_pos_type.append(
+                #     {
+                #         'nodeId':self.getNodeId(),
+                #         'funcType':'pure_variable',
+                #         'funcName':accumulator,
+                #         'funcStart':accumulatorStartPos,
+                #         'funcEnd':accumulatorEndPos,
+                #         'widthStart':accumulatorStartPos,
+                #         'widthEnd':accumulatorEndPos,
+                #         'args':[]
+                #     }
+                # )#<<<<<<<<<<<<<<<<<<<<<<could contain things like i=sqrt(-1), which is a number not a variable, should have its OWN FUNCTYPE, .... ANYTHING ELSE LIKE SUCH?
+                # self.number_pos_type.append(
+                #     {
+                #         'nodeId':self.getNodeId(),
+                #         'funcType':'pure_number',
+                #         'funcName':accumulator,
+                #         'funcStart':accumulatorStartPos,
+                #         'funcEnd':accumulatorEndPos,
+                #         'widthStart':accumulatorStartPos,
+                #         'widthEnd':accumulatorEndPos,
+                #         'args':[]
+                #     }
 
-                )
+                # )
+                if isNume: # pure_number
+                    self.entitystorage.insert(accumulator, accumulatorStartPos, accumulatorEndPos, EntityType.PURE_NUMBER, widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos)#fixed width
+                else: # pure variable (just not a backslash variable, can still have _{}, just need to widthMaxUpdate if we find _{})
+                    self.entitystorage.insert(accumulator, accumulatorStartPos, accumulatorEndPos, EntityType.PURE_VARIABLE, widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos) #width waiting for _{} later
                 #reset
                 accumulator = leftOverChar
                 accumulatorStartPos = leftOverPos
@@ -894,7 +965,55 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 accumulatorEndPos += len(leftOverChar)
                 #startPos same. accumulatorType V->N or pure V or pure N is fine.
 
+        """
+        4c. go through all collected_variables
+            4c1. immediateRight, lookFor _{ , make them part of the variable.
+            4c2. remove variable_brackets _{, from OTHER_brackets
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+        ALSO this case:
+
+    #if we have underscore, then caret, then es ist exponential
+    equationStr = 'V^x=V^{Q_{1}}_{BE}^x' #TODO if caret follows an underscore, then its not exponential, sondern, der ganz Ding ist ein VARIABLE
+
+    #if we have underscore, then caret, then es ist exponential
+    equationStr = 'V=V^{Q_{1}}_{BE}' #TODO if caret follows an underscore, then its not exponential, sondern, der ganz Ding ist ein VARIABLE
+    
+
+        """
+        #TODO this method is very similar to find_backslash args. REFACTOR? or use import ast to refactor (good training)
+        for funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_VARIABLE):
+            nextPos = funcEnd
+            closeBraPos = None
+            removeCaret__pos, removeCaretBra__pos = None, None
+            if self.entitystorage.existEntityAt('^', nextPos): # get the exponential immediate after funcEnd <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(nextPos+len('^'), BracketType.CURLY, True)
+                removeCaret__pos = nextPos#
+                if 0 <= openBraPos and openBraPos < len(self.equationStr):
+                    closeBraPos = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+                #remove from other brackets
+                    removeCaretBra__pos = openBraPos#
+                    nextPos = closeBraPos
+                else: # a single character
+                    nextPos += len('^')
+            #check if there is _ after the arg1 of the exponential immediate after funcEnd
+            if self.equationStr[nextPos] == '_':
+                if removeCaret__pos:#remove FAKE EXPONENTIAL
+                    self.entitystorage.remove(removeCaret__pos)#remove ^ only if its continued with _
+                if removeCaretBra__pos:
+                    self.bracketstorage.remove(removeCaretBra__pos) #only if its continued with _
+        #################
+                openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(nextPos, BracketType.CURLY, True)
+                if 0 <= openBraPos and openBraPos < len(self.equationStr): #TODO these seemed to be used together very often... condense into a method?????????????
+                    closeBraPos = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+                #remove from other brackets
+                    self.bracketstorage.remove(openBraPos)
+                else: #a single character
+                    closeBraPos = nextPos + 1
+
+            #UPDATE width, if we found _ or ^_
+            if closeBraPos:
+                self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
 
 
     def _find_implicit_0(self):
@@ -907,66 +1026,76 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         """
         def addImplictMinus(funcPos):
-            zeroNodeId = self.getNodeId()
-            self.infixs_pos_type.append(
-                {
-                    'nodeId':self.getNodeId(),
-                    'funcType':'infix_implicit',
-                    'funcName':'-',
-                    'funcStart':funcPos,
-                    'funcEnd':funcPos,
-                    'widthStart':funcPos,
-                    'widthEnd':None,#<<<<<<<<<<<<<<<<<<<<<UNKNOWN since argIdx=1 is UNKNOWN
-                    'args':[
-                        {
-                            'nodeId':zeroNodeId,
-                            'funcName':'0',
-                            'argIdx':0,
-                            'openBra':None,
-                            'openBraPos':None, 
-                            'closeBra':None,
-                            'closeBraPos': None
-                        },
-                        {
-                            'nodeId':None,# just a SLOT, not filled in yet
-                            'funcName':None,# just a SLOT, not filled in yet
-                            'argIdx':1,
-                            'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                            'openBraPos':None, 
-                            'closeBra':None,
-                            'closeBraPos': None
-                        }
-                    ]
-                }
-            )
-            self.number_pos_type.append(
-                    {
-                        'nodeId':zeroNodeId,
-                        'funcType':'pure_number',
-                        'funcName':'0',
-                        'funcStart':funcPos,
-                        'funcEnd':funcPos,
-                        'widthStart':funcPos,
-                        'widthEnd':funcPos,
-                        'args':[]
-                    }
+
+            pNodeId = self.entitystorage.insert( # insert -
+                '-', funcPos, funcPos, EntityType.IMPLICIT_INFIX, 
+                parentNodeId=None, argIdx=None, widthStart=funcPos, widthEnd=None#<<<<<<<<<<<<<<<<<<<<<UNKNOWN since argIdx=1 is UNKNOWN
             )
 
 
-        if self.rawEquationStr[0] in ['-']:
+            self.entitystorage.insert(# insert 0 with parentNodeId
+                '0', funcPos, funcPos, EntityType.PURE_NUMBER, 
+                parentNodeId=pNodeId, argIdx=0, widthStart=funcPos, widthEnd=funcPos)
+
+
+            # zeroNodeId = self.getNodeId()
+            # self.infixs_pos_type.append(
+            #     {
+            #         'nodeId':self.getNodeId(),
+            #         'funcType':'infix_implicit',
+            #         'funcName':'-',
+            #         'funcStart':funcPos,
+            #         'funcEnd':funcPos,
+            #         'widthStart':funcPos,
+            #         'widthEnd':None,#<<<<<<<<<<<<<<<<<<<<<UNKNOWN since argIdx=1 is UNKNOWN
+            #         'args':[
+            #             {
+            #                 'nodeId':zeroNodeId,
+            #                 'funcName':'0',
+            #                 'argIdx':0,
+            #                 'openBra':None,
+            #                 'openBraPos':None, 
+            #                 'closeBra':None,
+            #                 'closeBraPos': None
+            #             },
+            #             {
+            #                 'nodeId':None,# just a SLOT, not filled in yet
+            #                 'funcName':None,# just a SLOT, not filled in yet
+            #                 'argIdx':1,
+            #                 'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+            #                 'openBraPos':None, 
+            #                 'closeBra':None,
+            #                 'closeBraPos': None
+            #             }
+            #         ]
+            #     }
+            # )
+            # self.number_pos_type.append(
+            #         {
+            #             'nodeId':zeroNodeId,
+            #             'funcType':'pure_number',
+            #             'funcName':'0',
+            #             'funcStart':funcPos,
+            #             'funcEnd':funcPos,
+            #             'widthStart':funcPos,
+            #             'widthEnd':funcPos,
+            #             'args':[]
+            #         }
+            # )
+
+        affected = ['-']
+        if self.rawEquationStr[0] in affected:
             addImplictMinus(0)
         #all openbrackets except Matrices, no need bracketstorage
         for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in self.allBrackets:
-            if self.__isPosInMatrixTag(openBraPos) or self.__isPosInMatrixTag(closeBraPos):
+            if self.isPosInMatrixTag(openBraPos) or self.isPosInMatrixTag(closeBraPos):
                 continue
-            if self.rawEquationStr[openBraPos + 1] in ['-']:
+            if self.rawEquationStr[openBraPos + 1] in affected:
                 addImplictMinus(openBraPos + 1)
 
 
-    def _find_infixes_backslashes_backslashvars_width(self):
+    def _find_infixes_arg_brackets_width(self):
         """
-
-        AFTER THIS FUNCTION, we should get LARGEST WIDTH of backslashes
 
     6. get width(start~end) of infixes|backslash_function|backslash_variable
         6a. (by enclosing_brackets) or (by inputs) [tree_building]
@@ -975,19 +1104,20 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         6b. Check OTHER_brackets for enclosure that are wider than current_width_of_infix
         
         """
-        #backslashes and backslashvars already have all their inputs, so its relatively easier than infixes
-        for storeTemplate in self.backslash_pos_type:# backslash function ONLY, no filter needed
-            storeTemplate['widthStart'] = storeTemplate['funcStart'] # backslash is the start
-            storeTemplate['widthEnd'] = storeTemplate['funcEnd'] # farthest of all the closeBraPos
-            for argTemplate in storeTemplate['args']:
-                storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to entitystorage
+        #backslashes and backslashvars already have all their inputs, so its relatively easier than infixes >>>>>DONE: _find_backslash
+        # for storeTemplate in self.backslash_pos_type:# backslash function ONLY, no filter needed
+        #     storeTemplate['widthStart'] = storeTemplate['funcStart'] # backslash is the start
+        #     storeTemplate['widthEnd'] = storeTemplate['funcEnd'] # farthest of all the closeBraPos
+        #     for argTemplate in storeTemplate['args']:
+        #         storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
 
-        for storeTemplate in self.variables_pos_type: # contains pureVar and backslashVar
-            if storeTemplate['funcType'] in ['backslash_variable']:
-                storeTemplate['widthStart'] = storeTemplate['funcStart'] # backslash is the start
-                storeTemplate['widthEnd'] = storeTemplate['funcEnd'] # farthest of all the closeBraPos
-                for argTemplate in storeTemplate['args']:
-                    storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
+        # for storeTemplate in self.variables_pos_type: # contains pureVar and backslashVar
+        #     if storeTemplate['funcType'] in ['backslash_variable']:
+        #         storeTemplate['widthStart'] = storeTemplate['funcStart'] # backslash is the start
+        #         storeTemplate['widthEnd'] = storeTemplate['funcEnd'] # farthest of all the closeBraPos
+        #         for argTemplate in storeTemplate['args']:
+        #             storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], storeTemplate['closeBraPos'])
 
         #(matrices_pos_type|backslash_pos_type|variables_pos_type|number_pos_type) all have widthStart&widthEnd at_this_point
 
@@ -1005,15 +1135,18 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         All require entities to be touching, so the indexing of dictionary works. (alternative was using BinarySearch on a list)
         """
-        widthStart__tuple_nodeId_funcName = {}
-        widthEnd__tuple_nodeId_funcName = {}
+        # widthStart__tuple_nodeId_funcName = {}
+        # widthEnd__tuple_nodeId_funcName = {}
         #mixing entities up is ok, since they have the same template
         #NOTE +self.infixs_pos_type NOT INCLUDED YET!
-        for template in self.matrices_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type:
-            widthStart__tuple_nodeId_funcName[template['widthStart']] = (template['nodeId'], template['funcName'])
-            widthEnd__tuple_nodeId_funcName[template['widthEnd']] = (template['nodeId'], template['funcName'])
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replaced by self.entitystorage
+        # for template in self.matrices_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type:
+        #     widthStart__tuple_nodeId_funcName[template['widthStart']] = (template['nodeId'], template['funcName'])
+        #     widthEnd__tuple_nodeId_funcName[template['widthEnd']] = (template['nodeId'], template['funcName'])
         #
-        for storeTemplate in self.infixs_pos_type:
+        # for storeTemplate in self.infixs_pos_type:
+        for funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_INFIX):
+
             """
                         storeTemplate = {
                             'nodeId':self.getNodeId(),
@@ -1034,76 +1167,91 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         }
             """
             #is there closeBra left of infixSym?
-            closeBraType = ')'
-            closeBraPos = storeTemplate['funcStart'] - len(closeBraType)
+            # closeBraType = ')'
+            # closeBraPos = storeTemplate['funcStart'] - len(closeBraType)
+
+            #is there closeBra left of infixSym?
+            closeBraType = BracketType.ROUND.value[1]
+            closeBraPos = funcStart - len(closeBraType)
             if self.bracketstorage.exists(closeBraPos, BracketType.ROUND, False):
-                closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(closeBraPos)
+                openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(closeBraPos)
+                self.entitystorage.addUnConfirmedPCrelationship(funcStart, 0, openBraType, openBraPos, closeBraType, closeBraPos)
+
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
-                storeTemplate['args'].append({
-                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
-                    'funcName':None, # JUST a SLOT, might have alot of thing in the brackets
-                    'argIdx':0,
-                    'openBra':openBraType,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                    'openBraPos':openBraPos, 
-                    'closeBra':closeBraType,
-                    'closeBraPos': closeBraPos
-                })
+                # storeTemplate['args'].append({
+                #     'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                #     'funcName':None, # JUST a SLOT, might have alot of thing in the brackets
+                #     'argIdx':0,
+                #     'openBra':openBraType,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                #     'openBraPos':openBraPos, 
+                #     'closeBra':closeBraType,
+                #     'closeBraPos': closeBraPos
+                # })
                 self.bracketstorage.removeBracket(openBraPos)
             else:#no closeBra left of infixSym
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT0
-                argNodeId, argFuncName = widthEnd__tuple_nodeId_funcName[closeBraPos] # if this throws error, you made AN INDEX MISTAKE with widthEnd or closeBraPos
-                storeTemplate['args'].append({
-                    'nodeId':argNodeId,
-                    'funcName':argFuncName,
-                    'argIdx':0,
-                    'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
-                    'openBraPos':None, 
-                    'closeBra':None,
-                    'closeBraPos': None
-                })
-                self.bracketstorage.removeBracket(openBraPos)
+                argNodeId, argFuncName = self.entitystorage.getNodeIdFuncNameByFuncStart(funcStart)
+                # argNodeId, argFuncName = widthEnd__tuple_nodeId_funcName[closeBraPos] # if this throws error, you made AN INDEX MISTAKE with widthEnd or closeBraPos
+                self.entitystorage.addConfirmedPCrelationship(funcStart, argFuncName, argNodeId)
+                # storeTemplate['args'].append({
+                #     'nodeId':argNodeId,
+                #     'funcName':argFuncName,
+                #     'argIdx':0,
+                #     'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
+                #     'openBraPos':None, 
+                #     'closeBra':None,
+                #     'closeBraPos': None
+                # })
             # is there openBra right of infixSym?
-            openBraType = '('
-            openBraPos = storeTemplate['funcEnd']# + len(openBraType)
+            # openBraType = '('
+            # openBraPos = storeTemplate['funcEnd']# + len(openBraType)
+            openBraType = BracketType.ROUND.value[0]
+            openBraPos = funcEnd
             if self.bracketstorage.exists(openBraPos, BracketType.ROUND, True):
-                openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(openBraPos)
+                closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+                self.entitystorage.addUnConfirmedPCrelationship(funcStart, 0, openBraType, openBraPos, closeBraType, closeBraPos)
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
-                storeTemplate['args'].append({
-                    'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
-                    'funcName':None,
-                    'argIdx':1,
-                    'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                    'openBraPos':None, 
-                    'closeBra':None,
-                    'closeBraPos': None
-                })
+                # storeTemplate['args'].append({
+                #     'nodeId':None, # JUST a SLOT, might have alot of thing in the brackets
+                #     'funcName':None,
+                #     'argIdx':1,
+                #     'openBra':None,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
+                #     'openBraPos':None, 
+                #     'closeBra':None,
+                #     'closeBraPos': None
+                # })
                 self.bracketstorage.removeBracket(openBraPos)
             else:#no openBra right of infixSym
                 #<<<<<<<<<<<<<<<store in inputs [tree_building] INPUT1
-                argNodeId, argFuncName = widthStart__tuple_nodeId_funcName[openBraPos] # if this throws error, you made AN INDEX MISTAKE with widthStart or openBraPos
-                
-                storeTemplate['args'].append({
-                    'nodeId':argNodeId,
-                    'funcName':argFuncName,
-                    'argIdx':1,
-                    'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
-                    'openBraPos':None, 
-                    'closeBra':None,
-                    'closeBraPos': None
-                })
-                self.bracketstorage.removeBracket(openBraPos)
+                # argNodeId, argFuncName = widthStart__tuple_nodeId_funcName[openBraPos] # if this throws error, you made AN INDEX MISTAKE with widthStart or openBraPos
+                self.entitystorage.addConfirmedPCrelationship(funcStart, argFuncName, argNodeId)
+                argNodeId, argFuncName = self.entitystorage.getNodeIdFuncNameByFuncStart(funcStart)
+                # storeTemplate['args'].append({
+                #     'nodeId':argNodeId,
+                #     'funcName':argFuncName,
+                #     'argIdx':1,
+                #     'openBra':None,# MIGHT HAVE ENCLOSING, but will it be used?
+                #     'openBraPos':None, 
+                #     'closeBra':None,
+                #     'closeBraPos': None
+                # })
 
-            #CHECK wider enclosing brackets, for EVERYTHING 
-            self.matrices_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.matrices_pos_type)
-            self.infixs_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.infixs_pos_type)
-            self.backslash_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.backslash_pos_type)
-            self.variables_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.variables_pos_type)
-            self.number_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.number_pos_type)
-            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
+
+    def _update_all_width_by_enclosing_brackets_width_remove(self):
+        #remove all the user stupid multiple enclosing brackets
+        #CHECK wider enclosing brackets, for EVERYTHING 
+        self.infixs_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.infixs_pos_type)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to self.entitystorage
+
+        self.matrices_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.matrices_pos_type)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to self.entitystorage
+        self.backslash_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.backslash_pos_type)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to self.entitystorage
+        self.variables_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.variables_pos_type)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to self.entitystorage
+        self.number_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.number_pos_type)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to self.entitystorage
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
+        pass
 
     def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE???? #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
         for template in list_template:
-            allEnclosingTouchingBra = self.bracketstorage.getAllEnclosingTouchingBraOfPos(template['funcStart'], BracketType.ROUND)
+            allEnclosingTouchingBra = self.bracketstorage.getAllEnclosingTouchingBraOfPos(template['funcStart'], BracketType.ROUND)#<<<<<<<<<self.bracketstorage as input
             if len(allEnclosingTouchingBra) > 0:
                 widestWidth = 0
                 widestBra = None
@@ -1111,9 +1259,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     if width > widestWidth:
                         widestWidth = width
                         widestBra = (width, bracketId, openBraPos, closeBraPos)
-                    self.bracketstorage.removeBracket(openBraPos) # because these bracket cannot contain anything else
+                    self.bracketstorage.removeBracket(openBraPos) # because these bracket cannot contain anything else #<<<<<<<<<return self.bracketstorage to update self.bracketstorage
                 template['widthStart'] = widestBra[2] #TODO is this change INPLACE????
-                tempate['widthEnd'] = widestBra[3] #TODO is this change INPLACE????
+                template['widthEnd'] = widestBra[3] #TODO is this change INPLACE????
                 #self.bracketstorage.removeBracket(widestBra[2])# NO NEED, already removed in the loop
         return list_template
 
@@ -1137,38 +1285,45 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
         """
         def addImplictMultiply(funcPos, arg0NodeId, arg1NodeId, arg0WidthStart, arg1WidthEnd, arg0FuncName, arg1FuncName):
+            pNodeId = self.entitystorage.insert('*', funcPos, funcPos, EntityType.IMPLICIT_INFIX, 
+                parentNodeId=None, argIdx=None, widthStart=arg0WidthStart, widthEnd=arg1WidthEnd)
+            self.entitystorage.addConfirmedPCrelationshipById(pNodeId, arg0NodeId, arg0FuncName, 0)
+            self.entitystorage.addConfirmedPCrelationshipById(pNodeId, arg1NodeId, arg1FuncName, 1)
 
-            implicitMultiply = {
-                    'nodeId':self.getNodeId(),
-                    'funcType':'infix_implicit',
-                    'funcName':'*',
-                    'funcStart':funcPos,
-                    'funcEnd':funcPos,
-                    'widthStart':arg0WidthStart,
-                    'widthEnd':arg1WidthEnd,
-                    'args':[
-                        {
-                            'nodeId':arg0NodeId,
-                            'funcName':arg0FuncName,
-                            'argIdx':0,
-                            'openBra':None,# could be FILLED, but we don't need it, since p|c relationship built
-                            'openBraPos':None,# could be FILLED, but we don't need it, since p|c relationship built
-                            'closeBra':None,# could be FILLED, but we don't need it, since p|c relationship built
-                            'closeBraPos': None# could be FILLED, but we don't need it, since p|c relationship built
-                        },
-                        {
-                            'nodeId':arg1NodeId,
-                            'funcName':arg1FuncName, 
-                            'argIdx':1,
-                            'openBra':None,# could be FILLED, but we don't need it, since p|c relationship built
-                            'openBraPos':None,# could be FILLED, but we don't need it, since p|c relationship built
-                            'closeBra':None,# could be FILLED, but we don't need it, since p|c relationship built
-                            'closeBraPos': None# could be FILLED, but we don't need it, since p|c relationship built
-                        }
-                    ]
-                }
+            # implicitMultiply = {
+            #         'nodeId':self.getNodeId(),
+            #         'funcType':'infix_implicit',
+            #         'funcName':'*',
+            #         'funcStart':funcPos,
+            #         'funcEnd':funcPos,
+            #         'widthStart':arg0WidthStart,
+            #         'widthEnd':arg1WidthEnd,
+            #         'args':[
+            #             {
+            #                 'nodeId':arg0NodeId,
+            #                 'funcName':arg0FuncName,
+            #                 'argIdx':0,
+            #                 'openBra':None,# could be FILLED, but we don't need it, since p|c relationship built
+            #                 'openBraPos':None,# could be FILLED, but we don't need it, since p|c relationship built
+            #                 'closeBra':None,# could be FILLED, but we don't need it, since p|c relationship built
+            #                 'closeBraPos': None# could be FILLED, but we don't need it, since p|c relationship built
+            #             },
+            #             {
+            #                 'nodeId':arg1NodeId,
+            #                 'funcName':arg1FuncName, 
+            #                 'argIdx':1,
+            #                 'openBra':None,# could be FILLED, but we don't need it, since p|c relationship built
+            #                 'openBraPos':None,# could be FILLED, but we don't need it, since p|c relationship built
+            #                 'closeBra':None,# could be FILLED, but we don't need it, since p|c relationship built
+            #                 'closeBraPos': None# could be FILLED, but we don't need it, since p|c relationship built
+            #             }
+            #         ]
+            #     }
+            
+
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to self.entitystorage
             implicitMultiply = self.__updateTemplatesToWiderEnclosingBracketsAndRemove([implicitMultiply])[0] # necessary for p|c later
-            self.infixs_pos_type.append(implicitMultiply)
+            # self.infixs_pos_type.append(implicitMultiply)
 
 
         alle = self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type
@@ -1190,7 +1345,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         
     def _match_child_to_parent_input(self):
         """
-    ***everything has width at_this_point
+    ***everything has width at_this_point EXCEPT INFIXES
     ~~~ASTree construction~~~ by widest enclosing position? there is no need for brackets? 
     #process those_with_inputs(BACKSLASH&INFIX) by position (left to right)
     we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
@@ -1224,88 +1379,124 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         remove selected_item from list_1
         
         """
-        self.alle = self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type
-        """
-        Use BracketStorage to help make faster query for each SLOT.
-        self.cpbracketstorage.insert <<<<<<<<<<<<insert all alle the widthstart, widthend as brackets (FAKE brackets, we just need the query)
-        self.cpbracketstorage.getWidestEnclosingBra <<<<<< for each SLOT, find the widest for the SLOT (TODO implemented) REMOVE getTightestEnclosingBra?[seems like its never used]
-        """
+        # #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to entityStorage, this is STASHING
+        # self.alle = self.matrices_pos_type+self.infixs_pos_type+self.backslash_pos_type+self.variables_pos_type+self.number_pos_type
+        # """
+        # Use BracketStorage to help make faster query for each SLOT.
+        # self.cpbracketstorage.insert <<<<<<<<<<<<insert all alle the widthstart, widthend as brackets (FAKE brackets, we just need the query)
+        # self.cpbracketstorage.getWidestEnclosingBra <<<<<< for each SLOT, find the widest for the SLOT (TODO implemented) REMOVE getTightestEnclosingBra?[seems like its never used]
+        # """
 
-        default = BracketType.ROUND # FAKE TODO rename bracketstorage to more general
-        defaultOpen, defaultClose = default #FAKE TODO rename bracketstorage to more general
-        cpbracketstorage = BracketStorage()#<<<<<<<<<<<<<<<<<<<<< we can change this to entitystorage.
-        bracketId__tuple_nodeId_funcName = {}
-        nodeId__bracketId = {}
-        for template in self.alle:
-            bracketId = cpbracketstorage.insertBracket(defaultOpen, template['widthStart'], defaultClose, template['widthEnd'])
-            bracketId__tuple_nodeId_funcName[bracketId] = (template['nodeId'], template['funcName'])
-            nodeId__bracketId[template['nodeId']] = bracketId
+        # default = BracketType.ROUND # FAKE TODO rename bracketstorage to more general
+        # defaultOpen, defaultClose = default #FAKE TODO rename bracketstorage to more general
+        # cpbracketstorage = BracketStorage()#<<<<<<<<<<<<<<<<<<<<< we can change this to entitystorage.
+        # bracketId__tuple_nodeId_funcName = {}
+        # nodeId__bracketId = {}
+        # for template in self.alle:
+        #     bracketId = cpbracketstorage.insertBracket(defaultOpen, template['widthStart'], defaultClose, template['widthEnd'])
+        #     bracketId__tuple_nodeId_funcName[bracketId] = (template['nodeId'], template['funcName'])
+        #     nodeId__bracketId[template['nodeId']] = bracketId
+
+
+        for funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.BACKSLASH_FUNCTION):
+            for openBraPos, closeBraPos, argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(funcStart): # SLOT
+                cNodeId, cFuncName = self.entitystorage.getWidestFit(openBraPos, closeBraPos)
+                self.entitystorage.addConfirmedPCrelationship(funcStart, cFuncName, argIdx, hasUnconfirmed=True)
 
         """
         Of the childNeedy, backslash_pos_type args have widthStart and widthEnd, only infixs_pos_type might have no widthStart and widthEnd and might require BODMAS
         we will seperately deal with them
         """
-        for template in self.backslash_pos_type:
-            if arg['nodeId'] is None: #This is criterion for a SLOT
-                #find the widest child, that is stored in cpbracketstorage
-                pos = arg['closeBraPos']# pos = arg['openBraPos'] | arg['closeBraPos']#<<<<either have nodeId(argLen<2) | have closeBraPos: guaranteed from _find_backslash
-                #if output from cpbracketstorage.getWidestEnclosingBra doesn't fit 3-piece tuple, then _find_backslash made a mistake
-                answer = cpbracketstorage.getWidestEnclosingBra(pos, default)
-                _, _, bracketId = answer # we don't have to care about the width, since backslash width is fixed, after you get the args
-                nodeId, funcName = bracketId__tuple_nodeId_funcName[bracketId] 
-                arg['nodeId'] = nodeId# TODO is this INPLACE?????
-                arg['funcName'] = funcName# TODO is this INPLACE?????
-        #the self.infixs_pos_type have fixed width. so no need to update the width in the loop. we can bulk update after
-        # self.backslash_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.backslash_pos_type) # already done in _find_infixes_backslashes_backslashvars_width
+        # for template in self.backslash_pos_type:
+        #     for arg in template['args']:
+        #         if arg['nodeId'] is None: #This is criterion for a SLOT
+        #             #find the widest child, that is stored in cpbracketstorage
+        #             pos = arg['closeBraPos']# pos = arg['openBraPos'] | arg['closeBraPos']#<<<<either have nodeId(argLen<2) | have closeBraPos: guaranteed from _find_backslash
+        #             #if output from cpbracketstorage.getWidestEnclosingBra doesn't fit 3-piece tuple, then _find_backslash made a mistake
+        #             answer = cpbracketstorage.getWidestEnclosingBra(pos, default)
+        #             _, _, bracketId = answer # we don't have to care about the width, since backslash width is fixed, after you get the args
+        #             nodeId, funcName = bracketId__tuple_nodeId_funcName[bracketId] 
+        #             arg['nodeId'] = nodeId# TODO is this INPLACE?????
+        #             arg['funcName'] = funcName# TODO is this INPLACE?????
+        #     #the self.infixs_pos_type have fixed width. so no need to update the width in the loop. we can bulk update after
+        #     # self.backslash_pos_type = self.__updateTemplatesToWiderEnclosingBracketsAndRemove(self.backslash_pos_type) # already done in _find_infixes_backslashes_backslashvars_width
 
-        for template in sorted(self.infixs_pos_type, key=lambda infix: Latexparser.INFIX.index(infix)): # should be processed in PRIORITY, no matter where they are. BODMAS
-            if arg['nodeId'] is None: #This is criterion for a SLOT
-                #is it right or left arg?
-                if arg['argIdx'] == 0:#left
-                    # TAKE length of leftCloseBra and take a small step to the left
-                    pos = template['funcStart'] - len(arg['closeBraPos']) - 1
-                elif arg['argIdx'] ==  1:#right
-                    # TAKE length of rightOpenBra and take a small step to the right
-                    pos = template['funcEnd'] + len(arg['openBraPos']) + 1
-                else:#unhandled
-                    raise Exception(f'Infix {template["funcName"]}, id {template["nodeId"]} has argIdx {template["argIdx"]}, argIdx should only be 0 or 1')
-                
-                #MUST HAVE ANSWER. WHY?
-                answer = cpbracketstorage.getWidestEnclosingBra(pos, default)
-                argOpenPos, argClosePos, bracketId = answer
-                nodeId, funcName = bracketId__tuple_nodeId_funcName[bracketId]
-                arg['nodeId'] = nodeId#TODO is this INPLACE??????
-                arg['funcName'] = funcName#TODO is this INPLACE????
-                if arg['argIdx'] == 0:#left
-                    #right (widthEnd) is unchanged
-                    template['widthStart'] = argOpenPos#left is changed
-                elif arg['argIdx'] == 1:#right
-                    #left (widthStart) is unchanged
-                    template['widthEnd'] = argClosePos#right is changed
-                else:#unhandled
-                    raise Exception(f'Infix {template["funcName"]}, id {template["nodeId"]} has argIdx {template["argIdx"]}, argIdx should only be 0 or 1')
-                #the new width will affect arg of those infixs yet_to_be_processed, so infix width has to be processed in the loop
-                template = self.__updateTemplatesToWiderEnclosingBracketsAndRemove([template])[0]
-                self.cpbracketstorage.updateBracket(
-                    nodeId__bracketId[template['nodeId']], 
-                    defaultOpen, #FAKE TODO rename bracketstorage to more general
-                    template['widthStart'], #FAKE TODO rename bracketstorage to more general
-                    defaultClose, #FAKE TODO rename bracketstorage to more general
-                    template['widthEnd'] #FAKE TODO rename bracketstorage to more general
-                )
+        for funcStart, funcEnd in sorted(
+            self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_INFIX)+self.entitystorage.getAllEndPosOfEntityType(EntityType.IMPLICIT_INFIX),
+            key=lambda infix: Latexparser.INFIX.index(infix) #should be processed in PRIORITY, no matter where they are. BODMAS
+            ):
+            for openBraPos, closeBraPos, argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(funcStart): # SLOT TODO we assumed that all infixes have all their slots
+                cNodeId, cFuncName = self.entitystorage.getWidestFit(openBraPos, closeBraPos)
+                self.bracketstorage = self.entitystorage.addConfirmedPCrelationship(funcStart, cFuncName, argIdx, hasUnconfirmed=True, bracketstorage=self.bracketstorage) # this should also update infix width and all enclosing brackets
+
+
+
+        # for template in sorted(self.infixs_pos_type, key=lambda infix: Latexparser.INFIX.index(infix)): # should be processed in PRIORITY, no matter where they are. BODMAS
+        #     for arg in template['args']:
+        #         if arg['nodeId'] is None: #This is criterion for a SLOT
+        #             #is it right or left arg?
+        #             if arg['argIdx'] == 0:#left
+        #                 # TAKE length of leftCloseBra and take a small step to the left
+        #                 pos = template['funcStart'] - len(arg['closeBraPos']) - 1
+        #             elif arg['argIdx'] ==  1:#right
+        #                 # TAKE length of rightOpenBra and take a small step to the right
+        #                 pos = template['funcEnd'] + len(arg['openBraPos']) + 1
+        #             else:#unhandled
+        #                 raise Exception(f'Infix {template["funcName"]}, id {template["nodeId"]} has argIdx {template["argIdx"]}, argIdx should only be 0 or 1')
+                    
+        #             #MUST HAVE ANSWER. WHY?
+        #             answer = cpbracketstorage.getWidestEnclosingBra(pos, default)
+        #             argOpenPos, argClosePos, bracketId = answer
+        #             nodeId, funcName = bracketId__tuple_nodeId_funcName[bracketId]
+        #             arg['nodeId'] = nodeId#TODO is this INPLACE??????
+        #             arg['funcName'] = funcName#TODO is this INPLACE????
+        #             if arg['argIdx'] == 0:#left
+        #                 #right (widthEnd) is unchanged
+        #                 template['widthStart'] = argOpenPos#left is changed
+        #             elif arg['argIdx'] == 1:#right
+        #                 #left (widthStart) is unchanged
+        #                 template['widthEnd'] = argClosePos#right is changed
+        #             else:#unhandled
+        #                 raise Exception(f'Infix {template["funcName"]}, id {template["nodeId"]} has argIdx {template["argIdx"]}, argIdx should only be 0 or 1')
+        #             #the new width will affect arg of those infixs yet_to_be_processed, so infix width has to be processed in the loop
+        #             template = self.__updateTemplatesToWiderEnclosingBracketsAndRemove([template])[0]
+        #             self.cpbracketstorage.updateBracket(
+        #                 nodeId__bracketId[template['nodeId']], 
+        #                 defaultOpen, #FAKE TODO rename bracketstorage to more general
+        #                 template['widthStart'], #FAKE TODO rename bracketstorage to more general
+        #                 defaultClose, #FAKE TODO rename bracketstorage to more general
+        #                 template['widthEnd'] #FAKE TODO rename bracketstorage to more general
+        #             )
 
 
 
         
     def _format_to_pyStyledAST(self):
         """
-
-    go through all items, looking at inputs of each, create nodeId to list[nodeId] dictionary, store as latex tree
+self.entitystorage.nodeId__tuple_pNodeId_argIdx
         """
+        pNode__list_tuple_argId_cNode = {}
+        for nodeId, (pNodeId, argIdx) in self.entitystorage.nodeId__tuple_pNodeId_argIdx.items():
+            pFuncName = self.entitystorage.nodeId__funcName[pNodeId]
+            existingChildren = pNode__list_tuple_argId_cNode.get((pFuncName, pNodeId), [])
+            funcName = self.entitystorage.nodeId__funcName[nodeId]
+            existingChildren.append((argIdx, (funcName, nodeId)))
+            pNode__list_tuple_argId_cNode[(pFuncName, pNodeId)] = existingChildren
+
+        #sort all children, strip the argIdx from all the children
         self.latexAST = {}
-        for template in self.alle:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
-            list_tuple_nodeId_argIdx = sorted(map(lambda argTem: (argTem['nodeId'], argTem['argIdx'], argTem['argFuncName']), template['args']), key=lambda tup: tup[1]) #tup[1] is the argIdx
-            self.latexAST[(template['funcName'], template['nodeId'])] = list(map(lambda tup: (tup[2], tup[0]), list_tuple_nodeId_argIdx)) # tup[2] is argFuncName, tup[0] is nodeId
+        for pNode, list_tuple_argId_cNode in pNode__list_tuple_argId_cNode.items():
+            list_cNode = []
+            for argId, cNode in list_tuple_argId_cNode:
+                list_cNode.append(cNode)
+            self.latexAST[pNode] = list_cNode
+
+
+
+        # self.latexAST = {}
+        # for template in self.alle:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage
+        #     list_tuple_nodeId_argIdx = sorted(map(lambda argTem: (argTem['nodeId'], argTem['argIdx'], argTem['argFuncName']), template['args']), key=lambda tup: tup[1]) #tup[1] is the argIdx
+        #     self.latexAST[(template['funcName'], template['nodeId'])] = list(map(lambda tup: (tup[2], tup[0]), list_tuple_nodeId_argIdx)) # tup[2] is argFuncName, tup[0] is nodeId
         
     def _convert_to_schemeStyledAST(self):
         """
@@ -1368,19 +1559,187 @@ class EntityStorage:
     This acts like a database for Entities, allowing CRUD
 
     WHAT ARE THE QUERIES? THIS WILL DETERMINE THE UNDERLYING DATASTRUCTURE.
-    __updateTemplatesToWiderEnclosingBracketsAndRemove [width updates]
-    containment of a certain type [pos In matrices?]
-    widest entity in [startPos, endPos]
-    StatisticalCounts
+    Q0:__updateTemplatesToWiderEnclosingBracketsAndRemove [width updates]
+    Q1:containment of a point POS of a certain type [pos In matrices?]
+    Q2:widest entity within [startPos, endPos]
+    Q3:StatisticalCounts
+    Q4: entities Iterator
+    <<<<<<<<<<<add arg: _match_child_to_parent_input
+    Q5:add arg: nodeId, funcName, argIdx, openBra(needed? yes we might only know the brackets but not the exact nodeId at that time), openBraPos(needed? yes we might only know the brackets but not the exact nodeId at that time), closeBra(needed? yes we might only know the brackets but not the exact nodeId at that time), closeBraPos(needed? yes we might only know the brackets but not the exact nodeId at that time)
+    Q6:update arg: nodeId, funcName, argIdx
     """
 
-    def insert(self, ):
+
+    def __init__(self):
+        self.node_id = 0
+        self.entity_template = {
+            'nodeId':None,
+            'funcType':None,
+            'funcName':None,
+            'funcStart':None,
+            'funcEnd':None,
+            'widthStart':None,
+            'widthEnd':None,
+            'args':[]
+        }
+        self.arg_template = {
+            'nodeId':None,
+            'funcName':None,
+            'argIdx':None,
+            # 'openBra':None,
+            # 'openBraPos':None,
+            # 'closeBra':None,
+            # 'closeBraPos': None
+        }
+
+        self.list_widthStart = [] # for BS, OR it can hold tuples. with nodeId, and then nodeId to everything else., find widthStart instead of id
+        self.list_widthEnd = [] # for BS
+        self.widthStart__nodeId = {}
+        self.nodeId__widthStart = {}
+        self.widthEnd__nodeId = {}
+        self.nodeId__widthEnd = {}
+        self.entityType__list_nodeId = {}
+        self.funcStart__nodeId = {}
+        #nodeId -> datum 
+        self.nodeId__entityType = {}
+        self.nodeId__funcName = {}
+        self.nodeId__funcStart = {}
+        self.nodeId__funcEnd = {}
+        #p|c 
+        self.nodeId__tuple_pNodeId_argIdx = {} # p(arent)NodeId_argIdx CONFIRMED p|c
+        self.nodeId__tuple_cArgIdx_openBra_openBraPos_closeBra_closeBraPos = {} #c(hild)ArgIdx UNCONFIRMED p|c ( we only know the argument width.)
+
+    def insert(self, funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None):
+        nodeId = self._getNodeId()
+        self.nodeId__entityType[nodeId] = entityType
+        self.nodeId__funcName[nodeId] = funcName
+        self.nodeId__tuple_pNodeId_argIdx[nodeId] = (parentNodeId, argIdx)
+        self.nodeId__funcStart[nodeId] = funcStart
+        self.nodeId__funcEnd[nodeId] = funcEnd
+        self.funcStart__nodeId[funcStart] = nodeId
+
+        existing = self.entityType__list_nodeId.get(entityType, [])
+        insertPos = BinarySearch.binarySearchPre(existing, nodeId)
+        existing.insert(insertPos, nodeId)
+        self.entityType__list_nodeId[entityType] = existing
+
+        if widthStart is not None:
+            self.widthStart__nodeId[widthStart] = nodeId
+            self.nodeId__widthStart[nodeId] = widthStart
+
+            insertPos = BinarySearch.binarySearchPre(self.list_widthStart, widthStart)
+            self.list_widthStart.insert(insertPos, widthStart)
+
+        if widthEnd is not None:
+            self.widthEnd__nodeId[widthEnd] = nodeId
+            self.nodeId__widthEnd[nodeId] = widthEnd
+
+            insertPos = BinarySearch.binarySearchPre(self.list_widthEnd, widthEnd)
+            self.list_widthEnd.insert(insertPos, widthEnd)
+        return nodeId
+
+"""NEEDS TO BE IMPLEMENTED
+argNodeId, argFuncName = self.entitystorage.getNodeIdFuncNameByFuncStart(funcStart)
+self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)
+existEntityAt(self, entityString, pos)
+widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update<<<<<<<<<<<
+funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_VARIABLE): <<<<<<<<<<<<<<<<<<
+addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx, hasUnconfimed=False):<<<<<<<<<<<<<<<<<<<<<<<
+self.bracketstorage = self.entitystorage.addConfirmedPCrelationship(funcStart, cFuncName, argIdx, hasUnconfirmed=True, bracketstorage=self.bracketstorage) # this should also update infix width and all enclosing brackets <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+openBraPos, closeBraPos,argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(funcStart): # SLOT <<<<<<<<<<<<<<<<<<
+nodeId, funcName = self.entitystorage.getWidestFit(openBraPos, closeBraPos) <<<<<<<<<<<<<<<
+__updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE???? #<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+"""
+
+
+    def remove(self, funcStart):
+        """
+        """
+        nodeId = funcStart__nodeId[funcStart]
+        funcStart__nodeId.pop(funcStart, None)
+
+        entityType = nodeId__entityType.pop(nodeId)
+        nodeId__funcName.pop(nodeId, None)
+        nodeId__funcStart.pop(nodeId, None)
+        nodeId__funcEnd.pop(nodeId, None)
+        nodeId__tuple_pNodeId_argIdx.pop(nodeId, None)
+
+        list_nodeId = entityType__list_nodeId.pop(entityType)
+        list_nodeId.remove(nodeId)
+        entityType__list_nodeId[entityType] = nodeId
+
+        widthEnd = nodeId__widthEnd.pop(nodeId, None)
+        widthStart = nodeId__widthStart.pop(nodeId, None)
+
+        if widthStart is not None:
+            list_widthStart.remove(widthStart)
+            widthStart__nodeId.pop(widthStart, None)
+
+        if widthEnd is not None:
+            list_widthEnd.remove(widthEnd)
+            widthEnd__nodeId.pop(widthEnd, None)
+
+
+
+
+
+    def _getNodeId(self):
+        """
+        NodeId Dispenser
+        """
+        oNodeId = copy(self.node_id)
+        self.node_id += 1
+        return oNodeId
+
+
+
+
+
+
+
+
+##############################BELOW speculations
+    def existEntityType(self, entityType):
+        return len(entityType__list_nodeId[entityType]) > 0
+
+    def widthUpdate(self, funcStart, widthStart, widthEnd):
         pass
 
-    def widthUpdate(self, )
-
-    def remove(self, ):
+    def addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx):
+        #UPDATE width if EntityType == infix
+        #remove from UNCONFIRMED: self.nodeId__tuple_cArgIdx_openBra_openBraPos_closeBra_closeBraPos
         pass
+
+    def addUnConfirmedPCrelationship(self, pFuncStart, argIdx, openBraType, openBraPos, closeBraType, closeBraPos)
+    """
+
+            # 'openBra':None,
+            # 'openBraPos':None,
+            # 'closeBra':None,
+            # 'closeBraPos': None
+    """
+        pass
+
+    def _getEntityTemplate(self, nodeId, funcType, funcName, funcStart, funcEnd, widthStart=None, widthEnd=None):
+        """
+        Good for displaying...? Entities Iterator
+        :param funcType:
+        :type EntityType:
+        """
+        copy_template = deepcopy(self.entity_template)
+        copy_template['nodeId'] = nodeId
+        copy_template['funcType'] = funcType
+        copy_template['funcName'] = funcName
+        copy_template['funcStart'] = funcStart
+        copy_template['funcEnd'] = funcEnd
+        copy_template['widthStart'] = widthStart
+        copy_template['widthEnd'] = widthEnd
+
+
+    def _getArgTemplate(self):
+        pass
+
 
 class BracketStorage:
     """
@@ -1401,19 +1760,18 @@ class BracketStorage:
     """
 
 
-    closeBraType__sortedPosList = {}
-    openBraType__sortedPosList = {}
-    id__tuple_openPos_openBraType_closePos_closeBraType = {}
-    list_tuple_width_id_openPos_closePos = []
-    openBraPos__bracketId = {}
-    closeBraPos__bracketId = {}
 
     def __init__(self):
         self.bracketId = 0
+        self.closeBraType__sortedPosList = {}
+        self.openBraType__sortedPosList = {}
+        self.id__tuple_openPos_openBraType_closePos_closeBraType = {}
+        self.list_tuple_width_id_openPos_closePos = []
+        self.openBraPos__bracketId = {}
+        self.closeBraPos__bracketId = {}
 
     def _getBracketId(self):
-        import copy
-        newBracketId = copy.copy(self.bracketId)
+        newBracketId = copy(self.bracketId)
         self.bracketId += 1
         return newBracketId
     
@@ -1524,10 +1882,10 @@ class BracketStorage:
             theDict__sortedPosList = self.closeBraType__sortedPosList
             typeOfBracket = typeOfBracket.value[1] # the close version of typeOfBracket
 
-        immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
+        immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList.get(typeOfBracket, []), pos) # always gives right_of_pos
         
         braPos = float('inf') # for getAllEnclosingBraOfPos, if there is no such thing
-        if 0 <= immediateRightIdx and immediateRightIdx < len(theDict__sortedPosList[typeOfBracket]):
+        if 0 <= immediateRightIdx and immediateRightIdx < len(theDict__sortedPosList.get(typeOfBracket, [])):
             braPos = theDict__sortedPosList[typeOfBracket][immediateRightIdx]
         return braPos
     
@@ -1547,10 +1905,10 @@ class BracketStorage:
             theDict__sortedPosList = self.closeBraType__sortedPosList
             typeOfBracket = typeOfBracket.value[1] # the close version of typeOfBracket
 
-        immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList[typeOfBracket], pos) # always gives right_of_pos
+        immediateRightIdx = BinarySearch.binarySearchPre(theDict__sortedPosList.get(typeOfBracket, []), pos) # always gives right_of_pos
         
         braPos = float('-inf') # for getAllEnclosingBraOfPos, if there is no such thing
-        if 0 <= immediateRightIdx - 1 and immediateRightIdx - 1 < len(theDict__sortedPosList[typeOfBracket]):
+        if 0 <= immediateRightIdx - 1 and immediateRightIdx - 1 < len(theDict__sortedPosList.get(typeOfBracket, [])):
             braPos = theDict__sortedPosList[typeOfBracket][immediateRightIdx - 1]
         return braPos
 
@@ -1605,6 +1963,7 @@ class BracketStorage:
         :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
         :type typeOfBracket: BracketType Enum
         """
+
         nearest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False) #no such thing...-inf
         nearest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True) #no such thing...inf
         filt__list_tuple_width_id_openPos_closePos = filter(
@@ -1678,3 +2037,33 @@ class BracketStorage:
                 if width > maxWidth:
                     maxWidth, selectedOpenPos, selectedClosePos, selectedBracketId = width, openPos, closePos, bracketId
             return selectedOpenPos, selectedClosePos, selectedBracketId
+
+    def __str__(self):
+        """
+        print internal state of store
+
+        #TODO prefix the internal states, and use self to find in a single loop
+    closeBraType__sortedPosList = {}
+    openBraType__sortedPosList = {}
+    id__tuple_openPos_openBraType_closePos_closeBraType = {}
+    list_tuple_width_id_openPos_closePos = []
+    openBraPos__bracketId = {}
+    closeBraPos__bracketId = {}
+
+        """
+        import os
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        s = 'closeBraType__sortedPosList' + os.linesep
+        s+=pp.pformat(self.closeBraType__sortedPosList) + os.linesep
+        s+='openBraType__sortedPosList' + os.linesep
+        s+=pp.pformat(self.openBraType__sortedPosList) + os.linesep
+        s+='id__tuple_openPos_openBraType_closePos_closeBraType' + os.linesep
+        s+=pp.pformat(self.id__tuple_openPos_openBraType_closePos_closeBraType) + os.linesep
+        s+='list_tuple_width_id_openPos_closePos' + os.linesep
+        s+=pp.pformat(self.list_tuple_width_id_openPos_closePos) + os.linesep
+        s+='openBraPos__bracketId' + os.linesep
+        s+=pp.pformat(self.openBraPos__bracketId) + os.linesep
+        s+='closeBraPos__bracketId' + os.linesep
+        s+=pp.pformat(self.closeBraPos__bracketId) + os.linesep
+        return s

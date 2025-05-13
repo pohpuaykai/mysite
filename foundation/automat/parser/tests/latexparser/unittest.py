@@ -144,7 +144,7 @@ def test__bracketStorage__getBraPosImmediateLeftOfPos0(verbose=False):
     expected_list_tuple_width_id_openPos_closePos = [(4, 0, 0, 4)]
     expected_openBraPos__bracketId = {0: 0}
     expected_closeBraPos__bracketId = {4: 0}
-    expected_insertIdx = 4
+    expected_insertIdx = float('-inf')
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected_closeBraType__sortedPosList == braSt.closeBraType__sortedPosList and \
@@ -464,13 +464,20 @@ def test__find_matrices0(verbose=False):
         print(parser.matrices_pos_type)
 
 def test___isPosInMatrixTag0(verbose=False):
+    """
+\\begin{pmatrix}(a^2-b^2-c^2-d^2)+i(2ab)&2ac+i(2ad)\\\\-2ac+i(2ad)&(a^2+b^2-c^2-d^2)-i(2ab)\\\\\\end{pmatrix}=\\begin{pmatrix}a+bi&c+di\\\\-c+di&a-bi\\\\\\end{pmatrix}\\begin{pmatrix}a+bi&c+di\\\\-c+di&a-bi\\\\\\end{pmatrix}
+^                                                                                                            ^^                                                        ^               
+0                                                                                                            11                                                        1
+                                                                                                             00                                                        5
+                                                                                                             34                                                        4
+    """
     #(a+bi+cj+dk)(a+bi+cj+dk)
 
     equationStr = "\\begin{pmatrix}(a^2-b^2-c^2-d^2)+i(2ab)&2ac+i(2ad)\\\\-2ac+i(2ad)&(a^2+b^2-c^2-d^2)-i(2ab)\\\\\\end{pmatrix}=\\begin{pmatrix}a+bi&c+di\\\\-c+di&a-bi\\\\\\end{pmatrix}\\begin{pmatrix}a+bi&c+di\\\\-c+di&a-bi\\\\\\end{pmatrix}"
     parser = Latexparser(equationStr, verbose=verbose)
     parser._remove_all_spacing()
     parser._find_matrices()
-    has = parser._Latexparser__isPosInMatrixTag(120)
+    has = parser.isPosInMatrixTag(120)
 
     expected_matrices_pos_type = [   
     {   'args': [],
@@ -750,9 +757,17 @@ def test__find_infix0(verbose=False): #TODO infix test for \\to;\\cross;\\cdot
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', parser.infixs_pos_type == expected_infixs_pos_type)
     if verbose:
-        print(parser.infixs_pos_type)
+        # print(parser.infixs_pos_type)
+        print(parser.entitystorage) # TODO
 
 def test__find_brackets(verbose=False):
+    """
+\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}
+      ^                  ^^      ^          ^ ^       ^^      ^ ^^ ^      ^   ^ ^    ^ ^ ^  ^             ^ ^^ ^ ^  ^^  ^            ^ ^^ ^ ^^^
+      5                  22      2          3 4       44      5 55 5      6   6 7    7 7 8  8             9 99 1 1  11  1            1 11 1 111
+                         12      8          8 0       78      4 67 9      5   9 1    6 8 0  3             5 78 0 0  00  0            2 22 2 222
+                                                                                                               0 2  56  9            0 23 5 789
+    """
     #Fourier transform
     equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2} f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}"
     parser = Latexparser(equationStr, verbose=verbose)
@@ -760,11 +775,31 @@ def test__find_brackets(verbose=False):
     parser._find_matrices()
     parser._find_infix()
     parser._find_brackets()
-    expected = None
+    expected_id__tuple_openPos_openBraType_closePos_closeBraType = {   
+    0: (5, '{', 21, '}'),
+    1: (28, '{', 38, '}'),
+    2: (40, '{', 47, '}'),
+    3: (54, '{', 56, '}'),
+    4: (57, '{', 59, '}'),
+    5: (65, '{', 69, '}'),
+    6: (71, '{', 76, '}'),
+    7: (78, '(', 80, ')'),
+    8: (95, '{', 97, '}'),
+    9: (98, '{', 100, '}'),
+    10: (83, '{', 102, '}'),
+    11: (48, '{', 105, '}'),
+    12: (120, '{', 122, '}'),
+    13: (123, '{', 125, '}'),
+    14: (109, '{', 127, '}'),
+    15: (106, '(', 128, ')'),
+    16: (22, '{', 129, '}')}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType == expected_id__tuple_openPos_openBraType_closePos_closeBraType
+        )
     if verbose:
-        print()
+        #parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType
+        pp.pprint(parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType)
 
 def test__find_backslash0(verbose=False):
     #Fourier transform
@@ -807,13 +842,19 @@ def test__find_implicit_multiply0(verbose=False):
         print() # TODO
 
 
-def test__find_infixes_width0(verbose=False):
+def test__find_infixes_arg_brackets_width0(verbose=False):
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
         print() # TODO
 
+def test__update_all_width_by_enclosing_brackets_width_remove0(verbose=False):
+
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
+    if verbose:
+        print() # TODO
 
 def test__match_child_to_parent_input0(verbose=False):
 
@@ -857,16 +898,17 @@ if __name__=='__main__':
     # test__bracketStorage__getAllEnclosingTouchingBraOfPos0()
     # test__bracketStorage__getWidestEnclosingBra0()
 
-    # test__remove_space0()
-    # test__find_matrices0()
-    # test___isPosInMatrixTag0()
-    # test__find_infix0()
+    test__remove_space0()
+    test__find_matrices0()
+    test___isPosInMatrixTag0()
+    # test__find_infix0(True) 
     test__find_brackets(True)
     # test__find_backslash0(True)
     #test__find_variables_or_numbers0(True)
     #test__find_implicit_00(True)
+    # test__find_infixes_arg_brackets_width0(True)
+    # test__update_all_width_by_enclosing_brackets_width_remove0(True)
     #test__find_implicit_multiply0(True)
-    #test__find_infixes_width0(True)
     #test__match_child_to_parent_input0(True)
     #test__format_to_pyStyledAST0(True)
     #test__convert_to_schemeStyledAST0(True)
