@@ -1473,10 +1473,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         
     def _format_to_pyStyledAST(self):
         """
-self.entitystorage.nodeId__tuple_pNodeId_argIdx
+self.entitystorage.tuple_nodeId_argIdx__pNodeId
         """
         pNode__list_tuple_argId_cNode = {}
-        for nodeId, (pNodeId, argIdx) in self.entitystorage.nodeId__tuple_pNodeId_argIdx.items():
+        for (nodeId, argIdx), pNodeId in self.entitystorage.tuple_nodeId_argIdx__pNodeId.items():
             pFuncName = self.entitystorage.nodeId__funcName[pNodeId]
             existingChildren = pNode__list_tuple_argId_cNode.get((pFuncName, pNodeId), [])
             funcName = self.entitystorage.nodeId__funcName[nodeId]
@@ -1559,14 +1559,7 @@ class EntityStorage:
     This acts like a database for Entities, allowing CRUD
 
     WHAT ARE THE QUERIES? THIS WILL DETERMINE THE UNDERLYING DATASTRUCTURE.
-    Q0:__updateTemplatesToWiderEnclosingBracketsAndRemove [width updates]
-    Q1:containment of a point POS of a certain type [pos In matrices?]
-    Q2:widest entity within [startPos, endPos]
     Q3:StatisticalCounts
-    Q4: entities Iterator
-    <<<<<<<<<<<add arg: _match_child_to_parent_input
-    Q5:add arg: nodeId, funcName, argIdx, openBra(needed? yes we might only know the brackets but not the exact nodeId at that time), openBraPos(needed? yes we might only know the brackets but not the exact nodeId at that time), closeBra(needed? yes we might only know the brackets but not the exact nodeId at that time), closeBraPos(needed? yes we might only know the brackets but not the exact nodeId at that time)
-    Q6:update arg: nodeId, funcName, argIdx
     """
 
 
@@ -1592,31 +1585,34 @@ class EntityStorage:
             # 'closeBraPos': None
         }
 
-        self.list_widthStart = [] # for BS, OR it can hold tuples. with nodeId, and then nodeId to everything else., find widthStart instead of id
-        self.list_widthEnd = [] # for BS
-        self.widthStart__nodeId = {}
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<needs to be tagged with nodeId.. or your algo, doesn't work.
+        self.list_tuple_widthStart_nodeId = [] # for BS, OR it can hold tuples. with nodeId, and then nodeId to everything else., find widthStart instead of id
+        self.list_tuple_widthEnd_nodeId = [] # for BS
+
+
         self.nodeId__widthStart = {}
-        self.widthEnd__nodeId = {}
         self.nodeId__widthEnd = {}
         self.entityType__list_nodeId = {}
         self.funcStart__nodeId = {}
+        self.funcName__nodeId = {}
         #nodeId -> datum 
         self.nodeId__entityType = {}
         self.nodeId__funcName = {}
         self.nodeId__funcStart = {}
         self.nodeId__funcEnd = {}
         #p|c 
-        self.nodeId__tuple_pNodeId_argIdx = {} # p(arent)NodeId_argIdx CONFIRMED p|c
-        self.nodeId__tuple_cArgIdx_openBra_openBraPos_closeBra_closeBraPos = {} #c(hild)ArgIdx UNCONFIRMED p|c ( we only know the argument width.)
+        self.tuple_nodeId_argIdx__pNodeId = {} # p(arent)NodeId_argIdx CONFIRMED p|c
+        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c(hild)ArgIdx UNCONFIRMED p|c ( we only know the argument width.)
 
     def insert(self, funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None):
         nodeId = self._getNodeId()
         self.nodeId__entityType[nodeId] = entityType
         self.nodeId__funcName[nodeId] = funcName
-        self.nodeId__tuple_pNodeId_argIdx[nodeId] = (parentNodeId, argIdx)
+        # self.nodeId__tuple_pNodeId_argIdx[nodeId] = (parentNodeId, argIdx) # not confirmed yet.
         self.nodeId__funcStart[nodeId] = funcStart
         self.nodeId__funcEnd[nodeId] = funcEnd
         self.funcStart__nodeId[funcStart] = nodeId
+        self.funcName__nodeId[funcName] = nodeId
 
         existing = self.entityType__list_nodeId.get(entityType, [])
         insertPos = BinarySearch.binarySearchPre(existing, nodeId)
@@ -1624,65 +1620,192 @@ class EntityStorage:
         self.entityType__list_nodeId[entityType] = existing
 
         if widthStart is not None:
-            self.widthStart__nodeId[widthStart] = nodeId
             self.nodeId__widthStart[nodeId] = widthStart
 
-            insertPos = BinarySearch.binarySearchPre(self.list_widthStart, widthStart)
-            self.list_widthStart.insert(insertPos, widthStart)
+            insertPos = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, widthStart)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            self.list_tuple_widthStart_nodeId.insert(insertPos, widthStart)
 
         if widthEnd is not None:
-            self.widthEnd__nodeId[widthEnd] = nodeId
             self.nodeId__widthEnd[nodeId] = widthEnd
 
-            insertPos = BinarySearch.binarySearchPre(self.list_widthEnd, widthEnd)
-            self.list_widthEnd.insert(insertPos, widthEnd)
+            insertPos = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, widthEnd)
+            self.list_tuple_widthEnd_nodeId.insert(insertPos, widthEnd)
         return nodeId
 
-"""NEEDS TO BE IMPLEMENTED
-argNodeId, argFuncName = self.entitystorage.getNodeIdFuncNameByFuncStart(funcStart)
-self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)
-existEntityAt(self, entityString, pos)
-widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update<<<<<<<<<<<
-funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_VARIABLE): <<<<<<<<<<<<<<<<<<
-addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx, hasUnconfimed=False):<<<<<<<<<<<<<<<<<<<<<<<
-self.bracketstorage = self.entitystorage.addConfirmedPCrelationship(funcStart, cFuncName, argIdx, hasUnconfirmed=True, bracketstorage=self.bracketstorage) # this should also update infix width and all enclosing brackets <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-openBraPos, closeBraPos,argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(funcStart): # SLOT <<<<<<<<<<<<<<<<<<
-nodeId, funcName = self.entitystorage.getWidestFit(openBraPos, closeBraPos) <<<<<<<<<<<<<<<
-__updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE???? #<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    """NEEDS TO BE IMPLEMENTED
+    argNodeId, argFuncName = self.entitystorage.getNodeIdFuncNameByFuncStart(funcStart)
+    self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< need widthUpdater
+    existEntityAt(self, entityString, pos)
+    widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< need widthUpdater
+    funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_VARIABLE): <<<<<<<<<<<<<<<<<<
+    addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx, hasUnconfimed=False):<<<<<<<<<<<<<<<<<<<<<<<
+    self.bracketstorage = self.entitystorage.addConfirmedPCrelationship(funcStart, cFuncName, argIdx, hasUnconfirmed=True, bracketstorage=self.bracketstorage) # this should also update infix width and all enclosing brackets <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    openBraPos, closeBraPos,argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(funcStart): # SLOT <<<<<<<<<<<<<<<<<<
+    nodeId, funcName = self.entitystorage.getWidestFit(openBraPos, closeBraPos) <<<<<<<<<<<<<<<
+    __updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE???? #<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-"""
+    """
+    def getNodeIdFunNameByFuncStart(self, funcStart):#<<<<<<<<<<<<<<<<UNIT TEST
+        nodeId = self.funcStart__nodeId[funcStart]
+        funcName = self.nodeId__funcName[nodeId]
+        return nodeId, funcName
+
+    def addConfirmedPCrelationshipById(self, pNodeId, cNodeId, cFuncName, argIdx):
+        #remove from UNCONFIRMED: self.nodeId__tuple_cArgIdx_openBra_openBraPos_closeBra_closeBraPos
+        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.pop((pNodeId, argIdx), None)
+        #add to confirmed p|c:
+        self.tuple_nodeId_argIdx__pNodeId[(cNodeId, argIdx)] = pNodeId
+
+        #UPDATE width if EntityType == infix
+        if self.nodeId__entityType[pNodeId] in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX]:
+            if argIdx == 0: #only need to update widthStart to child's
+                pWidthStart = self.nodeId__widthStart[pNodeId]
+                cWidthStart = self.nodeId__widthStart[cNodeId]
+                #note that list_tuple_widthStart_nodeId will have two same values in widthStart
+                self.list_tuple_widthStart_nodeId.remove((pWidthStart, pNodeId))
+                insertIdx = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, cWidthStart, key=lambda t:t[0])
+                self.list_tuple_widthStart_nodeId.insert(insertIdx, (cWidthStart, cNodeId))
+
+                self.updateWidth(pNodeId, pWidthStart, None)
+            elif argIdx == 1: #only need to update widthEnd to child's
+                pWidthEnd = self.nodeId__widthEnd[pNodeId]
+                cWidthEnd = self.nodeId__widthEnd[cNodeId]
+                #note that list_tuple_widthEnd_nodeId will have two same values in widthEnd
+                self.list_tuple_widthEnd_nodeId.remove((pWidthEnd, pNodeId))
+                insertIdx = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, cWidthEnd, key=lambda t:t[0])
+                self.list_tuple_widthEnd_nodeId.insert(insertIdx, (cWidthEnd, cNodeId))
+
+                self.updateWidth(pNodeId, None, pWidthEnd)
+
+            else:
+                raise Exception(f'infix nodeId: {pNodeId}, argIdx not 0 nor 1: {argIdx}')
+
+    def existEntityAt(self, funcName, pos):#funcName is the actual symbol like '^', TODO rename to existFuncNameAt
+        nodeId = self.funcName__nodeId.get(funcName)
+        funcStart = self.nodeId__funcStart.get(nodeId)
+        return funcStart == pos
+
+    def widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update<<<<<<<<<<<
+        nodeId = self.funcStart__nodeId[funcStart]
+        if widthStart is not None:
+            widthStart = max(widthStart, self.nodeId__widthStart[nodeId])
+        if widthEnd is not None:
+            widthEnd = max(widthEnd, self.nodeId__widthEnd[nodeId])
+        self.updateWidth(nodeId, widthStart, widthEnd)
+
+    def getAllEndPosOfEntityType(self, entityType): # entityType is a enum, rename: getAllStartEndPosOfEntityType
+        list_tuple_funcStart_funcEnd = []
+        for nodeId in self.entityType__list_nodeId[entityType]:
+            list_tuple_funcStart_funcEnd.append((
+                self.nodeId__funcStart[nodeId], self.nodeId__funcEnd[nodeId]
+            ))
+        return list_tuple_funcStart_funcEnd
+
+
+    def addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx, hasUnconfimed=False, bracketstorage=None): # TODO remove the flag hasUncofirmed, we just try pop
+        pNodeId = self.funcStart__nodeId[pFuncStart]
+        cNodeId = self.funcStart__nodeId[cFuncStart]
+        cFuncName = self.nodeId__funcName[cNodeId]
+        self.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)
+        if bracketstorage is not None: #update infix width and all enclosing brackets <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            self.__updateTemplatesToWiderEnclosingBracketsAndRemove(nodeIds, bracketstorage)
+            return bracketstorage
+
+    def getAllUnConfirmedPCrelationship(self, funcStart): # SLOT
+        """
+        unconfirmed:
+        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos # can only filter.... if we have a nodeId__list_cArgIdx, then it will be much faster??? TODO
+        """
+        pNodeId = self.funcStart__nodeId[funcStart]
+        list_tuple_openBraPos_closeBraPos_argIdx = []
+        for (_, cArgIdx), (_, openBraPos, _, closeBraPos) in filter(
+            lambda t: t[0][0]==pNodeId, self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items()):
+            list_tuple_openBraPos_closeBraPos_argIdx.append((openBraPos, closeBraPos, cArgIdx))
+        return list_tuple_openBraPos_closeBraPos_argIdx
+
+    def getWidestFit(self, openBraPos, closeBraPos):# get widest nodeId that still between (openBraPos, closeBraPos)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        list_nodeIdContaining = self.getAllContainingByWidth(openBraPos, closeBraPos)
+        maxWidth, maxNodeId, maxFuncName = float('-inf'), None, None
+        for nodeId in list_nodeIdContaining:
+            width = self.nodeId__widthEnd[nodeId] - self.nodeId__widthStart[nodeId]
+            if width > maxWidth:
+                maxWidth = width; maxNodeId = nodeId; maxFuncName = self.nodeId__funcName[nodeId]
+        return maxNodeId, maxFuncName
+
+    def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, nodeIds, bracketstorage): 
+        for nodeId in nodeIds:
+            allEnclosingTouchingBra = bracketstorage.getAllEnclosingTouchingBraOfPos(self.nodeId__funcStart[nodeId], BracketType.ROUND)
+            if len(allEnclosingTouchingBra) > 0:
+                widestWidth = 0
+                widestBra = None
+                for width, bracketId, openBraPos, closeBraPos in allEnclosingTouchingBra:
+                    if width > widestWidth:
+                        widestWidth = width
+                        widestBra = (width, bracketId, openBraPos, closeBraPos)
+                    bracketstorage.removeBracket(openBraPos) # because this bracket cannot contain anything else
+                self.updateWidth(nodeId, widestBra[2], widestBra[3])
+        return bracketstorage
+        #
+
+    def getAllContainingByWidth(self, startPos, endPos):#all the entities within startPos and endPos, 
+        startWidthIdx = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, startPos, key=lambda t:t[0])
+        endWidthIdx = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, endPos, key=lambda t:t[0])
+
+        set_containingNodeIdByStartWidth = set(map(lambda t:t[1], list_tuple_widthStart_nodeId[startWidthIdx:]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
+        set_containingNodeIdByEndWidth = set(map(lambda t:t[1], list_tuple_widthEnd_nodeId[:endWidthIdx]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
+
+        return list(set_containingNodeIdByStartWidth.intersection(set_containingNodeIdByEndWidth))
 
 
     def remove(self, funcStart):
         """
         """
-        nodeId = funcStart__nodeId[funcStart]
-        funcStart__nodeId.pop(funcStart, None)
+        nodeId = self.funcStart__nodeId[funcStart]
+        self.funcStart__nodeId.pop(funcStart, None)
 
-        entityType = nodeId__entityType.pop(nodeId)
-        nodeId__funcName.pop(nodeId, None)
-        nodeId__funcStart.pop(nodeId, None)
-        nodeId__funcEnd.pop(nodeId, None)
-        nodeId__tuple_pNodeId_argIdx.pop(nodeId, None)
+        entityType = self.nodeId__entityType.pop(nodeId)
+        funcName = self.nodeId__funcName.pop(nodeId, None)
+        self.nodeId__funcStart.pop(nodeId, None)
+        self.nodeId__funcEnd.pop(nodeId, None)
+        self.funcName__nodeId.pop(funcName, None)
+        #TODO removal of p|c relationship<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        self.tuple_nodeId_argIdx__pNodeId.pop(nodeId, None)
+        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.pop((pNode, argIdx), None)
 
-        list_nodeId = entityType__list_nodeId.pop(entityType)
+        list_nodeId = self.entityType__list_nodeId.pop(entityType)
         list_nodeId.remove(nodeId)
         entityType__list_nodeId[entityType] = nodeId
 
-        widthEnd = nodeId__widthEnd.pop(nodeId, None)
-        widthStart = nodeId__widthStart.pop(nodeId, None)
+        widthEnd = self.nodeId__widthEnd.pop(nodeId, None)
+        widthStart = self.nodeId__widthStart.pop(nodeId, None)
 
         if widthStart is not None:
-            list_widthStart.remove(widthStart)
-            widthStart__nodeId.pop(widthStart, None)
+            list_tuple_widthStart_nodeId.remove((widthStart, nodeId))
 
         if widthEnd is not None:
-            list_widthEnd.remove(widthEnd)
-            widthEnd__nodeId.pop(widthEnd, None)
+            list_tuple_widthEnd_nodeId.remove((widthEnd, nodeId))
 
 
+    def updateWidth(self, nodeId, widthStart, widthEnd):
+        """
+        widths to update : maybe a method update WIDTH? can put into insert also?
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    self.list_tuple_widthStart_nodeId = [] # for BS, OR it can hold tuples. with nodeId, and then nodeId to everything else., find widthStart instead of id
+    self.list_tuple_widthEnd_nodeId = [] # for BS
+    self.nodeId__widthStart = {}
+    self.nodeId__widthEnd = {}
+        """
+        if widthStart is not None:
+            oldWidthStart = self.nodeId__widthStart[nodeId]
+            self.nodeId__widthStart[nodeId] = widthStart
+            idx = self.list_tuple_widthStart_nodeId.index((oldWidthStart, nodeId))
+            self.list_tuple_widthStart_nodeId[(oldWidthStart, nodeId)] = (widthStart, nodeId)
 
-
+        if widthEnd is not None:
+            oldWidthEnd = self.nodeId__widthEnd[nodeId]
+            self.nodeId__widthEnd[nodeId] = widthEnd
+            idx = self.list_tuple_widthEnd_nodeId.index((oldWidthEnd, nodeId))
+            self.list_tuple_widthEnd_nodeId[(oldWidthEnd, nodeId)] = (widthEnd, nodeId)
 
     def _getNodeId(self):
         """
@@ -1691,35 +1814,6 @@ __updateTemplatesToWiderEnclosingBracketsAndRemove(self, list_template):#INPLACE
         oNodeId = copy(self.node_id)
         self.node_id += 1
         return oNodeId
-
-
-
-
-
-
-
-
-##############################BELOW speculations
-    def existEntityType(self, entityType):
-        return len(entityType__list_nodeId[entityType]) > 0
-
-    def widthUpdate(self, funcStart, widthStart, widthEnd):
-        pass
-
-    def addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx):
-        #UPDATE width if EntityType == infix
-        #remove from UNCONFIRMED: self.nodeId__tuple_cArgIdx_openBra_openBraPos_closeBra_closeBraPos
-        pass
-
-    def addUnConfirmedPCrelationship(self, pFuncStart, argIdx, openBraType, openBraPos, closeBraType, closeBraPos)
-    """
-
-            # 'openBra':None,
-            # 'openBraPos':None,
-            # 'closeBra':None,
-            # 'closeBraPos': None
-    """
-        pass
 
     def _getEntityTemplate(self, nodeId, funcType, funcName, funcStart, funcEnd, widthStart=None, widthEnd=None):
         """

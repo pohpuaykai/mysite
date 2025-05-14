@@ -1,7 +1,7 @@
 import inspect
 import pprint
 
-from foundation.automat.parser.sorte import Latexparser, BracketStorage, BracketType
+from foundation.automat.parser.sorte import Latexparser, BracketStorage, BracketType, EntityStorage, EntityType
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -408,6 +408,150 @@ def test__bracketStorage__getWidestEnclosingBra0(verbose=False):
         print(selectedOpenPos)
         print(selectedClosePos)
         print(selectedBracketId)
+
+
+def test__entityStorage__insert0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+def test__entityStorage__getNodeIdFunNameByFuncStart0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.getNodeIdFunNameByFuncStart(funcStart)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+def test__entityStorage__addConfirmedPCrelationshipById0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+def test__entityStorage__existEntityAt0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.existEntityAt(funcName, pos)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+def test__entityStorage__widthMaxUpdate0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.widthMaxUpdate(funcStart, widthStart, widthEnd)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+def test__entityStorage__getAllEndPosOfEntityType0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.getAllEndPosOfEntityType(entityType)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+
+def test__entityStorage__addConfirmedPCrelationship0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    braSt = BracketStorage()
+    entSt.addConfirmedPCrelationship(pFuncStart, cFuncStart, argIdx, hasUnconfimed=False, bracketstorage=None)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+
+def test__entityStorage__getAllUnConfirmedPCrelationship0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.getAllUnConfirmedPCrelationship(funcStart)
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+
+def test__entityStorage__getWidestFit0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.getWidestFit(openBraPos, closeBraPos)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+
+def test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(nodeIds, bracketstorage)
+
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+
+def test__entityStorage__getAllContainingByWidth0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.getAllContainingByWidth(startPos, endPos)
+    expected = None
+
+    if verbose:
+        print()
+
+
+
+
+def test__entityStorage__remove0(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.remove(funcStart)
+    expected = None
+
+    if verbose:
+        print()
 
 
 
@@ -898,11 +1042,24 @@ if __name__=='__main__':
     # test__bracketStorage__getAllEnclosingTouchingBraOfPos0()
     # test__bracketStorage__getWidestEnclosingBra0()
 
-    test__remove_space0()
-    test__find_matrices0()
-    test___isPosInMatrixTag0()
+    test__entityStorage__insert0(True)
+    test__entityStorage__getNodeIdFunNameByFuncStart0(True)
+    test__entityStorage__addConfirmedPCrelationshipById0(True)
+    test__entityStorage__existEntityAt0(True)
+    test__entityStorage__widthMaxUpdate0(True)
+    test__entityStorage__getAllEndPosOfEntityType0(True)
+    test__entityStorage__addConfirmedPCrelationship0(True)
+    test__entityStorage__getAllUnConfirmedPCrelationship0(True)
+    test__entityStorage__getWidestFit0(True)
+    test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(True)
+    test__entityStorage__getAllContainingByWidth0(True)
+    test__entityStorage__remove0(True)
+
+    # test__remove_space0()
+    # test__find_matrices0()
+    # test___isPosInMatrixTag0()
     # test__find_infix0(True) 
-    test__find_brackets(True)
+    # test__find_brackets(True)
     # test__find_backslash0(True)
     #test__find_variables_or_numbers0(True)
     #test__find_implicit_00(True)
