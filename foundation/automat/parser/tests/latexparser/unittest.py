@@ -526,8 +526,8 @@ pos 5: nodeId 2
     entSt.insert(
         '=', 5, 6, EntityType.PURE_INFIX, widthStart=5, widthEnd=6
     )
-    entSt.addConfirmedPCrelationshipById(1, 0, '+', 0)
-    entSt.addConfirmedPCrelationshipById(2, 1, '+', 0)
+    entSt.addConfirmedPCrelationshipById(1, 0, 0)
+    entSt.addConfirmedPCrelationshipById(2, 1, 0)
 
     expected_list_tuple_widthStart_nodeId = [(1, 0), (1, 1), (1, 2)]
     expected_list_tuple_widthEnd_nodeId = [(2, 0), (4, 1), (6, 2)]
@@ -677,34 +677,46 @@ pos 5: nodeId 2
 
 def test__entityStorage__addConfirmedPCrelationship0(verbose=False):
     """
-1+1+1=3
- ^ ^ ^
- 1 3 5
+((((1+1))+1))=3
+^^^^ ^ ^^^ ^^^
+0123 5 789 111
+           123
 
-pos 1: nodeId 0
-pos 3: nodeId 1
-pos 5: nodeId 2
+infixes:
+pos 5: nodeId 0 +
+pos 9: nodeId 1 +
+pos 13: nodeId 2 =
 
-2        (ws:1 we:6)
+2        (ws: we:)
 |
-1 (arg0) (ws:1 we:4)
+1 (arg0) (ws: we:)
 |
-0 (arg0) (ws:1 we:2)
+0 (arg0) (ws: we:)
+
+brackets:
+(0, 12)
+(1, 11)
+(2, 8)
+(3, 7)
     """
     entSt = EntityStorage()
     entSt.insert(
-        '+', 1, 2, EntityType.PURE_INFIX, widthStart=1, widthEnd=2
+        '+', 5, 6, EntityType.PURE_INFIX, widthStart=5, widthEnd=6
     )
     entSt.insert(
-        '+', 3, 4, EntityType.PURE_INFIX, widthStart=3, widthEnd=4
+        '+', 9, 10, EntityType.PURE_INFIX, widthStart=9, widthEnd=10
     )
     entSt.insert(
-        '=', 5, 6, EntityType.PURE_INFIX, widthStart=5, widthEnd=6
+        '=', 13, 14, EntityType.PURE_INFIX, widthStart=13, widthEnd=14
     )
 
     braSt = BracketStorage() #<<<<<<<<<<<<<<also need to check if braSt was updated correctly <<<add some brackets to testcase
-    entSt.addConfirmedPCrelationship(3, 1, 0, hasUnconfimed=False, bracketstorage=braSt)
-    entSt.addConfirmedPCrelationship(5, 3, 0, hasUnconfimed=False, bracketstorage=braSt)
+    braSt.insertBracket(BracketType.ROUND.value[0], 0, BracketType.ROUND.value[1], 12)
+    braSt.insertBracket(BracketType.ROUND.value[0], 1, BracketType.ROUND.value[1], 11)
+    braSt.insertBracket(BracketType.ROUND.value[0], 2, BracketType.ROUND.value[1], 8)
+    braSt.insertBracket(BracketType.ROUND.value[0], 3, BracketType.ROUND.value[1], 7)
+    entSt.addConfirmedPCrelationship(9, 0, 0, bracketstorage=braSt)
+    entSt.addConfirmedPCrelationship(13, 1, 0, bracketstorage=braSt)
 
     expected_list_tuple_widthStart_nodeId = [(1, 0), (1, 1), (1, 2)]
     expected_list_tuple_widthEnd_nodeId = [(2, 0), (4, 1), (6, 2)]
@@ -743,7 +755,16 @@ pos 5: nodeId 2
         print(str(braSt))
 
 
+def test__entityStorage__getAllNodeIdFuncNameWidthStartWidthEnd0(True)
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.getAllNodeIdFuncNameWidthStartWidthEnd()
+    expected = None
 
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+    )
+    if verbose:
+        print(str(entSt))
 
 def test__entityStorage__getAllUnConfirmedPCrelationship0(verbose=False):
     entSt = EntityStorage()
@@ -1305,20 +1326,21 @@ if __name__=='__main__':
 
     # test__entityStorage__insert0()
     # test__entityStorage__getNodeIdFunNameByFuncStart0()
-    # test__entityStorage__addConfirmedPCrelationshipById0()
+    test__entityStorage__addConfirmedPCrelationshipById0(True)
     # test__entityStorage__existEntityAt0()
     # test__entityStorage__widthMaxUpdate0()
-    test__entityStorage__getAllEndPosOfEntityType0(True)
-    # test__entityStorage__addConfirmedPCrelationship0(True)
+    # test__entityStorage__getAllEndPosOfEntityType0()
+    test__entityStorage__getAllNodeIdFuncNameWidthStartWidthEnd0(True)
+    test__entityStorage__addConfirmedPCrelationship0(True)
     # test__entityStorage__getAllUnConfirmedPCrelationship0(True)
     # test__entityStorage__getWidestFit0(True)
     # test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(True)
     # test__entityStorage__getAllContainingByWidth0(True)
     # test__entityStorage__remove0(True)
 
-    # test__remove_space0()
-    # test__find_matrices0()
-    # test___isPosInMatrixTag0()
+    # test__remove_space0(True)
+    # test__find_matrices0(True)
+    # test___isPosInMatrixTag0(True)
     # test__find_infix0(True) 
     # test__find_brackets(True)
     # test__find_backslash0(True)
