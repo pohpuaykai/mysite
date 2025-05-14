@@ -1594,7 +1594,8 @@ class EntityStorage:
         self.nodeId__widthEnd = {}
         self.entityType__list_nodeId = {}
         self.funcStart__nodeId = {}
-        self.funcName__nodeId = {}
+        # self.funcName__nodeId = {} #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<a lot of nodeIds
+        self.funcName__list_nodeId = {}
         #nodeId -> datum 
         self.nodeId__entityType = {}
         self.nodeId__funcName = {}
@@ -1608,11 +1609,15 @@ class EntityStorage:
         nodeId = self._getNodeId()
         self.nodeId__entityType[nodeId] = entityType
         self.nodeId__funcName[nodeId] = funcName
-        # self.nodeId__tuple_pNodeId_argIdx[nodeId] = (parentNodeId, argIdx) # not confirmed yet.
         self.nodeId__funcStart[nodeId] = funcStart
         self.nodeId__funcEnd[nodeId] = funcEnd
         self.funcStart__nodeId[funcStart] = nodeId
-        self.funcName__nodeId[funcName] = nodeId
+
+        exlist_nodeId = self.funcName__list_nodeId.get(funcName, [])
+        exlist_nodeId.append(nodeId)
+        self.funcName__list_nodeId[funcName] = exlist_nodeId
+
+        # self.funcName__nodeId[funcName] = nodeId
 
         existing = self.entityType__list_nodeId.get(entityType, [])
         insertPos = BinarySearch.binarySearchPre(existing, nodeId)
@@ -1622,21 +1627,25 @@ class EntityStorage:
         if widthStart is not None:
             self.nodeId__widthStart[nodeId] = widthStart
 
-            insertPos = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, widthStart)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            self.list_tuple_widthStart_nodeId.insert(insertPos, widthStart)
+            insertPos = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, widthStart, key=lambda t: t[0])
+            self.list_tuple_widthStart_nodeId.insert(insertPos, (widthStart, nodeId))
 
         if widthEnd is not None:
             self.nodeId__widthEnd[nodeId] = widthEnd
 
-            insertPos = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, widthEnd)
-            self.list_tuple_widthEnd_nodeId.insert(insertPos, widthEnd)
+            insertPos = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, widthEnd, key=lambda t: t[0])
+            self.list_tuple_widthEnd_nodeId.insert(insertPos, (widthEnd, nodeId))
+
+        if parentNodeId is not None and argIdx is not None: # if usr gives, then we assume this p|c is confirmed
+            self.tuple_nodeId_argIdx__pNodeId[(nodeId, argIdx)] = parentNodeId
+
         return nodeId
 
     """NEEDS TO BE IMPLEMENTED
     argNodeId, argFuncName = self.entitystorage.getNodeIdFuncNameByFuncStart(funcStart)
-    self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< need widthUpdater
+    self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, cFuncName, argIdx)
     existEntityAt(self, entityString, pos)
-    widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< need widthUpdater
+    widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update
     funcStart, funcEnd in self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_VARIABLE): <<<<<<<<<<<<<<<<<<
     addConfirmedPCrelationship(self, pFuncStart, cFuncStart, argIdx, hasUnconfimed=False):<<<<<<<<<<<<<<<<<<<<<<<
     self.bracketstorage = self.entitystorage.addConfirmedPCrelationship(funcStart, cFuncName, argIdx, hasUnconfirmed=True, bracketstorage=self.bracketstorage) # this should also update infix width and all enclosing brackets <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1659,36 +1668,29 @@ class EntityStorage:
         #UPDATE width if EntityType == infix
         if self.nodeId__entityType[pNodeId] in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX]:
             if argIdx == 0: #only need to update widthStart to child's
-                pWidthStart = self.nodeId__widthStart[pNodeId]
                 cWidthStart = self.nodeId__widthStart[cNodeId]
-                #note that list_tuple_widthStart_nodeId will have two same values in widthStart
-                self.list_tuple_widthStart_nodeId.remove((pWidthStart, pNodeId))
-                insertIdx = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, cWidthStart, key=lambda t:t[0])
-                self.list_tuple_widthStart_nodeId.insert(insertIdx, (cWidthStart, cNodeId))
+                self.updateWidth(pNodeId, cWidthStart, None)
 
-                self.updateWidth(pNodeId, pWidthStart, None)
             elif argIdx == 1: #only need to update widthEnd to child's
-                pWidthEnd = self.nodeId__widthEnd[pNodeId]
                 cWidthEnd = self.nodeId__widthEnd[cNodeId]
-                #note that list_tuple_widthEnd_nodeId will have two same values in widthEnd
-                self.list_tuple_widthEnd_nodeId.remove((pWidthEnd, pNodeId))
-                insertIdx = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, cWidthEnd, key=lambda t:t[0])
-                self.list_tuple_widthEnd_nodeId.insert(insertIdx, (cWidthEnd, cNodeId))
-
-                self.updateWidth(pNodeId, None, pWidthEnd)
+                self.updateWidth(pNodeId, None, cWidthEnd)
 
             else:
                 raise Exception(f'infix nodeId: {pNodeId}, argIdx not 0 nor 1: {argIdx}')
 
     def existEntityAt(self, funcName, pos):#funcName is the actual symbol like '^', TODO rename to existFuncNameAt
-        nodeId = self.funcName__nodeId.get(funcName)
-        funcStart = self.nodeId__funcStart.get(nodeId)
-        return funcStart == pos
+        # nodeId = self.funcName__nodeId.get(funcName)
+        list_nodeId = self.funcName__list_nodeId.get(funcName, [])
+        list_funcStart = list(map(lambda nodeId: self.nodeId__funcStart[nodeId], list_nodeId))
+        # funcStart = self.nodeId__funcStart.get(nodeId)
+        # print('list_nodeId', list_nodeId, 'funcStart', funcStart)
+        # import pdb;pdb.set_trace()
+        return pos in list_funcStart#funcStart == pos
 
-    def widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update<<<<<<<<<<<
+    def widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update
         nodeId = self.funcStart__nodeId[funcStart]
         if widthStart is not None:
-            widthStart = max(widthStart, self.nodeId__widthStart[nodeId])
+            widthStart = min(widthStart, self.nodeId__widthStart[nodeId])#<<<<<<<<<<<<<<<<<<<<<<<<<should be min? so that width is maximised?
         if widthEnd is not None:
             widthEnd = max(widthEnd, self.nodeId__widthEnd[nodeId])
         self.updateWidth(nodeId, widthStart, widthEnd)
@@ -1767,7 +1769,11 @@ class EntityStorage:
         funcName = self.nodeId__funcName.pop(nodeId, None)
         self.nodeId__funcStart.pop(nodeId, None)
         self.nodeId__funcEnd.pop(nodeId, None)
-        self.funcName__nodeId.pop(funcName, None)
+        # self.funcName__nodeId.pop(funcName, None)
+        exlist_nodeId = self.funcName__list_nodeId.get(funcName, [])
+        exlist_nodeId.pop(funcName, None)
+        self.funcName__list_nodeId[funcName] = exlist_nodeId
+
         #TODO removal of p|c relationship<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         self.tuple_nodeId_argIdx__pNodeId.pop(nodeId, None)
         self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.pop((pNode, argIdx), None)
@@ -1798,14 +1804,75 @@ class EntityStorage:
         if widthStart is not None:
             oldWidthStart = self.nodeId__widthStart[nodeId]
             self.nodeId__widthStart[nodeId] = widthStart
-            idx = self.list_tuple_widthStart_nodeId.index((oldWidthStart, nodeId))
-            self.list_tuple_widthStart_nodeId[(oldWidthStart, nodeId)] = (widthStart, nodeId)
+            if (oldWidthStart, nodeId) in self.list_tuple_widthStart_nodeId:
+                idx = self.list_tuple_widthStart_nodeId.index((oldWidthStart, nodeId))
+                self.list_tuple_widthStart_nodeId[idx] = (widthStart, nodeId)
 
         if widthEnd is not None:
             oldWidthEnd = self.nodeId__widthEnd[nodeId]
             self.nodeId__widthEnd[nodeId] = widthEnd
-            idx = self.list_tuple_widthEnd_nodeId.index((oldWidthEnd, nodeId))
-            self.list_tuple_widthEnd_nodeId[(oldWidthEnd, nodeId)] = (widthEnd, nodeId)
+            if (oldWidthEnd, nodeId) in self.list_tuple_widthEnd_nodeId:
+                idx = self.list_tuple_widthEnd_nodeId.index((oldWidthEnd, nodeId))
+                self.list_tuple_widthEnd_nodeId[idx] = (widthEnd, nodeId)
+
+    def __str__(self):
+        """
+
+        #TODO prefix the internal states, and use self to find in a single loop
+
+
+
+        self.list_tuple_widthStart_nodeId = [] # for BS, OR it can hold tuples. with nodeId, and then nodeId to everything else., find widthStart instead of id
+        self.list_tuple_widthEnd_nodeId = [] # for BS
+
+
+        self.nodeId__widthStart = {}
+        self.nodeId__widthEnd = {}
+        self.entityType__list_nodeId = {}
+        self.funcStart__nodeId = {}
+        self.funcName__nodeId = {}
+        #nodeId -> datum 
+        self.nodeId__entityType = {}
+        self.nodeId__funcName = {}
+        self.nodeId__funcStart = {}
+        self.nodeId__funcEnd = {}
+        #p|c 
+        self.tuple_nodeId_argIdx__pNodeId = {} # p(arent)NodeId_argIdx CONFIRMED p|c
+        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c(hild)ArgIdx UNCONFIRMED p|c ( we only know the argument width.)
+
+        """
+        import os
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+
+        s = 'list_tuple_widthStart_nodeId'+os.linesep
+        s += pp.pformat(self.list_tuple_widthStart_nodeId)+os.linesep
+        s += 'list_tuple_widthEnd_nodeId'+os.linesep
+        s += pp.pformat(self.list_tuple_widthEnd_nodeId)+os.linesep
+        s += 'nodeId__widthStart'+os.linesep
+        s += pp.pformat(self.nodeId__widthStart)+os.linesep
+        s += 'nodeId__widthEnd'+os.linesep
+        s += pp.pformat(self.nodeId__widthEnd)+os.linesep
+        s += 'entityType__list_nodeId'+os.linesep
+        s += pp.pformat(self.entityType__list_nodeId)+os.linesep
+        s += 'funcStart__nodeId'+os.linesep
+        s += pp.pformat(self.funcStart__nodeId)+os.linesep
+        s += 'funcName__list_nodeId'+os.linesep
+        s += pp.pformat(self.funcName__list_nodeId)+os.linesep
+        s += 'nodeId__entityType'+os.linesep
+        s += pp.pformat(self.nodeId__entityType)+os.linesep
+        s += 'nodeId__funcName'+os.linesep
+        s += pp.pformat(self.nodeId__funcName)+os.linesep
+        s += 'nodeId__funcStart'+os.linesep
+        s += pp.pformat(self.nodeId__funcStart)+os.linesep
+        s += 'nodeId__funcEnd'+os.linesep
+        s += pp.pformat(self.nodeId__funcEnd)+os.linesep
+        s += 'tuple_nodeId_argIdx__pNodeId'+os.linesep
+        s += pp.pformat(self.tuple_nodeId_argIdx__pNodeId)+os.linesep
+        s += 'tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos'+os.linesep
+        s += pp.pformat(self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)+os.linesep
+        return s
+
 
     def _getNodeId(self):
         """
