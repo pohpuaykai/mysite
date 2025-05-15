@@ -745,12 +745,13 @@ entSt.insert ORDER:
 +     6
 =     11
 -     12
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<braSt.insertBraket
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<braSt.insertBracket
 pi  8
 sin 1 <addUnconfirm
 sin 14 <addUnconfirm
 x     5
 x     18
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<_find_infixes_arg_brackets_width [add children to backslashes]
 
 braSt.insertBracket ORDER:
 (4, 10)
@@ -785,25 +786,27 @@ braSt.insertBracket ORDER:
     entSt.insert('x', 18, 19, EntityType.PURE_VARIABLE, 
         widthStart=18, widthEnd=19)
 
+    braSt = entSt.addConfirmedPCrelationship(6, 6, 0, bracketstorage=braSt) # also removes the (4, 10) containing this arg
+    braSt = entSt.addConfirmedPCrelationship(6, 3, 1, bracketstorage=braSt) # also removes the (4, 10) containing this arg
 
     nodeId4, funcName4 = entSt.getWidestFit(4, 10)
-    nodeId5, funcName5 = entSt.getWidestFit(17, 19) #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<endPoint off by 1
+    nodeId5, funcName5 = entSt.getWidestFit(17, 19)
 
     """
     nodeId ~ widthStart ~ widthEnd
-    0 ~ 6 ~ 7
-    1 ~ 11 ~ 12
-    2 ~ 12 ~ 13
-    3 ~ 8 ~ 10
-    4 ~ 1 ~ 4
-    5 ~ 14 ~ 17
-    6 ~ 5 ~ 6
-    7 ~ 18 ~ 19
+    0 ~ 6 ~ 7                      +
+    1 ~ 11 ~ 12                    =
+    2 ~ 12 ~ 13                    -
+    3 ~ 8 ~ 10                     pi
+    4 ~ 1 ~ 4                      sin
+    5 ~ 14 ~ 17                    sin
+    6 ~ 5 ~ 6                      x
+    7 ~ 18 ~ 19                    x
     """
-    expected_list_tuple_widthStart_nodeId = [(1, 4), (5, 6), (6, 0), (8, 3), (11, 1), (12, 2), (14, 5), (18, 7)]
-    expected_list_tuple_widthEnd_nodeId = [(4, 4), (6, 6), (7, 0), (10, 3), (12, 1), (13, 2), (17, 5), (19, 7)]
-    expected_nodeId__widthStart = {0: 6, 1: 11, 2: 12, 3: 8, 4: 1, 5: 14, 6: 5, 7: 18}
-    expected_nodeId__widthEnd = {0: 7, 1: 12, 2: 13, 3: 10, 4: 4, 5: 17, 6: 6, 7: 19}
+    expected_list_tuple_widthStart_nodeId = [(1, 4), (5, 6), (4, 0), (8, 3), (11, 1), (12, 2), (14, 5), (18, 7)]
+    expected_list_tuple_widthEnd_nodeId = [(4, 4), (6, 6), (10, 0), (10, 3), (12, 1), (13, 2), (17, 5), (19, 7)]
+    expected_nodeId__widthStart = {0: 4, 1: 11, 2: 12, 3: 8, 4: 1, 5: 14, 6: 5, 7: 18}
+    expected_nodeId__widthEnd = {0: 10, 1: 12, 2: 13, 3: 10, 4: 4, 5: 17, 6: 6, 7: 19}
     expected_entityType__list_nodeId = {
         EntityType.PURE_INFIX: [0, 1, 2],
         EntityType.BACKSLASH_NUMBER: [3],
@@ -823,26 +826,26 @@ braSt.insertBracket ORDER:
     expected_nodeId__funcName = {0: '+', 1: '=', 2: '-', 3: 'pi', 4: 'sin', 5: 'sin', 6: 'x', 7: 'x'}
     expected_nodeId__funcStart = {0: 6, 1: 11, 2: 12, 3: 8, 4: 1, 5: 14, 6: 5, 7: 18}
     expected_nodeId__funcEnd = {0: 7, 1: 12, 2: 13, 3: 10, 4: 4, 5: 17, 6: 6, 7: 19}
-    expected_tuple_nodeId_argIdx__pNodeId = {}
+    expected_tuple_nodeId_argIdx__pNodeId = {(3, 1): 0, (6, 0): 0}
     expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {
-    (0, 0): (None, 0, None, 6),
-    (0, 1): (None, 6, None, 20),
+    # (0, 0): (None, 0, None, 6),
+    # (0, 1): (None, 6, None, 20),
     (1, 0): (None, 0, None, 11),
     (1, 1): (None, 11, None, 20),
     (2, 0): (None, 0, None, 12),
     (2, 1): (None, 12, None, 20),
     (4, 1): ('(', 4, ')', 10),
     (5, 1): ('(', 17, ')', 19)}
-    expected_closeBraType__sortedPosList = {')': [10, 19]}
-    expected_openBraType__sortedPosList = {'(': [4, 17]}
-    expected_id__tuple_openPos_openBraType_closePos_closeBraType = {0: (4, '(', 10, ')'), 1: (17, '(', 19, ')')}
-    expected_list_tuple_width_id_openPos_closePos = [(2, 1, 17, 19), (6, 0, 4, 10)]
-    expected_openBraPos__bracketId = {4: 0, 17: 1}
-    expected_closeBraPos__bracketId = {10: 0, 19: 1}
+    expected_closeBraType__sortedPosList = {')': [19]}
+    expected_openBraType__sortedPosList = {'(': [17]}
+    expected_id__tuple_openPos_openBraType_closePos_closeBraType = {1: (17, '(', 19, ')')}
+    expected_list_tuple_width_id_openPos_closePos = [(2, 1, 17, 19)]
+    expected_openBraPos__bracketId = {17: 1}
+    expected_closeBraPos__bracketId = {19: 1}
 
     expected_nodeId4 = 0
     expected_funcName4 = '+'
-    expected_nodeId5 = 7#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wrong... endPoint is off by 1? but it affects the above (nodeId4)....?
+    expected_nodeId5 = 7
     expected_funcName5 = 'x'
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -882,9 +885,87 @@ braSt.insertBracket ORDER:
 
 
 def test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(verbose=False):
-    entSt = EntityStorage()
-    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
-    entSt._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(nodeIds, bracketstorage)
+    """
+((((\\sin((x+\\pi)))+(\\sin(x)))))=0
+^^^^^ ^  ^^^^^ ^ ^^^^^^ ^  ^^^^^^^^^
+01234 56789111 11111112 222222222333
+           012 34567890 123456789012
+
+
+entSt.insert ORDER:
+0  +     11
+1  +     18
+2  =     31
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<braSt.insertBracket
+3  pi    13
+4  sin   5 <addUnconfirm
+5  sin   21 <addUnconfirm
+6  x     10
+7  x     25
+8  0     32
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<_find_infixes_arg_brackets_width [add children to backslashes]
+
+braSt.insertBracket ORDER:
+(0, 30)
+(1, 29)
+(2, 28)
+(3, 17)
+(8, 16)
+(9, 15)
+(19, 27)
+(24, 26)
+
+    """
+    braSt = BracketStorage()
+    entSt = EntityStorage(eqStrLen=len('((((\\sin((x+\\pi)))+(\\sin(x)))))=0'))
+
+
+    entSt.insert('+', 11, 12, EntityType.PURE_INFIX, 
+        widthStart=11, widthEnd=12) #0
+    entSt.insert('=', 18, 19, EntityType.PURE_INFIX, 
+        widthStart=18, widthEnd=19) #1
+    entSt.insert('+', 32, 33, EntityType.PURE_INFIX, 
+        widthStart=32, widthEnd=33) #2
+    #<<<<<<<<<<<
+    braSt.insertBracket(BracketType.ROUND.value[0], 0, BracketType.ROUND.value[1], 30)
+    braSt.insertBracket(BracketType.ROUND.value[0], 1, BracketType.ROUND.value[1], 29)
+    braSt.insertBracket(BracketType.ROUND.value[0], 2, BracketType.ROUND.value[1], 28)
+    braSt.insertBracket(BracketType.ROUND.value[0], 3, BracketType.ROUND.value[1], 17)
+    braSt.insertBracket(BracketType.ROUND.value[0], 8, BracketType.ROUND.value[1], 16)
+    braSt.insertBracket(BracketType.ROUND.value[0], 9, BracketType.ROUND.value[1], 15)
+    braSt.insertBracket(BracketType.ROUND.value[0], 19, BracketType.ROUND.value[1], 27)
+    braSt.insertBracket(BracketType.ROUND.value[0], 24, BracketType.ROUND.value[1], 26)
+    #<<<<<<<<<<<
+    entSt.insert('pi', 13, 15, EntityType.BACKSLASH_NUMBER, 
+        widthStart=13, widthEnd=15)#\\pi #3
+    entSt.insert('sin', 5, 8, EntityType.BACKSLASH_FUNCTION, 
+        widthStart=5, widthEnd=8) #4
+
+    entSt.addUnConfirmedPCrelationship(5, 1, BracketType.ROUND.value[0], 8, BracketType.ROUND.value[1], 16)#<<<<<in main_code, _find_backslash will remove the bracket. add auto remove to addUnConfirmedPCrelationship??
+
+    entSt.insert('sin', 21, 24, EntityType.BACKSLASH_FUNCTION, 
+        widthStart=21, widthEnd=24) #5
+
+    entSt.addUnConfirmedPCrelationship(21, 1, BracketType.ROUND.value[0], 24, BracketType.ROUND.value[1], 26)#<<<<<in main_code, _find_backslash will remove the bracket. add auto remove to addUnConfirmedPCrelationship??
+
+    entSt.insert('x', 10, 11, EntityType.PURE_VARIABLE, 
+        widthStart=10, widthEnd=11) #6
+    entSt.insert('x', 25, 26, EntityType.PURE_VARIABLE, 
+        widthStart=25, widthEnd=26) #7
+
+    print('addConfirmedPCrelationship')
+    braSt = entSt.addConfirmedPCrelationship(11, 6, 0, bracketstorage=braSt) # also removes the (4, 10) containing this arg
+    braSt = entSt.addConfirmedPCrelationship(11, 3, 1, bracketstorage=braSt) # also removes the (4, 10) containing this arg
+    braSt = entSt._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove([4, 5], braSt)
+    braSt = entSt.addConfirmedPCrelationship(18, 4, 0, bracketstorage=braSt)#funcStart, cNodeId, argId
+    braSt = entSt.addConfirmedPCrelationship(18, 5, 1, bracketstorage=braSt)#funcStart, cNodeId, argId
+    print('removing by __updateTemplatesToWiderEnclosingBracketsAndRemove')
+    braSt = entSt._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove([1, 4, 5], braSt)
+
+
+    # nodeId4, funcName4 = entSt.getWidestFit(4, 10)
+    # nodeId5, funcName5 = entSt.getWidestFit(17, 19)
+
 
     expected = None
 
@@ -892,6 +973,7 @@ def test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(ver
     )
     if verbose:
         print(str(entSt))
+        print(str(braSt))
 
 
 
@@ -944,8 +1026,8 @@ if __name__=='__main__':
     # test__entityStorage__addConfirmedPCrelationship0()
     # test__entityStorage__addUnConfirmedPCrelationship0()
     # test__entityStorage__getAllUnConfirmedPCrelationship0()
-    test__entityStorage__getWidestFit0(True)
-    # test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(True)
+    # test__entityStorage__getWidestFit0()
+    test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(True)
     # test__entityStorage__getAllContainingByWidth0(True)
     # test__entityStorage__remove0(True)
     # test__entityStorage__updateIfExists(True)
