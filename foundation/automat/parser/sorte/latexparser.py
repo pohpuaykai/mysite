@@ -250,7 +250,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.allBrackets = None # all of the bracket STATIC, 
         self.openBraPos__bracketId = None # STATIC
         self.bracketstorage = BracketStorage()
-        self.entitystorage = EntityStorage()
+        self.entitystorage = None
         self.mabracketstorage = BracketStorage()
         self.list_openTagPos = None
         self.list_closeTagPos = None
@@ -263,6 +263,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
     def _remove_all_spacing(self):
         self.equationStr = self.rawEquationStr.replace(" ", '')
+        self.entitystorage = EntityStorage(eqStrLen=len(self.equationStr))
         
     def _find_matrices(self):
         """
@@ -1174,7 +1175,8 @@ class EntityStorage:
     """
 
 
-    def __init__(self):
+    def __init__(self, eqStrLen):
+        self.eqStrLen = eqStrLen
         self.node_id = 0
         self.entity_template = {
             'nodeId':None,
@@ -1251,8 +1253,8 @@ class EntityStorage:
             #<<<<<<<<<<<<<<<<<<<<differ to addConfirmed
             self.addConfirmedPCrelationshipById(parentNodeId, nodeId, argIdx)
         elif entityType in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX]:#everytime, infix added, AUTO add 2 unconfirmed.
-            self.addUnConfirmedPCrelationship(funcStart, 0, None, float('-inf'), None, float('inf'))#SLOTS open to all possibilities
-            self.addUnConfirmedPCrelationship(funcStart, 1, None, float('-inf'), None, float('inf'))
+            self.addUnConfirmedPCrelationship(funcStart, 0, None, 0, None, funcStart)#SLOTS open to all possibilities
+            self.addUnConfirmedPCrelationship(funcStart, 1, None, funcStart, None, self.eqStrLen)
 
         return nodeId
 
@@ -1363,8 +1365,8 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         startWidthIdx = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, startPos, key=lambda t:t[0])
         endWidthIdx = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, endPos, key=lambda t:t[0])
 
-        set_containingNodeIdByStartWidth = set(map(lambda t:t[1], list_tuple_widthStart_nodeId[startWidthIdx:]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
-        set_containingNodeIdByEndWidth = set(map(lambda t:t[1], list_tuple_widthEnd_nodeId[:endWidthIdx]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
+        set_containingNodeIdByStartWidth = set(map(lambda t:t[1], self.list_tuple_widthStart_nodeId[startWidthIdx:]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
+        set_containingNodeIdByEndWidth = set(map(lambda t:t[1], self.list_tuple_widthEnd_nodeId[:endWidthIdx]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
 
         return list(set_containingNodeIdByStartWidth.intersection(set_containingNodeIdByEndWidth))
 
