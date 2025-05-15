@@ -19,13 +19,13 @@ pos 5: nodeId 2
     """
     entSt = EntityStorage()
     entSt.insert(
-        '+', 1, 2, EntityType.PURE_INFIX, parentNodeId=1, argIdx=0, widthStart=0, widthEnd=3
+        '+', 1, 2, EntityType.PURE_INFIX, widthStart=0, widthEnd=3
     )
     entSt.insert(
-        '+', 3, 4, EntityType.PURE_INFIX, parentNodeId=2, argIdx=0, widthStart=0, widthEnd=5
+        '+', 3, 4, EntityType.PURE_INFIX, widthStart=0, widthEnd=5
     )
     entSt.insert(
-        '=', 5, 6, EntityType.PURE_INFIX, parentNodeId=None, argIdx=None, widthStart=0, widthEnd=7
+        '=', 5, 6, EntityType.PURE_INFIX, widthStart=0, widthEnd=7
     )
 
     expected_list_tuple_widthStart_nodeId = [(0, 2), (0, 1), (0, 0)]
@@ -42,8 +42,14 @@ pos 5: nodeId 2
     expected_nodeId__funcName = {0: '+', 1: '+', 2: '='}
     expected_nodeId__funcStart = {0: 1, 1: 3, 2: 5}
     expected_nodeId__funcEnd = {0: 2, 1: 4, 2: 6}
-    expected_tuple_nodeId_argIdx__pNodeId = {(0, 0): 1, (1, 0): 2}
-    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {}
+    expected_tuple_nodeId_argIdx__pNodeId = {}
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {   
+    (0, 0): (None, float('-inf'), None, float('inf')),
+    (0, 1): (None, float('-inf'), None, float('inf')),
+    (1, 0): (None, float('-inf'), None, float('inf')),
+    (1, 1): (None, float('-inf'), None, float('inf')),
+    (2, 0): (None, float('-inf'), None, float('inf')),
+    (2, 1): (None, float('-inf'), None, float('inf'))}
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected_list_tuple_widthStart_nodeId == entSt.list_tuple_widthStart_nodeId and \
@@ -76,13 +82,13 @@ pos 5: nodeId 2
     """
     entSt = EntityStorage()
     entSt.insert(
-        '+', 1, 2, EntityType.PURE_INFIX, parentNodeId=1, argIdx=0, widthStart=0, widthEnd=3
+        '+', 1, 2, EntityType.PURE_INFIX, widthStart=0, widthEnd=3
     )
     entSt.insert(
-        '+', 3, 4, EntityType.PURE_INFIX, parentNodeId=2, argIdx=0, widthStart=0, widthEnd=5
+        '+', 3, 4, EntityType.PURE_INFIX, widthStart=0, widthEnd=5
     )
     entSt.insert(
-        '=', 5, 6, EntityType.PURE_INFIX, parentNodeId=None, argIdx=None, widthStart=0, widthEnd=7
+        '=', 5, 6, EntityType.PURE_INFIX, widthStart=0, widthEnd=7
     )
     nodeId, funcName = entSt.getNodeIdFunNameByFuncStart(3)
 
@@ -141,7 +147,11 @@ pos 5: nodeId 2
     expected_nodeId__funcStart = {0: 1, 1: 3, 2: 5}
     expected_nodeId__funcEnd = {0: 2, 1: 4, 2: 6}
     expected_tuple_nodeId_argIdx__pNodeId = {(0, 0): 1, (1, 0): 2}
-    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {}
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {   
+    (0, 0): (None, float('-inf'), None, float('inf')),
+    (0, 1): (None, float('-inf'), None, float('inf')),
+    (1, 1): (None, float('-inf'), None, float('inf')),
+    (2, 1): (None, float('-inf'), None, float('inf'))}
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected_list_tuple_widthStart_nodeId == entSt.list_tuple_widthStart_nodeId and \
@@ -437,9 +447,51 @@ __updateTemplatesToWiderEnclosingBracketsAndRemove only returns 1 set, that is s
 
 
 def test__entityStorage__addUnConfirmedPCrelationship0(verbose=False):
+    """
+\\sin(x+\\pi)=-\\sin(x)
+^ ^  ^^^^ ^ ^^^^ ^  ^^^
+0 1  4567 8 1111 1  111
+            0123 4  789
+
+entSt.insert ORDER:
++     6
+-     11
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<braSt.insertBraket
+\\pi  7
+\\sin 0 <addUnconfirm
+\\sin 13 <addUnconfirm
+x     5
+x     18
+
+braSt.insertBracket ORDER:
+(4, 10)
+(17, 19)
+    """
+    braSt = BracketStorage() 
     entSt = EntityStorage()
-    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)
+    #<<<<<<<<<<<
+    braSt.insertBracket(BracketType.ROUND.value[0], 0, BracketType.ROUND.value[1], 12)
+    braSt.insertBracket(BracketType.ROUND.value[0], 1, BracketType.ROUND.value[1], 11)
+    #<<<<<<<<<<<
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)#\\pi
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)
+
     entSt.addUnConfirmedPCrelationship(funcName, argId, openBraType, openBraPos, closeBraType, closeBraPos)
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)
+
+    entSt.addUnConfirmedPCrelationship(funcName, argId, openBraType, openBraPos, closeBraType, closeBraPos)
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)
+    entSt.insert(funcName, funcStart, funcEnd, entityType, 
+        widthStart=None, widthEnd=None)
+    
     expected = None
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -518,18 +570,30 @@ def test__entityStorage__remove0(verbose=False):
         print(str(entSt))
 
 
+def test__entityStorage__updateIfExists(verbose=False):
+    entSt = EntityStorage()
+    entSt.insert(funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None)
+    updateIfExists(funcStart, entityType=None)
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+    )
+    if verbose:
+        print(str(entSt))
+
+
 if __name__=='__main__':
-    # test__entityStorage__insert0(True)
-    # test__entityStorage__getNodeIdFunNameByFuncStart0(True)
-    # test__entityStorage__addConfirmedPCrelationshipById0(True)
-    # test__entityStorage__existEntityAt0(True)
-    # test__entityStorage__widthMaxUpdate0(True)
-    # test__entityStorage__getAllEndPosOfEntityType0(True)
-    # test__entityStorage__getAllNodeIdFuncNameWidthStartWidthEnd0(True)
-    # test__entityStorage__addConfirmedPCrelationship0(True)
-    # test__entityStorage__addUnConfirmedPCrelationship0(True)
+    # test__entityStorage__insert0()
+    # test__entityStorage__getNodeIdFunNameByFuncStart0()
+    # test__entityStorage__addConfirmedPCrelationshipById0()
+    # test__entityStorage__existEntityAt0()
+    # test__entityStorage__widthMaxUpdate0()
+    # test__entityStorage__getAllEndPosOfEntityType0()
+    # test__entityStorage__getAllNodeIdFuncNameWidthStartWidthEnd0()
+    # test__entityStorage__addConfirmedPCrelationship0()
+    test__entityStorage__addUnConfirmedPCrelationship0(True)
     # test__entityStorage__getAllUnConfirmedPCrelationship0(True)
     # test__entityStorage__getWidestFit0(True)
     # test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0(True)
     # test__entityStorage__getAllContainingByWidth0(True)
     # test__entityStorage__remove0(True)
+    # test__entityStorage__updateIfExists(True)

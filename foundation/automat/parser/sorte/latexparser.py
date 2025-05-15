@@ -521,6 +521,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"{re.escape(infix)}", self.equationStr)))
             
             for start, end, group in infix_pos_type_list:
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<might have gotten IMPLICIT_INFIX -
                 self.entitystorage.insert(group, start, end, EntityType.PURE_INFIX, widthStart=start, widthEnd=end)
 
     def _find_brackets(self):
@@ -921,12 +922,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         def addImplictMinus(funcPos):
 
-            pNodeId = self.entitystorage.insert( # insert -
-                '-', funcPos, funcPos, EntityType.IMPLICIT_INFIX, 
-                parentNodeId=None, argIdx=None, widthStart=funcPos, widthEnd=None#<<<<<<<<<<<<<<<<<<<<<UNKNOWN since argIdx=1 is UNKNOWN
-            )
+            #check if we already inserted this as PURE_INFIX ( should be yes)
+            pNodeId = self.entitystorage.updateIfExists(funcPos, entityType=EntityType.IMPLICIT_INFIX) # returns None with no throw, if not exist.
 
-
+            # pNodeId = self.entitystorage.insert( # insert -
+            #     '-', funcPos, funcPos, EntityType.IMPLICIT_INFIX, 
+            #     parentNodeId=None, argIdx=None, widthStart=funcPos, widthEnd=None#<<<<<<<<<<<<<<<<<<<<<UNKNOWN since argIdx=1 is UNKNOWN
+            # )
             self.bracketstorage = self.entitystorage.insert(# insert 0 with parentNodeId
                 '0', funcPos, funcPos, EntityType.PURE_NUMBER, 
                 parentNodeId=pNodeId, argIdx=0, widthStart=funcPos, widthEnd=funcPos, bracketstorage=self.bracketstorage)
@@ -1338,12 +1340,12 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         return maxNodeId, maxFuncName
 
     def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, nodeIds, bracketstorage): 
-        print('nodeId', nodeIds)
+        # print('nodeId', nodeIds)
         for nodeId in nodeIds:
             widthStart = self.nodeId__widthStart[nodeId]
             widthEnd = self.nodeId__widthEnd[nodeId]
             allEnclosingTouchingBra = bracketstorage.getAllEnclosingTouchingBraOfPos(self.nodeId__funcStart[nodeId], widthStart, widthEnd, BracketType.ROUND)
-            print('allEnclosingTouchingBra', allEnclosingTouchingBra)
+            # print('allEnclosingTouchingBra', allEnclosingTouchingBra)
             if len(allEnclosingTouchingBra) > 0:
                 widestWidth = 0
                 widestBra = None
@@ -1352,7 +1354,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
                         widestWidth = width
                         widestBra = (width, bracketId, openBraPos, closeBraPos)
                     bracketstorage.removeBracket(openBraPos) # because this bracket cannot contain anything else
-                    print('removing bracket', openBraPos)
+                    # print('removing bracket', openBraPos)
                 self.updateWidth(nodeId, widestBra[2], widestBra[3])
         return bracketstorage
         #
@@ -1433,6 +1435,20 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             if (oldWidthEnd, nodeId) in self.list_tuple_widthEnd_nodeId:
                 idx = self.list_tuple_widthEnd_nodeId.index((oldWidthEnd, nodeId))
                 self.list_tuple_widthEnd_nodeId[idx] = (widthEnd, nodeId)
+
+    def updateIfExists(self, funcPos, entityType=None):#TODO include other possible updates to the fields
+        nodeId = self.funcStart__nodeId[funcPos]
+        #remove old
+        oEntityType = self.nodeId__entityType.pop(nodeId)
+        olist_nodeId = self.entityType__list_nodeId[oEntityType]
+        olist_nodeId.remove(nodeId)
+        self.entityType__list_nodeId[oEntityType] = olist_nodeId
+        #add new
+        self.nodeId__entityType[nodeId] = entityType
+        elist_nodeId = self.entityType__list_nodeId.get(entityType, [])
+        elist_nodeId.append(nodeId)
+        self.entityType__list_nodeId[entityType] = elist_nodeId
+        #TODO log to tell the user 
 
     def __str__(self):
         """
