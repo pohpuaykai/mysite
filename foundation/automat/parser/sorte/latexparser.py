@@ -168,33 +168,72 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     # 'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
     ######
     BACKSLASH_EXPECTED_INPUTS = { #all possible returns according to input_type, for easy collating
-        '^{}()':[
-                {'argId':0, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}, #exponential
-                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'} # angle
-        ],
-        '()':[
+
+
+        '(C)': [
                 {'argId':0, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
         ],
-        '_{}()':[
-                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
-                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
-        ],
-        '{}{}':[
-                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
-        ],
-        '[]{}':[
+        '[O]{C}': [
                 {'argId':0, 'preSym':'', 'optional':True, 'openBra':'[', 'closeBra':']', 'braOptional':'False'},
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
-        '_{}^{}{}':[
+        '^{O}(C)': [
+                {'argId':0, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}, #exponential
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'} # angle
+        ],
+        '_{C}{C}': [
+                {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+        ],
+
+    '_{C}^{C}{C}': [
+            {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+            {'argId':1, 'preSym':'^', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+            {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+        ],
+
+
+
+
+    '_{C}^{O}{C}': [
+            {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+            {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+            {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+        ],
+
+
+
+
+    '_{O}(C)': [
+                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
+        ],
+
+
+
+
+    '_{O}^{O}{C}': [
                 {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-                {'argId':2, 'preSym':'', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+                {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
             ],
-        '{}': [
-                {'argId':0, 'preSym':'', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+
+
+
+
+    '{C}': [
+                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+        ],
+
+
+
+
+    '{C}{C}': [
+                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ]
+
+
     }#argId is for ASTree building
     
     def _getExpectedBackslashInputs(self, funcName):
@@ -206,28 +245,40 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         closeBra is the closing_delimiter of input
         braOptional is if the openBra and closeBra are optional. (TODO convert to enum? ENUM) 
         
+        {   '(C)': ['ln', 'det'],
+    '[O]{C}': ['sqrt'],
+    '^{O}(C)': ['TRIG'],
+
+    '_{C}(C)': ['lim'],
+    '_{C}^{C}{C}': ['sum', 'prod', 'int'],
+    '_{C}^{O}{C}': ['iint', 'iiint', 'oint', 'oiint'],
+    '_{O}(C)': ['log'],
+    '_{O}^{O}{C}': ['partial', 'nabla', 'Delta'],
+    '{C}': ['VARIABLENAMESTAKEANARG'],
+    '{C}{C}': ['frac']}
         """
-        if funcName in self.TRIGOFUNCTION: 
-            #input_type: ^{}()
-            return self.BACKSLASH_EXPECTED_INPUTS['^{}()']
-        if funcName in ['ln', 'det']:  #det is determinant
-            #input_type: ()
-            return self.BACKSLASH_EXPECTED_INPUTS['()']
-        if funcName in ['log', 'lim']:
-            #input_type: _{}()
-            return self.BACKSLASH_EXPECTED_INPUTS['_{}()']
-        if funcName in ['frac']:
-            #input_type: {}{}
-            return self.BACKSLASH_EXPECTED_INPUTS['{}{}']
+        if funcName in ['ln', 'det']:
+            return self.BACKSLASH_EXPECTED_INPUTS['(C)']
         if funcName in ['sqrt']:
-            #input_type: []{}
-            return self.BACKSLASH_EXPECTED_INPUTS['[]{}']
-        if funcName in ['sum', 'prod', 'partial', 'nabla', 'Delta', 'int', 'iint', 'iiint', 'oint', 'oiint']:
-            #input_type: _{}^{}{}
-            return self.BACKSLASH_EXPECTED_INPUTS['_{}^{}{}']
+            return self.BACKSLASH_EXPECTED_INPUTS['[O]{C}']
+        if funcName in self.TRIGOFUNCTION:
+            return self.BACKSLASH_EXPECTED_INPUTS['^{O}(C)']
+        if funcName in ['lim']:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{C}{C}']
+        if funcName in ['sum', 'prod', 'int']:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{C}^{C}{C}']
+        if funcName in ['iint', 'iiint', 'oint', 'oiint']:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{C}^{O}{C}']
+        if funcName in ['log']:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{O}(C)']
+        if funcName in ['partial', 'nabla', 'Delta']:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{O}^{O}{C}']
         if funcName in self.VARIABLENAMESTAKEANARG:
-            #input_type: {}
-            return self.BACKSLASH_EXPECTED_INPUTS['{}']
+            return self.BACKSLASH_EXPECTED_INPUTS['{C}']
+        if funcName in ['frac']:
+            return self.BACKSLASH_EXPECTED_INPUTS['{C}{C}']
+
+
     #TODO move this up to BACKSLASH_EXPECTED_INPUTS ??
     VARIABLENAMESTAKEANARG = ['overline', 'underline', 'widehat', 'widetilde', 'overrightarrow', 'overleftarrow', 'overbrace', 'underbrace'
     #Math mode accents
@@ -631,7 +682,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 # foundType = 'backslash_number'
                 # storeTemplate['funcType'] = foundType
                 # self.number_pos_type.append(storeTemplate)
-                self.bracketstorage=self.entitystorage.insert(foundType, funcStart, funcEnd, EntityType.BACKSLASH_NUMBER, 
+                self.bracketstorage=self.entitystorage.insert(funcName, funcStart, funcEnd, EntityType.BACKSLASH_NUMBER, 
                     widthStart=funcStart, widthEnd=funcEnd, bracketstorage=self.bracketstorage)
                 continue # skip args finding
             #type == BACKSLASH_FUNCTION
@@ -693,13 +744,17 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
             def findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos):
                 closeBraPos, closeBraType = None, None
-                if nextChar == template['openBra']: # found bracket
+                import pdb;pdb.set_trace()
+                if self.equationStr[nextCharPos+len(template['preSym'])] == template['openBra']: # found bracket, 
+                    gotArg = True
                     #get corresponding closePos
-                    closeBraPos, closeBraType = self.bracketStorage.getCorrespondingCloseBraPos(nextCharPos)
+                    closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(nextCharPos+len(template['preSym']))
+                    self.bracketstorage.removeBracket(nextCharPos+len(template['preSym']))
                     #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
                     #NOTE bracket position if any, store
                     nextCharPos = closeBraPos + len(closeBraType)
-                    self.bracketstorage.removeBracket(openBraPos)
+                    # nextChar = self.equationStr[nextCharPos]
+                    print(template['preSym'], "; removing", template['preSym'] in ['^']);import pdb;pdb.set_trace()
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         """
 
@@ -717,28 +772,30 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 elif template['braOptional'] == 'argLen<2': #no bracket, args of length 1 needed
                     #TAKEARG as nextCharPos+1, store
                     #NOTE NO_BRACKETS, store
+                    gotArg = True
                     nextCharPos += 1
-                    self.bracketstorage.removeBracket(openBraPos)
+                    print(template['preSym'], "; removing", template['preSym'] in ['^']);import pdb;pdb.set_trace()
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient
                         #self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
                         self.entitystorage.remove(funcStart)
+                    # nextChar = self.equationStr[nextCharPos]
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
                     if foundType in ['backslash_function', 'backslash_variable']:
                         raise Exception()
-                return gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
+                return gotArg, nextCharPos, closeBraPos, closeBraType
 
 
             def processOptionalList(funcStart, funcEnd, funcName, eOptionalList, template, nextChar, nextCharPos):
                 gotArg, closeBraPos, closeBraType = False, float('inf'), None#if eOptionalList is empty
                 for template in eOptionalList:
-                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
+                    gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
                     if gotArg:
                         eOptionalList.remove(template)
                         break
-                return eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType
+                return eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType
 
             compulsoryStack, optionalList = [], []
             for template in list_template:
@@ -746,15 +803,26 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     optionalList.append(template)
                 else:
                     compulsoryStack.append(template)
-            nextCharPos = funcEnd#TODO if preSym is multiChar, then i am fucked
-            nextChar = self.equationStr[nextCharPos]#TODO if preSym is multiChar, then i am fucked
+
+            prevCharPos, prevChar, nextCharPos, nextChar = None, None, funcEnd, self.equationStr[funcEnd]
+            print('**********************************************funcName:', funcName, compulsoryStack, optionalList, 'nextChar', nextChar, 'nextCharPos', nextCharPos)
             while len(compulsoryStack) > 0:
                 template = compulsoryStack.pop()
-                if nextChar == template['preSym']: # matched the right nextChar with this COMPULSORYTemplate
-                    gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
+                prevCharPos, prevChar = nextCharPos, nextChar
+                if len(template['preSym']) ==0 or nextChar == template['preSym']: # matched the right nextChar with this COMPULSORYTemplate
+                    gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
+                    print('findBracketGetArgStore', gotArg, nextCharPos, nextChar, closeBraPos, closeBraType)
+                    if not gotArg: # this is compulsory so we put back to compulsoryStack
+                        compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
+                    #if last thing in the bracket? OR if nextCharPos > len(self.equationStr), resetToWhat?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    if nextCharPos >= len(self.equationStr):
+                        nextCharPos, nextChar = prevCharPos, prevChar
+                    else:
+                        nextChar = self.equationStr[nextCharPos]
+                    #TODO if compulsoryStack cannot empty, then there is a syntax error from the user, .....
                 else: # did not match the right nextChar with this COMPULSORYTemplate
                     compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
-                    eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
+                    eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos)
                 
                 #<<<<<<<<<<<<<<<<<<<<
                 self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos) # the entity is not created yet
@@ -762,9 +830,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.entitystorage.addUnConfirmedPCrelationship(
                     funcStart, 
                     template['argId'], nextChar, nextCharPos, closeBraType, closeBraPos)
-            eOptionalList, gotArg, nextCharPos, nextChar, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName,optionalList, template, nextCharPos, nextChar)
+            eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos)
+            
             self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
-            # storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
+            nextChar = self.equationStr[nextCharPos]
             self.entitystorage.addUnConfirmedPCrelationship(
                 funcStart, 
                 template['argId'], nextChar, nextCharPos, closeBraType, closeBraPos)
@@ -899,7 +968,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(nextPos+len('^'), BracketType.CURLY, True)
                 removeCaret__pos = nextPos#
                 if 0 <= openBraPos and openBraPos < len(self.equationStr):
-                    closeBraPos = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+                    closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
                 #remove from other brackets
                     removeCaretBra__pos = openBraPos#
                     nextPos = closeBraPos
@@ -914,7 +983,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #################
                 openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(nextPos, BracketType.CURLY, True)
                 if 0 <= openBraPos and openBraPos < len(self.equationStr): #TODO these seemed to be used together very often... condense into a method?????????????
-                    closeBraPos = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
+                    closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
                 #remove from other brackets
                     self.bracketstorage.remove(openBraPos)
                 else: #a single character
@@ -1237,7 +1306,7 @@ class EntityStorage:
         self.tuple_nodeId_argIdx__pNodeId = {} # p(arent)NodeId_argIdx CONFIRMED p|c
         self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c(hild)ArgIdx UNCONFIRMED p|c ( we only know the argument width.)
 
-    def insert(self, funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None):
+    def insert(self, funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None, bracketstorage=None):
         nodeId = self._getNodeId()
         self.nodeId__entityType[nodeId] = entityType
         self.nodeId__funcName[nodeId] = funcName
@@ -1270,11 +1339,13 @@ class EntityStorage:
 
         if parentNodeId is not None and argIdx is not None: # if usr gives, then we assume this p|c is confirmed
             #<<<<<<<<<<<<<<<<<<<<differ to addConfirmed
-            self.addConfirmedPCrelationshipById(parentNodeId, nodeId, argIdx)
+            self.addConfirmedPCrelationshipById(parentNodeId, nodeId, argIdx, bracketstorage=bracketstorage)
         elif entityType in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX]:#everytime, infix added, AUTO add 2 unconfirmed.
             self.addUnConfirmedPCrelationship(funcStart, 0, None, 0, None, funcStart)#SLOTS open to all possibilities
             self.addUnConfirmedPCrelationship(funcStart, 1, None, funcStart, None, self.eqStrLen)
 
+        if bracketstorage:
+            return bracketstorage
         return nodeId
 
     def getNodeIdFunNameByFuncStart(self, funcStart):
@@ -1414,7 +1485,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         return list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd
 
     def remove(self, funcStart):
-        """Seems to be never used, keep for GOOD_FEELS
+        """This is used by _find_backslash, TODO unit_test
         """
         nodeId = self.funcStart__nodeId[funcStart]
         self.funcStart__nodeId.pop(funcStart, None)
@@ -1425,7 +1496,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         self.nodeId__funcEnd.pop(nodeId, None)
         # self.funcName__nodeId.pop(funcName, None)
         exlist_nodeId = self.funcName__list_nodeId.get(funcName, [])
-        exlist_nodeId.pop(funcName, None)
+        exlist_nodeId.remove(funcName)
         self.funcName__list_nodeId[funcName] = exlist_nodeId
 
         #TODO removal of p|c relationship<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

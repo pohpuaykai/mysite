@@ -93,27 +93,27 @@ def test___isPosInMatrixTag0(verbose=False):
 
 def test__find_infix0(verbose=False): #TODO infix test for \\to;\\cross;\\cdot
     """
-    #\forall k \in \Z^+ and \forall prime_number p, equationStr = 1 | -1 a multivalue function
+    #\forall k \\in \\Z^+ and \forall prime_number p, equationStr = 1 | -1 a multivalue function
 
-(\\frac{p+1}{2})*((p-1)/2)^{(k-1)(p-1)/2})\\%p=p-1
-^^ ^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^
-01 2   678911111111112222222222333333333344 444444
-           01234567890123456789012345678901 234567
+(\\frac{p+1}{2})*((p-1)/2)^{(k-1)(p-1)/2})\\%p=-1
+^^ ^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^
+01 2   678911111111112222222222333333333344 44444
+           01234567890123456789012345678901 23456
 
     """
     
-    equationStr = "(\\frac{p+1}{2})*((p-1)/2)^{(k-1)(p-1)/2})\\%p=p-1"
+    equationStr = "(\\frac{p+1}{2})*((p-1)/2)^{(k-1)(p-1)/2})\\%p=-1"
     parser = Latexparser(equationStr, verbose=verbose)
     parser._remove_all_spacing()
     parser._find_matrices()
     parser._find_infix()
 
-    expected_list_tuple_widthStart_nodeId = None
-    expected_list_tuple_widthEnd_nodeId = None
-    expected_nodeId__widthStart = {0: 44, 1: 41, 2: 25, 3: 22, 4: 37, 5: 15, 6: 19, 7: 29, 8: 34, 9: 46, 10: 8}
-    expected_nodeId__widthEnd = None
-    expected_entityType__list_nodeId = None
-    expected_funcStart__nodeId = None
+    expected_list_tuple_widthStart_nodeId = [(8, 10),(15, 5),(19, 6),(22, 3),(25, 2),(29, 7),(34, 8),(37, 4),(41, 1),(44, 0),(45, 9)]
+    expected_list_tuple_widthEnd_nodeId = [(9, 10), (16, 5), (20, 6), (23, 3), (26, 2), (30, 7), (35, 8), (38, 4), (43, 1), (45, 0), (46, 9)]
+    expected_nodeId__widthStart = {0: 44, 1: 41, 2: 25, 3: 22, 4: 37, 5: 15, 6: 19, 7: 29, 8: 34, 9: 45, 10: 8}
+    expected_nodeId__widthEnd = {0: 45, 1: 43, 2: 26, 3: 23, 4: 38, 5: 16, 6: 20, 7: 30, 8: 35, 9: 46, 10: 9}
+    expected_entityType__list_nodeId = {EntityType.PURE_INFIX: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+    expected_funcStart__nodeId = {8: 10, 15: 5, 19: 6, 22: 3, 25: 2, 29: 7, 34: 8, 37: 4, 41: 1, 44: 0, 45: 9}
     expected_funcName__list_nodeId = {
     '*': [5],
     '+': [10],
@@ -122,12 +122,56 @@ def test__find_infix0(verbose=False): #TODO infix test for \\to;\\cross;\\cdot
     '=': [0],
     '\\%': [1],
     '^': [2]}
-    expected_nodeId__entityType = None
-    expected_nodeId__funcName = None
-    expected_nodeId__funcStart = None
-    expected_nodeId__funcEnd = None
-    expected_tuple_nodeId_argIdx__pNodeId = None
-    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = None
+    expected_nodeId__entityType = {
+    0: EntityType.PURE_INFIX,
+    1: EntityType.PURE_INFIX,
+    2: EntityType.PURE_INFIX,
+    3: EntityType.PURE_INFIX,
+    4: EntityType.PURE_INFIX,
+    5: EntityType.PURE_INFIX,
+    6: EntityType.PURE_INFIX,
+    7: EntityType.PURE_INFIX,
+    8: EntityType.PURE_INFIX,
+    9: EntityType.PURE_INFIX,
+    10: EntityType.PURE_INFIX}
+    expected_nodeId__funcName = {
+    0: '=',
+    1: '\\%',
+    2: '^',
+    3: '/',
+    4: '/',
+    5: '*',
+    6: '-',
+    7: '-',
+    8: '-',
+    9: '-',
+    10: '+'}
+    expected_nodeId__funcStart = {0: 44, 1: 41, 2: 25, 3: 22, 4: 37, 5: 15, 6: 19, 7: 29, 8: 34, 9: 45, 10: 8}
+    expected_nodeId__funcEnd = {0: 45, 1: 43, 2: 26, 3: 23, 4: 38, 5: 16, 6: 20, 7: 30, 8: 35, 9: 46, 10: 9}
+    expected_tuple_nodeId_argIdx__pNodeId = {}
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {
+    (0, 0): (None, 0, None, 44),
+    (0, 1): (None, 44, None, 47),
+    (1, 0): (None, 0, None, 41),
+    (1, 1): (None, 41, None, 47),
+    (2, 0): (None, 0, None, 25),
+    (2, 1): (None, 25, None, 47),
+    (3, 0): (None, 0, None, 22),
+    (3, 1): (None, 22, None, 47),
+    (4, 0): (None, 0, None, 37),
+    (4, 1): (None, 37, None, 47),
+    (5, 0): (None, 0, None, 15),
+    (5, 1): (None, 15, None, 47),
+    (6, 0): (None, 0, None, 19),
+    (6, 1): (None, 19, None, 47),
+    (7, 0): (None, 0, None, 29),
+    (7, 1): (None, 29, None, 47),
+    (8, 0): (None, 0, None, 34),
+    (8, 1): (None, 34, None, 47),
+    (9, 0): (None, 0, None, 45),
+    (9, 1): (None, 45, None, 47),
+    (10, 0): (None, 0, None, 8),
+    (10, 1): (None, 8, None, 47)}
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         parser.entitystorage.list_tuple_widthStart_nodeId == expected_list_tuple_widthStart_nodeId\
@@ -186,8 +230,8 @@ def test__find_brackets0(verbose=False):
 parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType == expected_id__tuple_openPos_openBraType_closePos_closeBraType
         )
     if verbose:
-        #parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType
-        pp.pprint(parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType)
+        print(str(parser.bracketstorage))
+
 
 def test__find_backslash0(verbose=False):
     #Fourier transform
@@ -198,14 +242,68 @@ def test__find_backslash0(verbose=False):
     parser._find_infix()
     parser._find_brackets()
     parser._find_backslash()
-    expected = None
+
+    expected_closeBraType__sortedPosList = None
+    expected_openBraType__sortedPosList = None
+    expected_id__tuple_openPos_openBraType_closePos_closeBraType = None
+    expected_list_tuple_width_id_openPos_closePos = None
+    expected_openBraPos__bracketId = None
+    expected_closeBraPos__bracketId = None
+    expected_list_tuple_widthStart_nodeId = None
+    expected_list_tuple_widthEnd_nodeId = None
+    expected_nodeId__widthStart = None
+    expected_nodeId__widthEnd = None
+    expected_entityType__list_nodeId = None
+    expected_funcStart__nodeId = None
+    expected_funcName__list_nodeId = {
+        '-': [8, 9, 10],
+        '/': [6, 7],
+        '=': [0],
+        '\\to': [1],
+        '^': [2, 3, 4, 5],
+        'frac': [18, 21, 23],
+        'infty': [14],
+        'int': [19],
+        'lim': [11],
+        'pi': [20, 22],
+        'sum': [15],
+        'theta': [12, 16, 17],
+        'to': [13]}
+    expected_nodeId__entityType = None
+    expected_nodeId__funcName = {   0: '=',
+    1: '\\to',
+    2: '^',#<<<<<<<<<<<<<<<<<<<<<wrong only supposed to have 2 ^, other 2 belong to backslash
+    3: '^',
+    4: '^',
+    5: '^',
+    6: '/',
+    7: '/',
+    8: '-',
+    9: '-',
+    10: '-',
+    11: 'lim',
+    12: 'theta',
+    13: 'to',
+    14: 'infty',
+    15: 'sum',
+    16: 'theta',
+    17: 'theta',
+    18: 'frac',
+    19: 'int',
+    20: 'pi',
+    21: 'frac',
+    22: 'pi',
+    23: 'frac'}
+    expected_nodeId__funcStart = None
+    expected_nodeId__funcEnd = None
+    expected_tuple_nodeId_argIdx__pNodeId = None
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = None
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print('backslash_pos_type', parser.backslash_pos_type)
-        print('variables_pos_type', parser.variables_pos_type)
-        print('number_pos_type', parser.number_pos_type)
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
         
 
 def test__find_variables_or_numbers0(verbose=False):
@@ -278,9 +376,9 @@ if __name__=='__main__':
     # test__remove_space0()
     # test__find_matrices0()
     # test___isPosInMatrixTag0()
-    test__find_infix0(True) 
-    # test__find_brackets0(True)
-    # test__find_backslash0(True)
+    # test__find_infix0() 
+    # test__find_brackets0()
+    test__find_backslash0(True)
     #test__find_variables_or_numbers0(True)
     #test__find_implicit_00(True)
     # test__find_infixes_arg_brackets_width0(True)
