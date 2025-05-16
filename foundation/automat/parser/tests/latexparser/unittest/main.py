@@ -29,35 +29,41 @@ def test__find_matrices0(verbose=False):
     parser._remove_all_spacing()
     parser._find_matrices()
 
-    expected_matrices_pos_type = [   
-    {   'args': [],
-        'funcEnd': 103,
-        'funcName': 'pmatrix',
-        'funcStart': 0,
-        'funcType': 'matrix',
-        'nodeId': 0,
-        'widthEnd': 103,
-        'widthStart': 0},
-    {   'args': [],
-        'funcEnd': 155,
-        'funcName': 'pmatrix',
-        'funcStart': 104,
-        'funcType': 'matrix',
-        'nodeId': 1,
-        'widthEnd': 155,
-        'widthStart': 104},
-    {   'args': [],
-        'funcEnd': 206,
-        'funcName': 'pmatrix',
-        'funcStart': 155,
-        'funcType': 'matrix',
-        'nodeId': 2,
-        'widthEnd': 206,
-        'widthStart': 155}]
+    expected_list_tuple_widthStart_nodeId = [(0, 0), (104, 1), (155, 2)]
+    expected_list_tuple_widthEnd_nodeId = [(103, 0), (155, 1), (206, 2)]
+    expected_nodeId__widthStart = {0: 0, 1: 104, 2: 155}
+    expected_nodeId__widthEnd = {0: 103, 1: 155, 2: 206}
+    expected_entityType__list_nodeId = {EntityType.MATRIX: [0, 1, 2]}
+    expected_funcStart__nodeId = {0: 0, 104: 1, 155: 2}
+    expected_funcName__list_nodeId = {'pmatrix': [0, 1, 2]}
+    expected_nodeId__entityType = {
+        0: EntityType.MATRIX,
+        1: EntityType.MATRIX,
+        2: EntityType.MATRIX}
+    expected_nodeId__funcName = {0: 'pmatrix', 1: 'pmatrix', 2: 'pmatrix'}
+    expected_nodeId__funcStart = {0: 0, 1: 104, 2: 155}
+    expected_nodeId__funcEnd = {0: 103, 1: 155, 2: 206}
+    expected_tuple_nodeId_argIdx__pNodeId = {}
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', parser.matrices_pos_type == expected_matrices_pos_type)
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        parser.entitystorage.list_tuple_widthStart_nodeId == expected_list_tuple_widthStart_nodeId\
+        and parser.entitystorage.list_tuple_widthEnd_nodeId == expected_list_tuple_widthEnd_nodeId\
+        and parser.entitystorage.nodeId__widthStart == expected_nodeId__widthStart\
+        and parser.entitystorage.nodeId__widthEnd == expected_nodeId__widthEnd\
+        and parser.entitystorage.entityType__list_nodeId == expected_entityType__list_nodeId\
+        and parser.entitystorage.funcStart__nodeId == expected_funcStart__nodeId\
+        and parser.entitystorage.funcName__list_nodeId == expected_funcName__list_nodeId\
+        and parser.entitystorage.nodeId__entityType == expected_nodeId__entityType\
+        and parser.entitystorage.nodeId__funcName == expected_nodeId__funcName\
+        and parser.entitystorage.nodeId__funcStart == expected_nodeId__funcStart\
+        and parser.entitystorage.nodeId__funcEnd == expected_nodeId__funcEnd\
+        and parser.entitystorage.tuple_nodeId_argIdx__pNodeId == expected_tuple_nodeId_argIdx__pNodeId\
+        and parser.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos == expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos\
+        
+    )
     if verbose:
-        print(parser.matrices_pos_type)
+        print(str(parser.entitystorage))
 
 def test___isPosInMatrixTag0(verbose=False):
     """
@@ -75,288 +81,74 @@ def test___isPosInMatrixTag0(verbose=False):
     parser._find_matrices()
     has = parser.isPosInMatrixTag(120)
 
-    expected_matrices_pos_type = [   
-    {   'args': [],
-        'funcEnd': 103,
-        'funcName': 'pmatrix',
-        'funcStart': 0,
-        'funcType': 'matrix',
-        'nodeId': 0,
-        'widthEnd': 103,
-        'widthStart': 0},
-    {   'args': [],
-        'funcEnd': 155,
-        'funcName': 'pmatrix',
-        'funcStart': 104,
-        'funcType': 'matrix',
-        'nodeId': 1,
-        'widthEnd': 155,
-        'widthStart': 104},
-    {   'args': [],
-        'funcEnd': 206,
-        'funcName': 'pmatrix',
-        'funcStart': 155,
-        'funcType': 'matrix',
-        'nodeId': 2,
-        'widthEnd': 206,
-        'widthStart': 155}]
     expected_has = True
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
-        parser.matrices_pos_type == expected_matrices_pos_type and\
         has == expected_has
         )
     if verbose:
-        print(parser.matrices_pos_type)
+        print(str(parser.entitystorage))
         print(has)
 
 
 def test__find_infix0(verbose=False): #TODO infix test for \\to;\\cross;\\cdot
+    """
     #\forall k \in \Z^+ and \forall prime_number p, equationStr = 1 | -1 a multivalue function
+
+(\\frac{p+1}{2})*((p-1)/2)^{(k-1)(p-1)/2})\\%p=p-1
+^^ ^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^
+01 2   678911111111112222222222333333333344 444444
+           01234567890123456789012345678901 234567
+
+    """
+    
     equationStr = "(\\frac{p+1}{2})*((p-1)/2)^{(k-1)(p-1)/2})\\%p=p-1"
     parser = Latexparser(equationStr, verbose=verbose)
     parser._remove_all_spacing()
-    #parser._find_matrices()
+    parser._find_matrices()
     parser._find_infix()
-    expected_infixs_pos_type = [   
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 45,
-        'funcName': '=',
-        'funcStart': 44,
-        'funcType': 'infix',
-        'nodeId': 0,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 43,
-        'funcName': '\\%',
-        'funcStart': 41,
-        'funcType': 'infix',
-        'nodeId': 1,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 26,
-        'funcName': '^',
-        'funcStart': 25,
-        'funcType': 'infix',
-        'nodeId': 2,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 23,
-        'funcName': '/',
-        'funcStart': 22,
-        'funcType': 'infix',
-        'nodeId': 3,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 38,
-        'funcName': '/',
-        'funcStart': 37,
-        'funcType': 'infix',
-        'nodeId': 4,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 16,
-        'funcName': '*',
-        'funcStart': 15,
-        'funcType': 'infix',
-        'nodeId': 5,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 20,
-        'funcName': '-',
-        'funcStart': 19,
-        'funcType': 'infix',
-        'nodeId': 6,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 30,
-        'funcName': '-',
-        'funcStart': 29,
-        'funcType': 'infix',
-        'nodeId': 7,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 35,
-        'funcName': '-',
-        'funcStart': 34,
-        'funcType': 'infix',
-        'nodeId': 8,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 47,
-        'funcName': '-',
-        'funcStart': 46,
-        'funcType': 'infix',
-        'nodeId': 9,
-        'widthEnd': None,
-        'widthStart': None},
-    {   'args': [   {   'argIdx': 0,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None},
-                    {   'argIdx': 1,
-                        'closeBra': None,
-                        'closeBraPos': None,
-                        'funcName': None,
-                        'nodeId': None,
-                        'openBra': None,
-                        'openBraPos': None}],
-        'funcEnd': 9,
-        'funcName': '+',
-        'funcStart': 8,
-        'funcType': 'infix',
-        'nodeId': 10,
-        'widthEnd': None,
-        'widthStart': None}]
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', parser.infixs_pos_type == expected_infixs_pos_type)
+    expected_list_tuple_widthStart_nodeId = None
+    expected_list_tuple_widthEnd_nodeId = None
+    expected_nodeId__widthStart = {0: 44, 1: 41, 2: 25, 3: 22, 4: 37, 5: 15, 6: 19, 7: 29, 8: 34, 9: 46, 10: 8}
+    expected_nodeId__widthEnd = None
+    expected_entityType__list_nodeId = None
+    expected_funcStart__nodeId = None
+    expected_funcName__list_nodeId = {
+    '*': [5],
+    '+': [10],
+    '-': [6, 7, 8, 9],
+    '/': [3, 4],
+    '=': [0],
+    '\\%': [1],
+    '^': [2]}
+    expected_nodeId__entityType = None
+    expected_nodeId__funcName = None
+    expected_nodeId__funcStart = None
+    expected_nodeId__funcEnd = None
+    expected_tuple_nodeId_argIdx__pNodeId = None
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = None
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        parser.entitystorage.list_tuple_widthStart_nodeId == expected_list_tuple_widthStart_nodeId\
+        and parser.entitystorage.list_tuple_widthEnd_nodeId == expected_list_tuple_widthEnd_nodeId\
+        and parser.entitystorage.nodeId__widthStart == expected_nodeId__widthStart\
+        and parser.entitystorage.nodeId__widthEnd == expected_nodeId__widthEnd\
+        and parser.entitystorage.entityType__list_nodeId == expected_entityType__list_nodeId\
+        and parser.entitystorage.funcStart__nodeId == expected_funcStart__nodeId\
+        and parser.entitystorage.funcName__list_nodeId == expected_funcName__list_nodeId\
+        and parser.entitystorage.nodeId__entityType == expected_nodeId__entityType\
+        and parser.entitystorage.nodeId__funcName == expected_nodeId__funcName\
+        and parser.entitystorage.nodeId__funcStart == expected_nodeId__funcStart\
+        and parser.entitystorage.nodeId__funcEnd == expected_nodeId__funcEnd\
+        and parser.entitystorage.tuple_nodeId_argIdx__pNodeId == expected_tuple_nodeId_argIdx__pNodeId\
+        and parser.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos == expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos\
+        
+    )
     if verbose:
-        # print(parser.infixs_pos_type)
-        print(parser.entitystorage) # TODO
+        print(str(parser.entitystorage))
 
-def test__find_brackets(verbose=False):
+def test__find_brackets0(verbose=False):
     """
 \\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}
       ^                  ^^      ^          ^ ^       ^^      ^ ^^ ^      ^   ^ ^    ^ ^ ^  ^             ^ ^^ ^ ^  ^^  ^            ^ ^^ ^ ^^^
@@ -483,11 +275,11 @@ def test__get_statistics0(verbose=False):
 
 
 if __name__=='__main__':
-    test__remove_space0(True)
-    # test__find_matrices0(True)
-    # test___isPosInMatrixTag0(True)
-    # test__find_infix0(True) 
-    # test__find_brackets(True)
+    # test__remove_space0()
+    # test__find_matrices0()
+    # test___isPosInMatrixTag0()
+    test__find_infix0(True) 
+    # test__find_brackets0(True)
     # test__find_backslash0(True)
     #test__find_variables_or_numbers0(True)
     #test__find_implicit_00(True)
