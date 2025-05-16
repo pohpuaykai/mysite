@@ -321,7 +321,7 @@ def test__bracketStorage__getAllEnclosingTouchingBraOfPos0(verbose=False):
     id2 = braSt.insertBracket('(', 2, ')', 8)
     id3 = braSt.insertBracket('(', 3, ')', 7)
     id4 = braSt.insertBracket('(', 10, ')', 14)
-    list_tuple_width_id_openPos_closePos_oCcC = braSt.getAllEnclosingTouchingBraOfPos(5, BracketType.ROUND)
+    list_tuple_width_id_openPos_closePos_oCcC = braSt.getAllEnclosingTouchingBraOfPos(5, 3, 7, BracketType.ROUND)
 
     expected_closeBraType__sortedPosList = {')': [7, 8, 9, 14, 15]}
     expected_openBraType__sortedPosList = {'(': [0, 1, 2, 3, 10]}
@@ -336,13 +336,13 @@ def test__bracketStorage__getAllEnclosingTouchingBraOfPos0(verbose=False):
     ]
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
-        expected_closeBraType__sortedPosList == braSt.closeBraType__sortedPosList and \
-        expected_openBraType__sortedPosList == braSt.openBraType__sortedPosList and \
-        expected_id__tuple_openPos_openBraType_closePos_closeBraType == braSt.id__tuple_openPos_openBraType_closePos_closeBraType and\
-        expected_list_tuple_width_id_openPos_closePos == braSt.list_tuple_width_id_openPos_closePos and\
-        expected_openBraPos__bracketId == braSt.openBraPos__bracketId and\
-        expected_closeBraPos__bracketId == braSt.closeBraPos__bracketId and\
-        expected_list_tuple_width_id_openPos_closePos_oCcC == list_tuple_width_id_openPos_closePos_oCcC
+        expected_closeBraType__sortedPosList == braSt.closeBraType__sortedPosList\
+        and expected_openBraType__sortedPosList == braSt.openBraType__sortedPosList\
+        and expected_id__tuple_openPos_openBraType_closePos_closeBraType == braSt.id__tuple_openPos_openBraType_closePos_closeBraType\
+        and expected_list_tuple_width_id_openPos_closePos == braSt.list_tuple_width_id_openPos_closePos\
+        and expected_openBraPos__bracketId == braSt.openBraPos__bracketId\
+        and expected_closeBraPos__bracketId == braSt.closeBraPos__bracketId\
+        and expected_list_tuple_width_id_openPos_closePos_oCcC == list_tuple_width_id_openPos_closePos_oCcC
     )
     if verbose:
         print(braSt.closeBraType__sortedPosList)
@@ -413,14 +413,14 @@ def test__bracketStorage__getWidestEnclosingBra0(verbose=False):
 
 
 if __name__=='__main__':
-    # test__bracketStorage__insert0()
-    # test__bracketStorage__remove0()
-    # test__bracketStorage__update0()
-    # test__bracketStorage__getBraPosImmediateRightOfPos0()
-    # test__bracketStorage__getBraPosImmediateLeftOfPos0()
-    # test__bracketStorage__exists0()
-    # test__bracketStorage__getCorrespondingCloseBraPos0()
-    # test__bracketStorage__getCorrespondingOpenBraPos0()
-    # test__bracketStorage__getAllEnclosingBraOfPos0()
-    # test__bracketStorage__getAllEnclosingTouchingBraOfPos0()
-    # test__bracketStorage__getWidestEnclosingBra0()
+    test__bracketStorage__insert0()
+    test__bracketStorage__remove0()
+    test__bracketStorage__update0()
+    test__bracketStorage__getBraPosImmediateRightOfPos0()
+    test__bracketStorage__getBraPosImmediateLeftOfPos0()
+    test__bracketStorage__exists0()
+    test__bracketStorage__getCorrespondingCloseBraPos0()
+    test__bracketStorage__getCorrespondingOpenBraPos0()
+    test__bracketStorage__getAllEnclosingBraOfPos0()
+    test__bracketStorage__getAllEnclosingTouchingBraOfPos0()
+    test__bracketStorage__getWidestEnclosingBra0()

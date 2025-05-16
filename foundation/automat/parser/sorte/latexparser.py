@@ -1303,12 +1303,12 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         if self.nodeId__entityType[pNodeId] in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX]:
             if argIdx == 0: #only need to update widthStart to child's
                 cWidthStart = self.nodeId__widthStart[cNodeId]
-                self.updateWidth(pNodeId, cWidthStart, None)
-
+                # self.updateWidth(pNodeId, cWidthStart, None) # might ge wrong, if enclosing bracket was updated first
+                self.widthMaxUpdateById(pNodeId, cWidthStart, None)#bigger is correct
             elif argIdx == 1: #only need to update widthEnd to child's
                 cWidthEnd = self.nodeId__widthEnd[cNodeId]
-                self.updateWidth(pNodeId, None, cWidthEnd)
-
+                # self.updateWidth(pNodeId, None, cWidthEnd) # might ge wrong, if enclosing bracket was updated first
+                self.widthMaxUpdateById(pNodeId, None, cWidthEnd)#bigger is correct
             else:
                 raise Exception(f'infix nodeId: {pNodeId}, argIdx not 0 nor 1: {argIdx}')
 
@@ -1322,13 +1322,17 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         list_funcStart = list(map(lambda nodeId: self.nodeId__funcStart[nodeId], list_nodeId))
         return pos in list_funcStart#funcStart == pos
 
-    def widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update
-        nodeId = self.funcStart__nodeId[funcStart]
+    def widthMaxUpdateById(self, nodeId, widthStart, widthEnd):
         if widthStart is not None:
             widthStart = min(widthStart, self.nodeId__widthStart[nodeId])#<<<<<<<<<<<<<<<<<<<<<<<<<should be min? so that width is maximised?
         if widthEnd is not None:
             widthEnd = max(widthEnd, self.nodeId__widthEnd[nodeId])
         self.updateWidth(nodeId, widthStart, widthEnd)
+
+
+    def widthMaxUpdate(self, funcStart, widthStart, widthEnd): #update to max(current, width), if None, then do not update
+        nodeId = self.funcStart__nodeId[funcStart]
+        self.widthMaxUpdateById(nodeId, widthStart, widthEnd)
 
     # def getAllEndPosOfEntityType(self, entityType): # entityType is a enum, rename: getAllStartEndPosOfEntityType
     #     list_tuple_funcStart_funcEnd = []
@@ -1366,13 +1370,13 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             widthStart = self.nodeId__widthStart[nodeId]
             #because we exclude the front_backslash_character that we removed so that touching matches
             entityType = self.nodeId__entityType[nodeId]
-            if entityType in [EntityType.BACKSLASH_FUNCTION, EntityType.BACKSLASH_VARIABLE, EntityType.BACKSLASH_NUMBER]:
-                print('added front_backslash_character')
-                widthStart -= 1 # add back the front_backslash_character
+            # if entityType in [EntityType.BACKSLASH_FUNCTION, EntityType.BACKSLASH_VARIABLE, EntityType.BACKSLASH_NUMBER]:
+            #     # print('added front_backslash_character')
+            #     widthStart -= 1 # add back the front_backslash_character
             widthEnd = self.nodeId__widthEnd[nodeId]
             allEnclosingTouchingBra = bracketstorage.getAllEnclosingTouchingBraOfPos(self.nodeId__funcStart[nodeId], widthStart, widthEnd, BracketType.ROUND)
-            print('nodeId', nodeId)
-            print('allEnclosingTouchingBra', allEnclosingTouchingBra, 'widthStart', widthStart, 'widthEnd', widthEnd)
+            # print('nodeId', nodeId)
+            # print('allEnclosingTouchingBra', allEnclosingTouchingBra, 'widthStart', widthStart, 'widthEnd', widthEnd)
             # import pdb;pdb.set_trace()
             if len(allEnclosingTouchingBra) > 0:
                 widestWidth = 0
@@ -1394,22 +1398,23 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         set_containingNodeIdByStartWidth = set(map(lambda t:t[1], self.list_tuple_widthStart_nodeId[startWidthIdx:]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
         set_containingNodeIdByEndWidth = set(map(lambda t:t[1], self.list_tuple_widthEnd_nodeId[:endWidthIdx+1]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
         #off by 1 revealed by test__entityStorage__getWidestFit0
-        return list(set_containingNodeIdByStartWidth.intersection(set_containingNodeIdByEndWidth))
+        list_nodeId = list(set_containingNodeIdByStartWidth.intersection(set_containingNodeIdByEndWidth))
+        return list_nodeId
 
 
     def getAllNodeIdFuncNameWidthStartWidthEnd(self, *entityTypes):
         if len(entityTypes) == 0:
             entityTypes = list(EntityType.__members__.values())
-        list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart = []
+        list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd = []
         for entityType in entityTypes:
             for nodeId in self.entityType__list_nodeId.get(entityType, []):
-                list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart.append((
+                list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd.append((
                     nodeId, self.nodeId__funcName[nodeId], self.nodeId__widthStart[nodeId], self.nodeId__widthEnd[nodeId], self.nodeId__funcStart[nodeId], self.nodeId__funcEnd[nodeId]
                 ))
         return list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd
 
     def remove(self, funcStart):
-        """
+        """Seems to be never used, keep for GOOD_FEELS
         """
         nodeId = self.funcStart__nodeId[funcStart]
         self.funcStart__nodeId.pop(funcStart, None)
@@ -1659,13 +1664,17 @@ class BracketStorage:
         if len(self.closeBraType__sortedPosList[closeBraType]) == 0:
             del self.closeBraType__sortedPosList[closeBraType]
 
-        deletePos = BinarySearch.binarySearchPre(
-            self.list_tuple_width_id_openPos_closePos,
-            #(closeBraPos - openBraPos, bracketId, openBraPos, closeBraPos),
-            closeBraPos - openBraPos,
-            key=lambda tuple_width_id: tuple_width_id[0] # get width, getWidestEnclosingBra might depend on this
-        )
-        del self.list_tuple_width_id_openPos_closePos[deletePos]
+        # deletePos = BinarySearch.binarySearchPre(
+        #     self.list_tuple_width_id_openPos_closePos,
+        #     #(closeBraPos - openBraPos, bracketId, openBraPos, closeBraPos),
+        #     # closeBraPos - openBraPos,
+        #     bracketId,
+        #     key=lambda t: t[1] # bracketId
+        #     # key=lambda tuple_width_id: tuple_width_id[0] # this list is sorted by width, but there may be many same width. so
+        # )
+        # print('bracketId', bracketId, 'removing idx:', deletePos, ' from ', self.list_tuple_width_id_openPos_closePos)
+        # del self.list_tuple_width_id_openPos_closePos[deletePos]
+        self.list_tuple_width_id_openPos_closePos.remove((closeBraPos - openBraPos, bracketId, openBraPos, closeBraPos))
 
         del self.openBraPos__bracketId[openBraPos]
         del self.closeBraPos__bracketId[closeBraPos]
@@ -1822,11 +1831,18 @@ class BracketStorage:
         #actually either side touching is FINE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         sortedByOpenPos = sorted(list_tuple_width_id_openPos_closePos, key=lambda tup: tup[2])
         sortedByClosePos = sorted(list_tuple_width_id_openPos_closePos, key=lambda tup: tup[3])
-        print('anytouch? s:', widthStart, 'e:', widthEnd);import pdb;pdb.set_trace()
-        if (len(sortedByOpenPos) == 0 or sortedByOpenPos[-1][2] + len(typeOfBracket.value[0]) != widthStart) and \
-        (len(sortedByClosePos) == 0 or sortedByClosePos[0][3] != widthEnd):
+        ####
+        # print('anytouch? s:', widthStart, 'e:', widthEnd)
+        # print('list_tuple_width_id_openPos_closePos', list_tuple_width_id_openPos_closePos)
+        # print('self.id__tuple_openPos_openBraType_closePos_closeBraType', self.id__tuple_openPos_openBraType_closePos_closeBraType);import pdb;pdb.set_trace()
+        ####
+        """
+        touching on both sides, else its not yours to claim. recheck: test__entityStorage__addConfirmedPCrelationship0
+        """
+        if (len(sortedByOpenPos) == 0 or (sortedByOpenPos[-1][2] + len(typeOfBracket.value[0]) != widthStart and sortedByOpenPos[-1][2] != widthStart)) or \
+        (len(sortedByClosePos) == 0 or (sortedByClosePos[0][3] != widthEnd and sortedByClosePos[0][3] - len(typeOfBracket.value[1]) != widthEnd)):#need to minus (sortedByClosePos[0][3] - len(typeOfBracket.value[1]) != widthEnd)? check previous case, where i minused and then something went wrong....
             return []
-        print('findConsec?');import pdb;pdb.set_trace()
+        # print('did NOT return []');import pdb;pdb.set_trace()
         list_tuple_width_id_openPos_closePos__oC = [] # oC~openBraPos are Consecutive
         prevOpenBraPos = None
         for width, bracketId, openBraPos, closeBraPos in sorted(list_tuple_width_id_openPos_closePos, key=lambda tup: tup[2], reverse=True):#ascending by openBraPos
