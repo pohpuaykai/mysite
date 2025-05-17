@@ -1089,8 +1089,6 @@ braSt.insertBracket ORDER:
         print(str(entSt))
 
 
-
-
 def test__entityStorage__updateIfExists(verbose=False):
     """mostly used for pure_infix_- to implicit_infix_-
 
@@ -1134,17 +1132,32 @@ braSt.insertBracket ORDER:
         print(str(entSt))
 
 
+def test__entityStorage__remove0(verbose=False):
+    entSt = EntityStorage(eqStrLen=len('\\sin(x+\\pi)=-\\sin(x)'))
+    funcStart = 6
+    entSt.insert('+', funcStart, 7, EntityType.PURE_INFIX, 
+        widthStart=funcStart, widthEnd=7)
+    entSt.remove(funcStart)
+    expected = None
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+    )
+    if verbose:
+        print(str(entSt))
+
+
 if __name__=='__main__':
-    test__entityStorage__insert0()
-    test__entityStorage__getNodeIdFunNameByFuncStart0()
-    test__entityStorage__addConfirmedPCrelationshipById0()
-    test__entityStorage__existEntityAt0()
-    test__entityStorage__widthMaxUpdate0()
-    test__entityStorage__getAllNodeIdFuncNameWidthStartWidthEnd0()
-    test__entityStorage__addConfirmedPCrelationship0()
-    test__entityStorage__addUnConfirmedPCrelationship0()
-    test__entityStorage__getAllUnConfirmedPCrelationship0()
-    test__entityStorage__getWidestFit0()
-    test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0()
-    test__entityStorage__getAllContainingByWidth0()
-    test__entityStorage__updateIfExists()
+    # test__entityStorage__insert0()
+    # test__entityStorage__getNodeIdFunNameByFuncStart0()
+    # test__entityStorage__addConfirmedPCrelationshipById0()
+    # test__entityStorage__existEntityAt0()
+    # test__entityStorage__widthMaxUpdate0()
+    # test__entityStorage__getAllNodeIdFuncNameWidthStartWidthEnd0()
+    # test__entityStorage__addConfirmedPCrelationship0()
+    # test__entityStorage__addUnConfirmedPCrelationship0()
+    # test__entityStorage__getAllUnConfirmedPCrelationship0()
+    # test__entityStorage__getWidestFit0()
+    # test__entityStorage____updateTemplatesToWiderEnclosingBracketsAndRemove0()
+    # test__entityStorage__getAllContainingByWidth0()
+    # test__entityStorage__updateIfExists()
+    test__entityStorage__remove0(True)

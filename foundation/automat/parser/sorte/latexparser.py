@@ -744,15 +744,17 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
             def findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos):
                 closeBraPos, closeBraType = None, None
-                import pdb;pdb.set_trace()
+                print('fBGAS looking for ', template);import pdb;pdb.set_trace()
                 if self.equationStr[nextCharPos+len(template['preSym'])] == template['openBra']: # found bracket, 
                     gotArg = True
+                    nextCharPos += len(template['preSym'])
                     #get corresponding closePos
-                    closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(nextCharPos+len(template['preSym']))
-                    self.bracketstorage.removeBracket(nextCharPos+len(template['preSym']))
+                    closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(nextCharPos)
+                    closeBraPos += len(closeBraType)
+                    self.bracketstorage.removeBracket(nextCharPos)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wrong position being stored OFF-BY-1
+                    print('fBGAS', 'nCP', nextCharPos, closeBraPos, 'preSym', template['preSym'], self.equationStr[nextCharPos:closeBraPos]);import pdb;pdb.set_trace()
                     #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
                     #NOTE bracket position if any, store
-                    nextCharPos = closeBraPos + len(closeBraType)
                     # nextChar = self.equationStr[nextCharPos]
                     print(template['preSym'], "; removing", template['preSym'] in ['^']);import pdb;pdb.set_trace()
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
@@ -764,8 +766,11 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                         """
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient, ENTITIES STORAGE.
-                        #self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
-                        self.entitystorage.remove(funcStart)
+                        posOfPreSym = nextCharPos - len(template['openBra'])
+                        print('removing pos of preSym:', posOfPreSym)
+                        print(str(self.entitystorage))
+                        self.entitystorage.remove(posOfPreSym)
+                    nextCharPos = closeBraPos
                 elif template['braOptional'] == 'False': # no bracket but not neccessary
                     #log
                     gotArg = False #raise Exception #here is !gotArg
@@ -773,18 +778,21 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     #TAKEARG as nextCharPos+1, store
                     #NOTE NO_BRACKETS, store
                     gotArg = True
-                    nextCharPos += 1
                     print(template['preSym'], "; removing", template['preSym'] in ['^']);import pdb;pdb.set_trace()
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient
-                        #self.infixs_pos_type.remove((funcStart, funcEnd, funcName))#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WRONG FORMAT
-                        self.entitystorage.remove(funcStart)
+                        posOfPreSym = nextCharPos - len(template['openBra'])
+                        print('removing pos of preSym:', posOfPreSym)
+                        print(str(self.entitystorage))
+                        self.entitystorage.remove(posOfPreSym)
                     # nextChar = self.equationStr[nextCharPos]
+                    nextCharPos += 1
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
                     if foundType in ['backslash_function', 'backslash_variable']:
                         raise Exception()
+                print('returning from findBracketGetArgStore')
                 return gotArg, nextCharPos, closeBraPos, closeBraType
 
 
@@ -804,19 +812,21 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 else:
                     compulsoryStack.append(template)
 
-            prevCharPos, prevChar, nextCharPos, nextChar = None, None, funcEnd, self.equationStr[funcEnd]
-            print('**********************************************funcName:', funcName, compulsoryStack, optionalList, 'nextChar', nextChar, 'nextCharPos', nextCharPos)
+            nextCharPos, nextChar = funcEnd, self.equationStr[funcEnd]
+            print('**********************************************funcName: (', funcName, ')', compulsoryStack, optionalList, 'nextChar', nextChar, 'nextCharPos', nextCharPos)
             while len(compulsoryStack) > 0:
                 template = compulsoryStack.pop()
-                prevCharPos, prevChar = nextCharPos, nextChar
+                # prevCharPos, prevChar = nextCharPos, nextChar
                 if len(template['preSym']) ==0 or nextChar == template['preSym']: # matched the right nextChar with this COMPULSORYTemplate
                     gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
-                    print('findBracketGetArgStore', gotArg, nextCharPos, nextChar, closeBraPos, closeBraType)
+                    print('PREfindBracketGetArgStore', gotArg, 'nextCharPos', nextCharPos, 'closeBraPos', closeBraPos, 'closeBraType', closeBraType)
                     if not gotArg: # this is compulsory so we put back to compulsoryStack
                         compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
                     #if last thing in the bracket? OR if nextCharPos > len(self.equationStr), resetToWhat?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    if nextCharPos >= len(self.equationStr):
-                        nextCharPos, nextChar = prevCharPos, prevChar
+                    print('821', closeBraPos, 'closeBraPos >= len(self.equationStr)', closeBraPos is not None and closeBraPos >= len(self.equationStr))
+                    if closeBraPos is not None and closeBraPos >= len(self.equationStr):
+                        print('reseting closeBraPos because too long', nextCharPos)
+                        nextCharPos, nextChar = funcEnd, self.equationStr[funcEnd] # <<<<<<<<<<<<<<<<<<<<<<<for lim, the reset is wrong?
                     else:
                         nextChar = self.equationStr[nextCharPos]
                     #TODO if compulsoryStack cannot empty, then there is a syntax error from the user, .....
@@ -1496,16 +1506,24 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         self.nodeId__funcEnd.pop(nodeId, None)
         # self.funcName__nodeId.pop(funcName, None)
         exlist_nodeId = self.funcName__list_nodeId.get(funcName, [])
-        exlist_nodeId.remove(funcName)
+        exlist_nodeId.remove(nodeId)
         self.funcName__list_nodeId[funcName] = exlist_nodeId
 
-        #TODO removal of p|c relationship<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        self.tuple_nodeId_argIdx__pNodeId.pop(nodeId, None)
-        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.pop((pNode, argIdx), None)
+        #TODO removal of p|c relationship<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< and all the argIdx all children,so we loop through
+        new___tuple_nodeId_argIdx__pNodeId = {}
+        for (nodeId0, argIdx), pNodeId in self.tuple_nodeId_argIdx__pNodeId.items():
+            if nodeId0 == nodeId or pNodeid == nodeId#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<?
+        self.tuple_nodeId_argIdx__pNodeId = new___tuple_nodeId_argIdx__pNodeId 
+        #self.tuple_nodeId_argIdx__pNodeId.pop((nodeId, argIdx), None)
+
+        new__tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {}
+        for (nodeId0, cArgIdx), (openBra, openBraPos, closeBra, closeBraPos) in self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
+            if nodeId0 == nodeId:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<?
+        self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.pop((pNodeId, argIdx), None)
 
         list_nodeId = self.entityType__list_nodeId.pop(entityType)
         list_nodeId.remove(nodeId)
-        entityType__list_nodeId[entityType] = nodeId
+        entityType__list_nodeId[entityType] = list_nodeId
 
         widthEnd = self.nodeId__widthEnd.pop(nodeId, None)
         widthStart = self.nodeId__widthStart.pop(nodeId, None)
