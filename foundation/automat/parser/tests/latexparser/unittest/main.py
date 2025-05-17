@@ -234,8 +234,15 @@ parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType == exp
 
 
 def test__find_backslash0(verbose=False):
+    """
+\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}}
+      ^  ^      ^   ^    ^^      ^          ^^^       ^^      ^ ^^ ^      ^   ^ ^    ^ ^ ^  ^             ^ ^^ ^ ^  ^^  ^            ^ ^^ ^ ^^^^^
+      5  7      1   1    22      2          334       44      5 55 5      6   6 7    7 7 8  8             9 99 1 1  11  1            1 11 1 11111
+                3   6    12      8          890       78      4 67 9      5   9 1    6 8 0  3             5 78 0 0  00  0            2 22 2 22233
+                                                                                                               0 2  56  9            0 23 5 78901
+    """
     #Fourier transform
-    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2} f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}"
+    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i2\\pi\\frac{n}{P}x}dx}(e^{i2\\pi\\frac{n}{P}x})}}"
     parser = Latexparser(equationStr, verbose=verbose)
     parser._remove_all_spacing()
     parser._find_matrices()
@@ -260,7 +267,7 @@ def test__find_backslash0(verbose=False):
         '/': [6, 7],
         '=': [0],
         '\\to': [1],
-        '^': [2, 3, 4, 5],
+        '^': [4, 5],
         'frac': [18, 21, 23],
         'infty': [14],
         'int': [19],
@@ -270,10 +277,9 @@ def test__find_backslash0(verbose=False):
         'theta': [12, 16, 17],
         'to': [13]}
     expected_nodeId__entityType = None
-    expected_nodeId__funcName = {   0: '=',
+    expected_nodeId__funcName = {
+    0: '=',
     1: '\\to',
-    2: '^',#<<<<<<<<<<<<<<<<<<<<<wrong only supposed to have 2 ^, other 2 belong to backslash
-    3: '^',
     4: '^',
     5: '^',
     6: '/',
