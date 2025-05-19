@@ -3,7 +3,7 @@ from enum import Enum
 import re
 
 from foundation.automat.arithmetic.function import Function
-from foundation.automat.common import BinarySearch, isNum
+from foundation.automat.common import BinarySearch, isNum, lenOrZero
 
 class BracketType(Enum):
     ROUND = '(', ')'
@@ -170,23 +170,23 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     BACKSLASH_EXPECTED_INPUTS = { #all possible returns according to input_type, for easy collating
 
 
-        '(C)': [
+        '(C)': [#['ln', 'det']
                 {'argId':0, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
         ],
-        '[O]{C}': [
+        '[O]{C}': [#['sqrt']
                 {'argId':0, 'preSym':'', 'optional':True, 'openBra':'[', 'closeBra':']', 'braOptional':'False'},
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
-        '^{O}(C)': [
+        '^{O}(C)': [#['TRIG']
                 {'argId':0, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'}, #exponential
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'} # angle
         ],
-        '_{C}{C}': [
+        '_{C}{C}': [#['lim']
                 {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
 
-    '_{C}^{C}{C}': [
+    '_{C}^{C}{C}': [#['sum', 'prod', 'int']
             {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
             {'argId':1, 'preSym':'^', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
             {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
@@ -195,7 +195,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 
-    '_{C}^{O}{C}': [
+    '_{C}^{O}{C}': [#['iint', 'iiint', 'oint', 'oiint']
             {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
             {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
             {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
@@ -204,7 +204,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 
-    '_{O}(C)': [
+    '_{O}(C)': [#['log']
                 {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
         ],
@@ -212,7 +212,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 
-    '_{O}^{O}{C}': [
+    '_{O}^{O}{C}': [#['partial', 'nabla', 'Delta']
                 {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
@@ -221,14 +221,14 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 
-    '{C}': [
+    '{C}': [#VARIABLENAMESTAKEANARG
                 {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
 
 
 
 
-    '{C}{C}': [
+    '{C}{C}': [#['frac']
                 {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ]
@@ -289,7 +289,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']"""
     #INTEGRALS = ['int', 'oint', 'iint'] # TODO hikitoru this from sfunctors # remove
     #FUNCTIONNAMES = TRIGOFUNCTION + ['frac', 'sqrt',  'log', 'ln'] + INTEGRALS # remove?
-    EXCLUDE_BACKSLASH = ['\\to']
+    EXCLUDE_BACKSLASH_INFIX = ['to'] #because its an infix
     
     def __init__(self, equationStr=None, ast=None, verbose=False):
         self.rawEquationStr = equationStr
@@ -658,13 +658,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         Exclude all the backslash_infix
         
         """
+
         import re
-        # self.backslashNames = [] # this is for taking out occupied pos
-        self.backslash_pos_type = []
-        self.variables_pos_type = []
-        self.number_pos_type = [] #symbolic number like \\pi, i
         list_backslashReResult = list(map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\([a-zA-Z]+)", self.equationStr)))
         for funcStart, funcEnd, funcName in list_backslashReResult:
+            if funcName in self.EXCLUDE_BACKSLASH_INFIX:
+                continue
             foundType = 'backslash_function'
             # self.backslashNames.append((funcStart, funcEnd, funcName))
             if funcName in self.BACKSLASH_INFIX: # remove the backslash_infix from backslash
@@ -679,9 +678,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     EntityType.BACKSLASHVARIABLE, widthStart=funcStart, widthEnd=funcEnd, bracketstorage=self.bracketstorage)
             list_template = self._getExpectedBackslashInputs(funcName)
             if list_template is None: # number that starts with backslash. like \\pi
-                # foundType = 'backslash_number'
-                # storeTemplate['funcType'] = foundType
-                # self.number_pos_type.append(storeTemplate)
+                
                 self.bracketstorage=self.entitystorage.insert(funcName, funcStart, funcEnd, EntityType.BACKSLASH_NUMBER, 
                     widthStart=funcStart, widthEnd=funcEnd, bracketstorage=self.bracketstorage)
                 continue # skip args finding
@@ -741,15 +738,31 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             return gotArg, nextCharPos, nextChar
             """
 
+            compulsoryStack0, compulsoryStack1, optionalList0, optionalList1, everyOtherPreSym = [], [], [], [], []
+            for template in list_template:
+                if template['optional']:
+                    optionalList0.insert(0, template) # to keep the order in the list_template
+                else:
+                    compulsoryStack0.insert(0, template) # to keep the order in the list_template
+                #hasBlankPreSym, everyOtherPreSym
+                if template['preSym'] != '':
+                    everyOtherPreSym.append(template['preSym'])
+            #could empty everyOtherPreSym, if not hasBlankPreSym
 
-            def findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos):
+            ##
+            def findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym):
                 closeBraPos, closeBraType = None, None
-                if self.equationStr[nextCharPos+len(template['preSym'])] == template['openBra']: # found bracket, 
+                nextCharPos += len(template['preSym'])
+                nextChar = self.equationStr[nextCharPos]
+
+                if (template['preSym']=='' and self.equationStr[nextCharPos] not in everyOtherPreSym and self.equationStr[nextCharPos] == template['openBra']) or\
+                (self.equationStr[nextCharPos] == template['openBra']): # found bracket,
                     gotArg = True
-                    nextCharPos += len(template['preSym'])
                     #get corresponding closePos
                     closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(nextCharPos)
-                    closeBraPos += len(closeBraType)
+                    self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], self.equationStr[nextCharPos], nextCharPos, closeBraType, closeBraPos)
+                    #for backslash, we can update width here, not necessary for infix
+                    self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos+len(closeBraType))
                     self.bracketstorage.removeBracket(nextCharPos)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wrong position being stored OFF-BY-1
                     #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
                     #NOTE bracket position if any, store
@@ -773,12 +786,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     #TAKEARG as nextCharPos+1, store
                     #NOTE NO_BRACKETS, store
                     gotArg = True
+                    self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], None, nextCharPos, None, nextCharPos+1)#TODO test this branch<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
                     if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient
                         posOfPreSym = nextCharPos - len(template['openBra'])
                         self.entitystorage.remove(posOfPreSym)
-                    # nextChar = self.equationStr[nextCharPos]
-                    nextCharPos += 1
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
@@ -787,55 +800,50 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 return gotArg, nextCharPos, closeBraPos, closeBraType
 
 
-            def processOptionalList(funcStart, funcEnd, funcName, eOptionalList, template, nextChar, nextCharPos):
-                gotArg, closeBraPos, closeBraType = False, float('inf'), None#if eOptionalList is empty
+            def processOptionalList(funcStart, funcEnd, funcName, eOptionalList, template, nextChar, nextCharPos, everyOtherPreSym):
+                gotArg, closeBraPos, closeBraType = False, len(self.equationStr), None#if eOptionalList is empty
+                self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], self.equationStr[nextCharPos], nextCharPos, closeBraType, closeBraPos - len(closeBraType) if closeBraType is not None else None)
                 for template in eOptionalList:
-                    gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
+                    gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym)
                     if gotArg:
                         eOptionalList.remove(template)
                         break
                 return eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType
-
-            compulsoryStack, optionalList = [], []
-            for template in list_template:
-                if template['optional']:
-                    optionalList.append(template)
-                else:
-                    compulsoryStack.append(template)
-
-            nextCharPos, nextChar = funcEnd, self.equationStr[funcEnd]
-            while len(compulsoryStack) > 0:
-                template = compulsoryStack.pop()
-                # prevCharPos, prevChar = nextCharPos, nextChar
-                if len(template['preSym']) ==0 or nextChar == template['preSym']: # matched the right nextChar with this COMPULSORYTemplate
-                    gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos)
-                    if not gotArg: # this is compulsory so we put back to compulsoryStack
-                        compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
-                    #if last thing in the bracket? OR if nextCharPos > len(self.equationStr), resetToWhat?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    if closeBraPos is not None and closeBraPos >= len(self.equationStr):
-                        nextCharPos, nextChar = funcEnd, self.equationStr[funcEnd] # <<<<<<<<<<<<<<<<<<<<<<<for lim, the reset is wrong?
-                    else:
-                        nextChar = self.equationStr[nextCharPos]
-                    #TODO if compulsoryStack cannot empty, then there is a syntax error from the user, .....
-                else: # did not match the right nextChar with this COMPULSORYTemplate
-                    compulsoryStack.insert(0, template)#put it back, because its COMPULSORY, but at the bottom.
-                    eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos)
-                
-                #<<<<<<<<<<<<<<<<<<<<
-                self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos) # the entity is not created yet
-                # storeTemplate['widthEnd'] = max(storeTemplate['widthEnd'], closeBraPos)
-                self.entitystorage.addUnConfirmedPCrelationship(
-                    funcStart, 
-                    template['argId'], nextChar, nextCharPos, closeBraType, closeBraPos)
-            eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos)
-            
-            self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
+            ##
+            nextCharPos = funcEnd
             nextChar = self.equationStr[nextCharPos]
-            self.entitystorage.addUnConfirmedPCrelationship(
-                funcStart, 
-                template['argId'], nextChar, nextCharPos, closeBraType, closeBraPos)
+            while len(compulsoryStack0) > 0 or len(compulsoryStack1) > 0:
+                rStack = compulsoryStack0 if len(compulsoryStack0) >0 else compulsoryStack1
+                oStack = compulsoryStack1 if len(compulsoryStack0) >0 else compulsoryStack0
+                # print('0', funcName)
+                while len(rStack) > 0:
+                    template = rStack.pop()
+                    gotArg, nextCharPos0, closeBraPos0, closeBraType0 = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym)
+                    nextChar = self.equationStr[nextCharPos0]
+                    if gotArg:
+                    #jump to next char
+                        nextCharPos, nextChar, closeBraPos, closeBraType = nextCharPos0+len(closeBraType0), self.equationStr[nextCharPos], closeBraPos0, closeBraType0
+                    else:
+                        oStack.insert(0, template) # to keep the order in the list_template
+                    #update compulsoryStack0 and compulsoryStack1
+                compulsoryStack0, compulsoryStack1 = oStack, rStack
+                orStack = optionalList0 if len(optionalList0) >0 else optionalList1
+                ooStack = optionalList1 if len(optionalList0) >0 else optionalList0
+                while len(orStack) > 0:
+                    template = orStack.pop()
+                    optionalList, gotArg, nextCharPos0, closeBraPos0, closeBraType0 = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos, everyOtherPreSym)
+                    nextChar = self.equationStr[nextCharPos0]
+                    if gotArg:
+                    #jump to next char
+                        nextCharPos, nextChar, closeBraPos, closeBraType = nextCharPos0+len(closeBraType0), self.equationStr[nextCharPos], closeBraPos0, closeBraType0
+                    else:
+                        ooStack.insert(0, template) # to keep the order in the list_template
+                optionalList0, optionalList1 = orStack, ooStack
 
-        
+                    #update optionalList0 and optionalList1
+
+
+
         
     def _find_variables_or_numbers(self):
         """
@@ -862,21 +870,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #collate infix|backslash|matrices pos {infix_brackets are not removed, will be a problem if infix_brackets are curly}
         #backslash_brackets ONLY
         #matrices pos THE WHOLE MATRIX, not just the tags
-        #self.infixs_pos_type : [(startpos, endpos, group)], the symbol only
-        # self.variables_pos_type = None # might already have backslashVar inside.
-        # self.number_pos_type = [] #decimal numbers like 123, 23.2, -3.4
-
-        # infixName_occupied = []
-        # for start, end, group in self.infixs_pos_type:
-        #     for pos in range(start, end):
-        #         infixName_occupied.append(pos)
-        # infixName_occupied = sorted(infixName_occupied)
 
         infixName_occupied = []
         for nodeId, funcName, widthStart, widthEnd, funcStart, funcEnd in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX):
             for pos in range(funcStart, funcEnd):
                 infixName_occupied.append(pos)
-        infixName_occupied = sorted(infixName_occupied, key=lambda t: t[0])
+        infixName_occupied = sorted(infixName_occupied)
 
         backslashName_occupied = []
         for nodeId, funcName, widthStart, widthEnd, funcStart, funcEnd in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.BACKSLASH_VARIABLE):
@@ -884,21 +883,20 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 backslashName_occupied.append(pos)
 
         for nodeId, funcName, widthStart, widthEnd, funcStart, funcEnd in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.BACKSLASH_FUNCTION, EntityType.BACKSLASH_INFIX, EntityType.BACKSLASH_NUMBER):
-            for pos in range(start, end):
+            for pos in range(funcStart, funcEnd):
                 backslashName_occupied.append(pos)
-        backslashName_occupied = sorted(backslashName_occupied, key=lambda t:t[0])
-
-        # backslashName_occupied = []
-        # for start, end, group in self.backslashNames:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<for BACKSLASH_VARIABLE, need to remove the whole length
-        #     for pos in range(start, end):
-        #         backslashName_occupied.append(pos)
-        # backslashName_occupied = sorted(backslashName_occupied)
+        backslashName_occupied = sorted(backslashName_occupied)
 
         bracketSym_occupied = []
-        for (_, openBraPos, _), (closeBraPos, _, _) in self.allBrackets:
-            bracketSym.append(openBraPos)
-            bracketSym.append(closeBraPos)
-        bracketSym_occupied = sorted(bracketSym_occupied)
+        for width, bracketId, openPos, closePos in self.bracketstorage.list_tuple_width_id_openPos_closePos:
+            bracketSym_occupied.append(openPos)
+            bracketSym_occupied.append(closePos)
+
+        print('*************************************************')
+        print(infixName_occupied)
+        print(backslashName_occupied)
+        print(bracketSym_occupied)
+        print('*************************************************')
 
         leftOverPosList = []
         for pos in range(0, len(self.rawEquationStr)):
@@ -909,6 +907,10 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 continue # we skip these
             leftOverPosList.append(pos)
 
+
+        print('*************************************************')
+        print(leftOverPosList)
+        print('*************************************************')
 
         accumulator, accumulatorStartPos, accumulatorEndPos, accumulatorType= None, None, None, None
         for leftOverPos in leftOverPosList:
