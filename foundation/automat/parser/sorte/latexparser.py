@@ -292,8 +292,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     EXCLUDE_BACKSLASH_INFIX = ['to'] #because its an infix
     
     def __init__(self, equationStr=None, ast=None, verbose=False):
-        self.rawEquationStr = equationStr
-        self.equationStr = None #processed rawEquationStr
+        self.equationStr = equationStr #processed rawEquationStr
         self.matrices_pos_type = None # replace with entitystorage, the collating of intervals (bubble merge) needs work
         # self.infixs_pos_type = None
         # self.variables_pos_type = None
@@ -301,20 +300,22 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.allBrackets = None # all of the bracket STATIC, 
         self.openBraPos__bracketId = None # STATIC
         self.bracketstorage = BracketStorage()
-        self.entitystorage = None
+        self.entitystorage = EntityStorage(eqStrLen=len(self.equationStr))
         self.mabracketstorage = BracketStorage()
         self.list_openTagPos = None
         self.list_closeTagPos = None
         self.openTagPos__closeTagPos = None
         self.closeTagPos__openTagPos = None
         self.occupiedPositions = []
+        self.all_brackets_pos = None
+        self.all_preSym_pos = None
         # self.backslashNames = None # this is for taking out occupied pos
         self.latexAST = None
     
 
-    def _remove_all_spacing(self):
-        self.equationStr = self.rawEquationStr.replace(" ", '')
-        self.entitystorage = EntityStorage(eqStrLen=len(self.equationStr))
+    # def _remove_all_spacing(self):
+    #     self.equationStr = self.rawEquationStr.replace(" ", '')
+    #     self.entitystorage = EntityStorage(eqStrLen=len(self.equationStr))
         
     def _find_matrices(self):
         """
@@ -585,7 +586,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2d obsolete
         2d. check if left&right infixes (put to infix as inputs) (remove from OTHER_brackets)
         """
-
+        self.all_brackets_pos = []
+        self.endOfOpenBraPos = []
         #skip_bracket_accounting
 
         openOrClose__tuple_braType = {}
@@ -597,21 +599,29 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 closeBraTypes.add(template['closeBra'])
                 openOrClose__tuple_braType[template['openBra']] = (template['openBra'], template['closeBra'])
                 openOrClose__tuple_braType[template['closeBra']] = (template['openBra'], template['closeBra'])
+                # self.all_brackets_pos.append(template['openBra'])
+                # self.all_brackets_pos.append(template['closeBra'])
 
         list_tuple_pos_braType_isOpen = [] #skip_list
         openBracket_pos_type_list = []
         for openBracket in openBraTypes:
-            openBracket_pos_type_list+=list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{openBracket}", self.equationStr)))
+            for start, end, group in list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{openBracket}", self.equationStr))):
+                openBracket_pos_type_list.append((start, end, group))
+                self.all_brackets_pos.append(start)
         for start, end, openBraType in openBracket_pos_type_list:
             #TODO could have done the self.isPosInMatrixTag() here, which is more efficient?
             list_tuple_pos_braType_isOpen.append((start, openBraType, True))
+            self.endOfOpenBraPos.append(end)
 
 
         closeBracket_pos_type_list = []
         for closeBracket in closeBraTypes:
-            closeBracket_pos_type_list+=list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr)))
+            for start, end, group in list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"\\{closeBracket}", self.equationStr))):
+                closeBracket_pos_type_list.append((start, end, group))
+                self.all_brackets_pos.append(start)
         for start, end, closeBraType in closeBracket_pos_type_list:
             list_tuple_pos_braType_isOpen.append((start, closeBraType, False))
+            self.endOfOpenBraPos.append(end)
 
         braType__openPosStack = {}
         for pos, braType, isOpen in sorted(list_tuple_pos_braType_isOpen, key=lambda tup: tup[0]):
@@ -658,6 +668,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         Exclude all the backslash_infix
         
         """
+        self.all_preSym_pos = []
+        set_all_possible_preSym = set()
+        #for _find_variable_or_number
+        for shortkey, list_template in self.BACKSLASH_EXPECTED_INPUTS.items():
+            for template in list_template:
+                set_all_possible_preSym.add(template['preSym'])
 
         import re
         list_backslashReResult = list(map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\([a-zA-Z]+)", self.equationStr)))
@@ -752,6 +768,11 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             ##
             def findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym):
                 closeBraPos, closeBraType = None, None
+                #This is for _find_variable_or_number
+                if nextChar in set_all_possible_preSym:
+                    self.all_preSym_pos.append(nextCharPos)
+                #
+
                 nextCharPos += len(template['preSym'])
                 nextChar = self.equationStr[nextCharPos]
 
@@ -763,7 +784,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], self.equationStr[nextCharPos], nextCharPos, closeBraType, closeBraPos)
                     #for backslash, we can update width here, not necessary for infix
                     self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos+len(closeBraType))
-                    self.bracketstorage.removeBracket(nextCharPos)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wrong position being stored OFF-BY-1
+                    self.bracketstorage.removeBracket(nextCharPos)
+
                     #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
                     #NOTE bracket position if any, store
                     # nextChar = self.equationStr[nextCharPos]
@@ -846,7 +868,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         
     def _find_variables_or_numbers(self):
-        """
+        """ RELIES on the spacing on the equationStr, please do not remove spacing from the equationStr
 **** WHAT IF we take out everything that has been found so far AND all of the brackets.
 **** when we get all the variables(without _{}) and numbers,
 **** and then we put the _{} back to the variables that are supposed to have _{}
@@ -887,59 +909,61 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 backslashName_occupied.append(pos)
         backslashName_occupied = sorted(backslashName_occupied)
 
-        bracketSym_occupied = []
-        for width, bracketId, openPos, closePos in self.bracketstorage.list_tuple_width_id_openPos_closePos:
-            bracketSym_occupied.append(openPos)
-            bracketSym_occupied.append(closePos)
-
-        print('*************************************************')
-        print(infixName_occupied)
-        print(backslashName_occupied)
-        print(bracketSym_occupied)
-        print('*************************************************')
 
         leftOverPosList = []
-        for pos in range(0, len(self.rawEquationStr)):
+        for pos in range(0, len(self.equationStr)):
             if self.isPosInMatrixTag(pos) or \
             pos in infixName_occupied or \
             pos in backslashName_occupied or \
-            pos in bracketSym_occupied:
+            pos in self.all_brackets_pos or \
+            pos in self.all_preSym_pos:
                 continue # we skip these
             leftOverPosList.append(pos)
 
-
-        print('*************************************************')
-        print(leftOverPosList)
-        print('*************************************************')
-
-        accumulator, accumulatorStartPos, accumulatorEndPos, accumulatorType= None, None, None, None
+        accumulator, accumulatorStartPos, accumulatorEndPos, accumulatorType, prevLeftOverPos= None, None, None, None, None
         for leftOverPos in leftOverPosList:
-            leftOverChar = self.rawEquationStr[leftOverPos]
-            isNume = isNum(leftOverChar)
+            leftOverChar = self.equationStr[leftOverPos]
+            # isNume = isNum(leftOverChar)
             if accumulatorType is None:
                 accumulator = leftOverChar
                 accumulatorStartPos = leftOverPos
                 accumulatorEndPos = accumulatorStartPos + len(leftOverChar) # len(leftOverChar) should always = 1
-                accumulatorType = 'N' if isNume else 'V'
-            elif (accumulatorType == 'N' and not isNume) or \
-            (leftOverPos != leftOverPos): #break off conditions: 0. going_from_N_to_V. 1. not_consecutive
-                if isNume: # pure_number
+                accumulatorType = 'N' if isNum(leftOverChar) else 'V' # this is prevIsNume
+                prevLeftOverPos = leftOverPos
+            elif (accumulatorType == 'N' and not isNum(leftOverChar)) or \
+            (prevLeftOverPos + 1 != leftOverPos) or (re.match(r'\s', leftOverChar)): #break off conditions: 0. going_from_N_to_V. 1. not_consecutive (excluding space)2. is whitespace
+                accumulator = re.sub(r'\s', '', accumulator)
+                if isNum(accumulator): # pure_number
                     self.bracketstorage=self.entitystorage.insert(
                     accumulator, accumulatorStartPos, accumulatorEndPos, EntityType.PURE_NUMBER, 
                     widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos, bracketstorage=self.bracketstorage)#fixed width
                 else: # pure variable (just not a backslash variable, can still have _{}, just need to widthMaxUpdate if we find _{})
-                    self.entitystorage.insert(
+                    self.bracketstorage=self.entitystorage.insert(
                     accumulator, accumulatorStartPos, accumulatorEndPos, EntityType.PURE_VARIABLE, 
-                    widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos) #width waiting for _{} later
+                    widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos, bracketstorage=self.bracketstorage) #width waiting for _{} later
                 #reset
                 accumulator = leftOverChar
                 accumulatorStartPos = leftOverPos
                 accumulatorEndPos = accumulatorStartPos + len(leftOverChar)
-                accumulatorType = 'N' if isNume else 'V'
+                accumulatorType = 'N' if isNum(leftOverChar) else 'V'
+                prevLeftOverPos = leftOverPos
             else: # keep accumulating
                 accumulator += leftOverChar
                 accumulatorEndPos += len(leftOverChar)
+                accumulatorType = 'N' if isNum(leftOverChar) else 'V'
+                prevLeftOverPos = leftOverPos
                 #startPos same. accumulatorType V->N or pure V or pure N is fine.
+        #last collection
+        if len(accumulator) > 0:
+            accumulator = re.sub(r'\s', '', accumulator)
+            if isNum(accumulator): # pure_number
+                self.bracketstorage=self.entitystorage.insert(
+                accumulator, accumulatorStartPos, accumulatorEndPos, EntityType.PURE_NUMBER, 
+                widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos, bracketstorage=self.bracketstorage)#fixed width
+            else: # pure variable (just not a backslash variable, can still have _{}, just need to widthMaxUpdate if we find _{})
+                self.bracketstorage=self.entitystorage.insert(
+                accumulator, accumulatorStartPos, accumulatorEndPos, EntityType.PURE_VARIABLE, 
+                widthStart=accumulatorStartPos, widthEnd=accumulatorEndPos, bracketstorage=self.bracketstorage) #width waiting for _{} later
 
         """
         4c. go through all collected_variables
@@ -992,7 +1016,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             if closeBraPos:
                 self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
                 #update enclosing_touching brackets
-                self.bracketstorage = self.entitystorage.__updateTemplatesToWiderEnclosingBracketsAndRemove(
+                self.bracketstorage = self.entitystorage._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(
                     #takes nodeId
                     list(map(lambda t: t[0], self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.PURE_VARIABLE))), #has to be done here, since we need to check for superscript_pure_variableS
                     # self.entitystorage.getAllEndPosOfEntityType(EntityType.PURE_VARIABLE), #has to be done here, since we need to check for superscript_pure_variableS
@@ -1022,14 +1046,14 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 parentNodeId=pNodeId, argIdx=0, widthStart=funcPos, widthEnd=funcPos, bracketstorage=self.bracketstorage)
 
         affected = ['-']
-        if self.rawEquationStr[0] in affected:
+        if self.equationStr[0] in affected:
             addImplictMinus(0)
         #all openbrackets except Matrices, no need bracketstorage
-        for (_, openBraPos, openBraType), (closeBraPos, _, closeBraType) in self.allBrackets:
-            if self.isPosInMatrixTag(openBraPos) or self.isPosInMatrixTag(closeBraPos):
+        for openBraPos in self.endOfOpenBraPos:
+            if self.isPosInMatrixTag(openBraPos) or openBraPos >= len(self.equationStr):# or self.isPosInMatrixTag(closeBraPos):
                 continue
-            if self.rawEquationStr[openBraPos + 1] in affected:
-                addImplictMinus(openBraPos + 1)
+            if self.equationStr[openBraPos] in affected: #if openBraPos, is the end of the bracket DO NOT +1
+                addImplictMinus(openBraPos)
 
 
     def _find_infixes_arg_brackets_width(self):
@@ -1112,11 +1136,29 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         for idx in range(0, len(list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd)-1):
             vorDing = list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd[idx]
             hinDing = list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd[idx+1]
+            vorDingEntityType = self.entitystorage.nodeId__entityType[vorDing[0]]
+            hinDingEntityType = self.entitystorage.nodeId__entityType[hinDing[0]]
+            #START_CONDITIONAL
+            ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            print(vorDing[0], '************************')
+            if vorDing[0] == 32:
+                import pdb;pdb.set_trace()
+            ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            if (vorDingEntityType in [EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX]) and (hinDingEntityType in [EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX]):
+                continue
+            if (vorDing[1] in ['^']) or (hinDing[1] in ['^']):
+                continue
+            #END_CONDITIONAL
             if vorDing[3] +1 == hinDing[2]: #3=widthEnd & 2=widthStart
-                pNodeId = self.entitystorage.insert('*', funcPos, funcPos, EntityType.IMPLICIT_INFIX, 
-                    parentNodeId=None, argIdx=None, widthStart=arg0WidthStart, widthEnd=arg1WidthEnd)
-            self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(pNodeId, vorDing[0], 0, bracketstorage=self.bracketstorage)
-            self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(pNodeId, hinDing[0], 1, bracketstorage=self.bracketstorage)
+                pNodeId = self.entitystorage.insert('*', vorDing[3]+1, hinDing[2], EntityType.IMPLICIT_INFIX, 
+                    parentNodeId=None, argIdx=None, widthStart=vorDing[2], widthEnd=hinDing[3])
+                """TODO deal later
+                Contains 
+                0. function calls
+                1. differential 
+                """
+                self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(pNodeId, vorDing[0], 0, bracketstorage=self.bracketstorage)
+                self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(pNodeId, hinDing[0], 1, bracketstorage=self.bracketstorage)
 
     #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
 
@@ -1687,6 +1729,7 @@ class BracketStorage:
         self.list_tuple_width_id_openPos_closePos = []
         self.openBraPos__bracketId = {}
         self.closeBraPos__bracketId = {}
+        self.endOfOpenBraPos = {}
 
     def _getBracketId(self):
         newBracketId = copy(self.bracketId)
