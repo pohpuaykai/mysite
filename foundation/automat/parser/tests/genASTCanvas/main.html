@@ -1,0 +1,24 @@
+<html>
+
+<head>
+
+<script>
+
+</script>
+
+</head>
+<body>
+    <canvas id="myCanvas" width="512" height="512"></canvas>
+
+</body>
+
+
+<script>
+var c = document.getElementById("myCanvas");var ctx = c.getContext("2d");ctx.moveTo(0, 5);ctx.lineTo(20, 5);
+    ctx.lineTo(20, 25);ctx.lineTo(0, 25);ctx.lineTo(0, 5);ctx.stroke();ctx.fillText("=", 10, 15);ctx.moveTo(0, 30);ctx.lineTo(20, 30);
+    ctx.lineTo(20, 50);ctx.lineTo(0, 50);ctx.lineTo(0, 30);ctx.stroke();ctx.fillText("2", 10, 40);ctx.moveTo(25, 30);ctx.lineTo(45, 30);
+    ctx.lineTo(45, 50);ctx.lineTo(25, 50);ctx.lineTo(25, 30);ctx.stroke();ctx.fillText("+", 35, 40);ctx.moveTo(0, 55);ctx.lineTo(20, 55);
+    ctx.lineTo(20, 75);ctx.lineTo(0, 75);ctx.lineTo(0, 55);ctx.stroke();ctx.fillText("1", 10, 65);ctx.moveTo(25, 55);ctx.lineTo(45, 55);
+    ctx.lineTo(45, 75);ctx.lineTo(25, 75);ctx.lineTo(25, 55);ctx.stroke();ctx.fillText("1", 35, 65);ctx.moveTo(0, 5);ctx.lineTo(25, 30);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();ctx.moveTo(0, 5);ctx.lineTo(0, 30);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();ctx.moveTo(25, 30);ctx.lineTo(25, 55);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();ctx.moveTo(25, 30);ctx.lineTo(0, 55);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();
+</script>
+</html>

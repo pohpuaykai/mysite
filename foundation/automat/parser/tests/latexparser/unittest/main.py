@@ -575,12 +575,12 @@ def test__find_variables_or_numbers0(verbose=False):
 
     expected_list_tuple_widthStart_nodeId = [   (0, 11),
     (6, 12),
-    (12, 1),
+    (12, 0),
     (15, 13),
     (23, 14),
     (29, 23),
-    (30, 0),
-    (31, 8),
+    (30, 10),
+    (31, 7),
     (32, 15),
     (41, 16),
     (49, 17),
@@ -588,17 +588,17 @@ def test__find_variables_or_numbers0(verbose=False):
     (58, 25),
     (60, 18),
     (66, 26),
-    (67, 6),
+    (67, 5),
     (68, 27),
-    (72, 9),
+    (72, 8),
     (73, 28),
-    (74, 7),
+    (74, 6),
     (75, 29),
     (78, 30),
     (80, 31),
     (82, 32),
-    (83, 4),
-    (85, 10),
+    (83, 3),
+    (85, 9),
     (86, 33),
     (87, 34),
     (89, 19),
@@ -608,7 +608,7 @@ def test__find_variables_or_numbers0(verbose=False):
     (103, 37),
     (105, 38),
     (109, 39),
-    (110, 5),
+    (110, 4),
     (112, 40),
     (113, 41),
     (115, 21),
@@ -616,60 +616,58 @@ def test__find_variables_or_numbers0(verbose=False):
     (124, 42),
     (127, 43),
     (129, 44)]
-    expected_list_tuple_widthEnd_nodeId = [
-    (12, 12),
+    expected_list_tuple_widthEnd_nodeId = [   (12, 12),
+    (15, 0),
     (21, 13),
     (30, 23),
-    (134, 11),
-    (15, 1),
-    (56, 24),
-    (133, 14),
-    (31, 0),
-    (32, 8),
+    (31, 10),
+    (32, 7),
     (38, 15),
     (47, 16),
+    (56, 24),
     (59, 25),
     (60, 17),
     (67, 26),
+    (68, 5),
     (69, 27),
-    (104, 32),
-    (89, 34),
-    (102, 36),
-    (107, 38),
-    (108, 18),
-    (68, 6),
-    (73, 9),
+    (73, 8),
     (74, 28),
-    (75, 7),
+    (75, 6),
     (76, 29),
     (79, 30),
     (81, 31),
-    (84, 4),
-    (86, 10),
+    (83, 32),
+    (84, 3),
+    (86, 9),
     (87, 33),
+    (89, 34),
     (92, 19),
     (99, 35),
+    (102, 36),
     (103, 20),
     (104, 37),
-    (130, 39),
-    (111, 5),
+    (107, 38),
+    (108, 18),
+    (110, 39),
+    (111, 4),
     (113, 40),
     (115, 41),
     (118, 21),
     (125, 42),
     (128, 43),
     (129, 22),
-    (130, 44)]
-    expected_nodeId__widthStart = {
-    0: 30,
-    1: 12,
-    4: 83,
-    5: 110,
-    6: 67,
-    7: 74,
-    8: 31,
-    9: 72,
-    10: 85,
+    (130, 44),
+    (133, 14),
+    (134, 11)]
+    expected_nodeId__widthStart = {   0: 12,
+    3: 83,
+    4: 110,
+    5: 67,
+    6: 74,
+    7: 31,
+    8: 72,
+    9: 85,
+    10: 30,
     11: 0,
     12: 6,
     13: 15,
@@ -704,55 +702,60 @@ def test__find_variables_or_numbers0(verbose=False):
     42: 124,
     43: 127,
     44: 129}
-    expected_nodeId__widthEnd = {
-        0: 31,
-        1: 15,
-        4: 84,
-        5: 111,
-        6: 68,
-        7: 75,
-        8: 32,
-        9: 73,
-        10: 86,
-        11: 134,
-        12: 12,
-        13: 21,
-        14: 133,
-        15: 38,
-        16: 47,
-        17: 60,
-        18: 108,
-        19: 92,
-        20: 103,
-        21: 118,
-        22: 129,
-        23: 30,
-        24: 56,
-        25: 59,
-        26: 67,
-        27: 69,
-        28: 74,
-        29: 76,
-        30: 79,
-        31: 81,
-        32: 104,
-        33: 87,
-        34: 89,
-        35: 99,
-        36: 102,
-        37: 104,
-        38: 107,
-        39: 130,
-        40: 113,
-        41: 115,
-        42: 125,
-        43: 128,
-        44: 130
-        }
-    expected_entityType__list_nodeId = {
-        EntityType.PURE_NUMBER: [24, 27, 29, 34, 41],
-        EntityType.BACKSLASH_NUMBER: [12, 13, 15, 16, 19, 21],
-        EntityType.PURE_VARIABLE: [   23,
+    expected_nodeId__widthEnd = {   0: 15,
+    3: 84,
+    4: 111,
+    5: 68,
+    6: 75,
+    7: 32,
+    8: 73,
+    9: 86,
+    10: 31,
+    11: 134,
+    12: 12,
+    13: 21,
+    14: 133,
+    15: 38,
+    16: 47,
+    17: 60,
+    18: 108,
+    19: 92,
+    20: 103,
+    21: 118,
+    22: 129,
+    23: 30,
+    24: 56,
+    25: 59,
+    26: 67,
+    27: 69,
+    28: 74,
+    29: 76,
+    30: 79,
+    31: 81,
+    32: 83,
+    33: 87,
+    34: 89,
+    35: 99,
+    36: 102,
+    37: 104,
+    38: 107,
+    39: 110,
+    40: 113,
+    41: 115,
+    42: 125,
+    43: 128,
+    44: 130}
+    expected_entityType__list_nodeId = {   
+    EntityType.PURE_NUMBER: [24, 27, 29, 34, 41],
+    EntityType.PURE_INFIX: [0, 3, 4, 5, 6, 7, 8, 9, 10],
+    EntityType.BACKSLASH_FUNCTION: [   11,
+                                                               14,
+                                                               17,
+                                                               18,
+                                                               20,
+                                                               22],
+    EntityType.BACKSLASH_NUMBER: [12, 13, 15, 16, 19, 21],
+    EntityType.PURE_VARIABLE: [   23,
                                                      25,
                                                      26,
                                                      28,
@@ -768,67 +771,58 @@ def test__find_variables_or_numbers0(verbose=False):
                                                      40,
                                                      42,
                                                      43,
-                                                     44],
-        EntityType.PURE_INFIX: [0, 1, 4, 5, 6, 7, 8, 9, 10],
-        EntityType.BACKSLASH_FUNCTION: [   11,
-                                                               14,
-                                                               17,
-                                                               18,
-                                                               20,
-                                                               22]}
-    expected_funcStart__nodeId = {
-        0: 11,
-        6: 12,
-        12: 1,
-        15: 13,
-        23: 14,
-        29: 23,
-        30: 0,
-        31: 8,
-        32: 15,
-        41: 16,
-        49: 17,
-        55: 24,
-        58: 25,
-        60: 18,
-        66: 26,
-        67: 6,
-        68: 27,
-        72: 9,
-        73: 28,
-        74: 7,
-        75: 29,
-        78: 30,
-        80: 31,
-        82: 32,
-        83: 4,
-        85: 10,
-        86: 33,
-        87: 34,
-        89: 19,
-        92: 20,
-        98: 35,
-        101: 36,
-        103: 37,
-        105: 38,
-        109: 39,
-        110: 5,
-        112: 40,
-        113: 41,
-        115: 21,
-        118: 22,
-        124: 42,
-        127: 43,
-        129: 44}
-    expected_funcName__list_nodeId = {
-    '-': [8, 9, 10],
-    '/': [6, 7],
+                                                     44]}
+    expected_funcStart__nodeId = {   0: 11,
+    6: 12,
+    12: 0,
+    15: 13,
+    23: 14,
+    29: 23,
+    30: 10,
+    31: 7,
+    32: 15,
+    41: 16,
+    49: 17,
+    55: 24,
+    58: 25,
+    60: 18,
+    66: 26,
+    67: 5,
+    68: 27,
+    72: 8,
+    73: 28,
+    74: 6,
+    75: 29,
+    78: 30,
+    80: 31,
+    82: 32,
+    83: 3,
+    85: 9,
+    86: 33,
+    87: 34,
+    89: 19,
+    92: 20,
+    98: 35,
+    101: 36,
+    103: 37,
+    105: 38,
+    109: 39,
+    110: 4,
+    112: 40,
+    113: 41,
+    115: 21,
+    118: 22,
+    124: 42,
+    127: 43,
+    129: 44}
+    expected_funcName__list_nodeId = {   '-': [7, 8, 9],
+    '/': [5, 6],
     '1': [24],
     '2': [27, 29, 34, 41],
-    '=': [0],
+    '=': [10],
     'P': [25, 26, 28, 36, 43],
-    '\\to': [1],
-    '^': [4, 5],
+    '\\to': [0],
+    '^': [3, 4],
     'dx': [38],
     'e': [32, 39],
     'f': [30],
@@ -844,7 +838,7 @@ def test__find_variables_or_numbers0(verbose=False):
     'x': [31, 37, 44]}
     expected_nodeId__entityType = {
     0: EntityType.PURE_INFIX,
-    1: EntityType.PURE_INFIX,
+    3: EntityType.PURE_INFIX,
     4: EntityType.PURE_INFIX,
     5: EntityType.PURE_INFIX,
     6: EntityType.PURE_INFIX,
@@ -886,16 +880,15 @@ def test__find_variables_or_numbers0(verbose=False):
     42: EntityType.PURE_VARIABLE,
     43: EntityType.PURE_VARIABLE,
     44: EntityType.PURE_VARIABLE}
-    expected_nodeId__funcName = {
-    0: '=',
-    1: '\\to',
+    expected_nodeId__funcName = {   0: '\\to',
+    3: '^',
     4: '^',
-    5: '^',
+    5: '/',
     6: '/',
-    7: '/',
+    7: '-',
     8: '-',
     9: '-',
-    10: '-',
+    10: '=',
     11: 'lim',
     12: 'theta',
     13: 'infty',
@@ -930,16 +923,15 @@ def test__find_variables_or_numbers0(verbose=False):
     42: 'n',
     43: 'P',
     44: 'x'}
-    expected_nodeId__funcStart = {
-    0: 30,
-    1: 12,
-    4: 83,
-    5: 110,
-    6: 67,
-    7: 74,
-    8: 31,
-    9: 72,
-    10: 85,
+    expected_nodeId__funcStart = {   0: 12,
+    3: 83,
+    4: 110,
+    5: 67,
+    6: 74,
+    7: 31,
+    8: 72,
+    9: 85,
+    10: 30,
     11: 0,
     12: 6,
     13: 15,
@@ -974,16 +966,15 @@ def test__find_variables_or_numbers0(verbose=False):
     42: 124,
     43: 127,
     44: 129}
-    expected_nodeId__funcEnd = {
-    0: 31,
-    1: 15,
-    4: 84,
-    5: 111,
-    6: 68,
-    7: 75,
-    8: 32,
-    9: 73,
-    10: 86,
+    expected_nodeId__funcEnd = {   0: 15,
+    3: 84,
+    4: 111,
+    5: 68,
+    6: 75,
+    7: 32,
+    8: 73,
+    9: 86,
+    10: 31,
     11: 4,
     12: 12,
     13: 21,
@@ -1019,25 +1010,24 @@ def test__find_variables_or_numbers0(verbose=False):
     43: 128,
     44: 130}
     expected_tuple_nodeId_argIdx__pNodeId = {}
-    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {
-    (0, 0): (None, 0, None, 30),
-    (0, 1): (None, 30, None, 134),
-    (1, 0): (None, 0, None, 12),
-    (1, 1): (None, 12, None, 134),
-    (4, 0): (None, 0, None, 83),
-    (4, 1): (None, 83, None, 134),
-    (5, 0): (None, 0, None, 110),
-    (5, 1): (None, 110, None, 134),
-    (6, 0): (None, 0, None, 67),
-    (6, 1): (None, 67, None, 134),
-    (7, 0): (None, 0, None, 74),
-    (7, 1): (None, 74, None, 134),
-    (8, 0): (None, 0, None, 31),
-    (8, 1): (None, 31, None, 134),
-    (9, 0): (None, 0, None, 72),
-    (9, 1): (None, 72, None, 134),
-    (10, 0): (None, 0, None, 85),
-    (10, 1): (None, 85, None, 134),
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {   (0, 0): (None, 0, None, 12),
+    (0, 1): (None, 12, None, 134),
+    (3, 0): (None, 0, None, 83),
+    (3, 1): (None, 83, None, 134),
+    (4, 0): (None, 0, None, 110),
+    (4, 1): (None, 110, None, 134),
+    (5, 0): (None, 0, None, 67),
+    (5, 1): (None, 67, None, 134),
+    (6, 0): (None, 0, None, 74),
+    (6, 1): (None, 74, None, 134),
+    (7, 0): (None, 0, None, 31),
+    (7, 1): (None, 31, None, 134),
+    (8, 0): (None, 0, None, 72),
+    (8, 1): (None, 72, None, 134),
+    (9, 0): (None, 0, None, 85),
+    (9, 1): (None, 85, None, 134),
+    (10, 0): (None, 0, None, 30),
+    (10, 1): (None, 30, None, 134),
     (11, 0): ('{', 5, '}', 21),
     (11, 1): ('{', 22, '}', 133),
     (14, 0): ('{', 28, '}', 38),
@@ -1064,11 +1054,14 @@ def test__find_variables_or_numbers0(verbose=False):
         and expected_list_tuple_widthStart_nodeId == parser.entitystorage.list_tuple_widthStart_nodeId\
         and expected_list_tuple_widthEnd_nodeId == parser.entitystorage.list_tuple_widthEnd_nodeId\
         and expected_nodeId__widthStart == parser.entitystorage.nodeId__widthStart\
+
         and expected_nodeId__widthEnd == parser.entitystorage.nodeId__widthEnd\
         and expected_entityType__list_nodeId == parser.entitystorage.entityType__list_nodeId\
+
         and expected_funcStart__nodeId == parser.entitystorage.funcStart__nodeId\
         and expected_funcName__list_nodeId == parser.entitystorage.funcName__list_nodeId\
         and expected_nodeId__entityType == parser.entitystorage.nodeId__entityType\
+
         and expected_nodeId__funcName == parser.entitystorage.nodeId__funcName\
         and expected_nodeId__funcStart == parser.entitystorage.nodeId__funcStart\
         and expected_nodeId__funcEnd == parser.entitystorage.nodeId__funcEnd\
@@ -1114,227 +1107,384 @@ def test__find_implicit_00(verbose=False):
     expected_closeBraPos__bracketId = {81: 7, 104: 10, 130: 14, 131: 15}
 
 
-    expected_list_tuple_widthStart_nodeId = [
-    (0, 11),
-    (6, 12),
-    (12, 1),
-    (15, 13),
-    (23, 14),
-    (29, 23),
-    (30, 0),
-    (31, 47),
-    (31, 8),
-    (32, 15),
-    (41, 16),
-    (49, 17),
-    (55, 24),
-    (58, 25),
-    (60, 18),
-    (66, 26),
-    (67, 6),
-    (68, 27),
-    (72, 45),
-    (72, 9),
-    (73, 28),
-    (74, 7),
-    (75, 29),
-    (78, 30),
-    (80, 31),
-    (82, 32),
-    (83, 4),
-    (85, 46),
-    (85, 10),
-    (86, 33),
-    (87, 34),
-    (89, 19),
-    (92, 20),
-    (98, 35),
-    (101, 36),
-    (103, 37),
-    (105, 38),
-    (109, 39),
-    (110, 5),
-    (112, 40),
-    (113, 41),
-    (115, 21),
-    (118, 22),
-    (124, 42),
-    (127, 43),
-    (129, 44)]
-    expected_list_tuple_widthEnd_nodeId = [   (12, 12),
-    (21, 13),
-    (30, 23),
-    (134, 11),
-    (15, 1),
-    (31, 47),
-    (56, 24),
-    (133, 14),
-    (31, 0),
-    (32, 8),
-    (38, 15),
-    (47, 16),
-    (59, 25),
-    (60, 17),
-    (67, 26),
-    (69, 27),
-    (72, 45),
-    (104, 32),
-    (89, 34),
-    (102, 36),
-    (107, 38),
-    (108, 18),
-    (68, 6),
-    (73, 9),
-    (74, 28),
-    (75, 7),
-    (76, 29),
-    (79, 30),
-    (81, 31),
-    (84, 4),
-    (85, 46),
-    (86, 10),
-    (87, 33),
-    (92, 19),
-    (99, 35),
-    (103, 20),
-    (104, 37),
-    (130, 39),
-    (111, 5),
-    (113, 40),
-    (115, 41),
-    (118, 21),
-    (125, 42),
-    (128, 43),
-    (129, 22),
-    (130, 44)]
-    expected_nodeId__widthStart = {   0: 30,
-    1: 12,
-    4: 83,
-    5: 110,
-    6: 67,
-    7: 74,
-    8: 31,
-    9: 72,
-    10: 85,
-    11: 0,
-    12: 6,
-    13: 15,
-    14: 23,
-    15: 32,
-    16: 41,
-    17: 49,
-    18: 60,
-    19: 89,
-    20: 92,
-    21: 115,
-    22: 118,
-    23: 29,
-    24: 55,
-    25: 58,
-    26: 66,
-    27: 68,
-    28: 73,
-    29: 75,
-    30: 78,
-    31: 80,
-    32: 82,
-    33: 86,
-    34: 87,
-    35: 98,
-    36: 101,
-    37: 103,
-    38: 105,
-    39: 109,
-    40: 112,
-    41: 113,
-    42: 124,
-    43: 127,
-    44: 129,
-    45: 72,
-    46: 85,
-    47: 31}
-    expected_nodeId__widthEnd = {   0: 31,
-    1: 15,
-    4: 84,
-    5: 111,
-    6: 68,
-    7: 75,
-    8: 32,
-    9: 73,
-    10: 86,
-    11: 134,
-    12: 12,
-    13: 21,
-    14: 133,
-    15: 38,
-    16: 47,
-    17: 60,
-    18: 108,
-    19: 92,
-    20: 103,
-    21: 118,
-    22: 129,
-    23: 30,
-    24: 56,
-    25: 59,
-    26: 67,
-    27: 69,
-    28: 74,
-    29: 76,
-    30: 79,
-    31: 81,
-    32: 104,
-    33: 87,
-    34: 89,
-    35: 99,
-    36: 102,
-    37: 104,
-    38: 107,
-    39: 130,
-    40: 113,
-    41: 115,
-    42: 125,
-    43: 128,
-    44: 130,
-    45: 72,
-    46: 85,
-    47: 31}
+    expected_list_tuple_widthStart_nodeId = [(0, 11), (6, 12), (12, 0), (15, 13), (23, 14), (29, 23),
+    (30, 10), (31, 47), (31, 7), (32, 15), (41, 16), (49, 17), (55, 24), (58, 25), (60, 18), (66, 26),
+    (67, 5), (68, 27), (72, 45), (72, 8), (73, 28), (74, 6), (75, 29), (78, 30), (80, 31), (82, 32),
+    (83, 3), (85, 46), (85, 9), (86, 33), (87, 34), (89, 19), (92, 20), (98, 35), (101, 36), (103, 37),
+    (105, 38), (109, 39), (110, 4), (112, 40), (113, 41), (115, 21), (118, 22), (124, 42), (127, 43), (129, 44)]
+    expected_list_tuple_widthEnd_nodeId = [(12, 12), (15, 0), (21, 13), (30, 23), (31, 47), (31, 10), (32, 7),
+    (38, 15), (47, 16), (56, 24), (59, 25), (60, 17), (67, 26), (68, 5), (69, 27), (72, 45), (73, 8), (74, 28),
+    (75, 6), (76, 29), (79, 30), (81, 31), (83, 32), (84, 3), (85, 46), (86, 9), (87, 33), (89, 34), (92, 19),
+    (99, 35), (102, 36), (103, 20), (104, 37), (107, 38), (108, 18), (110, 39), (111, 4), (113, 40), (115, 41),
+    (118, 21), (125, 42), (128, 43), (129, 22), (130, 44), (133, 14), (134, 11)]
+    expected_nodeId__widthStart = {0: 12, 3: 83, 4: 110, 5: 67, 6: 74, 7: 31, 8: 72, 9: 85, 10: 30,
+    11: 0, 12: 6, 13: 15, 14: 23, 15: 32, 16: 41, 17: 49, 18: 60, 19: 89, 20: 92, 21: 115, 22: 118,
+    23: 29, 24: 55, 25: 58, 26: 66, 27: 68, 28: 73, 29: 75, 30: 78, 31: 80, 32: 82, 33: 86, 34: 87,
+    35: 98, 36: 101, 37: 103, 38: 105, 39: 109, 40: 112, 41: 113, 42: 124, 43: 127, 44: 129, 45: 72,
+    46: 85, 47: 31}
+    expected_nodeId__widthEnd = {0: 15, 3: 84, 4: 111, 5: 68, 6: 75, 7: 32, 8: 73, 9: 86, 10: 31, 11: 134,
+    12: 12, 13: 21, 14: 133, 15: 38, 16: 47, 17: 60, 18: 108, 19: 92, 20: 103, 21: 118, 22: 129, 23: 30,
+    24: 56, 25: 59, 26: 67, 27: 69, 28: 74, 29: 76, 30: 79, 31: 81, 32: 83, 33: 87, 34: 89, 35: 99, 36: 102,
+    37: 104, 38: 107, 39: 110, 40: 113, 41: 115, 42: 125, 43: 128, 44: 130, 45: 72, 46: 85, 47: 31}
     expected_entityType__list_nodeId = {
-    EntityType.PURE_INFIX: [0, 1, 4, 5, 6, 7],
-    EntityType.PURE_NUMBER: [24, 27, 29, 34, 41, 45, 46, 47],
-    EntityType.BACKSLASH_NUMBER: [12, 13, 15, 16, 19, 21],
-    EntityType.IMPLICIT_INFIX: [9, 10, 8],
-    EntityType.PURE_VARIABLE: [   23,
-                                                     25,
-                                                     26,
-                                                     28,
-                                                     30,
-                                                     31,
-                                                     32,
-                                                     33,
-                                                     35,
-                                                     36,
-                                                     37,
-                                                     38,
-                                                     39,
-                                                     40,
-                                                     42,
-                                                     43,
-                                                     44],
-    EntityType.BACKSLASH_FUNCTION: [   11,
-                                                               14,
-                                                               17,
-                                                               18,
-                                                               20,
-                                                               22]}
+        EntityType.PURE_NUMBER: [24, 27, 29, 34, 41, 45, 46, 47],
+        EntityType.PURE_INFIX: [0, 3, 4, 5, 6, 10],
+        EntityType.BACKSLASH_FUNCTION: [11, 14, 17, 18, 20, 22],
+        EntityType.BACKSLASH_NUMBER: [12, 13, 15, 16, 19, 21],
+        EntityType.IMPLICIT_INFIX: [8, 9, 7],
+        EntityType.PURE_VARIABLE: [23, 25, 26, 28, 30, 31, 32,33, 35, 36, 37, 38, 39, 40, 42, 43, 44]}
+    expected_funcStart__nodeId = {0: 11, 6: 12, 12: 0, 15: 13, 23: 14, 29: 23, 30: 10, 31: 47, 32: 15,
+        41: 16, 49: 17, 55: 24, 58: 25, 60: 18, 66: 26, 67: 5, 68: 27, 72: 45, 73: 28, 74: 6, 75: 29,
+        78: 30, 80: 31, 82: 32, 83: 3, 85: 46, 86: 33, 87: 34, 89: 19, 92: 20, 98: 35, 101: 36, 103: 37,
+        105: 38, 109: 39, 110: 4, 112: 40, 113: 41, 115: 21, 118: 22, 124: 42, 127: 43, 129: 44}
+    expected_funcName__list_nodeId = {
+        '-': [7, 8, 9],
+        '/': [5, 6],
+        '0': [45, 46, 47],
+        '1': [24],
+        '2': [27, 29, 34, 41],
+        '=': [10],
+        'P': [25, 26, 28, 36, 43],
+        '\\to': [0],
+        '^': [3, 4],
+        'dx': [38],
+        'e': [32, 39],
+        'f': [30],
+        'frac': [17, 20, 22],
+        'i': [33, 40],
+        'infty': [13],
+        'int': [18],
+        'lim': [11],
+        'n': [23, 35, 42],
+        'pi': [19, 21],
+        'sum': [14],
+        'theta': [12, 15, 16],
+        'x': [31, 37, 44]}
+    expected_nodeId__entityType = {
+        0: EntityType.PURE_INFIX,
+        3: EntityType.PURE_INFIX,
+        4: EntityType.PURE_INFIX,
+        5: EntityType.PURE_INFIX,
+        6: EntityType.PURE_INFIX,
+        7: EntityType.IMPLICIT_INFIX,
+        8: EntityType.IMPLICIT_INFIX,
+        9: EntityType.IMPLICIT_INFIX,
+        10: EntityType.PURE_INFIX,
+        11: EntityType.BACKSLASH_FUNCTION,
+        12: EntityType.BACKSLASH_NUMBER,
+        13: EntityType.BACKSLASH_NUMBER,
+        14: EntityType.BACKSLASH_FUNCTION,
+        15: EntityType.BACKSLASH_NUMBER,
+        16: EntityType.BACKSLASH_NUMBER,
+        17: EntityType.BACKSLASH_FUNCTION,
+        18: EntityType.BACKSLASH_FUNCTION,
+        19: EntityType.BACKSLASH_NUMBER,
+        20: EntityType.BACKSLASH_FUNCTION,
+        21: EntityType.BACKSLASH_NUMBER,
+        22: EntityType.BACKSLASH_FUNCTION,
+        23: EntityType.PURE_VARIABLE,
+        24: EntityType.PURE_NUMBER,
+        25: EntityType.PURE_VARIABLE,
+        26: EntityType.PURE_VARIABLE,
+        27: EntityType.PURE_NUMBER,
+        28: EntityType.PURE_VARIABLE,
+        29: EntityType.PURE_NUMBER,
+        30: EntityType.PURE_VARIABLE,
+        31: EntityType.PURE_VARIABLE,
+        32: EntityType.PURE_VARIABLE,
+        33: EntityType.PURE_VARIABLE,
+        34: EntityType.PURE_NUMBER,
+        35: EntityType.PURE_VARIABLE,
+        36: EntityType.PURE_VARIABLE,
+        37: EntityType.PURE_VARIABLE,
+        38: EntityType.PURE_VARIABLE,
+        39: EntityType.PURE_VARIABLE,
+        40: EntityType.PURE_VARIABLE,
+        41: EntityType.PURE_NUMBER,
+        42: EntityType.PURE_VARIABLE,
+        43: EntityType.PURE_VARIABLE,
+        44: EntityType.PURE_VARIABLE,
+        45: EntityType.PURE_NUMBER,
+        46: EntityType.PURE_NUMBER,
+        47: EntityType.PURE_NUMBER}
+    expected_nodeId__funcName = {
+        0: '\\to',
+        3: '^',
+        4: '^',
+        5: '/',
+        6: '/',
+        7: '-',
+        8: '-',
+        9: '-',
+        10: '=',
+        11: 'lim',
+        12: 'theta',
+        13: 'infty',
+        14: 'sum',
+        15: 'theta',
+        16: 'theta',
+        17: 'frac',
+        18: 'int',
+        19: 'pi',
+        20: 'frac',
+        21: 'pi',
+        22: 'frac',
+        23: 'n',
+        24: '1',
+        25: 'P',
+        26: 'P',
+        27: '2',
+        28: 'P',
+        29: '2',
+        30: 'f',
+        31: 'x',
+        32: 'e',
+        33: 'i',
+        34: '2',
+        35: 'n',
+        36: 'P',
+        37: 'x',
+        38: 'dx',
+        39: 'e',
+        40: 'i',
+        41: '2',
+        42: 'n',
+        43: 'P',
+        44: 'x',
+        45: '0',
+        46: '0',
+        47: '0'}
+    expected_nodeId__funcStart = {
+        0: 12,
+        3: 83,
+        4: 110,
+        5: 67,
+        6: 74,
+        7: 31,
+        8: 72,
+        9: 85,
+        10: 30,
+        11: 0,
+        12: 6,
+        13: 15,
+        14: 23,
+        15: 32,
+        16: 41,
+        17: 49,
+        18: 60,
+        19: 89,
+        20: 92,
+        21: 115,
+        22: 118,
+        23: 29,
+        24: 55,
+        25: 58,
+        26: 66,
+        27: 68,
+        28: 73,
+        29: 75,
+        30: 78,
+        31: 80,
+        32: 82,
+        33: 86,
+        34: 87,
+        35: 98,
+        36: 101,
+        37: 103,
+        38: 105,
+        39: 109,
+        40: 112,
+        41: 113,
+        42: 124,
+        43: 127,
+        44: 129,
+        45: 72,
+        46: 85,
+        47: 31}
+    expected_nodeId__funcEnd = {
+        0: 15,
+        3: 84,
+        4: 111,
+        5: 68,
+        6: 75,
+        7: 32,
+        8: 73,
+        9: 86,
+        10: 31,
+        11: 4,
+        12: 12,
+        13: 21,
+        14: 27,
+        15: 38,
+        16: 47,
+        17: 54,
+        18: 64,
+        19: 92,
+        20: 97,
+        21: 118,
+        22: 123,
+        23: 30,
+        24: 56,
+        25: 59,
+        26: 67,
+        27: 69,
+        28: 74,
+        29: 76,
+        30: 79,
+        31: 81,
+        32: 83,
+        33: 87,
+        34: 89,
+        35: 99,
+        36: 102,
+        37: 104,
+        38: 107,
+        39: 110,
+        40: 113,
+        41: 115,
+        42: 125,
+        43: 128,
+        44: 130,
+        45: 72,
+        46: 85,
+        47: 31}
+    expected_tuple_nodeId_argIdx__pNodeId = {}
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {
+        (0, 0): (None, 0, None, 12),
+        (0, 1): (None, 12, None, 134),
+        (3, 0): (None, 0, None, 83),
+        (3, 1): (None, 83, None, 134),
+        (4, 0): (None, 0, None, 110),
+        (4, 1): (None, 110, None, 134),
+        (5, 0): (None, 0, None, 67),
+        (5, 1): (None, 67, None, 134),
+        (6, 0): (None, 0, None, 74),
+        (6, 1): (None, 74, None, 134),
+        (7, 0): (None, 0, None, 31),
+        (7, 1): (None, 31, None, 134),
+        (8, 0): (None, 0, None, 72),
+        (8, 1): (None, 72, None, 134),
+        (9, 0): (None, 0, None, 85),
+        (9, 1): (None, 85, None, 134),
+        (10, 0): (None, 0, None, 30),
+        (10, 1): (None, 30, None, 134),
+        (11, 0): ('{', 5, '}', 21),
+        (11, 1): ('{', 22, '}', 133),
+        (14, 0): ('{', 28, '}', 38),
+        (14, 1): ('{', 40, '}', 47),
+        (14, 2): ('{', 48, '}', 132),
+        (17, 0): ('{', 54, '}', 56),
+        (17, 1): ('{', 57, '}', 59),
+        (18, 0): ('{', 65, '}', 69),
+        (18, 1): ('{', 71, '}', 76),
+        (18, 2): ('{', 77, '}', 107),
+        (20, 0): ('{', 97, '}', 99),
+        (20, 1): ('{', 100, '}', 102),
+        (22, 0): ('{', 123, '}', 125),
+        (22, 1): ('{', 126, '}', 128)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_closeBraType__sortedPosList == parser.bracketstorage.closeBraType__sortedPosList \
+        and expected_openBraType__sortedPosList == parser.bracketstorage.openBraType__sortedPosList \
+        and expected_id__tuple_openPos_openBraType_closePos_closeBraType == parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType\
+        and expected_list_tuple_width_id_openPos_closePos == parser.bracketstorage.list_tuple_width_id_openPos_closePos\
+        and expected_openBraPos__bracketId == parser.bracketstorage.openBraPos__bracketId\
+        and expected_closeBraPos__bracketId == parser.bracketstorage.closeBraPos__bracketId\
+        and expected_list_tuple_widthStart_nodeId == parser.entitystorage.list_tuple_widthStart_nodeId\
+        and expected_list_tuple_widthEnd_nodeId == parser.entitystorage.list_tuple_widthEnd_nodeId\
+        and expected_nodeId__widthStart == parser.entitystorage.nodeId__widthStart\
+        and expected_nodeId__widthEnd == parser.entitystorage.nodeId__widthEnd\
+        and expected_entityType__list_nodeId == parser.entitystorage.entityType__list_nodeId\
+        and expected_funcStart__nodeId == parser.entitystorage.funcStart__nodeId\
+        and expected_funcName__list_nodeId == parser.entitystorage.funcName__list_nodeId\
+        and expected_nodeId__entityType == parser.entitystorage.nodeId__entityType\
+        and expected_nodeId__funcName == parser.entitystorage.nodeId__funcName\
+        and expected_nodeId__funcStart == parser.entitystorage.nodeId__funcStart\
+        and expected_nodeId__funcEnd == parser.entitystorage.nodeId__funcEnd\
+        and expected_tuple_nodeId_argIdx__pNodeId == parser.entitystorage.tuple_nodeId_argIdx__pNodeId\
+        and expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos == parser.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos
+    )
+    if verbose:
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
+
+
+
+def test__find_infixes_arg_brackets_width0(verbose=False):
+    """
+\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}
+^ ^^^^^^ ^^^^^^ ^^^ ^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^ ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^ ^^^ ^^^^^^^^^^^^^^^^^^^^^^^ ^^^ ^^^^^^^^^^^^^^^
+0 123456 789111 111 11112222 222222333 333333344 44444444 55555555556 66666666677777777778888888888 999 99999991111111111111111 111 111111111111111
+            012 345 67890123 456789012 345678901 23456789 01234567890 12345678901234567890123456789 012 34567890000000000111111 111 122222222223333
+                                                                                                               0123456789012345 678 901234567890123
+
+                                                                                                               
+    """
+    #Fourier transform
+    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}"
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    parser._find_backslash()
+    parser._find_variables_or_numbers()
+    parser._find_implicit_0()
+    parser._find_infixes_arg_brackets_width()
+
+
+    expected_closeBraType__sortedPosList = {')': [81, 131], '}': [104, 130]}
+    expected_openBraType__sortedPosList = {'(': [79, 108], '{': [84, 111]}
+    expected_id__tuple_openPos_openBraType_closePos_closeBraType = {
+        7: (79, '(', 81, ')'),
+        10: (84, '{', 104, '}'),
+        14: (111, '{', 130, '}'),
+        15: (108, '(', 131, ')')}
+    expected_list_tuple_width_id_openPos_closePos = [(2, 7, 79, 81), (19, 14, 111, 130), (20, 10, 84, 104), (23, 15, 108, 131)]
+    expected_openBraPos__bracketId = {79: 7, 84: 10, 108: 15, 111: 14}
+    expected_closeBraPos__bracketId = {81: 7, 104: 10, 130: 14, 131: 15}
+
+
+    expected_list_tuple_widthStart_nodeId = None
+    expected_list_tuple_widthEnd_nodeId = None
+    expected_nodeId__widthStart = None
+    expected_nodeId__widthEnd = None
+
+    expected_entityType__list_nodeId = {
+        EntityType.PURE_NUMBER: [24, 27, 29, 34, 41, 45, 46, 47],
+        EntityType.PURE_INFIX: [0, 3, 4, 5, 6, 10],
+        EntityType.BACKSLASH_NUMBER: [12, 13, 15, 16, 19, 21],
+        EntityType.IMPLICIT_INFIX: [8, 9, 7],
+        EntityType.PURE_VARIABLE: [   23,
+                                                         25,
+                                                         26,
+                                                         28,
+                                                         30,
+                                                         31,
+                                                         32,
+                                                         33,
+                                                         35,
+                                                         36,
+                                                         37,
+                                                         38,
+                                                         39,
+                                                         40,
+                                                         42,
+                                                         43,
+                                                         44],
+        EntityType.BACKSLASH_FUNCTION: [   11,
+                                                                   14,
+                                                                   17,
+                                                                   18,
+                                                                   20,
+                                                                   22]}
     expected_funcStart__nodeId = {
     0: 11,
     6: 12,
-    12: 1,
+    12: 0,
     15: 13,
     23: 14,
     29: 23,
-    30: 0,
+    30: 10,
     31: 47,
     32: 15,
     41: 16,
@@ -1343,16 +1493,16 @@ def test__find_implicit_00(verbose=False):
     58: 25,
     60: 18,
     66: 26,
-    67: 6,
+    67: 5,
     68: 27,
     72: 45,
     73: 28,
-    74: 7,
+    74: 6,
     75: 29,
     78: 30,
     80: 31,
     82: 32,
-    83: 4,
+    83: 3,
     85: 46,
     86: 33,
     87: 34,
@@ -1363,7 +1513,7 @@ def test__find_implicit_00(verbose=False):
     103: 37,
     105: 38,
     109: 39,
-    110: 5,
+    110: 4,
     112: 40,
     113: 41,
     115: 21,
@@ -1372,15 +1522,15 @@ def test__find_implicit_00(verbose=False):
     127: 43,
     129: 44}
     expected_funcName__list_nodeId = {
-    '-': [8, 9, 10],
-    '/': [6, 7],
+    '-': [7, 8, 9],
+    '/': [5, 6],
     '0': [45, 46, 47],
     '1': [24],
     '2': [27, 29, 34, 41],
-    '=': [0],
+    '=': [10],
     'P': [25, 26, 28, 36, 43],
-    '\\to': [1],
-    '^': [4, 5],
+    '\\to': [0],
+    '^': [3, 4],
     'dx': [38],
     'e': [32, 39],
     'f': [30],
@@ -1396,14 +1546,14 @@ def test__find_implicit_00(verbose=False):
     'x': [31, 37, 44]}
     expected_nodeId__entityType = {
     0: EntityType.PURE_INFIX,
-    1: EntityType.PURE_INFIX,
+    3: EntityType.PURE_INFIX,
     4: EntityType.PURE_INFIX,
     5: EntityType.PURE_INFIX,
     6: EntityType.PURE_INFIX,
-    7: EntityType.PURE_INFIX,
+    7: EntityType.IMPLICIT_INFIX,
     8: EntityType.IMPLICIT_INFIX,
     9: EntityType.IMPLICIT_INFIX,
-    10: EntityType.IMPLICIT_INFIX,
+    10: EntityType.PURE_INFIX,
     11: EntityType.BACKSLASH_FUNCTION,
     12: EntityType.BACKSLASH_NUMBER,
     13: EntityType.BACKSLASH_NUMBER,
@@ -1442,15 +1592,15 @@ def test__find_implicit_00(verbose=False):
     46: EntityType.PURE_NUMBER,
     47: EntityType.PURE_NUMBER}
     expected_nodeId__funcName = {
-    0: '=',
-    1: '\\to',
+    0: '\\to',
+    3: '^',
     4: '^',
-    5: '^',
+    5: '/',
     6: '/',
-    7: '/',
+    7: '-',
     8: '-',
     9: '-',
-    10: '-',
+    10: '=',
     11: 'lim',
     12: 'theta',
     13: 'infty',
@@ -1487,17 +1637,17 @@ def test__find_implicit_00(verbose=False):
     44: 'x',
     45: '0',
     46: '0',
-    47:'0'}
+    47: '0'}
     expected_nodeId__funcStart = {
-    0: 30,
-    1: 12,
-    4: 83,
-    5: 110,
-    6: 67,
-    7: 74,
-    8: 31,
-    9: 72,
-    10: 85,
+    0: 12,
+    3: 83,
+    4: 110,
+    5: 67,
+    6: 74,
+    7: 31,
+    8: 72,
+    9: 85,
+    10: 30,
     11: 0,
     12: 6,
     13: 15,
@@ -1533,17 +1683,18 @@ def test__find_implicit_00(verbose=False):
     43: 127,
     44: 129,
     45: 72,
-    46: 85}
+    46: 85,
+    47: 31}
     expected_nodeId__funcEnd = {
-    0: 31,
-    1: 15,
-    4: 84,
-    5: 111,
-    6: 68,
-    7: 75,
-    8: 32,
-    9: 73,
-    10: 86,
+    0: 15,
+    3: 84,
+    4: 111,
+    5: 68,
+    6: 75,
+    7: 32,
+    8: 73,
+    9: 86,
+    10: 31,
     11: 4,
     12: 12,
     13: 21,
@@ -1579,390 +1730,28 @@ def test__find_implicit_00(verbose=False):
     43: 128,
     44: 130,
     45: 72,
-    46: 85}
+    46: 85,
+    47: 31}
     expected_tuple_nodeId_argIdx__pNodeId = {}
     expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {
-    (0, 0): (None, 0, None, 30),
-    (0, 1): (None, 30, None, 134),
-    (1, 0): (None, 0, None, 12),
-    (1, 1): (None, 12, None, 134),
-    (4, 0): (None, 0, None, 83),
-    (4, 1): (None, 83, None, 134),
-    (5, 0): (None, 0, None, 110),
-    (5, 1): (None, 110, None, 134),
-    (6, 0): (None, 0, None, 67),
-    (6, 1): (None, 67, None, 134),
-    (7, 0): (None, 0, None, 74),
-    (7, 1): (None, 74, None, 134),
-    (8, 0): (None, 0, None, 31),
-    (8, 1): (None, 31, None, 134),
-    (9, 0): (None, 0, None, 72),
-    (9, 1): (None, 72, None, 134),
-    (10, 0): (None, 0, None, 85),
-    (10, 1): (None, 85, None, 134),
-    (11, 0): ('{', 5, '}', 21),
-    (11, 1): ('{', 22, '}', 133),
-    (14, 0): ('{', 28, '}', 38),
-    (14, 1): ('{', 40, '}', 47),
-    (14, 2): ('{', 48, '}', 132),
-    (17, 0): ('{', 54, '}', 56),
-    (17, 1): ('{', 57, '}', 59),
-    (18, 0): ('{', 65, '}', 69),
-    (18, 1): ('{', 71, '}', 76),
-    (18, 2): ('{', 77, '}', 107),
-    (20, 0): ('{', 97, '}', 99),
-    (20, 1): ('{', 100, '}', 102),
-    (22, 0): ('{', 123, '}', 125),
-    (22, 1): ('{', 126, '}', 128)}
-
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
-        expected_closeBraType__sortedPosList == parser.bracketstorage.closeBraType__sortedPosList \
-        # and expected_openBraType__sortedPosList == parser.bracketstorage.openBraType__sortedPosList \
-        # and expected_id__tuple_openPos_openBraType_closePos_closeBraType == parser.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType\
-        # and expected_list_tuple_width_id_openPos_closePos == parser.bracketstorage.list_tuple_width_id_openPos_closePos\
-        # and expected_openBraPos__bracketId == parser.bracketstorage.openBraPos__bracketId\
-        # and expected_closeBraPos__bracketId == parser.bracketstorage.closeBraPos__bracketId\
-        # and expected_list_tuple_widthStart_nodeId == parser.entitystorage.list_tuple_widthStart_nodeId\
-        # and expected_list_tuple_widthEnd_nodeId == parser.entitystorage.list_tuple_widthEnd_nodeId\
-        # and expected_nodeId__widthStart == parser.entitystorage.nodeId__widthStart\
-        # and expected_nodeId__widthEnd == parser.entitystorage.nodeId__widthEnd\
-        # and expected_entityType__list_nodeId == parser.entitystorage.entityType__list_nodeId\
-        # and expected_funcStart__nodeId == parser.entitystorage.funcStart__nodeId\
-        # and expected_funcName__list_nodeId == parser.entitystorage.funcName__list_nodeId\
-        # and expected_nodeId__entityType == parser.entitystorage.nodeId__entityType\
-        
-        and expected_nodeId__funcName == parser.entitystorage.nodeId__funcName\
-        
-        # and expected_nodeId__funcStart == parser.entitystorage.nodeId__funcStart\
-        # and expected_nodeId__funcEnd == parser.entitystorage.nodeId__funcEnd\
-        # and expected_tuple_nodeId_argIdx__pNodeId == parser.entitystorage.tuple_nodeId_argIdx__pNodeId\
-        # and expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos == parser.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos
-    )
-    if verbose:
-        print(str(parser.bracketstorage))
-        print(str(parser.entitystorage))
-
-
-
-def test__find_infixes_arg_brackets_width0(verbose=False):
-    """
-\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}
-^ ^^^^^^ ^^^^^^ ^^^ ^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^ ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^ ^^^ ^^^^^^^^^^^^^^^^^^^^^^^ ^^^ ^^^^^^^^^^^^^^^
-0 123456 789111 111 11112222 222222333 333333344 44444444 55555555556 66666666677777777778888888888 999 99999991111111111111111 111 111111111111111
-            012 345 67890123 456789012 345678901 23456789 01234567890 12345678901234567890123456789 012 34567890000000000111111 111 122222222223333
-                                                                                                               0123456789012345 678 901234567890123
-
-                                                                                                               
-    """
-    #Fourier transform
-    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}"
-    parser = Latexparser(equationStr, verbose=verbose)
-    parser._find_matrices()
-    parser._find_infix()
-    parser._find_brackets()
-    parser._find_backslash()
-    parser._find_variables_or_numbers()
-    parser._find_implicit_0()
-    parser._find_infixes_arg_brackets_width()
-
-
-    expected_closeBraType__sortedPosList = None
-    expected_openBraType__sortedPosList = None
-    expected_id__tuple_openPos_openBraType_closePos_closeBraType = None
-    expected_list_tuple_width_id_openPos_closePos = None
-    expected_openBraPos__bracketId = None
-    expected_closeBraPos__bracketId = None
-
-
-    expected_list_tuple_widthStart_nodeId = None
-    expected_list_tuple_widthEnd_nodeId = None
-    expected_nodeId__widthStart = None
-    expected_nodeId__widthEnd = None
-    expected_entityType__list_nodeId = {
-    EntityType.PURE_INFIX: [0, 1, 4, 5, 6, 7, 8],
-    EntityType.PURE_NUMBER: [24, 27, 29, 34, 41, 45, 46],
-    EntityType.BACKSLASH_NUMBER: [12, 13, 15, 16, 19, 21],
-    EntityType.IMPLICIT_INFIX: [9, 10],
-    EntityType.PURE_VARIABLE: [   23,
-                                                     25,
-                                                     26,
-                                                     28,
-                                                     30,
-                                                     31,
-                                                     32,
-                                                     33,
-                                                     35,
-                                                     36,
-                                                     37,
-                                                     38,
-                                                     39,
-                                                     40,
-                                                     42,
-                                                     43,
-                                                     44],
-    EntityType.BACKSLASH_FUNCTION: [   11,
-                                                               14,
-                                                               17,
-                                                               18,
-                                                               20,
-                                                               22]}
-    expected_funcStart__nodeId = {
-    0: 11,
-    6: 12,
-    12: 1,
-    15: 13,
-    23: 14,
-    29: 23,
-    30: 0,
-    31: 8,
-    32: 15,
-    41: 16,
-    49: 17,
-    55: 24,
-    58: 25,
-    60: 18,
-    66: 26,
-    67: 6,
-    68: 27,
-    72: 45,
-    73: 28,
-    74: 7,
-    75: 29,
-    78: 30,
-    80: 31,
-    82: 32,
-    83: 4,
-    85: 46,
-    86: 33,
-    87: 34,
-    89: 19,
-    92: 20,
-    98: 35,
-    101: 36,
-    103: 37,
-    105: 38,
-    109: 39,
-    110: 5,
-    112: 40,
-    113: 41,
-    115: 21,
-    118: 22,
-    124: 42,
-    127: 43,
-    129: 44}
-    expected_funcName__list_nodeId = {
-    '-': [8, 9, 10],
-    '/': [6, 7],
-    '0': [45, 46],
-    '1': [24],
-    '2': [27, 29, 34, 41],
-    '=': [0],
-    'P': [25, 26, 28, 36, 43],
-    '\\to': [1],
-    '^': [4, 5],
-    'dx': [38],
-    'e': [32, 39],
-    'f': [30],
-    'frac': [17, 20, 22],
-    'i': [33, 40],
-    'infty': [13],
-    'int': [18],
-    'lim': [11],
-    'n': [23, 35, 42],
-    'pi': [19, 21],
-    'sum': [14],
-    'theta': [12, 15, 16],
-    'x': [31, 37, 44]}
-    expected_nodeId__entityType = {
-    0: EntityType.PURE_INFIX,
-    1: EntityType.PURE_INFIX,
-    4: EntityType.PURE_INFIX,
-    5: EntityType.PURE_INFIX,
-    6: EntityType.PURE_INFIX,
-    7: EntityType.PURE_INFIX,
-    8: EntityType.PURE_INFIX,
-    9: EntityType.IMPLICIT_INFIX,
-    10: EntityType.IMPLICIT_INFIX,
-    11: EntityType.BACKSLASH_FUNCTION,
-    12: EntityType.BACKSLASH_NUMBER,
-    13: EntityType.BACKSLASH_NUMBER,
-    14: EntityType.BACKSLASH_FUNCTION,
-    15: EntityType.BACKSLASH_NUMBER,
-    16: EntityType.BACKSLASH_NUMBER,
-    17: EntityType.BACKSLASH_FUNCTION,
-    18: EntityType.BACKSLASH_FUNCTION,
-    19: EntityType.BACKSLASH_NUMBER,
-    20: EntityType.BACKSLASH_FUNCTION,
-    21: EntityType.BACKSLASH_NUMBER,
-    22: EntityType.BACKSLASH_FUNCTION,
-    23: EntityType.PURE_VARIABLE,
-    24: EntityType.PURE_NUMBER,
-    25: EntityType.PURE_VARIABLE,
-    26: EntityType.PURE_VARIABLE,
-    27: EntityType.PURE_NUMBER,
-    28: EntityType.PURE_VARIABLE,
-    29: EntityType.PURE_NUMBER,
-    30: EntityType.PURE_VARIABLE,
-    31: EntityType.PURE_VARIABLE,
-    32: EntityType.PURE_VARIABLE,
-    33: EntityType.PURE_VARIABLE,
-    34: EntityType.PURE_NUMBER,
-    35: EntityType.PURE_VARIABLE,
-    36: EntityType.PURE_VARIABLE,
-    37: EntityType.PURE_VARIABLE,
-    38: EntityType.PURE_VARIABLE,
-    39: EntityType.PURE_VARIABLE,
-    40: EntityType.PURE_VARIABLE,
-    41: EntityType.PURE_NUMBER,
-    42: EntityType.PURE_VARIABLE,
-    43: EntityType.PURE_VARIABLE,
-    44: EntityType.PURE_VARIABLE,
-    45: EntityType.PURE_NUMBER,
-    46: EntityType.PURE_NUMBER}
-    expected_nodeId__funcName = {
-    0: '=',
-    1: '\\to',
-    4: '^',
-    5: '^',
-    6: '/',
-    7: '/',
-    8: '-',
-    9: '-',
-    10: '-',
-    11: 'lim',
-    12: 'theta',
-    13: 'infty',
-    14: 'sum',
-    15: 'theta',
-    16: 'theta',
-    17: 'frac',
-    18: 'int',
-    19: 'pi',
-    20: 'frac',
-    21: 'pi',
-    22: 'frac',
-    23: 'n',
-    24: '1',
-    25: 'P',
-    26: 'P',
-    27: '2',
-    28: 'P',
-    29: '2',
-    30: 'f',
-    31: 'x',
-    32: 'e',
-    33: 'i',
-    34: '2',
-    35: 'n',
-    36: 'P',
-    37: 'x',
-    38: 'dx',
-    39: 'e',
-    40: 'i',
-    41: '2',
-    42: 'n',
-    43: 'P',
-    44: 'x',
-    45: '0',
-    46: '0'}
-    expected_nodeId__funcStart = {
-    0: 30,
-    1: 12,
-    4: 83,
-    5: 110,
-    6: 67,
-    7: 74,
-    8: 31,
-    9: 72,
-    10: 85,
-    11: 0,
-    12: 6,
-    13: 15,
-    14: 23,
-    15: 32,
-    16: 41,
-    17: 49,
-    18: 60,
-    19: 89,
-    20: 92,
-    21: 115,
-    22: 118,
-    23: 29,
-    24: 55,
-    25: 58,
-    26: 66,
-    27: 68,
-    28: 73,
-    29: 75,
-    30: 78,
-    31: 80,
-    32: 82,
-    33: 86,
-    34: 87,
-    35: 98,
-    36: 101,
-    37: 103,
-    38: 105,
-    39: 109,
-    40: 112,
-    41: 113,
-    42: 124,
-    43: 127,
-    44: 129,
-    45: 72,
-    46: 85}
-    expected_nodeId__funcEnd = {
-    0: 31,
-    1: 15,
-    4: 84,
-    5: 111,
-    6: 68,
-    7: 75,
-    8: 32,
-    9: 73,
-    10: 86,
-    11: 4,
-    12: 12,
-    13: 21,
-    14: 27,
-    15: 38,
-    16: 47,
-    17: 54,
-    18: 64,
-    19: 92,
-    20: 97,
-    21: 118,
-    22: 123,
-    23: 30,
-    24: 56,
-    25: 59,
-    26: 67,
-    27: 69,
-    28: 74,
-    29: 76,
-    30: 79,
-    31: 81,
-    32: 83,
-    33: 87,
-    34: 89,
-    35: 99,
-    36: 102,
-    37: 104,
-    38: 107,
-    39: 110,
-    40: 113,
-    41: 115,
-    42: 125,
-    43: 128,
-    44: 130,
-    45: 72,
-    46: 85}
-    expected_tuple_nodeId_argIdx__pNodeId = None
-    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {
-    (9, 0): (None, 0, None, 72),
-    (9, 1): (None, 72, None, 134),
-    (10, 0): (None, 0, None, 85),
-    (10, 1): (None, 85, None, 134),
+    (0, 0): (None, 6, None, 12),
+    (0, 1): (None, 12, None, 21),
+    (3, 0): (None, 83, None, 83),
+    (3, 1): (None, 83, None, 85),
+    (4, 0): (None, 109, None, 110),
+    (4, 1): (None, 110, None, 113),
+    (5, 0): (None, 66, None, 67),
+    (5, 1): (None, 67, None, 69),
+    (6, 0): (None, 73, None, 74),
+    (6, 1): (None, 74, None, 76),
+    (7, 0): (None, 0, None, 31),
+    (7, 1): (None, 31, None, 134),
+    (8, 0): (None, 0, None, 72),
+    (8, 1): (None, 72, None, 134),
+    (9, 0): (None, 0, None, 85),
+    (9, 1): (None, 85, None, 134),
+    (10, 0): (None, 29, None, 30),
+    (10, 1): (None, 30, None, 31),
     (11, 0): ('{', 5, '}', 21),
     (11, 1): ('{', 22, '}', 133),
     (14, 0): ('{', 28, '}', 38),
@@ -1988,11 +1777,55 @@ def test__find_infixes_arg_brackets_width0(verbose=False):
 
 
 def test__update_all_width_by_enclosing_brackets_width_remove0(verbose=False):
+    """
+\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}
+^ ^^^^^^ ^^^^^^ ^^^ ^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^ ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^ ^^^ ^^^^^^^^^^^^^^^^^^^^^^^ ^^^ ^^^^^^^^^^^^^^^
+0 123456 789111 111 11112222 222222333 333333344 44444444 55555555556 66666666677777777778888888888 999 99999991111111111111111 111 111111111111111
+            012 345 67890123 456789012 345678901 23456789 01234567890 12345678901234567890123456789 012 34567890000000000111111 111 122222222223333
+                                                                                                               0123456789012345 678 901234567890123
 
+                                                                                                               
+    """
+    #Fourier transform
+    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}"
+    parser = Latexparser(equationStr, verbose=verbose)
+    # parser._remove_all_spacing()
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    parser._find_backslash()
+    parser._find_variables_or_numbers()
+    parser._find_implicit_0()
+    parser._find_infixes_arg_brackets_width()
+    parser._update_all_width_by_enclosing_brackets_width_remove()
+
+
+    expected_closeBraType__sortedPosList = None
+    expected_openBraType__sortedPosList = None
+    expected_id__tuple_openPos_openBraType_closePos_closeBraType = None
+    expected_list_tuple_width_id_openPos_closePos = None
+    expected_openBraPos__bracketId = None
+    expected_closeBraPos__bracketId = None
+
+
+    expected_list_tuple_widthStart_nodeId = None
+    expected_list_tuple_widthEnd_nodeId = None
+    expected_nodeId__widthStart = None
+    expected_nodeId__widthEnd = None
+    expected_entityType__list_nodeId = None
+    expected_funcStart__nodeId = None
+    expected_funcName__list_nodeId = None
+    expected_nodeId__entityType = None
+    expected_nodeId__funcName = None
+    expected_nodeId__funcStart = None
+    expected_nodeId__funcEnd = None
+    expected_tuple_nodeId_argIdx__pNodeId = None
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = None
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print() # TODO
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
 
 
 
@@ -2016,6 +1849,8 @@ def test__find_implicit_multiply0(verbose=False):
     parser._find_backslash()
     parser._find_variables_or_numbers()
     parser._find_implicit_0()
+    parser._find_infixes_arg_brackets_width()
+    parser._update_all_width_by_enclosing_brackets_width_remove()
     parser._find_implicit_multiply()
 
 
@@ -2625,18 +2460,90 @@ def test__find_implicit_multiply0(verbose=False):
 
 
 def test__match_child_to_parent_input0(verbose=False):
+    """
+\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}
+^ ^^^^^^ ^^^^^^ ^^^ ^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^ ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^ ^^^ ^^^^^^^^^^^^^^^^^^^^^^^ ^^^ ^^^^^^^^^^^^^^^
+0 123456 789111 111 11112222 222222333 333333344 44444444 55555555556 66666666677777777778888888888 999 99999991111111111111111 111 111111111111111
+            012 345 67890123 456789012 345678901 23456789 01234567890 12345678901234567890123456789 012 34567890000000000111111 111 122222222223333
+                                                                                                               0123456789012345 678 901234567890123
 
+                                                                                                               
+    """
+    #Fourier transform
+    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}"
+    parser = Latexparser(equationStr, verbose=verbose)
+    # parser._remove_all_spacing()
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    parser._find_backslash()
+    parser._find_variables_or_numbers()
+    parser._find_implicit_0()
+    parser._find_infixes_arg_brackets_width()
+    parser._update_all_width_by_enclosing_brackets_width_remove()
+    parser._find_implicit_multiply()
+    parser._match_child_to_parent_input()
+
+
+    expected_closeBraType__sortedPosList = None
+    expected_openBraType__sortedPosList = None
+    expected_id__tuple_openPos_openBraType_closePos_closeBraType = None
+    expected_list_tuple_width_id_openPos_closePos = None
+    expected_openBraPos__bracketId = None
+    expected_closeBraPos__bracketId = None
+
+
+    expected_list_tuple_widthStart_nodeId = None
+    expected_list_tuple_widthEnd_nodeId = None
+    expected_nodeId__widthStart = None
+    expected_nodeId__widthEnd = None
+    expected_entityType__list_nodeId = None
+    expected_funcStart__nodeId = None
+    expected_funcName__list_nodeId = None
+    expected_nodeId__entityType = None
+    expected_nodeId__funcName = None
+    expected_nodeId__funcStart = None
+    expected_nodeId__funcEnd = None
+    expected_tuple_nodeId_argIdx__pNodeId = None
+    expected_tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = None
+    
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print() # TODO
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
         
 def test__format_to_pyStyledAST0(verbose=False):
+    """
+\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}
+^ ^^^^^^ ^^^^^^ ^^^ ^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^ ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^ ^^^ ^^^^^^^^^^^^^^^^^^^^^^^ ^^^ ^^^^^^^^^^^^^^^
+0 123456 789111 111 11112222 222222333 333333344 44444444 55555555556 66666666677777777778888888888 999 99999991111111111111111 111 111111111111111
+            012 345 67890123 456789012 345678901 23456789 01234567890 12345678901234567890123456789 012 34567890000000000111111 111 122222222223333
+                                                                                                               0123456789012345 678 901234567890123
 
+                                                                                                               
+    """
+    #Fourier transform
+    equationStr = "\\lim_{\\theta\\to\\infty}{\\sum_{n=-\\theta}^{\\theta}{\\frac{1}{P}\\int_{P/2}^{-P/2}{f(x)e^{-i 2\\pi\\frac{n}{P}x}dx}(e^{i 2\\pi\\frac{n}{P}x})}}"
+    parser = Latexparser(equationStr, verbose=verbose)
+    # parser._remove_all_spacing()
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    parser._find_backslash()
+    parser._find_variables_or_numbers()
+    parser._find_implicit_0()
+    parser._find_infixes_arg_brackets_width()
+    parser._update_all_width_by_enclosing_brackets_width_remove()
+    parser._find_implicit_multiply()
+    parser._match_child_to_parent_input()
+    parser._format_to_pyStyledAST()
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print() # TODO
+        print(parser.latexAST) # TODO
+        print(str(parser.entitystorage))
+        print(str(parser.bracketstorage))
         
 def test__convert_to_schemeStyledAST0(verbose=False):
 
@@ -2663,10 +2570,10 @@ if __name__=='__main__':
     # test__find_backslash0()
     # test__find_variables_or_numbers0()
     # test__find_implicit_00()
-    test__find_infixes_arg_brackets_width0(True)
+    # test__find_infixes_arg_brackets_width0(True) # this will need to take implicit multiply as,, but they are not FOUND YET<<<<<<<<<<
     # test__update_all_width_by_enclosing_brackets_width_remove0(True)
-    # test__find_implicit_multiply0()
-    #test__match_child_to_parent_input0(True)
-    #test__format_to_pyStyledAST0(True)
+    # test__find_implicit_multiply0(True) # if make this before test__find_infixes_arg_brackets_width0, we need the full_width
+    # test__match_child_to_parent_input0(True)
+    test__format_to_pyStyledAST0(True)
     #test__convert_to_schemeStyledAST0(True)
     #test__get_statistics0(True)
