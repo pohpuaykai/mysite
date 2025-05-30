@@ -1,4 +1,3 @@
-
 def genASTSVG(ast, rootNode, canvasId):
     content = f'var c = document.getElementById("{canvasId}");var ctx = c.getContext("2d");'
 
@@ -30,7 +29,7 @@ def genASTSVG(ast, rootNode, canvasId):
             })
             nodeId__pNodeId[node[1]]=c['node'][1]
     #sort each level, by parent, then by id, then place it on the SVG
-    heightOfBox, widthOfBox, topPadding, leftPadding = 20, 20, 5, 5
+    heightOfBox, widthOfBox, topPadding, leftPadding = 20, 20, 10, 10
 
     #position the nodes
     #all nodes are SVG rect
@@ -47,7 +46,7 @@ def genASTSVG(ast, rootNode, canvasId):
             # content += rect(widthOffset, heightOffset, "#fff", "#000", widthOfBox, heightOfBox)
             # content += text(widthOffset, heightOffset, nodeId__funcName[dic['nodeId']])#1 & 1 are missing
             content += rect(widthOffset, heightOffset, widthOfBox, heightOfBox)
-            content += text(widthOffset+2*leftPadding, heightOffset+2*topPadding, nodeId__funcName[dic['nodeId']])
+            content += text(widthOffset+widthOfBox/2, heightOffset+heightOfBox/2, nodeId__funcName[dic['nodeId']])
     #draw the connecting lines
     for cnid, pnid in nodeId__pNodeId.items():
         cCoordDict = nodeId__label__coordinate[cnid]
@@ -56,9 +55,9 @@ def genASTSVG(ast, rootNode, canvasId):
         #     (pCoordDict['widthOffset'], pCoordDict['heightOffset']),
         #     (cCoordDict['widthOffset'], cCoordDict['heightOffset']),
         # ], "#fff", 3, "#000") #stroke_width=3
-        print("adding line: ", )
-        content += line(pCoordDict['widthOffset'], pCoordDict['heightOffset'], 
-            cCoordDict['widthOffset'], cCoordDict['heightOffset'])#TODO<<<<<<<pCoordDict should be bottom-centre of the square, and it should be right
+        #print("adding line: ", )
+        content += line(pCoordDict['widthOffset']+(widthOfBox/2), pCoordDict['heightOffset']+(heightOfBox), 
+            cCoordDict['widthOffset']+(widthOfBox/2), cCoordDict['heightOffset'])#TODO<<<<<<<pCoordDict should be bottom-centre of the square, and it should be right
     return content
 
 def rect(x, y, width, height):
@@ -82,4 +81,4 @@ if __name__=="__main__":
     rootNode = ("=", 0)
 
     SVGContent = genASTSVG(sampleAST, rootNode, "myCanvas")
-    print(SVGContent)
+    print(SVGContent
