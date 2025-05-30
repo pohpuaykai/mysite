@@ -3,7 +3,7 @@ from enum import Enum
 import re
 
 from foundation.automat.arithmetic.function import Function
-from foundation.automat.common import BinarySearch, isNum, lenOrZero
+from foundation.automat.common import BinarySearch, isNum, lenOrZero, EnclosureTree
 
 class BracketType(Enum):
     ROUND = '(', ')'
@@ -155,7 +155,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     #\cdot is vector dot product  #\times is vector cross product
     BACKSLASH_INFIX = ['\\to', '\\times', '\\cdot','\\%']#vectors op prioritised over backslash
     PRIOIRITIZED_INFIX = [ '^', '/','//', '*', '-', '+']#['^', '/', '*', '-', '+'] 
-    INFIX = ['=']+BACKSLASH_INFIX+PRIOIRITIZED_INFIX #the smaller the number the higher the priority
+    INFIX = BACKSLASH_INFIX+PRIOIRITIZED_INFIX+['='] #the smaller the number the higher the priority
     OPEN_BRACKETS = ['{', '[', '(']
     CLOSE_BRACKETS = ['}', ']', ')']
     close__open = dict(zip(CLOSE_BRACKETS, OPEN_BRACKETS))
@@ -167,6 +167,14 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     # 'arccsc', 'csc', 'arcsec', 'sec', 'arccot', 'cot', 'arsinh', 'sinh', 'arcosh', 'cosh', 
     # 'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
     ######
+    def getPriority(self, funcName):
+        if funcName == 'frac':
+            funcName = '/'
+        if funcName not in self.INFIX:
+            return len(self.INFIX)
+        return self.INFIX.index(funcName)
+
+
     BACKSLASH_EXPECTED_INPUTS = { #all possible returns according to input_type, for easy collating
 
 
@@ -769,6 +777,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     gotArg = True
                     #get corresponding closePos
                     closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(nextCharPos)
+                    self.bracketstorage.tagAsBackslashBrackets(nextCharPos)
                     self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], self.equationStr[nextCharPos], nextCharPos, closeBraType, closeBraPos)
                     #for backslash, we can update width here, not necessary for infix
                     self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos+len(closeBraType))
@@ -1137,39 +1146,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 
-
-            # #is there closeBra left of infixSym?
-            # closeBraType = BracketType.ROUND.value[1]#MIGHT also be bound by other brakets like \\to
-            # closeBraPos = funcStart - len(closeBraType)
-            # #getBraPosImmediateRightOfPos(self, pos, typeOfBracket, open)
-            # #find immediate right open, if next to pos, then found else take immediate right entity of pos
-            # openBraPos = self.bracketstorage.getBraPosImmediateRightOfPos(funcEnd, BracketType.ROUND, True)
-            # if funcEnd == openBraPos:
-            #     # print()
-            #     closeBraPos, _ = self.bracketstorage.getCorrespondingCloseBraPos(openBraPos)
-            #     self.entitystorage.addUnConfirmedPCrelationship(funcStart, 1, BracketType.ROUND.value[0], openBraPos, BracketType.ROUND.value[1], closeBraPos)
-            #     # self.bracketstorage.removeBracket(openBraPos) # it is really ok to remove brackets at all?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            #     self.entitystorage.widthMaxUpdateById(nodeId, widthStart, closeBraPos)#right=End
-            # else:#cannot add confirmed relationship because only of implicit, but implicit has no width, next_door_entity_width to update
-            #     cNodeId = self.entitystorage.getEntityImmediateRightOfPos(funcEnd) # need to remove implicit <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            #     cWidthEnd = self.entitystorage.nodeId__widthEnd.get(cNodeId)#WHAT IF THERE IS NO WIDTH, because cNodeId is a infix, thats not processed yet?
-            #     self.entitystorage.widthMaxUpdateById(nodeId, widthStart, cWidthEnd)#right=End
-
-            # closeBraPos = self.bracketstorage.getBraPosImmediateLeftOfPos(funcStart, BracketType.ROUND, False)
-            # if closeBraPos + len(BracketType.ROUND.value[1]) == funcStart:
-            #     print('foundBracket');import pdb;pdb.set_trace()
-            #     openBraPos, _ = self.bracketstorage.getCorrespondingOpenBraPos(closeBraPos)
-            #     self.entitystorage.addUnConfirmedPCrelationship(funcStart, 0, BracketType.ROUND.value[0], openBraPos, BracketType.ROUND.value[1], closeBraPos)
-            #     # self.bracketstorage.removeBracket(closeBraPos)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            #     self.entitystorage.widthMaxUpdateById(nodeId, widthStart, widthEnd)#left=Start
-            # else:#cannot add confirmedRelationship, because implicit multiply not in yet, implicit multiply depends on width
-            #     cNodeId = self.entitystorage.getEntityImmediateLeftOfPos(funcStart)
-            #     cWidthStart = self.entitystorage.nodeId__widthStart.get(cNodeId)
-            #     print('foundEntity', self.entitystorage.nodeId__funcStart[cNodeId], self.entitystorage.nodeId__funcName[cNodeId]);import pdb;pdb.set_trace()
-            #     self.entitystorage.widthMaxUpdateById(nodeId, cWidthStart, widthEnd)#left=Start
-
-
-
     def _update_all_width_by_enclosing_brackets_width_remove(self):
         #remove all the user stupid multiple enclosing brackets
         #CHECK wider enclosing brackets, for EVERYTHING 
@@ -1265,28 +1241,257 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             we want widest input that fits input_position_of_a break ties with PRIOIRITIZED_INFIX, and then from left_to_right
         remove selected_item from list_1
         
-        """
-        for pNodeId, pFuncName, pWidthStart, pWidthEnd, funcStart, funcEnd in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.BACKSLASH_FUNCTION):
-            for openBraPos, closeBraPos, argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(pNodeId): # SLOT
-                cNodeId, cFuncName = self.entitystorage.getWidestFit(openBraPos, closeBraPos)
-                self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, argIdx, bracketstorage=None) # enclosing should already be updated
+
+
+
+
+PSEUDOCODE:
+
+
 
         """
-        Of the childNeedy, backslash_pos_type args have widthStart and widthEnd, only infixs_pos_type might have no widthStart and widthEnd and might require BODMAS
-        we will seperately deal with them
-        """
-        # print(self.entitystorage.nodeId__widthStart)
-        # print(self.entitystorage.nodeId__widthEnd)# getWidestFit is returning None
-        # print(self.entitystorage.nodeId__funcName)
-        for pNodeId, pFuncName, pWidthStart, pWidthEnd, funcStart, funcEnd in sorted(
-            self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX),
-            key=lambda t: str(Latexparser.INFIX.index(t[1]))+'|'+str(t[4]) #should be processed in PRIORITY, no matter where they are. BODMAS
-            ):
-            for openBraPos, closeBraPos, argIdx in self.entitystorage.getAllUnConfirmedPCrelationship(pNodeId): # SLOT TODO we assumed that all infixes have all their slots
-                cNodeId, cFuncName = self.entitystorage.getWidestFit(openBraPos, closeBraPos)
-                # print('getWidestFit:', openBraPos, closeBraPos)
-                # print('pNodeId ', pNodeId, ' pFuncName ', pFuncName, ' cNodeId ', cNodeId, 'cFuncName', cFuncName)
-                self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, argIdx, bracketstorage=self.bracketstorage) # this should also update infix width and all enclosing brackets
+        #do are the brackets nested in each other ==> EnclosureTree
+        list_tuple_openBraPos_closeBraPos = list(map(lambda tup: (tup[0], tup[2]), self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType.values()))
+        def firstContainsSecond(b0, b1):
+            return b0[0] <= b1[0] and b1[1] <= b0[1]
+        def getId(braTuple):
+            return self.bracketstorage.openBraPos__bracketId[braTuple[0]]
+        roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(list_tuple_openBraPos_closeBraPos, firstContainsSecond, getId)
+
+        bracketId__list_rmArgTup = {}#
+        for level, list_bracketId in sorted(levelToIDs.items(), key=lambda tup: tup[0], reverse=True):
+            for bracketId in list_bracketId:
+                openBraPos, _, closeBraPos, _ = self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+                list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openBraPos, closeBraPos)
+                #find the args that needs to be removed
+                list_enclosureBracketId=enclosureTree[bracketId]#list of eBracketId that are in bracketId
+                for eBracketId in list_enclosureBracketId:
+                    for rmArgTup in bracketId__list_rmArgTup.get(eBracketId, []):
+                        list_tuple_nodeId_funcName_funcStart_funcEnd.remove(rmArgTup)
+                #END:find the args that needs to be removed
+                #get priorities
+                list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup: tup[2]+tup[3])
+                nodeId__priority = {}
+                for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
+                    nodeId__priority[nodeId] = self.getPriority(funcName)
+                #END:get priorities
+                list_tuple_nodeId_funcName_funcStart_funcEnd
+                print('going in as ', list_tuple_nodeId_funcName_funcStart_funcEnd, ' priority: ', nodeId__priority);import pdb;pdb.set_trace()
+                #match p|c
+                while len(list_tuple_nodeId_funcName_funcStart_funcEnd) > 1:
+                    #find lowest priority
+                    lowestPriority, lpNodeId, lpFuncName, lpFuncStart, lpFuncEnd = float('inf'), None, None, None, None
+                    for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
+                        #find lowest priority # DEAL WITH frac and /!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        if nodeId__priority[nodeId] < lowestPriority:
+                            lowestPriority = nodeId__priority[nodeId]
+                            lpNodeId, lpFuncName, lpFuncStart, lpFuncEnd = nodeId, funcName, funcStart, funcEnd
+                    #END find lowest priority
+                    print('got lowestPriority: ', lpNodeId, lpFuncName, lpFuncStart, lpFuncEnd);import pdb;pdb.set_trace()
+                    #get Unconfirmed Pos of entity (SLOTs)
+                    list_tuple_openBraPos_closeBraPos_argIdx = self.entitystorage.getAllUnConfirmedPCrelationship(lpNodeId)
+                    print(lpNodeId, ' all UNCONFIRMED ', list_tuple_openBraPos_closeBraPos);import pdb;pdb.set_trace()
+                    #make confirmed ...arg #GEt the widest width
+                    argPrioritySum = 0
+                    rmlist_tuple_nodeId_funcName_funcStart_funcEnd = []
+                    for argOpenBraPos, argCloseBraPos, argIdx in list_tuple_openBraPos_closeBraPos_argIdx:
+                        print('0');import pdb;pdb.set_trace()
+                        cNodeId, cFuncName, cFuncStart, cFuncEnd = self.entitystorage.getWidestFit(argOpenBraPos, argCloseBraPos)
+                        print('1');import pdb;pdb.set_trace()
+                        self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(lpNodeId, cNodeId, argIdx, bracketstorage=self.bracketstorage) #TODO does this update the ONLY the width of the parent, lpNodeId????
+                        #remove ...arg from list_tuple_nodeId_funcName_funcStart_funcEnd
+
+                        print('2');import pdb;pdb.set_trace()
+                        ctuple_nodeId_funcName_funcStart_funcEnd = (cNodeId, cFuncName, cFuncStart, cFuncEnd)
+
+                        print('3');import pdb;pdb.set_trace()
+                        list_tuple_nodeId_funcName_funcStart_funcEnd.remove(ctuple_nodeId_funcName_funcStart_funcEnd)
+
+                        print('4');import pdb;pdb.set_trace()
+                        #add ... arg to bracketId__rmArgTup[bracketId]
+                        existing_list = bracketId__list_rmArgTup.get(bracketId, [])
+
+                        print('5');import pdb;pdb.set_trace()
+                        existing_list+=list_tuple_nodeId_funcName_funcStart_funcEnd
+
+                        print('6');import pdb;pdb.set_trace()
+                        bracketId__list_rmArgTup[bracketId] = existing_list
+
+                        print('7');import pdb;pdb.set_trace()
+                        argPrioritySum += nodeId__priority[cNodeId]
+
+                    #add to nodeId__priority, so it doesn't get picked again??????
+                    nodeId__priority[nodeId] += argPrioritySum
+
+
+
+
+
+
+
+
+        # import pprint
+        # pp = pprint.PrettyPrinter(indent=4)
+        # #DO WE HAVE ALL the BRACKEtS? 
+        # #MIGHT NOT NEED THIS
+        # listPoss = list(map(lambda tup: (tup[0], tup[2]), self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType.values()))
+        # def firstContainsSecond(p0, p1):
+        #     return p0[0] <= p1[0] and p1[1] <= p0[1]
+        # def getId(p0):
+        #     # return p0
+        #     return self.bracketstorage.openBraPos__bracketId[p0[0]]
+        # roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(listPoss, firstContainsSecond, getId)
+        # print(listPoss)
+        # pp.pprint(self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType)
+        # print(enclosureTree)
+        # # import pdb;pdb.set_trace()
+        # #go from lowest level
+        # bracketId__root = {}
+        # #TODO cannot just go by length, must be at least by dependency of the enclosureTree! 
+        # #put all bracketId in a stack, if has dependency that is not there push it back
+        # stack = list(enclosureTree.keys())
+        # while len(stack) > 0:
+        #     bracketId = stack.pop()
+        #     list_bracketIdEnclosed = enclosureTree[bracketId]
+        #     if len(list_bracketIdEnclosed) > 0 and set(list_bracketIdEnclosed).intersection(set(bracketId__root.keys())) != set(list_bracketIdEnclosed):
+        #         stack.insert(0, bracketId)
+        #         print('stack', stack)
+        #         print('list_bracketIdEnclosed', list_bracketIdEnclosed)
+        #         print('bracketId__root', bracketId__root)
+        #         print(bracketId, " not in ", bracketId__root);import pdb;pdb.set_trace();
+        #         continue
+        #     elif len(list_bracketIdEnclosed) > 0:
+        #         print('what to replace?', list_bracketIdEnclosed, '<<<<<');print('bracketId__root', bracketId__root);
+        #         print('pos to replace?')
+        #         list_tuple_dingsToReplace = []
+        #         for rBracketId in list_bracketIdEnclosed:
+        #             rOpenPos, rOpenBraType, rClosePos, rCloseBraType = self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType[rBracketId]
+        #             rRoot = bracketId__root[rBracketId]
+        #             ####
+        #             print('OG: ', )
+        #             print('replacing ', rOpenPos, rClosePos, ' being: ',  self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(rOpenPos, rClosePos), ' with ', rRoot)
+        #             list_tuple_dingsToReplace.append(rRoot)
+
+        #         if self.bracketstorage.isBackslashBracket(openPos):#TODO wrong openPos, should be after the backslash
+        #             #remove the front args of backslash and do not add previous subree root
+        #             print('IS A BACKSLASH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ARG')
+        #             openPos, _, closePos, _ = self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+
+        #             list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openPos, closePos)
+        #             for tuple_dingsToReplace in list_tuple_dingsToReplace:#TODO need to remove all nodes|entities under this? not just subtree?
+        #                 list_tuple_nodeId_funcName_funcStart_funcEnd.remove(tuple_dingsToReplace)
+        #             list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup: tup[2]+tup[3])
+        #             # print(list_tuple_nodeId_funcName_funcStart_funcEnd);import pdb;pdb.set_trace()
+        #             print(list_tuple_nodeId_funcName_funcStart_funcEnd);
+        #             import pdb;pdb.set_trace()
+        #         else:
+        #             #replace the front args and add subtreeroot
+        #             print('@@@@@@@@@NOT BS@@@@@@@@@')
+        #             #TODO*****************************************************************************************************************************
+        #             openPos, _, closePos, _ = self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+
+        #             list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openPos, closePos)
+        #             for tuple_dingsToReplace in list_tuple_dingsToReplace:#TODO need to remove all nodes|entities under this? not just subtree?
+        #                 list_tuple_nodeId_funcName_funcStart_funcEnd.remove(tuple_dingsToReplace)
+        #             list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup: tup[2]+tup[3])
+        #             print('infix arg removal'); print(list_tuple_dingsToReplace)
+        #             print(list_tuple_nodeId_funcName_funcStart_funcEnd);import pdb;pdb.set_trace()
+        #     else:#TODO<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<continue? this is not wanted to be processed later, ????
+        #         print('@@@@@@@@@@@@@@@@@@')
+        #         #TODO*****************************************************************************************************************************
+        #         openPos, _, closePos, _ = self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
+
+        #         list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openPos, closePos)
+        #         list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup: tup[2]+tup[3])
+        #         # print(list_tuple_nodeId_funcName_funcStart_funcEnd);import pdb;pdb.set_trace()
+        #         print(list_tuple_nodeId_funcName_funcStart_funcEnd);import pdb;pdb.set_trace()
+
+        #         #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #         #implicit mul funcStart and funcEnd a little bit weird
+        #         #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            
+
+        #     print('going into node joiner as: ', list_tuple_nodeId_funcName_funcStart_funcEnd)
+        #     #NODE JOINER<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #     nodeId__priority = {}
+
+        #     while len(list_tuple_nodeId_funcName_funcStart_funcEnd) > 1: # join everything together until we have 1 root
+        #         #subtreeUe, take note of the root, and the join the roots
+        #         # list_tuple_removed = []
+        #         print('unterWHILE', list_tuple_nodeId_funcName_funcStart_funcEnd, nodeId__priority)
+        #         #get lowest Prioirity
+        #         if len(nodeId__priority) == 0:#use new priority
+        #             minPriority, dingId, tupleIdx = float('inf'), None, None
+        #             for tupIdx, (nodeId, funcName, funcStart, funcEnd) in enumerate(list_tuple_nodeId_funcName_funcStart_funcEnd):#tupIdx is for getting leftChild and rightChild
+        #                 if funcName == '=':
+        #                     equalsIdx = tupIdx
+        #                     equalsNodeIdx = nodeId
+        #                 if funcName in self.INFIX:
+        #                     priority = self.INFIX.index(funcName)
+        #                 else:#not a infix
+        #                     priority = len(self.INFIX)
+        #                 nodeId__priority[nodeId] = priority
+        #                 if priority< minPriority:
+        #                     minPriority = priority
+        #                     dingId = nodeId
+        #                     tupleIdx = tupIdx
+        #         else:#use previous priority
+        #             dingId, lowestPriority = None, float('inf')
+        #             for nodeId, priority in nodeId__priority.items():
+        #                 if lowestPriority > priority:
+        #                     lowestPriority, dingId = priority, nodeId
+        #             print('lowestPriority', lowestPriority, 'dingId', dingId)
+        #             tupleIdx = None
+        #             # print('lowestPriorityNodeId', lowestPriorityNodeId, nodeId__priority);import pdb;pdb.set_trace(); 
+        #             #nodeId__priority & list_tuple_nodeId_funcName_funcStart_funcEnd MISMATCH????????????????????????????????????????????????????
+        #             #find tupleIdx of lowestPriorityNodeId
+        #             for tupIdx, (nodeId, _, _, _) in enumerate(list_tuple_nodeId_funcName_funcStart_funcEnd):
+                        
+        #                 # import pdb;pdb.set_trace()
+        #                 if nodeId == dingId:
+        #                     tupleIdx = tupIdx
+        #                     break
+        #         #left and right of dingId are its children, DOES bracketstorage need to be updated?
+        #         print('tupleIdx', tupleIdx)
+        #         leftChildIdIdx, rightChildIdIdx = tupleIdx-1, tupleIdx+1#it may overrun the boundary of list_tuple_nodeId_funcName
+        #         print('lowestPriorityNodeId:', dingId, 'selected idx:', tupleIdx, ' left: ', leftChildIdIdx, ' right: ', rightChildIdIdx);import pdb;pdb.set_trace()
+        #         #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<BACKSLASH brackets only take 1 at a time, when it could have taken 2 (the side by side)
+        #         if rightChildIdIdx < len(list_tuple_nodeId_funcName_funcStart_funcEnd):
+        #             rightChildId, _, _, _ = list_tuple_nodeId_funcName_funcStart_funcEnd[rightChildIdIdx]
+        #             self.entitystorage.addConfirmedPCrelationshipById(dingId, rightChildId, 1)#rightChild
+        #             print('right, before: ', nodeId__priority)
+        #             nodeId__priority[dingId] += nodeId__priority[rightChildId]
+        #             print('right, after: ', nodeId__priority)
+        #             # del nodeId__priority[rightChildId]
+        #             # print('right ', rightChildId, 'to adding dingId', dingId, '<<<', nodeId__priority)
+        #             # list_tuple_removed.append(list_tuple_nodeId_funcName_funcStart_funcEnd[rightChildIdIdx])
+        #             list_tuple_nodeId_funcName_funcStart_funcEnd.remove(list_tuple_nodeId_funcName_funcStart_funcEnd[rightChildIdIdx])#NOTE: remove works with item_of_list, not idx_of_list
+        #             # list_processedFuncStart.append(list_tuple_nodeId_funcName_funcStart_funcEnd[rightChildIdIdx][2])
+        #             # print('took right added');import pdb;pdb.set_trace()
+        #         if leftChildIdIdx > -1:
+        #             leftChildId, _, _, _ = list_tuple_nodeId_funcName_funcStart_funcEnd[leftChildIdIdx]
+        #             self.entitystorage.addConfirmedPCrelationshipById(dingId, leftChildId, 0)#leftChild
+        #             print('left, before: ', nodeId__priority)
+        #             nodeId__priority[dingId] += nodeId__priority[leftChildId]
+        #             print('left, after: ', nodeId__priority)
+        #             # del nodeId__priority[leftChildId]
+        #             # print('left ', leftChildId, 'to adding dingId', dingId, '<<<', nodeId__priority)
+        #             # list_tuple_removed.append(list_tuple_nodeId_funcName_funcStart_funcEnd[leftChildIdIdx])
+        #             list_tuple_nodeId_funcName_funcStart_funcEnd.remove(list_tuple_nodeId_funcName_funcStart_funcEnd[leftChildIdIdx])#NOTE: remove works with item_of_list, not idx_of_list
+        #             # list_processedFuncStart.append(list_tuple_nodeId_funcName_funcStart_funcEnd[leftChildIdIdx][2])
+        #             # print('took left added');import pdb;pdb.set_trace()
+        #         #remove leftChild and rightChild from list_tuple_nodeId_funcName 
+        #         #removing larger index first, so we do not mess up the larger index, since larger index depends on smaller index
+        #         print(
+        #             list(map(lambda tup: (tup[0], tup[1], tup[2], tup[3], nodeId__priority[tup[0]]),list_tuple_nodeId_funcName_funcStart_funcEnd)), 
+
+        #             'nokorimono**********')
+        #     #note down the root....
+        #     theRoot = list_tuple_nodeId_funcName_funcStart_funcEnd[0] # what if throw?????? what if more than 1?????
+        #     bracketId__root[bracketId] = theRoot
+
+
+
 
 
         
@@ -1419,6 +1624,16 @@ class EntityStorage:
         self.tuple_nodeId_argIdx__pNodeId = {} # p(arent)NodeId_argIdx CONFIRMED p|c
         self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c(hild)ArgIdx UNCONFIRMED p|c ( we only know the argument width.)
 
+    def getAllEntityIdWithinFuncStartAndFuncEnd(self, startPos, endPos):
+        list_tuple_nodeId_funcName_funcStart_funcEnd = []
+        for nodeId, funcStart in self.nodeId__funcStart.items():#using self.funcStart__nodeId have collisions for implicit - (#fix? TODO)
+            if startPos <= funcStart and funcStart <= endPos:
+                list_tuple_nodeId_funcName_funcStart_funcEnd.append((nodeId, self.nodeId__funcName[nodeId], funcStart, self.nodeId__funcEnd[nodeId]))
+        return list_tuple_nodeId_funcName_funcStart_funcEnd
+
+
+
+
     def insert(self, funcName, funcStart, funcEnd, entityType, parentNodeId=None, argIdx=None, widthStart=None, widthEnd=None, bracketstorage=None):
         nodeId = self._getNodeId()
         self.nodeId__entityType[nodeId] = entityType
@@ -1548,7 +1763,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             width = self.nodeId__widthEnd[nodeId] - self.nodeId__widthStart[nodeId]
             if width > maxWidth:
                 maxWidth = width; maxNodeId = nodeId; maxFuncName = self.nodeId__funcName[nodeId]
-        return maxNodeId, maxFuncName
+        return maxNodeId, maxFuncName, self.nodeId__funcStart[maxNodeId], self.nodeId__funcEnd[maxNodeId]
 
     def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, nodeIds, bracketstorage): 
         for nodeId in nodeIds:
@@ -1824,6 +2039,7 @@ class BracketStorage:
         self.openBraPos__bracketId = {}
         self.closeBraPos__bracketId = {}
         self.endOfOpenBraPos = {}
+        self.list_backslashBracketOpenPos = []
 
     def _getBracketId(self):
         newBracketId = copy(self.bracketId)
@@ -1872,6 +2088,11 @@ class BracketStorage:
         self.closeBraPos__bracketId[closeBraPos] = bracketId
         return bracketId
 
+    def tagAsBackslashBrackets(self, openPos):
+        self.list_backslashBracketOpenPos.append(openPos)
+
+    def isBackslashBracket(self, openPos):
+        return openPos in self.list_backslashBracketOpenPos
         
     def removeBracket(self, openBraPos):
         """
@@ -1989,7 +2210,7 @@ class BracketStorage:
         (openPos, openBraType, _, _) = self.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
         return openPos, openBraType
 
-    def getAllBracket(self):#TODO is this ever used? make a AST_dependency diagram... (good place to learn)
+    def getAllBracket(self):# make a AST_dependency diagram... (good place to learn)
         """
         return all the bracket in tuple (openBraType, openBraPos, closeBraType, closeBraPos)
         """

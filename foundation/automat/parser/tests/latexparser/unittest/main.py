@@ -2539,11 +2539,11 @@ def test__format_to_pyStyledAST0(verbose=False):
     parser._match_child_to_parent_input()
     parser._format_to_pyStyledAST()
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
-    if verbose:
-        print(parser.latexAST) # TODO
-        print(str(parser.entitystorage))
-        print(str(parser.bracketstorage))
+    # print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
+    # if verbose:
+    #     print(parser.latexAST) # TODO
+    #     print(str(parser.entitystorage))
+    #     print(str(parser.bracketstorage))
         
 def test__convert_to_schemeStyledAST0(verbose=False):
 
