@@ -1150,7 +1150,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             hinDing = list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd[idx+1]
             vorDingEntityType = self.entitystorage.nodeId__entityType[vorDing[0]]
             hinDingEntityType = self.entitystorage.nodeId__entityType[hinDing[0]]
-            # print(idx,'GOT:', vorDing, hinDing);import pdb;pdb.set_trace()
+            print(idx,'GOT:', vorDing, hinDing);import pdb;pdb.set_trace()
             #START_CONDITIONAL
             ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1183,6 +1183,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 0, None, vorDing[2], None, vorDing[3])
                 self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 1, None, hinDing[2], None, hinDing[3])
 
+        #also look for touching bras to insert * and addUnConfirmedPCrelationshipById
+        for closeBraPos, openBraPos in self.bracketstorage.getAllTouchingBras():
+            pNodeId = self.entitystorage.insert('*', closeBraPos, closeBraPos, EntityType.IMPLICIT_INFIX, 
+                parentNodeId=None, argIdx=None, widthStart=closeBraPos, widthEnd=closeBraPos)
+            #<<<<<<<<<<<<<<<get vorDing and hinDing, by width??????????????????????????????????????????????????????????????????????????????
+            self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 0, None, vorDing[2], None, vorDing[3])
+            self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 1, None, hinDing[2], None, hinDing[3])
     #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
 
         
