@@ -1100,21 +1100,27 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     def _update_all_width_by_enclosing_brackets_width_remove(self):
         #remove all the user stupid multiple enclosing brackets
         #CHECK wider enclosing brackets, for EVERYTHING 
-        self.bracketstorage = self.entitystorage._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(
-            list(self.entitystorage.nodeId__funcStart.keys()), #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<UPDATES should be done by EntityType, and then from left to right????
-            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<only need to update for INFIX and BACKSLASH_FUNCTIONS|BACKSLASH_VARIABLES?
-            """
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<UPDATES should be done by EntityType, and then from left to right????
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<only need to update for INFIX and BACKSLASH_FUNCTIONS|BACKSLASH_VARIABLES?
+        """
 
-    PURE_NUMBER = 'pure_number'
-    IMPLICIT_INFIX = 'implicit_infix'
-    PURE_VARIABLE = 'pure_variable'
-    BACKSLASH_VARIABLE = 'backslash_variable'
-    BACKSLASH_FUNCTION = 'backslash_function'
-    BACKSLASH_NUMBER = 'backslash_number'
-    PURE_INFIX = 'pure_infix'
-    BACKSLASH_INFIX = 'backslash_infix'
-    MATRIX = 'matrix'
-            """
+        PURE_NUMBER = 'pure_number'
+        IMPLICIT_INFIX = 'implicit_infix'
+        PURE_VARIABLE = 'pure_variable'
+        BACKSLASH_VARIABLE = 'backslash_variable'
+        BACKSLASH_FUNCTION = 'backslash_function'
+        BACKSLASH_NUMBER = 'backslash_number'
+        PURE_INFIX = 'pure_infix'
+        BACKSLASH_INFIX = 'backslash_infix'
+        MATRIX = 'matrix'
+        """
+        list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd = self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(
+            EntityType.IMPLICIT_INFIX, EntityType.BACKSLASH_VARIABLE, EntityType.BACKSLASH_FUNCTION, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX)
+
+        print(list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd);import pdb;pdb.set_trace()
+
+        self.bracketstorage = self.entitystorage._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(
+            list(map(lambda tup:tup[0], list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd)), 
             bracketstorage=self.bracketstorage)
 
         
@@ -1668,16 +1674,24 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             #because we exclude the front_backslash_character that we removed so that touching matches
             entityType = self.nodeId__entityType[nodeId]
             widthEnd = self.nodeId__widthEnd[nodeId]
-            allEnclosingTouchingBra = bracketstorage.getAllEnclosingTouchingBraOfPos(self.nodeId__funcStart[nodeId], widthStart, widthEnd, BracketType.ROUND)
-            if len(allEnclosingTouchingBra) > 0:
-                widestWidth = 0
-                widestBra = None
-                for width, bracketId, openBraPos, closeBraPos in allEnclosingTouchingBra:
-                    if width > widestWidth:
-                        widestWidth = width
-                        widestBra = (width, bracketId, openBraPos, closeBraPos)
-                    # bracketstorage.removeBracket(openBraPos) # because this bracket cannot contain anything else
-                self.updateWidth(nodeId, widestBra[2], widestBra[3])
+            # allEnclosingBra = list(bracketstorage.getAllEnclosingBraOfPos(self.nodeId__funcStart[nodeId], BracketType.ROUND))# we also have bracketstorage.widestEnclosingBra
+            # allEnclosingTouchingBra = bracketstorage.getAllEnclosingTouchingBraOfPos(self.nodeId__funcStart[nodeId], widthStart, widthEnd, BracketType.ROUND)
+            # print('enclosingTouchingBra', self.nodeId__funcStart[nodeId], self.nodeId__funcName[nodeId], allEnclosingTouchingBra);import pdb;pdb.set_trace()
+            # if len(allEnclosingTouchingBra) > 0:
+            # if len(allEnclosingBra) > 0:
+            #     widestWidth = 0
+            #     widestBra = None
+            #     for width, bracketId, openBraPos, closeBraPos in allEnclosingBra:
+            #     # for width, bracketId, openBraPos, closeBraPos in allEnclosingTouchingBra:
+            #         if width > widestWidth:
+            #             widestWidth = width
+            #             widestBra = (width, bracketId, openBraPos, closeBraPos)
+            #         # bracketstorage.removeBracket(openBraPos) # because this bracket cannot contain anything else
+            #     self.updateWidth(nodeId, widestBra[2], widestBra[3])
+
+            selectedOpenClosePos = bracketstorage.getTightestEnclosingPos(self.nodeId__funcStart[nodeId], BracketType.ROUND)
+            if selectedOpenClosePos:
+                self.updateWidth(nodeId, selectedOpenClosePos[0], selectedOpenClosePos[1])
         return bracketstorage
         #
 
@@ -2198,10 +2212,10 @@ class BracketStorage:
         :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
         :type typeOfBracket: BracketType Enum
         """
-        filt__list_tuple_width_id_openPos_closePos = self.getAllEnclosingBraOfPos(pos, typeOfBracket)
-        if len(filt__list_tuple_width_id_openPos_closePos) > 0:
+        list_tuple_width_id_openPos_closePos = list(self.getAllEnclosingBraOfPos(pos, typeOfBracket))
+        if len(list_tuple_width_id_openPos_closePos) > 0:
             minWidth, selectedOpenPos, selectedClosePos = float('inf'), None, None
-            for width, bracketId, openPos, closePos in self.list_tuple_width_id_openPos_closePos:
+            for width, bracketId, openPos, closePos in list_tuple_width_id_openPos_closePos:
                 if width < minWidth:
                     minWidth, selectedOpenPos, selectedClosePos = width, openPos, closePos
             return selectedOpenPos, selectedClosePos
