@@ -570,7 +570,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         3. str.find, chop and str.find, and then match outer \\begin\\end
         
         """
-        self.infixs_pos_type = []
         for infix in self.INFIX:
             infix_pos_type_list = list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(f"{re.escape(infix)}", self.equationStr)))
             
@@ -653,19 +652,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
             2b1.^ to the left (power) [only for ASTreeConstructionBODMAS, input of infix] (remove from OTHER_brackets)
             2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
-            
-        
-        
-        
-        
-        Again, the same 3 ways as _find_matrices
-        1. go character by character
-        2. use re.findall<<<<<<<<<
-        3. str.find, chop and str.find, and then match outer \\begin\\end
-        find the inputs to these backslash using _getExpectedBackslashInputs as template
-        Exclude all the backslash_infix
         
         """
+        # print(str(self.entitystorage), '7');import pdb;pdb.set_trace()
         self.all_preSym_pos = []
         set_all_possible_preSym = set()
         #for _find_variable_or_number
@@ -673,9 +662,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             for template in list_template:
                 set_all_possible_preSym.add(template['preSym'])
 
+        # print(str(self.entitystorage), '8');import pdb;pdb.set_trace()
         import re
         list_backslashReResult = list(map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\([a-zA-Z]+)", self.equationStr)))
+        # print(str(self.entitystorage), '9');import pdb;pdb.set_trace()
         for funcStart, funcEnd, funcName in list_backslashReResult:
+            # print(str(self.entitystorage), '10');import pdb;pdb.set_trace()
             if funcName in self.EXCLUDE_BACKSLASH_INFIX:
                 continue
             foundType = 'backslash_function'
@@ -696,6 +688,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     widthStart=funcStart, widthEnd=funcEnd, bracketstorage=self.bracketstorage)
                 continue # skip args finding
             #type == BACKSLASH_FUNCTION
+            # print(str(self.entitystorage), '11');import pdb;pdb.set_trace()
             self.bracketstorage=self.entitystorage.insert(
                 funcName, 
                 funcStart, 
@@ -704,55 +697,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             #backslash function at_this_point
             #search for immediateNextBracket inputs from m.start(), until m.end() 
 
-            #BUT preSym could be in ANY ORDER
-            """
-            split inputTemplate as 2 stacks, compulsoryStack and optionalList (depends on 'optional')
-            while the compulsoryStack is full, 
-                inputTemplate = compulsoryStack.pop()
-                if nextChar == preSym:
-                    find_bracket_get_arg_store
-                else:
-                    for inputTemplate in optionalList:
-                        gotArg = find_bracket_get_arg_store
-                        if gotArg:
-                            optionalList.remove(inputTemplate)
-                            break
-                set_nextChar
-            for inputTemplate in optionalList:
-                gotArg = find_bracket_get_arg_store
-                if gotArg:
-                    optionalList.remove(inputTemplate)
-                    break
-            -----------------------------------------------
-            #find_bracket_get_arg_store
-
-            if nextChar == inputTemplate['openBra']:
-                #get corresponding closePos
-                closeBraPos, closeBraType = self.bracketStorage.getCorrespondingCloseBraPos(nextCharPos)
-                #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
-                #NOTE bracket position if any, store
-                nextCharPos = closeBraPos + len(closeBraType)
-                nextChar = equation[nextCharPos] #<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                self.bracketstorage.removeBracket(openBraPos)#<<<<< do no do that
-                if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
-                    self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
-            elif inputTemplate['braOptional'] == 'False':
-                raise Exception #here is !gotArg
-            elif inputTemplate['braOptional'] == 'argLen<2':
-                #TAKEARG as nextCharPos+1, store
-                #NOTE NO_BRACKETS, store
-                nextCharPos += 1
-                nextChar = equation[nextCharPos] #<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                self.bracketstorage.removeBracket(openBraPos)#<<<<< do no do that
-                if inputTemplate['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
-                    self.infixs_pos_type.remove((m.start(), m.end(), m.group()))
-            else:
-                raise Exception('Unhandled') #here is !gotArg
-            return gotArg, nextCharPos, nextChar
-            """
-
             compulsoryStack0, compulsoryStack1, optionalList0, optionalList1, everyOtherPreSym = [], [], [], [], []
             for template in list_template:
+                # print(str(self.entitystorage), '12');import pdb;pdb.set_trace()
                 if template['optional']:
                     optionalList0.insert(0, template) # to keep the order in the list_template
                 else:
@@ -769,6 +716,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 if nextChar in set_all_possible_preSym:
                     self.all_preSym_pos.append(nextCharPos)
                 #
+                    print(str(self.entitystorage), '13');import pdb;pdb.set_trace();
 
                 nextCharPos += len(template['preSym'])
                 nextChar = self.equationStr[nextCharPos]
@@ -787,7 +735,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     #TAKEARG as everything between nextCharPos+len(nextChar) and closeBraPos, store
                     #NOTE bracket position if any, store
                     # nextChar = self.equationStr[nextCharPos]
-                    if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
+                    # print(str(self.entitystorage), '14');import pdb;pdb.set_trace()
+                    posOfPreSym = nextCharPos - len(template['openBra'])
+                    if template['preSym'] in ['^'] and self.equationStr[posOfPreSym] in ['^']: # controlSymbols mixing with mathSymbols
                         """
 
             2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
@@ -796,8 +746,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
                         """
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient, ENTITIES STORAGE.
-                        posOfPreSym = nextCharPos - len(template['openBra'])
+                        # posOfPreSym = nextCharPos - len(template['openBra'])
                         self.entitystorage.remove(posOfPreSym)
+                        print(str(self.entitystorage), '15');import pdb;pdb.set_trace()
                     nextCharPos = closeBraPos
                 elif template['braOptional'] == 'False': # no bracket but not neccessary
                     #log
@@ -808,10 +759,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     gotArg = True
                     self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], None, nextCharPos, None, nextCharPos+1)#TODO test this branch<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     self.entitystorage.widthMaxUpdate(funcStart, None, closeBraPos)
-                    if template['preSym'] in ['^']: # controlSymbols mixing with mathSymbols
+                    posOfPreSym = nextCharPos - len(template['openBra'])
+                    # print(str(self.entitystorage), '16');import pdb;pdb.set_trace()
+                    if template['preSym'] in ['^'] and self.equationStr[posOfPreSym] in ['^']: # controlSymbols mixing with mathSymbols
                         #remove from self.infixs_pos_type # TODO binarySearch, this is not very efficient
-                        posOfPreSym = nextCharPos - len(template['openBra'])
                         self.entitystorage.remove(posOfPreSym)
+                        # print(str(self.entitystorage), '17');import pdb;pdb.set_trace()
                 else:
                     #log
                     gotArg = False#raise Exception('Unhandled') #here is !gotArg
@@ -819,17 +772,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                         raise Exception()
                 return gotArg, nextCharPos, closeBraPos, closeBraType
 
-
-            def processOptionalList(funcStart, funcEnd, funcName, eOptionalList, template, nextChar, nextCharPos, everyOtherPreSym):
-                gotArg, closeBraPos, closeBraType = False, len(self.equationStr), None#if eOptionalList is empty
-                self.entitystorage.addUnConfirmedPCrelationship(funcStart, template['argId'], self.equationStr[nextCharPos], nextCharPos, closeBraType, closeBraPos - len(closeBraType) if closeBraType is not None else None)
-                for template in eOptionalList:
-                    gotArg, nextCharPos, closeBraPos, closeBraType = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym)
-                    if gotArg:
-                        eOptionalList.remove(template)
-                        break
-                return eOptionalList, gotArg, nextCharPos, closeBraPos, closeBraType
-            ##
             nextCharPos = funcEnd
             nextChar = self.equationStr[nextCharPos]
             while len(compulsoryStack0) > 0 or len(compulsoryStack1) > 0:
@@ -837,26 +779,36 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 oStack = compulsoryStack1 if len(compulsoryStack0) >0 else compulsoryStack0
                 while len(rStack) > 0:
                     template = rStack.pop()
-                    gotArg, nextCharPos0, closeBraPos0, closeBraType0 = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym)
-                    nextChar = self.equationStr[nextCharPos0]
-                    if gotArg:
-                    #jump to next char
-                        nextCharPos, nextChar, closeBraPos, closeBraType = nextCharPos0+len(closeBraType0), self.equationStr[nextCharPos], closeBraPos0, closeBraType0
+                    nextCharPos0 = nextCharPos
+                    if nextCharPos0 < len(self.equationStr):
+                        gotArg, nextCharPos0, closeBraPos0, closeBraType0 = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym)
+                        nextChar = self.equationStr[nextCharPos0]
+                        if gotArg:
+                        #jump to next char
+                            nextCharPos, nextChar, closeBraPos, closeBraType = nextCharPos0+len(closeBraType0), self.equationStr[nextCharPos], closeBraPos0, closeBraType0
+                        else:
+                            oStack.insert(0, template) # to keep the order in the list_template
                     else:
-                        oStack.insert(0, template) # to keep the order in the list_template
+                        pass
                     #update compulsoryStack0 and compulsoryStack1
                 compulsoryStack0, compulsoryStack1 = oStack, rStack
                 orStack = optionalList0 if len(optionalList0) >0 else optionalList1
                 ooStack = optionalList1 if len(optionalList0) >0 else optionalList0
                 while len(orStack) > 0:
                     template = orStack.pop()
-                    optionalList, gotArg, nextCharPos0, closeBraPos0, closeBraType0 = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos, everyOtherPreSym)
-                    nextChar = self.equationStr[nextCharPos0]
-                    if gotArg:
-                    #jump to next char
-                        nextCharPos, nextChar, closeBraPos, closeBraType = nextCharPos0+len(closeBraType0), self.equationStr[nextCharPos], closeBraPos0, closeBraType0
+                    nextCharPos0 = nextCharPos
+                    # optionalList, gotArg, nextCharPos0, closeBraPos0, closeBraType0 = processOptionalList(funcStart, funcEnd, funcName, optionalList, template, nextChar, nextCharPos, everyOtherPreSym)
+                    
+                    if nextCharPos0 < len(self.equationStr):
+                        gotArg, nextCharPos0, closeBraPos0, closeBraType0 = findBracketGetArgStore(funcStart, funcEnd, funcName, template, nextChar, nextCharPos, everyOtherPreSym)
+                        nextChar = self.equationStr[nextCharPos0]
+                        if gotArg:
+                        #jump to next char
+                            nextCharPos, nextChar, closeBraPos, closeBraType = nextCharPos0+lenOrZero(closeBraType0), self.equationStr[nextCharPos], closeBraPos0, closeBraType0
+                        else:
+                            ooStack.insert(0, template) # to keep the order in the list_template
                     else:
-                        ooStack.insert(0, template) # to keep the order in the list_template
+                        break
                 optionalList0, optionalList1 = orStack, ooStack
 
                     #update optionalList0 and optionalList1
@@ -905,7 +857,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             for pos in range(funcStart, funcEnd):
                 backslashName_occupied.append(pos)
         backslashName_occupied = sorted(backslashName_occupied)
-
 
         leftOverPosList = []
         for pos in range(0, len(self.equationStr)):
@@ -1038,7 +989,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         """
         def addImplictMinus(funcPos):
-
             #check if we already inserted this as PURE_INFIX ( should be yes)
             pNodeId = self.entitystorage.updateIfExists(funcPos, entityType=EntityType.IMPLICIT_INFIX) # returns None with no throw, if not exist.
 
@@ -1152,6 +1102,19 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #CHECK wider enclosing brackets, for EVERYTHING 
         self.bracketstorage = self.entitystorage._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(
             list(self.entitystorage.nodeId__funcStart.keys()), #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<UPDATES should be done by EntityType, and then from left to right????
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<only need to update for INFIX and BACKSLASH_FUNCTIONS|BACKSLASH_VARIABLES?
+            """
+
+    PURE_NUMBER = 'pure_number'
+    IMPLICIT_INFIX = 'implicit_infix'
+    PURE_VARIABLE = 'pure_variable'
+    BACKSLASH_VARIABLE = 'backslash_variable'
+    BACKSLASH_FUNCTION = 'backslash_function'
+    BACKSLASH_NUMBER = 'backslash_number'
+    PURE_INFIX = 'pure_infix'
+    BACKSLASH_INFIX = 'backslash_infix'
+    MATRIX = 'matrix'
+            """
             bracketstorage=self.bracketstorage)
 
         
@@ -1192,8 +1155,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             if (vorDing[3] +1 == hinDing[2])\
              or (vorDing[3] == hinDing[2]): #3=widthEnd & 2=widthStart
                 # print('addmul:', vorDing, hinDing, '*********************')
-                pNodeId = self.entitystorage.insert('*', vorDing[3]+1, hinDing[2], EntityType.IMPLICIT_INFIX, 
-                    parentNodeId=None, argIdx=None, widthStart=vorDing[2], widthEnd=hinDing[3])
+                if vorDing[3] +1 == hinDing[2]:#to make sure that implcitMul has no width, i.e. funcStart=funcEnd
+                    funcStartEnd = vorDing[3]
+                else:
+                    funcStartEnd = hinDing[2]
+                pNodeId = self.entitystorage.insert('*', funcStartEnd, funcStartEnd, EntityType.IMPLICIT_INFIX, 
+                    parentNodeId=None, argIdx=None, widthStart=funcStartEnd, widthEnd=funcStartEnd)
                 """TODO deal later
                 Contains 
                 0. function calls f(x)
@@ -1204,6 +1171,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 """
  [ (58, '*', 119, 118)]<<<<<these implicit-multiply does not have openBraPos
  tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos
+ 
+ addUnConfirmedPCrelationshipById( nodeId, argId, openBraType, openBraPos, closeBraType, closeBraPos)
                 """
                 self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 0, None, vorDing[2], None, vorDing[3])
                 self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 1, None, hinDing[2], None, hinDing[3])
@@ -1254,44 +1223,68 @@ PSEUDOCODE:
         """
         #TODO did you move UNConfirmed to Confirmed?
         list_tuple_openSlotPos_closeSlotPos = []
-        for (pNodeId, cArgIdx), (openBra, openSlotPos, closeBra, closeSlotPos) in self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
-            list_tuple_openSlotPos_closeSlotPos.append((openBraPos, closeBraPos))
+        for (pNodeId, cArgIdx), (openBra, openSlotPos, closeBra, closeSlotPos) in self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
+            list_tuple_openSlotPos_closeSlotPos.append((openSlotPos, closeSlotPos))
         def firstContainsSecond(b0, b1):
             return b0[0] <= b1[0] and b1[1] <= b0[1]
         def getId(braTuple):
             return list_tuple_openSlotPos_closeSlotPos.index(braTuple)
+        print('FED this to enclosureTree:', list_tuple_openSlotPos_closeSlotPos)
         roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(
             list_tuple_openSlotPos_closeSlotPos, firstContainsSecond, getId)
 
+        print('entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos')
+        print(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)
+        print('enclosureTree')
+        print(enclosureTree);
+        print('levelToIDs')
+        print(levelToIDs);
+        print(self.entitystorage.nodeId__funcName);
+        print(self.entitystorage.nodeId__widthStart);
+        print(self.entitystorage.nodeId__widthEnd);import pdb;pdb.set_trace()
+        # print(self.entitystorage.nodeId__entityType);import pdb;pdb.set_trace()
 
-        for level, list_slotId in sorted(levelToIDs.items(), key=lambda tup: tup[0], reverse=True):#bigger number is smaller
-            tuple_openSlotPos_closeSlotPos__tuple_funcName_funcId_funcStart_funcEnd = {} # clear this for this new level
+        """NO REMOVABLES
+        [0, 1, 2, 4, 6, 7, 9, 11, 12, 14, 16, 17, 21, 23, 28, 30, 32, 34, 35, 38, 39, 41, 44, 45, 47, 48, 49, 51, 54, 55]
+        """
+
+        for level, list_slotId in sorted(levelToIDs.items(), key=lambda tup: len(enclosureTree[tup[0]])):#bigger number is smaller
+            tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd = {} # clear this for this new level
             for slotId in list_slotId:
                 openSlotPos, closeSlotPos = list_tuple_openSlotPos_closeSlotPos[slotId]
 
 
-                list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openBraPos, closeBraPos)
+                list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openSlotPos, closeSlotPos)
+                list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:self.getPriority(tup[1]))
+                newlist_tuple_nodeId_funcName_funcStart_funcEnd = []
+                print(list_tuple_nodeId_funcName_funcStart_funcEnd, '<<<<<<<<<<OLD', 'level: ', level)
                 for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
-                    new_list_tuple_nodeId_funcName_funcStart_funcEnd = []
                     #START easier to read if this is a function by itself
                     removableEntities, subNodeId, subFuncName = [], None, None
-                    for (oldOpenSlotPos, oldCloseSlotPos), (foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in tuple_openSlotPos_closeSlotPos__tuple_funcName_funcId_funcStart_funcEnd.items():
+                    for (oldOpenSlotPos, oldCloseSlotPos, oldArgIdx), (foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd.items():
 
                         #look for (funcStart, funcEnd) <= EACH tuple_openSlotPos_closeSlotPos__tuple_funcName_funcId
                         if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos:
                             removableEntities.append((oldOpenSlotPos, oldCloseSlotPos, foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd))
                             subNodeId, subFuncName = foldedNodeId, foldedFuncName
+
                     #END easier to read if this a function by itself
-                    #if found substitute away 
+
+                    print(removableEntities, 'toREMOVE, level: ', level)# 
+                #if found substitute away 
+                addedFolded = False
+                for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
                     for (oldOpenSlotPos, oldCloseSlotPos, foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in removableEntities:
-                        if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos:
+                        if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos and not addedFolded:#should not append so many times, only once<<<<<<<<<<<<<<<<<<<<<
                             newlist_tuple_nodeId_funcName_funcStart_funcEnd.append((foldedNodeId, foldedFuncName, foldedFuncStart, foldedFuncEnd))
+                            addedFolded = True
                         else:
                             newlist_tuple_nodeId_funcName_funcStart_funcEnd.append((nodeId, funcName, funcStart, funcEnd))
                 
                 #removed subtitutables from previous levels
             nodeId__priority = {}
-            stack = sorted(newlist_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:self.getPriority(tup[1], defaultDict=nodeId__priority))
+            stack = sorted(newlist_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:nodeId__priority.get(tup[0], self.getPriority(tup[1])))
+            print(newlist_tuple_nodeId_funcName_funcStart_funcEnd, '<<<<<<<<<<NEW')
             while len(stack) > 0:
                 (pNodeId, pFuncName, pFuncStart, pFuncEnd) = stack.pop()
                 #fold
@@ -1814,6 +1807,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         elist_nodeId.append(nodeId)
         self.entityType__list_nodeId[entityType] = elist_nodeId
         #TODO log to tell the user 
+        return nodeId
 
     def __str__(self):
         """
@@ -1880,7 +1874,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             funcStart = self.nodeId__funcStart[nodeId]
             funcEnd = self.nodeId__funcEnd[nodeId]
             list_tuple_funcName_widthStart_widthEnd.append((funcName, widthStart, widthEnd, funcStart, funcEnd))
-
+        s += "list_tuple_funcName_widthStart_widthEnd_funcStart_funcEnd"+os.linesep
         s += pp.pformat(list_tuple_funcName_widthStart_widthEnd)+os.linesep
 
         return s
