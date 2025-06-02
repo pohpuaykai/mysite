@@ -1202,209 +1202,227 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
     1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
     2. those without children but need to have children : BACKSLASH & INFIXES  <<<<<<<<start from the SLOTs with smallest width
-    (ALL of the BACKSLASH_FUNCTIONS) and (some of the args of INFIXES) will have SLOT like 
-{
-                        'nodeId':self.getNodeId(),
-                                'funcType':'infix',
-                                'funcName':m.group(),
-                                'funcStart':m.start(),
-                                'funcEnd':m.end(),
-                        'widthStart':,
-                        'widthEnd':,
-                                'args':[
-{
-        'nodeId':None, <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<SLOT
-                'argIdx':inputTemplate['argIdx'],
-                'openBra':nextChar,# <<<<<<<<<<<<<<<if noBra arglen=1, store as None
-                'openBraPos':nextCharPos, 
-                'closeBra':closeBraType,
-                'closeBraPos': closeBraPos
-            }
-                                ]
-                    }
-    
-    pop list_2 -> a
-    for each empty input of a ***********specify width for all the types
-        for each item in list_1 ??????
-            we want widest input that fits input_position_of_a break ties with PRIOIRITIZED_INFIX, and then from left_to_right
-        remove selected_item from list_1
-        
-
-PSEUDOCODE:
-
 
 
         """
-        #TODO did you move UNConfirmed to Confirmed?
-        list_tuple_openSlotPos_closeSlotPos = []
+
+        ############MISSING IMPLICIT_MULTIPLY SLOTS?????
+
+        ################################################
+
+
+
+
+        import pprint;pp = pprint.PrettyPrinter(indent=4)
+        print(str(self.entitystorage))
+        # pp.pprint('entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos [UNCONFIRMED]')
+        # pp.pprint(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)
+
+        #START sort by smallest amount of entity
+        # sortedByWidest = sorted(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items(), key=lambda item: item[1][3] - item[1][1])
+        listPoss = []
+        tuple_openBraPos_closeBraPos__tuple_pNodeId_cArgIdx = {}
         for (pNodeId, cArgIdx), (openBra, openSlotPos, closeBra, closeSlotPos) in self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
-            list_tuple_openSlotPos_closeSlotPos.append((openSlotPos, closeSlotPos))
-        def firstContainsSecond(b0, b1):
-            return b0[0] <= b1[0] and b1[1] <= b0[1]
-        def getId(braTuple):
-            return list_tuple_openSlotPos_closeSlotPos.index(braTuple)
-        print('FED this to enclosureTree:', list_tuple_openSlotPos_closeSlotPos)
-        roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(
-            list_tuple_openSlotPos_closeSlotPos, firstContainsSecond, getId)
-
-        print('entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos')
-        print(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)
-        print('enclosureTree')
-        print(enclosureTree);
-        print('levelToIDs')
-        print(levelToIDs);
-        print(self.entitystorage.nodeId__funcName);
-        print(self.entitystorage.nodeId__widthStart);
-        print(self.entitystorage.nodeId__widthEnd);import pdb;pdb.set_trace()
-        # print(self.entitystorage.nodeId__entityType);import pdb;pdb.set_trace()
-
-        """NO REMOVABLES
-        [0, 1, 2, 4, 6, 7, 9, 11, 12, 14, 16, 17, 21, 23, 28, 30, 32, 34, 35, 38, 39, 41, 44, 45, 47, 48, 49, 51, 54, 55]
-        """
-
-        for level, list_slotId in sorted(levelToIDs.items(), key=lambda tup: len(enclosureTree[tup[0]])):#bigger number is smaller
-            tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd = {} # clear this for this new level
-            for slotId in list_slotId:
-                openSlotPos, closeSlotPos = list_tuple_openSlotPos_closeSlotPos[slotId]
+            listPoss.append((openSlotPos, closeSlotPos))#this is actually the width of the infix|backslash
+            tuple_openBraPos_closeBraPos__tuple_pNodeId_cArgIdx[(openSlotPos, closeSlotPos)] = (pNodeId, cArgIdx)
 
 
-                list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openSlotPos, closeSlotPos)
-                list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:self.getPriority(tup[1]))
-                newlist_tuple_nodeId_funcName_funcStart_funcEnd = []
-                print(list_tuple_nodeId_funcName_funcStart_funcEnd, '<<<<<<<<<<OLD', 'level: ', level)
-                for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
-                    #START easier to read if this is a function by itself
-                    removableEntities, subNodeId, subFuncName = [], None, None
-                    for (oldOpenSlotPos, oldCloseSlotPos, oldArgIdx), (foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd.items():
+        def firstContainsSecond(p0, p1):
+            return p0[0] <= p1[0] and p1[1] <= p0[1]
+        def getId(p0):
+            return p0
 
-                        #look for (funcStart, funcEnd) <= EACH tuple_openSlotPos_closeSlotPos__tuple_funcName_funcId
-                        if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos:
-                            removableEntities.append((oldOpenSlotPos, oldCloseSlotPos, foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd))
-                            subNodeId, subFuncName = foldedNodeId, foldedFuncName
+        #init
+        nodeId__priority = {}
+        roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(listPoss, firstContainsSecond, getId)
+        print(enclosureTree) # of SLOTS not of Entity
+        pp.pprint(enclosureTree)
+        tuple_slotOpenClosePos__representativeNodeId = {}
 
-                    #END easier to read if this a function by itself
+        #
+        enclosureTreeSortedBYNumSubstitutable = sorted(enclosureTree.items(), key=lambda item: len(enclosureTree[item[0]]))
+        for (openSlotPos, closeSlotPos), listOfSubtitutableSlotPoss in  enclosureTreeSortedBYNumSubstitutable:
+            #find all the ID
+            allEntitiesInSlot = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openSlotPos, closeSlotPos) #nodeId_funcName_funcStart_funcEnd
+            #substituteIds
+            newAllEntitiesInSlot = []
+            #####
+            print('0processing: ', (openSlotPos, closeSlotPos), 'allEntitiesInSlot:', allEntitiesInSlot, 'enclosureTree Subbable: ', enclosureTree[(openSlotPos, closeSlotPos)])
+            #####
+            for subbableOpenPos, subbableClosePos in enclosureTree[(openSlotPos, closeSlotPos)]:
+                subbableEntitiesId = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(subbableOpenPos, subbableClosePos)
+                representativeNodeId = tuple_slotOpenClosePos__representativeNodeId[(subbableOpenPos, subbableClosePos)]
+                representativeFuncName, representativeFuncStart, representativeFuncEnd = self.entitystorage.nodeId__funcName[representativeNodeId], self.entitystorage.nodeId__funcStart[representativeNodeId], self.entitystorage.nodeId_funcEnd[representativeNodeId]
+                addedRepresentative = False
+                for nodeId, funcName, funcStart, funcEnd in allEntitiesInSlot:
+                    if (nodeId in subbableEntitiesId) and (not addedRepresentative):
+                        newAllEntitiesInSlot.append((representativeNodeId, representativeFuncName, representativeFuncStart, representativeFuncEnd))
+                        addedRepresentative = True # put in the representative just once
+                    elif nodeId not in subbableEntitiesId:
+                        newAllEntitiesInSlot.append((nodeId, funcName, funcStart, funcEnd)) # put back
+            ###
+            if len(enclosureTree[(openSlotPos, closeSlotPos)]) > 0:
+                allEntitiesInSlot = newAllEntitiesInSlot
+            #fold up the allEntitiesInSlot according to priority to find representative of allEntitiesInSlot
+            allEntitiesInSlotSortedByFuncStart = sorted(allEntitiesInSlot, key=lambda entity: entity[2])
+            allEntitiesInSlotSortedByPriority = sorted(allEntitiesInSlot, key=lambda entity: nodeId__priority.get(entity[0], self.getPriority(entity[1])))#smaller number more important(higher priority)
+            #####
+            print('1processing: ', (openSlotPos, closeSlotPos), 'allEntitiesInSlotSortedByPriority', allEntitiesInSlotSortedByPriority)
+            #####
+            while len(allEntitiesInSlotSortedByPriority) > 1: # should have exactly 1 left, which is the representative????
+                #because there is update to nodeId__priority
+                inEntity = allEntitiesInSlotSortedByPriority.pop(0) # nodeId, funcName, funcStart, funcEnd
 
-                    print(removableEntities, 'toREMOVE, level: ', level)# 
-                #if found substitute away 
-                addedFolded = False
-                for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
-                    for (oldOpenSlotPos, oldCloseSlotPos, foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in removableEntities:
-                        if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos and not addedFolded:#should not append so many times, only once<<<<<<<<<<<<<<<<<<<<<
-                            newlist_tuple_nodeId_funcName_funcStart_funcEnd.append((foldedNodeId, foldedFuncName, foldedFuncStart, foldedFuncEnd))
-                            addedFolded = True
-                        else:
-                            newlist_tuple_nodeId_funcName_funcStart_funcEnd.append((nodeId, funcName, funcStart, funcEnd))
+                print('chosen inEntity as: ', inEntity)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<might get implicit accidentally... BUT accidents happen ONLY when implicit is at the sides?
+                slotsOfInEntity = self.entitystorage.getSlots(inEntity[0]) # use the nodeId to get SLOT
+                #slotsOfInEntity = [(startWidth, _, endWidth, _)]
+                for startWidth, endWidth in slotsOfInEntity:
+
+                    #find all the entities in allEntitiesInSlotSortedByFuncStart, between startWidth & endWidth
+                    #there should be exactly 1 entity in (startWidth, endWidth), else something is WRONG
+                    listOfRepOfSlot = []
+                    for nodeId, funcName, funcStart, funcEnd in allEntitiesInSlotSortedByFuncStart:
+                        if (startWidth <= funcStart) and (funcEnd <= endWidth):
+                            listOfRepOfSlot.append((nodeId, funcName, funcStart, funcEnd))
+
+                #we got this case (most probably off-by-one): ####inEntity: (1, '-', 5, 6)  listOfRepOfSlot:  [(1, '-', 5, 6), (21, '0', 5, 5)]
+                if inEntity in listOfRepOfSlot:
+                    listOfRepOfSlot.remove(inEntity)
+
+                if len(listOfRepOfSlot) > 1:######################################################################################################################
+                    print('parent:', inEntity, ' children: ', listOfRepOfSlot)######parent: (1, '-', 5, 6)  children:  [(1, '-', 5, 6), (21, '0', 5, 5)]
+                    raise Exception()
+                theRepOfSlot = listOfRepOfSlot[0]
+                nodeId__priority[theRepOfSlot[0]] = float('inf')
+
+                #there is exactly 1 rep for this slot:
+                tuple_slotOpenClosePos__representativeNodeId[(openSlotPos, closeSlotPos)] = theRepOfSlot
+                pNodeId, cArgIdx = tuple_openBraPos_closeBraPos__tuple_pNodeId_cArgIdx[(openSlotPos, closeSlotPos)]
+                self.entitystorage.addConfirmedPCrelationshipById(
+                    pNodeId, 
+                    theRepOfSlot[0], 
+                    cArgIdx
+                ) 
+
+                allEntitiesInSlotSortedByPriority = sorted(allEntitiesInSlotSortedByPriority, key=lambda entity: nodeId__priority.get(entity[0], self.getPriority(entity[1])))#smaller number more important(higher priority)
                 
-                #removed subtitutables from previous levels
-            nodeId__priority = {}
-            stack = sorted(newlist_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:nodeId__priority.get(tup[0], self.getPriority(tup[1])))
-            print(newlist_tuple_nodeId_funcName_funcStart_funcEnd, '<<<<<<<<<<NEW')
-            while len(stack) > 0:
-                (pNodeId, pFuncName, pFuncStart, pFuncEnd) = stack.pop()
-                #fold
-                #get Unconfirmed Pos of entity (SLOTs)
-                list_tuple_openSlotPos_closeSlotPos_argIdx = self.entitystorage.getAllUnConfirmedPCrelationship(pNodeId)
-
-                for openSlotPos, closeSlotPos, argIdx in list_tuple_openSlotPos_closeSlotPos_argIdx:
-                    cNodeId, cFuncName, cFuncStart, cFuncEnd = self.entitystorage.getWidestFit(openSlotPos, closeSlotPos) 
-
-                    tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd[(openSlotPos, closeSlotPos, argIdx)] = (cNodeId, cFuncName, cFuncStart, cFuncEnd)#put folded in this level for next level to use
-                    #set ChosenPriority
-                    nodeId__priority[pNodeId] = float('inf') # so that unused
-                    #add Confirmed relationsip
-                    self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, argIdx)
+                print(len(allEntitiesInSlotSortedByPriority));print('added', pNodeId, theRepOfSlot[0], cArgIdx);
+                print('nodeId__priority')
+                print(nodeId__priority);
+                print('allEntitiesInSlotSortedByPriority');
+                print(allEntitiesInSlotSortedByPriority);import pdb;pdb.set_trace()
+                #every fold (connects parent to child), be it INFIX or BACKSLASH addConfirmedPCRelationshipById(pNodeId, cNodeId, argId)
+                #: tuple_slotOpenClosePos__representativeNodeId
 
 
 
 
+        ####################################################################################################Enclosure"Tree" gives directed cycles. So i try something else
+        #TODO did you move UNConfirmed to Confirmed?
+        # list_tuple_openSlotPos_closeSlotPos = []
+        # tuple_openBraPos_closeBraPos__tuple_nodeId_cArgIdx = {}
+        # for (pNodeId, cArgIdx), (openBra, openSlotPos, closeBra, closeSlotPos) in self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
+        #     list_tuple_openSlotPos_closeSlotPos.append((openSlotPos, closeSlotPos))#this is actually the width of the infix|backslash
+        #     tuple_openBraPos_closeBraPos__tuple_nodeId_cArgIdx[(openSlotPos, closeSlotPos)] = (pNodeId, cArgIdx)
 
 
 
-
-        # #do are the brackets nested in each other ==> EnclosureTree
-        # list_tuple_openBraPos_closeBraPos = list(map(lambda tup: (tup[0], tup[2]), self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType.values()))
         # def firstContainsSecond(b0, b1):
         #     return b0[0] <= b1[0] and b1[1] <= b0[1]
         # def getId(braTuple):
-        #     return self.bracketstorage.openBraPos__bracketId[braTuple[0]]
-        # roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(list_tuple_openBraPos_closeBraPos, firstContainsSecond, getId)
+        #     # return list_tuple_openSlotPos_closeSlotPos.index(braTuple)
+        #     return tuple_openBraPos_closeBraPos__tuple_nodeId_cArgIdx[braTuple]
 
-        # bracketId__list_rmArgTup = {}#
-        # for level, list_bracketId in sorted(levelToIDs.items(), key=lambda tup: tup[0], reverse=True):
-        #     for bracketId in list_bracketId:
-        #         openBraPos, _, closeBraPos, _ = self.bracketstorage.id__tuple_openPos_openBraType_closePos_closeBraType[bracketId]
-        #         list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openBraPos, closeBraPos)
+        # import pprint;pp = pprint.PrettyPrinter(indent=4)
+        # print('tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos')
+        # pp.pprint(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)
 
-        #         #when removing using bracketId__list_rm_ArgTup, we should DFS downward and remove those as well
-        #         enclosureTreeStack = enclosureTree[bracketId]
-        #         while len(enclosureTreeStack) > 0:
-        #             eBracketId = enclosureTreeStack.pop()
-        #             for rmArgTup in bracketId__list_rmArgTup.get(eBracketId, []):#only remove those that are linked in enclosureTree? See notepad !@#0
-        #                 list_tuple_nodeId_funcName_funcStart_funcEnd.remove(rmArgTup)
-        #             for cBracketId in enclosureTree[eBracketId]:
-        #                 enclosureTreeStack.append(cBracketId)
+        # pp.pprint('FED this to enclosureTree:')
+        # print(list_tuple_openSlotPos_closeSlotPos)
+        # roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(
+        #     list_tuple_openSlotPos_closeSlotPos, firstContainsSecond, getId)
+
+        # pp.pprint('entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos [UNCONFIRMED]')
+        # pp.pprint(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)
+        # pp.pprint('enclosureTree')
+        # pp.pprint(enclosureTree);
+
+        # enclosureTreeOhneArgIdx = {}
+        # #the enclosureTree key and items of listValues have 
+        # for (pNodeId, pArgId), listValues in enclosureTree.items():
+        #     newListValues = set()
+        #     for (cNodeId, cArgId) in listValues:
+        #         newListValues.add(cNodeId)
+        #     newListValues = list(newListValues)
+        #     existingListValues = enclosureTreeOhneArgIdx.get(pNodeId, []) + newListValues
+        #     enclosureTreeOhneArgIdx[pNodeId] = existingListValues
+
+        # print("enclosureTreeOhneArgIdx")
+        # pp.pprint(enclosureTreeOhneArgIdx)
+
+        # print(str(self.entitystorage));
+        # import pdb;pdb.set_trace()
+
+        # """NO REMOVABLES
+        # [0, 1, 2, 4, 6, 7, 9, 11, 12, 14, 16, 17, 21, 23, 28, 30, 32, 34, 35, 38, 39, 41, 44, 45, 47, 48, 49, 51, 54, 55]
+        # """
+
+        # for level, list_slotId in sorted(levelToIDs.items(), key=lambda tup: len(enclosureTree[tup[0]])):#bigger number is smaller
+        #     tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd = {} # clear this for this new level
+        #     for slotId in list_slotId:
+        #         openSlotPos, closeSlotPos = list_tuple_openSlotPos_closeSlotPos[slotId]
 
 
-
-
-
-        #         #find the args that needs to be removed
-        #         # list_enclosureBracketId=enclosureTree[bracketId]#list of eBracketId that are in bracketId
-        #         # for eBracketId in list_enclosureBracketId:
-        #         #     print('going to remove: ', bracketId__list_rmArgTup, '(bracketId__list_rmArgTup)');print('from: ', list_tuple_nodeId_funcName_funcStart_funcEnd);import pdb;pdb.set_trace()
-        #         #     for rmArgTup in bracketId__list_rmArgTup.get(eBracketId, []):#only remove those that are linked in enclosureTree? See notepad !@#0
-        #         #         list_tuple_nodeId_funcName_funcStart_funcEnd.remove(rmArgTup)
-        #         #END:find the args that needs to be removed
-
-
-
-        #         #get priorities
-        #         list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup: tup[2]+tup[3])
-        #         nodeId__priority = {}
+        #         list_tuple_nodeId_funcName_funcStart_funcEnd = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openSlotPos, closeSlotPos)
+        #         list_tuple_nodeId_funcName_funcStart_funcEnd = sorted(list_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:self.getPriority(tup[1]))
+        #         newlist_tuple_nodeId_funcName_funcStart_funcEnd = []
+        #         print(list_tuple_nodeId_funcName_funcStart_funcEnd, '<<<<<<<<<<OLD', 'level: ', level)
         #         for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
-        #             nodeId__priority[nodeId] = self.getPriority(funcName)
-        #         #END:get priorities
-        #         #still need to update bracketId__list_rmArgTup if len(list_tuple_nodeId_funcName_funcStart_funcEnd) == 1
-        #         if len(list_tuple_nodeId_funcName_funcStart_funcEnd) == 1:
-        #             existing_list = bracketId__list_rmArgTup.get(bracketId, [])
-        #             existing_list.append(list_tuple_nodeId_funcName_funcStart_funcEnd[0])
-        #             bracketId__list_rmArgTup[bracketId] = existing_list
-        #         #match p|c
-        #         while len(list_tuple_nodeId_funcName_funcStart_funcEnd) > 1:
-        #             #find lowest priority
-        #             lowestPriority, lpNodeId, lpFuncName, lpFuncStart, lpFuncEnd = float('inf'), None, None, None, None
-        #             for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
-        #                 #find lowest priority # DEAL WITH frac and /!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #                 if nodeId__priority[nodeId] < lowestPriority:
-        #                     lowestPriority = nodeId__priority[nodeId]
-        #                     lpNodeId, lpFuncName, lpFuncStart, lpFuncEnd = nodeId, funcName, funcStart, funcEnd
-        #             #END find lowest priority
-        #             #get Unconfirmed Pos of entity (SLOTs)
-        #             list_tuple_openBraPos_closeBraPos_argIdx = self.entitystorage.getAllUnConfirmedPCrelationship(lpNodeId)
-        #             #make confirmed ...arg #GEt the widest width
-        #             argPrioritySum = 0
-        #             rmlist_tuple_nodeId_funcName_funcStart_funcEnd = []
-        #             for argOpenBraPos, argCloseBraPos, argIdx in list_tuple_openBraPos_closeBraPos_argIdx:
-        #                 cNodeId, cFuncName, cFuncStart, cFuncEnd = self.entitystorage.getWidestFit(argOpenBraPos, argCloseBraPos)
-        #                 #<<<<<<<<<<<<<<<<<<<<<<<<<<<one of the UNCONFIRMED nodeId==58 openBraPos was removed in this statement?????
-        #                 self.bracketstorage = self.entitystorage.addConfirmedPCrelationshipById(lpNodeId, cNodeId, argIdx, bracketstorage=self.bracketstorage) #TODO does this update the ONLY the width of the parent, lpNodeId????
-        #                 #remove ...arg from list_tuple_nodeId_funcName_funcStart_funcEnd
-        #                 ctuple_nodeId_funcName_funcStart_funcEnd = (cNodeId, cFuncName, cFuncStart, cFuncEnd)
+        #             #START easier to read if this is a function by itself
+        #             removableEntities, subNodeId, subFuncName = [], None, None
+        #             for (oldOpenSlotPos, oldCloseSlotPos, oldArgIdx), (foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd.items():
 
-        #                 try:
-        #                     list_tuple_nodeId_funcName_funcStart_funcEnd.remove(ctuple_nodeId_funcName_funcStart_funcEnd)
-        #                 except:#the ctuple might not be there, since they are removed when bracketId__list_rmArgTup
-        #                     pass
-        #                 #REMOVE lpNodeId tooo?
+        #                 #look for (funcStart, funcEnd) <= EACH tuple_openSlotPos_closeSlotPos__tuple_funcName_funcId
+        #                 if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos:
+        #                     removableEntities.append((oldOpenSlotPos, oldCloseSlotPos, foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd))
+        #                     subNodeId, subFuncName = foldedNodeId, foldedFuncName
 
-        #                 #add ... arg to bracketId__rmArgTup[bracketId]
-        #                 existing_list = bracketId__list_rmArgTup.get(bracketId, [])
-        #                 existing_list+=list_tuple_nodeId_funcName_funcStart_funcEnd
-        #                 bracketId__list_rmArgTup[bracketId] = existing_list
-        #                 argPrioritySum += self.getPriority(cFuncName)#argPrioritySum += nodeId__priority[cNodeId]
+        #             #END easier to read if this a function by itself
 
-        #             #add to nodeId__priority, so it doesn't get picked again??????
-        #             nodeId__priority[lpNodeId] += argPrioritySum
+        #             print(removableEntities, 'toREMOVE, level: ', level)# 
+        #         #if found substitute away 
+        #         addedFolded = False
+        #         for nodeId, funcName, funcStart, funcEnd in list_tuple_nodeId_funcName_funcStart_funcEnd:
+        #             for (oldOpenSlotPos, oldCloseSlotPos, foldedFuncName, foldedNodeId, foldedFuncStart, foldedFuncEnd) in removableEntities:
+        #                 if oldOpenSlotPos <= funcStart and funcEnd <= oldCloseSlotPos and not addedFolded:#should not append so many times, only once<<<<<<<<<<<<<<<<<<<<<
+        #                     newlist_tuple_nodeId_funcName_funcStart_funcEnd.append((foldedNodeId, foldedFuncName, foldedFuncStart, foldedFuncEnd))
+        #                     addedFolded = True
+        #                 else:
+        #                     newlist_tuple_nodeId_funcName_funcStart_funcEnd.append((nodeId, funcName, funcStart, funcEnd))
+                
+        #         #removed subtitutables from previous levels
+        #     nodeId__priority = {}
+        #     stack = sorted(newlist_tuple_nodeId_funcName_funcStart_funcEnd, key=lambda tup:nodeId__priority.get(tup[0], self.getPriority(tup[1])))
+        #     print(newlist_tuple_nodeId_funcName_funcStart_funcEnd, '<<<<<<<<<<NEW')
+        #     while len(stack) > 0:
+        #         (pNodeId, pFuncName, pFuncStart, pFuncEnd) = stack.pop()
+        #         #fold
+        #         #get Unconfirmed Pos of entity (SLOTs)
+        #         list_tuple_openSlotPos_closeSlotPos_argIdx = self.entitystorage.getAllUnConfirmedPCrelationship(pNodeId)
+
+        #         for openSlotPos, closeSlotPos, argIdx in list_tuple_openSlotPos_closeSlotPos_argIdx:
+        #             cNodeId, cFuncName, cFuncStart, cFuncEnd = self.entitystorage.getWidestFit(openSlotPos, closeSlotPos) 
+
+        #             tuple_openSlotPos_closeSlotPos_argIdx__tuple_funcName_funcId_funcStart_funcEnd[(openSlotPos, closeSlotPos, argIdx)] = (cNodeId, cFuncName, cFuncStart, cFuncEnd)#put folded in this level for next level to use
+        #             #set ChosenPriority
+        #             nodeId__priority[pNodeId] = float('inf') # so that unused
+        #             #add Confirmed relationsip
+        #             self.entitystorage.addConfirmedPCrelationshipById(pNodeId, cNodeId, argIdx)
+
+
+
+
+
 
 
         
@@ -1682,24 +1700,9 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             #because we exclude the front_backslash_character that we removed so that touching matches
             entityType = self.nodeId__entityType[nodeId]
             widthEnd = self.nodeId__widthEnd[nodeId]
-            # allEnclosingBra = list(bracketstorage.getAllEnclosingBraOfPos(self.nodeId__funcStart[nodeId], BracketType.ROUND))# we also have bracketstorage.widestEnclosingBra
-            # allEnclosingTouchingBra = bracketstorage.getAllEnclosingTouchingBraOfPos(self.nodeId__funcStart[nodeId], widthStart, widthEnd, BracketType.ROUND)
-            # print('enclosingTouchingBra', self.nodeId__funcStart[nodeId], self.nodeId__funcName[nodeId], allEnclosingTouchingBra);import pdb;pdb.set_trace()
-            # if len(allEnclosingTouchingBra) > 0:
-            # if len(allEnclosingBra) > 0:
-            #     widestWidth = 0
-            #     widestBra = None
-            #     for width, bracketId, openBraPos, closeBraPos in allEnclosingBra:
-            #     # for width, bracketId, openBraPos, closeBraPos in allEnclosingTouchingBra:
-            #         if width > widestWidth:
-            #             widestWidth = width
-            #             widestBra = (width, bracketId, openBraPos, closeBraPos)
-            #         # bracketstorage.removeBracket(openBraPos) # because this bracket cannot contain anything else
-            #     self.updateWidth(nodeId, widestBra[2], widestBra[3])
-
             selectedOpenClosePos = bracketstorage.getTightestEnclosingPos(self.nodeId__funcStart[nodeId], BracketType.ROUND)
             if selectedOpenClosePos:
-                self.updateWidth(nodeId, selectedOpenClosePos[0], selectedOpenClosePos[1])
+                self.widthMaxUpdateById(nodeId, selectedOpenClosePos[0], selectedOpenClosePos[1])
         return bracketstorage
         #
 
@@ -1736,6 +1739,14 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         idx = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, pos, key=lambda t:t[0])
         nodeId = self.list_tuple_widthStart_nodeId[idx][1]
         return nodeId
+
+    def getSlots(self, nodeId):# get all the slots of nodeId
+        slots = []
+        for (pNodeId, cArgIdx), (_, openSlotPos, _, closeSlotPos) in self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
+            if pNodeId == nodeId:
+                slots.append((openSlotPos, closeSlotPos))
+        return slots
+
 
     def remove(self, funcStart):
         """This is used by _find_backslash, TODO unit_test
@@ -1861,7 +1872,23 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         import pprint
         pp = pprint.PrettyPrinter(indent=4)
 
-        s = 'list_tuple_widthStart_nodeId'+os.linesep
+        nodeId__tuple_funcName_funcStart_funcEnd_widthStart_widthEnd = {}
+        for nodeId, funcName in self.nodeId__funcName.items():
+            funcStart = self.nodeId__funcStart[nodeId]
+            funcEnd = self.nodeId__funcEnd[nodeId] # for user to tell implicit
+            widthStart = self.nodeId__widthStart[nodeId]
+            widthEnd = self.nodeId__widthEnd[nodeId]
+            nodeId__tuple_funcName_funcStart_funcEnd_widthStart_widthEnd[nodeId] = (funcName, funcStart, funcEnd, widthStart, widthEnd)
+
+        s = 'nodeId__tuple_funcName_funcStart_funcEnd_widthStart_widthEnd' +os.linesep
+        s += pp.pformat(nodeId__tuple_funcName_funcStart_funcEnd_widthStart_widthEnd) # fo easy usage
+
+        s += pp.pformat(self.tuple_nodeId_argIdx__pNodeId)+os.linesep
+        s += 'tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos'+os.linesep
+        s += pp.pformat(self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)+os.linesep
+
+        #below for checking system functioning
+        s += 'list_tuple_widthStart_nodeId'+os.linesep
         s += pp.pformat(self.list_tuple_widthStart_nodeId)+os.linesep
         s += 'list_tuple_widthEnd_nodeId'+os.linesep
         s += pp.pformat(self.list_tuple_widthEnd_nodeId)+os.linesep
@@ -1884,10 +1911,6 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         s += 'nodeId__funcEnd'+os.linesep
         s += pp.pformat(self.nodeId__funcEnd)+os.linesep
         s += 'tuple_nodeId_argIdx__pNodeId'+os.linesep
-        s += pp.pformat(self.tuple_nodeId_argIdx__pNodeId)+os.linesep
-        s += 'tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos'+os.linesep
-        s += pp.pformat(self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)+os.linesep
-
         #funcName, widthStart, widthEnd <<<for width-checking
         list_tuple_funcName_widthStart_widthEnd = []
         for nodeId, widthStart in self.nodeId__widthStart.items():
