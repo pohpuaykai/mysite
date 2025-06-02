@@ -1117,8 +1117,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd = self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(
             EntityType.IMPLICIT_INFIX, EntityType.BACKSLASH_VARIABLE, EntityType.BACKSLASH_FUNCTION, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX)
 
-        print(list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd);import pdb;pdb.set_trace()
-
         self.bracketstorage = self.entitystorage._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(
             list(map(lambda tup:tup[0], list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd)), 
             bracketstorage=self.bracketstorage)
@@ -1150,7 +1148,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             hinDing = list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd[idx+1]
             vorDingEntityType = self.entitystorage.nodeId__entityType[vorDing[0]]
             hinDingEntityType = self.entitystorage.nodeId__entityType[hinDing[0]]
-            print(idx,'GOT:', vorDing, hinDing);import pdb;pdb.set_trace()
+            # print(idx,'GOT:', vorDing, hinDing);import pdb;pdb.set_trace()
             #START_CONDITIONAL
             ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1184,18 +1182,21 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 1, None, hinDing[2], None, hinDing[3])
 
         #also look for touching bras to insert * and addUnConfirmedPCrelationshipById
-        for closeBraPos, openBraPos in self.bracketstorage.getAllTouchingBras():
-            pNodeId = self.entitystorage.insert('*', closeBraPos, closeBraPos, EntityType.IMPLICIT_INFIX, 
-                parentNodeId=None, argIdx=None, widthStart=closeBraPos, widthEnd=closeBraPos)
-            #<<<<<<<<<<<<<<<get vorDing and hinDing, by width??????????????????????????????????????????????????????????????????????????????
-            self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 0, None, vorDing[2], None, vorDing[3])
-            self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 1, None, hinDing[2], None, hinDing[3])
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<what is in self.bracketstorage at_this_point?????
+        #startPos is the_start_of_touching_pos, endPos is the_end_of_touching_pos
+
+        for startPos, endPos in self.bracketstorage.getAllTouchingBras(self.equationStr):
+            pNodeId = self.entitystorage.insert('*', startPos, startPos, EntityType.IMPLICIT_INFIX, 
+                parentNodeId=None, argIdx=None, widthStart=startPos, widthEnd=startPos)
+            for cNodeId, _, widthStart, widthEnd, _, _ in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd():
+                if widthEnd == startPos:#vorDing
+                    self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 0, None, widthStart, None, widthEnd)
+                if widthStart == endPos:#hinDing
+                    self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 1, None, widthStart, None, widthEnd)
 
         
     def _match_child_to_parent_input(self):
         """
-    ***everything has width at_this_point EXCEPT INFIXES
+    ***everything has width at_this_point
     ~~~ASTree construction~~~ by widest enclosing position? there is no need for brackets? 
     #process those_with_inputs(BACKSLASH&INFIX) by position (left to right)
     we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
@@ -2135,6 +2136,19 @@ class BracketStorage:
         """
         return list(self.id__tuple_openPos_openBraType_closePos_closeBraType.values())
     
+    def getAllTouchingBras(self, equationStr):
+        """
+        """
+        touchingBrasPoss=[]
+        for _, _, closeBraPos, closeBraType in self.getAllBracket():
+            for openBraPos, openBraType, _, _ in self.getAllBracket():
+                if closeBraPos < openBraPos:
+                    startTouchingPos, endTouchingPos = closeBraPos+len(closeBraType), openBraPos
+                    chasZweischen = equationStr[startTouchingPos:endTouchingPos]
+                    if len(chasZweischen.strip()) == 0: #only whitespace between closeLeftBraket and openRightBraket, then they are touching
+                        touchingBrasPoss.append((startTouchingPos, endTouchingPos))
+        return touchingBrasPoss
+
     def getAllEnclosingBraOfPos(self, pos, typeOfBracket):
         """
         Find 

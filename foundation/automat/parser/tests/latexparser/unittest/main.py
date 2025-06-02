@@ -268,33 +268,6 @@ def test__find_implicit_multiply0(verbose=False):
 0 123456789111111111 1222222222233333
            012345678 9012345678901234
 
-[   ('^', 24, 34, 27, 28),
-    ('-', 4, 17, 5, 6),
-    ('-', 19, 35, 19, 20),
-    ('+', 6, 11, 9, 10),
-    ('+', 12, 16, 14, 15),
-    ('+', 24, 34, 29, 30),
-    ('+', 24, 34, 32, 33),
-    ('=', 4, 20, 18, 19),
-    ('sin', 0, 18, 0, 4),
-    ('sin', 20, 35, 20, 24),
-    ('2', 7, 8, 7, 8),
-    ('x', 8, 9, 8, 9),
-    ('1', 10, 11, 10, 11),
-    ('x', 13, 14, 13, 14),
-    ('2', 15, 16, 15, 16),
-    ('2', 25, 26, 25, 26),
-    ('x', 26, 27, 26, 27),
-    ('2', 28, 29, 28, 29),
-    ('3', 30, 31, 30, 31),
-    ('x', 31, 32, 31, 32),
-    ('2', 33, 34, 33, 34),
-    ('0', 5, 5, 5, 5),
-    ('0', 19, 19, 19, 19),
-    ('*', 8, 8, 8, 8),
-    ('*', 26, 26, 26, 26),
-    ('*', 31, 31, 31, 31)]
-    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<missing implicit-multiply at (*, 12, 12, 12, 12)
     """
 
     equationStr = "\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)"
@@ -317,11 +290,33 @@ def test__find_implicit_multiply0(verbose=False):
 
 
 def test__match_child_to_parent_input0(verbose=False):
+    """
+\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)
+^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^
+0 123456789111111111 1222222222233333
+           012345678 9012345678901234
+
+    """
+
+    equationStr = "\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)"
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    parser._find_backslash()
+    parser._find_variables_or_numbers()
+    parser._find_implicit_0()
+    parser._find_infixes_arg_brackets_width()
+    parser._update_all_width_by_enclosing_brackets_width_remove()
+    parser._find_implicit_multiply()
+    parser._match_child_to_parent_input()
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print() # TODO
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
+        
 
 
 
@@ -361,8 +356,8 @@ if __name__=='__main__':
     # test__find_implicit_00(True)
     # test__find_infixes_arg_brackets_width0(True) # this will need to take implicit multiply as,, but they are not FOUND YET<<<<<<<<<<
     # test__update_all_width_by_enclosing_brackets_width_remove0(True)
-    test__find_implicit_multiply0(True) # if make this before test__find_infixes_arg_brackets_width0, we need the full_width
-    # test__match_child_to_parent_input0(True)
+    # test__find_implicit_multiply0(True) # if make this before test__find_infixes_arg_brackets_width0, we need the full_width
+    test__match_child_to_parent_input0(True)
     # test__format_to_pyStyledAST0(True)
     #test__convert_to_schemeStyledAST0(True)
     #test__get_statistics0(True)
