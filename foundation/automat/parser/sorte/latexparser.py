@@ -1214,7 +1214,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
         import pprint;pp = pprint.PrettyPrinter(indent=4)
-        print(str(self.entitystorage))
+        # print(str(self.entitystorage))
         # pp.pprint('entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos [UNCONFIRMED]')
         # pp.pprint(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos)
 
@@ -1235,12 +1235,16 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         #init
         nodeId__priority = {}
         roots, leaves, enclosureTree, levelToIDs, idToLevel = EnclosureTree.makeEnclosureTreeWithLevelRootLeaves(listPoss, firstContainsSecond, getId)
-        print(enclosureTree) # of SLOTS not of Entity
+        # print(enclosureTree) # of SLOTS not of Entity
         pp.pprint(enclosureTree)
+        # print(levelToIDs)
+        pp.pprint(levelToIDs)#missing NODEs from enclosureTree????
+        pp.pprint(idToLevel)#missing NODEs from enclosureTree????
+        pp.pprint('listPoss');pp.pprint(listPoss)
         tuple_slotOpenClosePos__representativeNodeId = {}
 
         #
-        enclosureTreeSortedBYNumSubstitutable = sorted(enclosureTree.items(), key=lambda item: len(enclosureTree[item[0]]))
+        enclosureTreeSortedBYNumSubstitutable = sorted(enclosureTree.items(), key=lambda item: idToLevel[item[0]], reverse=True)
         for (openSlotPos, closeSlotPos), listOfSubtitutableSlotPoss in  enclosureTreeSortedBYNumSubstitutable:
             #find all the ID
             allEntitiesInSlot = self.entitystorage.getAllEntityIdWithinFuncStartAndFuncEnd(openSlotPos, closeSlotPos) #nodeId_funcName_funcStart_funcEnd
@@ -1274,6 +1278,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 inEntity = allEntitiesInSlotSortedByPriority.pop(0) # nodeId, funcName, funcStart, funcEnd
 
                 print('chosen inEntity as: ', inEntity)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<might get implicit accidentally... BUT accidents happen ONLY when implicit is at the sides?
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<maybe the problem is with the extra SLOT that the FIRST SINE GOT? SO the problem is with _find_backslash?
+
                 slotsOfInEntity = self.entitystorage.getSlots(inEntity[0]) # use the nodeId to get SLOT
                 #slotsOfInEntity = [(startWidth, _, endWidth, _)]
                 for startWidth, endWidth in slotsOfInEntity:
@@ -1292,6 +1298,8 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 if len(listOfRepOfSlot) > 1:######################################################################################################################
                     print('parent:', inEntity, ' children: ', listOfRepOfSlot)######parent: (1, '-', 5, 6)  children:  [(1, '-', 5, 6), (21, '0', 5, 5)]
                     raise Exception()
+                if len(listOfRepOfSlot) == 0: # we catch an implicit  when its not part of the brackets
+                    continue#skip adding as confirmed
                 theRepOfSlot = listOfRepOfSlot[0]
                 nodeId__priority[theRepOfSlot[0]] = float('inf')
 
