@@ -316,20 +316,43 @@ def test__match_child_to_parent_input0(verbose=False):
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
-    if verbose:
+    # if verbose:
         
-        print(str(parser.bracketstorage))
-        print(str(parser.entitystorage))
+    #     print(str(parser.bracketstorage))
+    #     print(str(parser.entitystorage))
         
 
 
 
 def test__format_to_pyStyledAST0(verbose=False):
+    """
+\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)
+^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^
+0 123456789111111111 1222222222233333
+           012345678 9012345678901234
+
+    """
+
+    equationStr = "\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)"
+    parser = Latexparser(equationStr, verbose=verbose)
+    parser._find_matrices()
+    parser._find_infix()
+    parser._find_brackets()
+    parser._find_backslash()
+    parser._find_variables_or_numbers()
+    parser._find_infixes_arg_brackets_width()
+    parser._find_implicit_0()
+    parser._update_all_width_by_enclosing_brackets_width_remove()
+    parser._find_implicit_multiply()
+    parser._match_child_to_parent_input()
+    parser._format_to_pyStyledAST()
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
     if verbose:
-        print() # TODO
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
+        print(parser.latexAST)
 
 
 

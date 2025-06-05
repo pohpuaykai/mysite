@@ -62,83 +62,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     
     MATRIX: each matrix cell to be treated as a Latex formula. So we write whole matrix as a node on AST for now. then recursively parse each matrix_cell into AST. (treat matrix as multi-input function).
     
-    
-    BELOW is unit-testable, yay
-    PLAN: (also need a LIST_OF_ALL_OCCUPIED for variable_finding[CONTIGUOUSleftovers])
-    ~~NODES FINDING~~~ INCLUDE ITEM_ID for each 
-    EXPECTED INPUTS FOR EACH TYPE (INFIX, BACKSLASH)
-    0. remove ALL spacing from the Latex equation? (keep spacing_info to prompt user(FUTURE)) - a badcase: 222 actually means 2*2*2
-        0a. find all \begin{}\end{} # these are MATRICES (note start_position and end_position) and bracket positions of START_END_TAG
-        
-    1. find position of all infixes (infixes might be multi character), note all the ^(exponent), DS:
-        {
-            name:'',
-            start_position:[int], end_position = start_position+len(name)
-            length: #length >0, since these are not implicit
-            expected_inputs: #this will be a fixed dictionary. DO NOT PUT IT HERE
-            inputs:  #there are inputs no enclosed by brackets, data type is list
-            width:{start_position:[int], end_position:[int]} # initially empty
-        }
-        1a. occupied is only the symbol itself
-    2. find position of all OTHER_brackets, first find all brackets
-        2a. Keep position of all the brackets as a kind of datastorage
-        2b. check if there is a ^(exponent), to their direct right or left (note in brackets) [tree_building]
-            2b1.^ to the left (power) [only for ASTreeConstructionBODMAS, input of infix] (remove from OTHER_brackets)
-            2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
-        2c. DO NOT INCLUDE backslash brackets AND DO NOT INCLUDE MATRIX. (remove from OTHER_brackets)
-        2d. check if left&right infixes (put to infix as inputs) (remove from OTHER_brackets)
-    3. find start_position of all the backslashs (sqrt is special), EXCLUDE EXCLUDE_BACKSLASH like \to, because its an infix
-        3a. their _(if any) and its immediateNextBracket, their ^(if any) and its immediateNextBracket and {} [tree_building]
-        3b. remove all the ^ from infixes, that are actually backslash_exponents
-        3c. note its end_position, also 
-        3d. occupied is only the name and the backslash
-        3e. note the WHOLE_end_position (different from 2d), these are BACKSLASH
-        3f. BACKSLASHES always have at most 3 inputs
-        3g. remove VARIABLENAMESTAKEANARG and put in variables
-    4. find all leftover_positions(NOT infix|backslash|immediateNextBracket|NOT MATRICE), these are variable_fragments(may contain NESTED _{})
-        4a. collate consecutive. (may contain alphanumeric and brackets(may have exponent within brackets) and underscore BUT NOT EXPONENT) example V_{BE^0}
-            4a1.ONLY _{ are variable_subscripts. may have real brackets
-                4a1a. find all _{ and their closure }, GROUP AS ONE, call this _{C
-            4a2. N is a number, V is not number and not _{C, C is _{C
-            4a3. scan from left to right, 
-                4a4. if we go from N to V, break off. this means N is implicitly multiplied by V
-                4a5. if we reach C, break off. This is the end of a independent variable
-                4a6. else, keep collecting temp.
-        
-            4a4. These are VARIABLES|NUMBERS, also note start_position and length
-        4b. remove these variable_brackets _{C from OTHER_brackets
-    
-    5. implicit_0 (-)(NOTHING_ELSE?) need to add to the list of all infixes, indicated by length 0. need starting_position
-        5a. left of (nothing|open_brackets) , 
-            5a1. nothing is the left_most of the equationStr
-            5a2. search for open_brackets that have - (+ have no need of implicit_zero)
-    ***OTHER_brackets should only contain right_input_for_^ OR enclosures_for_implicit_multiply OR ORDER_ENCLOSURES[which_op_comes_first, associativity, should_only_enclose_infixes_but_user_can_put_redundant_brackets] at_this_point
-    6. implicit_multiply need to add to the list of all infixes, indicated by length 0. need starting_position
-        6a. ALL_X_INF = MATRICES+BACKSLASH+VARIABLES+NUMBERS (EVERYTHING EXCEPT INFIX and OTHER_brackets??)
-        6b. match the start_position and end_position of ALL_X_INF to each other, if they are immediateNext to each other, then add implicit multiply
-        6c. right_input_for_^ OR enclosures_for_implicit_multiply from OTHER_brackets
-    ***OTHER_brackets should only contain ORDER_ENCLOSURES[which_op_comes_first] at_this_point ?????????
-    ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
-    
-    7. get width(start~end) of infixes
-        7a. (by enclosing_brackets) or (by inputs) [tree_building]
-        LOOK immediate LEFT&RIGHT of infix [tree_building] | but if immediate LEFT&RIGHT of infix are redundant_brackets? 
-        then just update as width, and not as inputs
-        7b. Check OTHER_brackets for enclosure that are wider than current_width_of_infix
-        
-    ***everything has width at_this_point
-    ~~~ASTree construction~~~ by widest enclosing position? there is no need for brackets? 
-    #process those_with_inputs(BACKSLASH&INFIX) by position (left to right)
-    we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
-    1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
-    2. those without children but need to have children : BACKSLASH & INFIXES
-    
-    pop list_2 -> a
-    for each empty input of a ***********specify width for all the types
-        for each item in list_1 ??????
-            we want widest input that fits input_position_of_a break ties with PRIOIRITIZED_INFIX, and then from left_to_right
-        remove selected_item from list_1
-        
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO remove all the useless_methods, add a summary of this in comments here
             
     go through all items, looking at inputs of each, create nodeId to list[nodeId] dictionary, store as latex tree
     
@@ -205,34 +129,17 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
 
-    '_{C}^{C}{C}': [#['sum', 'prod', 'int']
-            {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-            {'argId':1, 'preSym':'^', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-            {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
-        ],
+        '_{C}^{C}{C}': [#['sum', 'prod', 'int']
+                {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':1, 'preSym':'^', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+            ],
 
 
 
 
-    '_{C}^{O}{C}': [#['iint', 'iiint', 'oint', 'oiint']
-            {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-            {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-            {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
-        ],
-
-
-
-
-    '_{O}(C)': [#['log']
-                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
-                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
-        ],
-
-
-
-
-    '_{O}^{O}{C}': [#['partial', 'nabla', 'Delta']
-                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+        '_{C}^{O}{C}': [#['iint', 'iiint', 'oint', 'oiint']
+                {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
             ],
@@ -240,17 +147,34 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
 
 
-    '{C}': [#VARIABLENAMESTAKEANARG
-                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
-        ],
+        '_{O}(C)': [#['log']
+                    {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'argLen<2'},
+                    {'argId':1, 'preSym':'', 'optional':False, 'openBra':'(', 'closeBra':')', 'braOptional':'False'}
+            ],
 
 
 
 
-    '{C}{C}': [#['frac']
-                {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
-                {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
-        ]
+        '_{O}^{O}{C}': [#['partial', 'nabla', 'Delta']
+                    {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                    {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                    {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+                ],
+
+
+
+
+        '{C}': [#VARIABLENAMESTAKEANARG
+                    {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+            ],
+
+
+
+
+        '{C}{C}': [#['frac']
+                    {'argId':0, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                    {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+            ]
 
 
     }#argId is for ASTree building
@@ -322,16 +246,13 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         self.list_closeTagPos = None
         self.openTagPos__closeTagPos = None
         self.closeTagPos__openTagPos = None
+        self.overallEqual_startPos = None
         self.occupiedPositions = []
         # self.all_brackets_pos = None
         self.all_preSym_pos = None
         self.latexAST = None
     
 
-    # def _remove_all_spacing(self):
-    #     self.equationStr = self.rawEquationStr.replace(" ", '')
-    #     self.entitystorage = EntityStorage(eqStrLen=len(self.equationStr))
-        
     def _find_matrices(self):
         """
         
@@ -603,7 +524,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
         #is = enclosed_in_brackets?
         equals_pos_type_list = list(filter(lambda tup: tup[2]=='=', infix_pos_type_list))
-        overallEqual_startPos = []
+        self.overallEqual_startPos = []
         for start, end, _ in equals_pos_type_list:
             isOverallEqual = False
             for bracketType in list(BracketType.__members__.values()):
@@ -612,17 +533,17 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     isOverallEqual = True
                     break
             if isOverallEqual:# this is a overall bracket
-                overallEqual_startPos.append(start)
+                self.overallEqual_startPos.append(start)
         #overallEquals SPLIT the equationStr into equal parts
-        overallEqual_startPos = sorted(overallEqual_startPos)
-        overallEqual_startPos.insert(0, 0)
-        overallEqual_startPos.append(len(self.equationStr)-1)#-1 so that its startPos
+        self.overallEqual_startPos = sorted(self.overallEqual_startPos)
+        self.overallEqual_startPos.insert(0, 0)
+        self.overallEqual_startPos.append(len(self.equationStr)-1)#-1 so that its startPos
         start__tuple_widthStart_widthEnd = {}
-        for i in range(0, len(overallEqual_startPos)-1):
-            startPos0, startPos1 = overallEqual_startPos[i], overallEqual_startPos[i+1]
+        for i in range(0, len(self.overallEqual_startPos)-1):
+            startPos0, startPos1 = self.overallEqual_startPos[i], self.overallEqual_startPos[i+1]
             if startPos1 != len(self.equationStr) - 1:
                 #startPos1_at_key because we added 0 at the beginning that does not belong to the original list of overallEqual_startPos
-                start__tuple_widthStart_widthEnd[startPos1] = (startPos0, overallEqual_startPos[i+2]+len('=')) 
+                start__tuple_widthStart_widthEnd[startPos1] = (startPos0, self.overallEqual_startPos[i+2]+len('=')) 
 
         for start, end, group in infix_pos_type_list:
             #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<might have gotten IMPLICIT_INFIX -
@@ -709,7 +630,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             2b2.^ to the right (base) [also for implicit_multiply remove_from_OTHER_brackets_after_implicit_multiply]
         
         """
-        # print(str(self.entitystorage), '7');import pdb;pdb.set_trace()
         self.all_preSym_pos = []
         set_all_possible_preSym = set()
         #for _find_variable_or_number
@@ -717,12 +637,9 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             for template in list_template:
                 set_all_possible_preSym.add(template['preSym'])
 
-        # print(str(self.entitystorage), '8');import pdb;pdb.set_trace()
         import re
         list_backslashReResult = list(map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\([a-zA-Z]+)", self.equationStr)))
-        # print(str(self.entitystorage), '9');import pdb;pdb.set_trace()
         for funcStart, funcEnd, funcName in list_backslashReResult:
-            # print(str(self.entitystorage), '10');import pdb;pdb.set_trace()
             if funcName in self.EXCLUDE_BACKSLASH_INFIX:
                 continue
             foundType = 'backslash_function'
@@ -743,7 +660,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     widthStart=funcStart, widthEnd=funcEnd, bracketstorage=self.bracketstorage)
                 continue # skip args finding
             #type == BACKSLASH_FUNCTION
-            # print(str(self.entitystorage), '11');import pdb;pdb.set_trace()
             self.bracketstorage=self.entitystorage.insert(
                 funcName, 
                 funcStart, 
@@ -802,6 +718,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     nextCha = self.equationStr[pointerPos]
                     if template['braOptional'] == 'argLen<2': # no need find bracket -> move pointerPosition
                         captureUnConfirmedArg(pointerPos, None, pointerPos+1) # +1 for the len of this arg: argLen
+                        self.bracketstorage.allOpenPosOfBackslashArgsNoBrackets.append(pointerPos)
                     elif template['braOptional'] == 'False':# must be brackets?
                         closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(pointerPos)
                         captureUnConfirmedArg(pointerPos, closeBraType, closeBraPos)
@@ -818,6 +735,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                     if (template['preSym'] == '' and nextCha not in everyOtherPreSym):
                         if template['braOptional'] == 'argLen<2': # no need find bracket -> move pointerPosition
                             captureUnConfirmedArg(pointerPos, None, pointerPos+1) # +1 for the len of this arg: argLen
+                            self.bracketstorage.allOpenPosOfBackslashArgsNoBrackets.append(pointerPos)
                         elif template['braOptional'] == 'False':# must be brackets?
                             closeBraPos, closeBraType = self.bracketstorage.getCorrespondingCloseBraPos(pointerPos)
                             captureUnConfirmedArg(pointerPos, closeBraType, closeBraPos)
@@ -1048,7 +966,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
 
             all_closeBracket_type = list(map(lambda t: t.value[1], BracketType))
             if self.equationStr[funcStart-1] in all_closeBracket_type:
-                # print('foundBracket');import pdb;pdb.set_trace()
                 openBraPos, openBraType = self.bracketstorage.getCorrespondingOpenBraPos(funcStart-1)
                 self.entitystorage.addUnConfirmedPCrelationship(funcStart, 0, openBraType, openBraPos, self.equationStr[funcStart-1], funcStart-1)
                 # self.bracketstorage.removeBracket(closeBraPos)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1057,7 +974,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             else:#cannot add confirmedRelationship, because implicit multiply not in yet, implicit multiply depends on width
                 cNodeId = self.entitystorage.getEntityImmediateLeftOfPos(funcStart)
                 cWidthStart = self.entitystorage.nodeId__widthStart.get(cNodeId)
-                # print('foundEntity', self.entitystorage.nodeId__funcStart[cNodeId], self.entitystorage.nodeId__funcName[cNodeId]);import pdb;pdb.set_trace()
                 self.entitystorage.widthMaxUpdateById(nodeId, cWidthStart, widthEnd)#left=Start
 
 
@@ -1117,12 +1033,7 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         print('_update_all_width_by_enclosing_brackets_width_remove********************************************************************************')
         self.bracketstorage = self.entitystorage._EntityStorage__updateEntityToWiderWidth(self.entitystorage.getAllNodeIds(), self.bracketstorage)
-        # list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd = self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(
-        #     EntityType.IMPLICIT_INFIX, EntityType.BACKSLASH_VARIABLE, EntityType.BACKSLASH_FUNCTION, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX)
 
-        # self.bracketstorage = self.entitystorage._EntityStorage__updateTemplatesToWiderEnclosingBracketsAndRemove(
-        #     list(map(lambda tup:tup[0], list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd)), 
-        #     bracketstorage=self.bracketstorage)
 
 
         
@@ -1145,31 +1056,23 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     ***implicit_0 and implicit_multiply already has all its children [tree_building] at_this_point
         """
         list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd = sorted(self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(), key=lambda t:t[4])
-        # print('sorted: ', list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd);import pdb;pdb.set_trace()
-
         for idx in range(0, len(list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd)-1):
             vorDing = list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd[idx]
             hinDing = list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd[idx+1]
             vorDingEntityType = self.entitystorage.nodeId__entityType[vorDing[0]]
             hinDingEntityType = self.entitystorage.nodeId__entityType[hinDing[0]]
-            # print(idx,'GOT:', vorDing, hinDing);import pdb;pdb.set_trace()
             #START_CONDITIONAL
-            ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            ##### REMOVE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if (vorDingEntityType in [EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX]) or (hinDingEntityType in [EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX]):
                 continue
             #END_CONDITIONAL
-            # print('checkConsec', vorDing[3]+1, hinDing[2], '$$$$$$$$$$$$$$')
             if (vorDing[3] +1 == hinDing[2])\
              or (vorDing[3] == hinDing[2]): #3=widthEnd & 2=widthStart
-                # print('addmul:', vorDing, hinDing, '*********************')
                 if vorDing[3] +1 == hinDing[2]:#to make sure that implcitMul has no width, i.e. funcStart=funcEnd
                     funcStartEnd = vorDing[3]
                 else:
                     funcStartEnd = hinDing[2]
                 pNodeId = self.entitystorage.insert('*', funcStartEnd, funcStartEnd, EntityType.IMPLICIT_INFIX, 
                     parentNodeId=None, argIdx=None, widthStart=vorDing[2], widthEnd=hinDing[3])
-                # self.bracketstorage = self.entitystorage._EntityStorage__updateEntityToWiderWidth([pNodeId], self.bracketstorage)
                 """TODO deal later
                 Contains 
                 0. function calls f(x)
@@ -1192,7 +1095,6 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         for startPos, endPos in self.bracketstorage.getAllTouchingBras(self.equationStr):
             pNodeId = self.entitystorage.insert('*', startPos, startPos, EntityType.IMPLICIT_INFIX, 
                 parentNodeId=None, argIdx=None, widthStart=startPos, widthEnd=startPos)
-            # self.bracketstorage = self.entitystorage._EntityStorage__updateEntityToWiderWidth([pNodeId], self.bracketstorage)
             for cNodeId, _, widthStart, widthEnd, _, _ in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd():
                 if widthEnd == startPos:#vorDing
                     self.entitystorage.addUnConfirmedPCrelationshipById(pNodeId, 0, None, widthStart, None, widthEnd)
@@ -1209,45 +1111,154 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
     1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
     2. those without children but need to have children : BACKSLASH & INFIXES  <<<<<<<<start from the SLOTs with smallest width
 
+        SOME HOW, there is no need for SLOTs? mySlots does not have hiearchy, so cannot "intergrenze"
+        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>remove Slots and all its book_keeping TODO after you clear all the old_tests
+
 
         """
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Seems to break a lot of things
-        print('_match_child_to_parent_input********************************************************************************')
         self.bracketstorage = self.entitystorage._EntityStorage__updateEntityToWiderWidth(self.entitystorage.getAllNodeIds(), self.bracketstorage)
-        print(str(self.entitystorage)); import pdb;pdb.set_trace()
+
+        tuple_startPos_endPos__NAMES__fromBracketAccounting = self.bracketstorage.toTree(self.overallEqual_startPos, self.equationStr) # this effectively takes care of brackets, so you don't have to care about brackets from here
+        
+        for idx in range(0, len(self.overallEqual_startPos)-1):
+            startPos, endPos = self.overallEqual_startPos[idx], self.overallEqual_startPos[idx+1]
+            parent__listOfChildren = tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)]['parent__listOfChildren']
+            openPosition__closePosition = tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)]['openPosition__closePosition']
+            openPosition__level = tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)]['openPosition__level']
+
+            """
+        over segments divided by OVERALLEQUALS
+                tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)] = {
+                    'parent__listOfChildren':parent__listOfChildren,
+                    'openPosition__closePosition':openPosition__closePosition,
+                    'openPosition__level':openPosition__level
+                }
+            """
+
+            #go by level, get openPosition~closePosition of level.
+            level__list_openPosition = {}
+            for openPosition, level in openPosition__level.items():
+                existing = level__list_openPosition.get(level, [])
+                existing.append(openPosition)
+                level__list_openPosition[level] = existing
+
+            def replaceBetween(cOpenPosition, cClosePosition, original_list_of_entities, rootOfSubTree):
+                #original_list_of_entities, element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)
+                #for infixes use funcStart|funcEnd, for everything else use widthStart|widthEnd
+                new_original_list_of_entities = []
+                addedRoot = False
+                for entTup in original_list_of_entities:
+                    entStartWidth, entEndWidth = None, None
+                    if entType[2] in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX]:
+                        entStartWidth, entEndWidth = entTup[3], entTup[4]
+                    else:
+                        entStartWidth, entEndWidth = entTup[5], entTup[6]
+                    #found startWidth, endWidth
+                    if cOpenPosition <= entStartWidth and entEndWidth <= cClosePosition:
+                        if not addedRoot:
+                            addedRoot = True
+                            new_original_list_of_entities.append(rootOfSubTree)
+                    else:
+                        new_original_list_of_entities.append(entTup)
+                return new_original_list_of_entities
+
+            """
+            What about the backslash, whose arguments have no brackets? -----> use slot, 
+            """
+            openClose__rootOfSubTree = {} #interTree
+            #IntraTree
+            sortedByLevel = sorted(level__list_openPosition.items(), key=lambda t: t[0], reverse=True)#0 is the top, and increases down the level
+            for level, list_openPosition in sortedByLevel:
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', level)
+                for openPosition in list_openPosition:
+                    closePosition = openPosition__closePosition[openPosition]
+                    openPosition = openPosition + 1#+1 exclude the openBracket
+                    #get all entities between openPosition and closePosition => original_list_of_entities
+                    """
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+self.entitystorage.getAllEntityBetween   
+
+**************************************************
+OGList: [('*', 26), ('x', 13), ('+', 4), ('2', 14)]<<<<<<<<GIVES TOO MUCH! ('*', 26) IS EXTRA
+mid:  ('*', 26)
+**************************************************
+
+eq:
+\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)
+^ ^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^
+0 12345678911111111112 22222222233333
+           01234567890 12345678901234
+                    """
+                    print('all entities between : ', openPosition, ' and', closePosition)
+                    
+                    original_list_of_entities = self.entitystorage.getAllEntityBetween(openPosition, closePosition) # element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)
+                    original_list_of_entities = sorted(original_list_of_entities, key=lambda ele: ele[4])#
+                    #replace with ROOT_OF_SUBTREE using parent__listOfChildren (this removes all brackets) in original_list_of_entities
+                    for cOpenPosition in parent__listOfChildren.get(openPosition, []):
+                        cClosePosition = openPosition__closePosition[cOpenPosition]
+                        rootOfSubTree = openClose__rootOfSubTree[(cOpenPosition, cClosePosition)] # rootOfSubTree=element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd), infixes_use_func, everythingelse_use_width
+                        print('$$$$replacements OG: ', original_list_of_entities)
+                        original_list_of_entities = replaceBetween(cOpenPosition, cClosePosition, original_list_of_entities, rootOfSubTree)
+                        print('$$$$replacements RE: ', original_list_of_entities)
+                    original_list_of_entities = sorted(original_list_of_entities, key=lambda ele: ele[4])#
+                    #take out all the infixes => infixes_list, process infixes_list by priority, break ties by ???
+                    infixes_list = sorted(list(filter(lambda ele: ele[2] in [EntityType.IMPLICIT_INFIX, EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX], original_list_of_entities)), key=lambda ele: self.getPriority(ele[1]))
+                    for infixEle in infixes_list:
+                        #look direct left|right in original_list_of_entities,
+                        listIdx = original_list_of_entities.index(infixEle)
+                        print('**************************************************')
+                        print('OGList:', list(map(lambda t: (t[1], t[0]), original_list_of_entities)))
+                        print('mid: ', list(map(lambda t: (t[1], t[0]), original_list_of_entities[listIdx:listIdx+1]))[0])
+                        print('**************************************************')
+                        leftEle = original_list_of_entities[listIdx-1]
+                        rightEle = original_list_of_entities[listIdx+1]
+                        #add leftEle|rightEle as children to the middle(infixEle),
+                        self.entitystorage.addConfirmedPCrelationshipById(infixEle[0], leftEle[0], 0) #leftEle[0]=nodeId # interTree and IntraTree
+                        self.entitystorage.addConfirmedPCrelationshipById(infixEle[0], rightEle[0], 1) #rightEle[0]=nodeId # interTree and IntraTree
+                        #remove left|right from original_list_of_entities
+                        original_list_of_entities.remove(leftEle)
+                        original_list_of_entities.remove(rightEle)
+                    print('doneWith infixes_list ಠ_ಠ (๑˃̵ᴗ˂̵)و ﾞ ♥ •͈ᴗ•͈  ಥ_ಥ (ؑ‷ᵕؑ̇‷)◞✧ ♡  ◡̈   ٩(^‿^)۶')
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', level)
 
 
-        nodeId__priority = {}
-        for (pNodeId, cArgIdx), (openBra, openSlotPos, closeBra, closeSlotPos) in self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
-            list_cNodeId_cFuncName_cFuncStart_cFuncEnd = self.entitystorage.getWidestFits(openSlotPos, closeSlotPos) #this is the child of pNodeId, widestFit should be the direct child of pNodeId
-            print('pNodeId ', pNodeId, 'cArgIdx', cArgIdx, 'openSlotPos', openSlotPos, 'closeSlotPos', closeSlotPos)
-            print('list_cNodeId_cFuncName_cFuncStart_cFuncEnd', list_cNodeId_cFuncName_cFuncStart_cFuncEnd, )
 
-            #choose by getPriority
-            lowestPriority, cNodeId = float('inf'), None
-            for _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd in list_cNodeId_cFuncName_cFuncStart_cFuncEnd:
-                priority = nodeId__priority.get(_cNodeId, self.getPriority(_cFuncName))
-                if priority < lowestPriority:
-                    lowestPriority = priority
-                    cNodeId, cFuncName, cFuncStart, cFuncEnd = _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd
-            if cNodeId is None: #everything has the same priority
-                #choose by nearest to pNodeId
-                pFuncStart = self.entitystorage.nodeId__funcStart[pNodeId]
-                smallestDistance = float('inf')
-                for _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd in list_cNodeId_cFuncName_cFuncStart_cFuncEnd:
-                    distance = abs(pFuncStart - _cFuncStart)
-                    if distance < smallestDistance:
-                        smallestDistance = distance
-                        cNodeId, cFuncName, cFuncStart, cFuncEnd = _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd
 
-            self.entitystorage.addConfirmedPCrelationshipById(
-                pNodeId, 
-                cNodeId, 
-                cArgIdx
-            )
-            print('addedConfirmed: ', pNodeId, cNodeId, cArgIdx)
-            nodeId__priority[cNodeId] = float('inf')
-            print('*****************************************************************************************************')
+
+
+
+
+        # nodeId__priority = {}
+        # sortedByPriority = sorted(self.entitystorage.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items(), key=lambda t: self.getPriority(self.entitystorage.nodeId__funcName[t[0][0]]))
+        # print("sortedByPriority", sortedByPriority)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<order is wrong? bracketstorage=>tree
+        # for (pNodeId, cArgIdx), (openBra, openSlotPos, closeBra, closeSlotPos) in sortedByPriority:
+        #     list_cNodeId_cFuncName_cFuncStart_cFuncEnd = self.entitystorage.getWidestFits(openSlotPos, closeSlotPos, pNodeId) #this is the child of pNodeId, widestFit should be the direct child of pNodeId
+        #     print(pNodeId, self.entitystorage.nodeId__funcName[pNodeId] ,cArgIdx, openSlotPos, closeSlotPos, 'possibleChildrenList:', list_cNodeId_cFuncName_cFuncStart_cFuncEnd);
+        #     #choose by getPriority
+        #     lowestPriority, cNodeId = float('inf'), None
+        #     for _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd in list_cNodeId_cFuncName_cFuncStart_cFuncEnd:
+        #         priority = nodeId__priority.get(_cNodeId, self.getPriority(_cFuncName))
+        #         if priority < lowestPriority:
+        #             lowestPriority = priority
+        #             cNodeId, cFuncName, cFuncStart, cFuncEnd = _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd
+        #     if cNodeId is None: #everything has the same priority
+        #         #choose by nearest to pNodeId <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #         pFuncStart = self.entitystorage.nodeId__funcStart[pNodeId]
+        #         smallestDistance = float('inf')
+        #         for _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd in list_cNodeId_cFuncName_cFuncStart_cFuncEnd:
+        #             distance = abs(pFuncStart - _cFuncStart)
+        #             if distance < smallestDistance:
+        #                 smallestDistance = distance
+        #                 cNodeId, cFuncName, cFuncStart, cFuncEnd = _cNodeId, _cFuncName, _cFuncStart, _cFuncEnd
+
+        #     self.entitystorage.addConfirmedPCrelationshipById(
+        #         pNodeId, 
+        #         cNodeId, 
+        #         cArgIdx
+        #     )
+        #     print('addedConfirmed:', pNodeId, cNodeId, cArgIdx)
+        #     print('********************************************************************************')
+        #     nodeId__priority[cNodeId] = float('inf')
 
 
         
@@ -1481,7 +1492,6 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
 
         entityType = self.nodeId__entityType[nodeId]
         if entityType in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX]:
-            # import pdb;pdb.set_trace()
             #leftEnd
             if (nodeId, 0) in self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos: #might not exist because removed by caller like "addConfirmedPCrelationship"
                 l = list(self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.get((nodeId, 0)))
@@ -1510,21 +1520,6 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
             list_tuple_openBraPos_closeBraPos_argIdx.append((openBraPos, closeBraPos, cArgIdx))
         return list_tuple_openBraPos_closeBraPos_argIdx
 
-    def getWidestFits(self, openBraPos, closeBraPos):# get widest nodeId that still between (openBraPos, closeBraPos)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        list_nodeIdContaining = self.getAllContainingByWidth(openBraPos, closeBraPos)
-        # print('open', openBraPos, 'close', closeBraPos, 'gWF list_nodeIdContaining: ', list_nodeIdContaining);import pdb;pdb.set_trace()
-        maxWidth, maxNodeId, maxFuncName = float('-inf'), None, None
-        for nodeId in list_nodeIdContaining:
-            width = self.nodeId__widthEnd[nodeId] - self.nodeId__widthStart[nodeId]
-            if width > maxWidth:
-                maxWidth = width; maxNodeId = nodeId; maxFuncName = self.nodeId__funcName[nodeId]
-
-        listOfWidestFits = []#might have many widestFits
-        for nodeId in list_nodeIdContaining:
-            width = self.nodeId__widthEnd[nodeId] - self.nodeId__widthStart[nodeId]
-            if width == maxWidth:
-                listOfWidestFits.append((nodeId, self.nodeId__funcName[nodeId], self.nodeId__funcStart[nodeId], self.nodeId__funcEnd[nodeId]))
-        return listOfWidestFits
 
     # remove? <<<<<<<<<<<<<<<<<<<<<<<<<<<<replace with self.__updateEntityToWiderWidth
     def __updateTemplatesToWiderEnclosingBracketsAndRemove(self, nodeIds, bracketstorage): #TODO rename to __updateEntitiesToWiderEnclosingBrackets
@@ -1548,7 +1543,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         selectedOpenClosePos = bracketstorage.getTightestEnclosingPos(self.nodeId__funcStart[nodeId], BracketType.ROUND)
         if selectedOpenClosePos:
             self.updateWidth(nodeId, selectedOpenClosePos[0], selectedOpenClosePos[1])
-            print('startWidth', selectedOpenClosePos[0], 'endWidth', selectedOpenClosePos[1])
+            # print('startWidth', selectedOpenClosePos[0], 'endWidth', selectedOpenClosePos[1])
             updated = True
         return bracketstorage, updated
 
@@ -1566,7 +1561,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
                 widthStart = self.nodeId__widthStart[nodeIdOfEntityLeftOfNodeId]
             self.updateWidth(nodeId, widthStart,
                 funcEnd)#no change to widthEnd
-            print('updated to nodeId of ', nodeIdOfEntityLeftOfNodeId, 'widthStart: ', widthStart, 'wdithEnd:', self.nodeId__funcEnd[nodeId])
+            # print('updated to nodeId of ', nodeIdOfEntityLeftOfNodeId, 'widthStart: ', widthStart, 'wdithEnd:', self.nodeId__funcEnd[nodeId])
             updated = True
         return bracketstorage, updated
 
@@ -1585,7 +1580,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
 
             self.updateWidth(nodeId, funcStart, #no change to widthStart
                 widthEnd)
-            print('updated to nodeId of ', nodeIdOfEntityRightOfNodeId, 'widthStart: ', self.nodeId__funcStart[nodeId], 'wdithEnd:', widthEnd)
+            # print('updated to nodeId of ', nodeIdOfEntityRightOfNodeId, 'widthStart: ', self.nodeId__funcStart[nodeId], 'wdithEnd:', widthEnd)
             updated = True
         return bracketstorage, updated
 
@@ -1601,7 +1596,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
                     return bracketstorage, updated
                 self.updateWidth(infixNodeIdx, openBraPos, 
                     self.nodeId__widthEnd[infixNodeIdx])#no change to widthEnd
-                print('updated widthStart', openBraPos, 'widthEnd', self.nodeId__widthEnd[infixNodeIdx])
+                # print('updated widthStart', openBraPos, 'widthEnd', self.nodeId__widthEnd[infixNodeIdx])
                 updated = True
                 break
         return bracketstorage, updated
@@ -1616,7 +1611,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
                 closeBraPos, _ = bracketstorage.getCorrespondingCloseBraPos(possibleOpenBraPos)
                 self.updateWidth(infixNodeIdx, self.nodeId__widthStart[infixNodeIdx], #no change to widthStart
                 closeBraPos)
-                print('updated widthStart', self.nodeId__widthStart[infixNodeIdx], 'widthEnd', closeBraPos)
+                # print('updated widthStart', self.nodeId__widthStart[infixNodeIdx], 'widthEnd', closeBraPos)
                 updated = True
                 break
         return bracketstorage, updated
@@ -1639,34 +1634,46 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         for nodeId in nodeIds:
 
             entityType = self.nodeId__entityType[nodeId]
-            print('~~~~~~~~~~~~~implicit0 id:21, widthStart', self.nodeId__widthStart[21], 'widthEnd', self.nodeId__widthEnd[21], 'funcStart', self.nodeId__funcStart[21], 'funcEnd', self.nodeId__funcEnd[21])
 
-            print('nodeId', nodeId, 'entityType', entityType, 'widthStart', self.nodeId__widthStart[nodeId], 'widthEnd', self.nodeId__widthEnd[nodeId]); import pdb;pdb.set_trace()
             if entityType in [EntityType.IMPLICIT_INFIX, EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX]:
                 self.bracketstorage, updated = self.__updateInfixesToWiderLeftBracket(nodeId, bracketstorage)
-                print('updated leftBracket', updated)
                 self.bracketstorage, updated = self.__updateInfixesToWiderRightBracket(nodeId, bracketstorage)
-                print('updated rightBracket', updated)
 
                 if not updated:
                     self.bracketstorage, updated = self.__updateEntitiesToWiderEnclosingBracket(nodeId, bracketstorage)
-                    print('updated toEnclosing', updated)
 
                     if not updated:
                         self.bracketstorage, updated = self.__updateEntitiesToWiderLeftEntities(nodeId, bracketstorage)
-                        print('updated toLeftEntity', updated)
                         self.bracketstorage, updated = self.__updateEntitiesToWiderRightEntities(nodeId, bracketstorage)
-                        print('updated toRightEntity', updated)
 
-        print('**************************************************');import pdb;pdb.set_trace()
         return bracketstorage
 
+        #not used, remove?
+    def getWidestFits(self, openBraPos, closeBraPos, selfNodeId):# get widest nodeId that still between (openBraPos, closeBraPos)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        """
+        selfNodeId is a nodeId we should not return
+        """
 
+        list_nodeIdContaining = self.getAllContainingByWidth(openBraPos, closeBraPos)
+        if selfNodeId in list_nodeIdContaining:
+            list_nodeIdContaining.remove(selfNodeId)
+        maxWidth, maxNodeId, maxFuncName = float('-inf'), None, None
+        for nodeId in list_nodeIdContaining:
+            width = self.nodeId__widthEnd[nodeId] - self.nodeId__widthStart[nodeId]
+            if width > maxWidth:
+                maxWidth = width; maxNodeId = nodeId; maxFuncName = self.nodeId__funcName[nodeId]
+
+        listOfWidestFits = []#might have many widestFits
+        for nodeId in list_nodeIdContaining:
+            width = self.nodeId__widthEnd[nodeId] - self.nodeId__widthStart[nodeId]
+            if width == maxWidth:
+                listOfWidestFits.append((nodeId, self.nodeId__funcName[nodeId], self.nodeId__funcStart[nodeId], self.nodeId__funcEnd[nodeId]))
+        return listOfWidestFits
+
+    #not used, remove?
     def getAllContainingByWidth(self, startPos, endPos):#all the entities within startPos and endPos, 
         startWidthIdx = BinarySearch.binarySearchPre(self.list_tuple_widthStart_nodeId, startPos, key=lambda t:t[0])
         endWidthIdx = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, endPos, key=lambda t:t[0], breakTie='r')#breakTie give right most, there might be multiple same endWidth of implicit add implicit mul
-        # print('s', startPos, 'e', endPos, '!!!!!!!getAllContainingByWidth:', self.list_tuple_widthStart_nodeId, '&&&&&&&&&&&',self.list_tuple_widthEnd_nodeId)
-        # import pdb;pdb.set_trace()
         set_containingNodeIdByStartWidth = set(map(lambda t:t[1], self.list_tuple_widthStart_nodeId[startWidthIdx:]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
         set_containingNodeIdByEndWidth = set(map(lambda t:t[1], self.list_tuple_widthEnd_nodeId[:endWidthIdx+1]))#verysimiliar0refactor?ONLYdifferIn:PositionTODO
         #off by 1 revealed by test__entityStorage__getWidestFit0
@@ -1688,7 +1695,6 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
     def getEntityImmediateLeftOfPos(self, pos):
         idx = BinarySearch.binarySearchPre(self.list_tuple_widthEnd_nodeId, pos, key=lambda t:t[0])
         nodeId = self.list_tuple_widthEnd_nodeId[idx][1]#[idx-1][1]
-        # import pdb;pdb.set_trace()
         return nodeId
 
     def getEntityImmediateRightOfPos(self, pos):
@@ -1696,6 +1702,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         nodeId = self.list_tuple_widthStart_nodeId[idx][1]
         return nodeId
 
+    #not used, remove?
     def getSlots(self, nodeId):# get all the slots of nodeId
         slots = []
         for (pNodeId, cArgIdx), (_, openSlotPos, _, closeSlotPos) in self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos.items():
@@ -1875,6 +1882,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         s += 'nodeId__funcEnd'+os.linesep
         s += pp.pformat(self.nodeId__funcEnd)+os.linesep
         s += 'tuple_nodeId_argIdx__pNodeId'+os.linesep
+        s += pp.pformat(self.tuple_nodeId_argIdx__pNodeId)
         #funcName, widthStart, widthEnd <<<for width-checking
         list_tuple_nodeId_funcName_widthStart_widthEnd_funcStart_funcEnd = []
         for nodeId, widthStart in self.nodeId__widthStart.items():
@@ -1912,9 +1920,26 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         copy_template['widthStart'] = widthStart
         copy_template['widthEnd'] = widthEnd
 
+    #not used, remove?
     def getAllNodeIds(self):
         return list(self.nodeId__funcStart.keys())
 
+
+    def getAllEntityBetween(self, openPos, closePos): 
+        """element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)"""
+        allEntities = []
+        allNodeIds = list(self.nodeId__funcStart.keys())
+        for nodeId in allNodeIds:
+            entityType = self.nodeId__entityType[nodeId]
+            if entityType in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX]:
+                widthStart = self.nodeId__funcStart[nodeId]
+                widthEnd = self.nodeId__funcEnd[nodeId]
+            else:
+                widthStart = self.nodeId__widthStart[nodeId]
+                widthEnd = self.nodeId__widthEnd[nodeId]
+            if openPos <= widthStart and widthEnd <= closePos:
+                allEntities.append((nodeId, self.nodeId__funcName[nodeId], entityType, self.nodeId__funcStart[nodeId], self.nodeId__funcEnd[nodeId], self.nodeId__widthStart[nodeId], self.nodeId__widthEnd[nodeId]))
+        return allEntities
 
 
 class BracketStorage:
@@ -1947,6 +1972,7 @@ class BracketStorage:
         self.closeBraPos__bracketId = {}
         self.endOfOpenBraPos = {}
         self.list_backslashBracketOpenPos = []
+        self.allOpenPosOfBackslashArgsNoBrackets = []
 
     def _getBracketId(self):
         newBracketId = copy(self.bracketId)
@@ -2246,6 +2272,74 @@ class BracketStorage:
 
     def isABracketPos(self, pos):
         return pos in self.openBraPos__bracketId or pos in self.closeBraPos__bracketId
+
+
+
+    def toTree(self, listOfOverallEqualPos, equationStr):#<<<<< this function has NO_NEED to be under BracketStorage
+        """
+        Merely bracket accounting gives the level, every time we increment, we link that bracket to prev, this forms a tree
+
+        recording the level will help us, go from the lowest to highest level
+        """
+
+        """
+        What about the backslash, whose arguments have no brackets? -----> use slot, <<<<<<<<<<<<<<<<<<<<<<<NOT! please remove slots, its useless TODO
+        """
+        #bracket accounting
+        def bracketAccounting(startPos, endPos):
+            close__open = dict(zip(BracketType.closeBras(), BracketType.openBras()))
+            open__level = dict(zip(BracketType.openBras(), len(BracketType.openBras()) * [0]))
+            open__listOfPosition = dict(zip(BracketType.openBras(), len(BracketType.openBras()) * [[]]))#listOfPosition contains openPosition
+            parent__listOfChildren = {} # returnable
+            openPosition__closePosition = {} # returnable
+            openPosition__level = {} # returnable
+            def handleOpenBracket(i):
+                if len(open__listOfPosition[equationStr[i]]) > 0: # has parent
+                    parent = open__listOfPosition[equationStr[i]][-1] # peek
+                else: # no parent
+                    parent = None
+                #add p|c relationship
+                existing = parent__listOfChildren.get(parent, [])
+                existing.append(i)
+                parent__listOfChildren[parent] = existing
+                #
+                existing = open__listOfPosition.get(equationStr[i], [])
+                existing.append(i)
+                open__listOfPosition[equationStr[i]] = existing
+                #
+                openPosition__level[i] = open__level[equationStr[i]]
+                open__level[equationStr[i]] += 1
+
+            def handleCloseBracket(i):
+                openPosition = open__listOfPosition[close__open[equationStr[i]]].pop()
+                openPosition__closePosition[openPosition] = i
+                open__level[close__open[equationStr[i]]] -= 1
+
+            for i in range(startPos, endPos):
+                if equationStr[i] in open__level:#its a OPEN_BRACKET
+                    handleOpenBracket(i)
+                elif equationStr[i] in close__open:#its a CLOSE_BRACKET
+                    handleCloseBracket(i)
+                elif i in self.allOpenPosOfBackslashArgsNoBrackets:#they are of len=1, i is a OPEN_BRACKET AND CLOSE_BRACKET
+                    openBraPos, closeBraPos = i, i+1 # +1 is the len of the char
+                    handleOpenBracket(openBraPos)
+                    handleCloseBracket(closeBraPos)
+
+            return parent__listOfChildren, openPosition__closePosition, openPosition__level
+        #find the equation segments given by listOfOverallEqualPos, do bracketAccounting on each segment
+        tuple_startPos_endPos__NAMES__fromBracketAccounting = {}
+        for idx in range(0, len(listOfOverallEqualPos)-1):
+            startPos, endPos = listOfOverallEqualPos[idx], listOfOverallEqualPos[idx+1]
+            parent__listOfChildren, openPosition__closePosition, openPosition__level = bracketAccounting(startPos, endPos)
+            tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)] = {
+                'parent__listOfChildren':parent__listOfChildren,
+                'openPosition__closePosition':openPosition__closePosition,
+                'openPosition__level':openPosition__level
+            }
+        return tuple_startPos_endPos__NAMES__fromBracketAccounting
+
+
+
 
 
     def __str__(self):
