@@ -109,7 +109,7 @@ def text(x, y, content):
 
 def generateNspacedColors(numOfColors):
     import random
-    maxNum = 16 * 16 * 16 # the maxColor
+    maxNum = 256 * 256 * 256 # the maxColor
     randomOffset = random.randint(0,maxNum)
     colorsInHex=[]
     for deciNum in list(range(0, maxNum, maxNum//numOfColors)):
@@ -148,7 +148,7 @@ if __name__=="__main__":#Use AST to convert to JavaScript (good training), or wr
         return node[1]
 
     def getLabel(node):
-        return node[0]
+        return str((node[0],node[1]))
     #################################################################
 
 
@@ -156,26 +156,24 @@ if __name__=="__main__":#Use AST to convert to JavaScript (good training), or wr
     ##################################################################
     # \\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)
     sampleAST = {
-    ('-', 1): [('0', 21), ('*', 23)], 
-    ('-', 2): [('0', 22), ('sin', 9)], 
-    ('^', 0): [('x', 16), ('2', 17)], 
-    ('+', 3): [('x', 11), ('1', 12)], 
-    ('*', 26): [('x', 13), ('+', 4)], #
-    ('+', 4): [('2', 14)], 
-    ('+', 5): [('2', 17), ('3', 18)], 
-    ('+', 6): [('x', 19), ('2', 20)], 
-    ('=', 7): [('*', 26), ('0', 22)], #0 is closer than -
-    ('sin', 8): [('-', 1)], 
-    ('sin', 9): [('^', 0)], 
+    ('-', 1): [('0', 21), ('*', 26)], 
+    ('-', 2): [('0', 22)], 
     ('*', 23): [('2', 10), ('x', 11)], 
-    ('*', 24): [('2', 15), ('x', 16)], 
-    ('*', 25): [('3', 18), ('x', 19)]}
+    ('+', 3): [('*', 23), ('1', 12)], 
+    ('+', 4): [('x', 13), ('2', 14)], 
+    ('*', 26): [('+', 3), ('+', 4)], 
+    ('^', 0): [('x', 16), ('2', 17)], 
+    ('*', 24): [('2', 15), ('^', 0)], 
+    ('*', 25): [('3', 18), ('x', 19)], 
+    ('+', 5): [('*', 24), ('*', 25)], 
+    ('+', 6): [('+', 5), ('2', 20)], 
+    ('=', 7): [('-', 1), ('+', 6)]}
     rootNode = ("=", 7)
     def getId(node):
         return node[1]
 
     def getLabel(node):
-        return node[0]
+        return str((node[0],node[1]))
     ##################################################################
 
     SVGContent = genASTSVG(sampleAST, rootNode, getId, getLabel)

@@ -1118,29 +1118,31 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
         """
         self.bracketstorage = self.entitystorage._EntityStorage__updateEntityToWiderWidth(self.entitystorage.getAllNodeIds(), self.bracketstorage)
 
+        OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd = []
+        for nodeId in self.entitystorage.getAllNodeIds():
+            funcName, funcStart = self.entitystorage.nodeId__funcName[nodeId], self.entitystorage.nodeId__funcStart[nodeId]
+            if funcName == '=' and funcStart in self.overallEqual_startPos:
+                OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd.append((
+                    nodeId, self.entitystorage.nodeId__entityType[nodeId] ,funcStart, self.entitystorage.nodeId__funcEnd[nodeId] , self.entitystorage.nodeId__widthStart[nodeId], self.entitystorage.nodeId__widthEnd[nodeId] ,
+                ))
+        OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd = sorted(OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd, key=lambda ele: ele[3])
+        prevOVERALLEquals = None
+        print('self.overallEqual_startPos', self.overallEqual_startPos)
+
         tuple_startPos_endPos__NAMES__fromBracketAccounting = self.bracketstorage.toTree(self.overallEqual_startPos, self.equationStr) # this effectively takes care of brackets, so you don't have to care about brackets from here
         
-        for idx in range(0, len(self.overallEqual_startPos)-1):
+        for idx in range(0, len(self.overallEqual_startPos)-1):#self.overallEqual_startPos include 0{at the beginning} and (len(self.equationStr)-1){at the end}
             startPos, endPos = self.overallEqual_startPos[idx], self.overallEqual_startPos[idx+1]
             parent__listOfChildren = tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)]['parent__listOfChildren']
             openPosition__closePosition = tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)]['openPosition__closePosition']
             openPosition__level = tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)]['openPosition__level']
-
-            """
-        over segments divided by OVERALLEQUALS
-                tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)] = {
-                    'parent__listOfChildren':parent__listOfChildren,
-                    'openPosition__closePosition':openPosition__closePosition,
-                    'openPosition__level':openPosition__level
-                }
-            """
-
             #go by level, get openPosition~closePosition of level.
             level__list_openPosition = {}
             for openPosition, level in openPosition__level.items():
                 existing = level__list_openPosition.get(level, [])
                 existing.append(openPosition)
                 level__list_openPosition[level] = existing
+
 
             def replaceBetween(cOpenPosition, cClosePosition, original_list_of_entities, rootOfSubTree):
                 #original_list_of_entities, element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)
@@ -1149,12 +1151,12 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
                 addedRoot = False
                 for entTup in original_list_of_entities:
                     entStartWidth, entEndWidth = None, None
-                    if entType[2] in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX]:
+                    if entTup[2] in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX]:
                         entStartWidth, entEndWidth = entTup[3], entTup[4]
                     else:
                         entStartWidth, entEndWidth = entTup[5], entTup[6]
                     #found startWidth, endWidth
-                    if cOpenPosition <= entStartWidth and entEndWidth <= cClosePosition:
+                    if cOpenPosition < entStartWidth and entEndWidth <= cClosePosition:#< and not <=, because we want avoid implicits
                         if not addedRoot:
                             addedRoot = True
                             new_original_list_of_entities.append(rootOfSubTree)
@@ -1168,59 +1170,57 @@ class Latexparser(): # TODO follow the inheritance of _latexparser
             openClose__rootOfSubTree = {} #interTree
             #IntraTree
             sortedByLevel = sorted(level__list_openPosition.items(), key=lambda t: t[0], reverse=True)#0 is the top, and increases down the level
+
             for level, list_openPosition in sortedByLevel:
-                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', level)
                 for openPosition in list_openPosition:
                     closePosition = openPosition__closePosition[openPosition]
-                    openPosition = openPosition + 1#+1 exclude the openBracket
                     #get all entities between openPosition and closePosition => original_list_of_entities
-                    """
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-self.entitystorage.getAllEntityBetween   
-
-**************************************************
-OGList: [('*', 26), ('x', 13), ('+', 4), ('2', 14)]<<<<<<<<GIVES TOO MUCH! ('*', 26) IS EXTRA
-mid:  ('*', 26)
-**************************************************
-
-eq:
-\\sin(-(2x+1)(x+2))=-\\sin(2x^2+3x+2)
-^ ^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^
-0 12345678911111111112 22222222233333
-           01234567890 12345678901234
-                    """
-                    print('all entities between : ', openPosition, ' and', closePosition)
-                    
-                    original_list_of_entities = self.entitystorage.getAllEntityBetween(openPosition, closePosition) # element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)
+                    #+1 exclude the openBracket
+                    original_list_of_entities = self.entitystorage.getAllEntityBetween(openPosition+1, closePosition) # element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)
                     original_list_of_entities = sorted(original_list_of_entities, key=lambda ele: ele[4])#
+
+                    print('all entities between : ', openPosition, ' and', closePosition, '', list(map(lambda t: (t[1], t[0]), original_list_of_entities)))
                     #replace with ROOT_OF_SUBTREE using parent__listOfChildren (this removes all brackets) in original_list_of_entities
                     for cOpenPosition in parent__listOfChildren.get(openPosition, []):
                         cClosePosition = openPosition__closePosition[cOpenPosition]
                         rootOfSubTree = openClose__rootOfSubTree[(cOpenPosition, cClosePosition)] # rootOfSubTree=element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd), infixes_use_func, everythingelse_use_width
-                        print('$$$$replacements OG: ', original_list_of_entities)
+                        print('$$$$replacements OG: ', list(map(lambda t: (t[1], t[0]), original_list_of_entities)))
                         original_list_of_entities = replaceBetween(cOpenPosition, cClosePosition, original_list_of_entities, rootOfSubTree)
-                        print('$$$$replacements RE: ', original_list_of_entities)
+                        print('$$$$replacements RE: ', list(map(lambda t: (t[1], t[0]), original_list_of_entities)))
+                        print('RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR')
                     original_list_of_entities = sorted(original_list_of_entities, key=lambda ele: ele[4])#
+                    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT TO DO IF THERE ARE backslash in this?
                     #take out all the infixes => infixes_list, process infixes_list by priority, break ties by ???
                     infixes_list = sorted(list(filter(lambda ele: ele[2] in [EntityType.IMPLICIT_INFIX, EntityType.BACKSLASH_INFIX, EntityType.PURE_INFIX], original_list_of_entities)), key=lambda ele: self.getPriority(ele[1]))
                     for infixEle in infixes_list:
                         #look direct left|right in original_list_of_entities,
                         listIdx = original_list_of_entities.index(infixEle)
+                        # import pdb;pdb.set_trace()
                         print('**************************************************')
                         print('OGList:', list(map(lambda t: (t[1], t[0]), original_list_of_entities)))
                         print('mid: ', list(map(lambda t: (t[1], t[0]), original_list_of_entities[listIdx:listIdx+1]))[0])
                         print('**************************************************')
-                        leftEle = original_list_of_entities[listIdx-1]
-                        rightEle = original_list_of_entities[listIdx+1]
                         #add leftEle|rightEle as children to the middle(infixEle),
+                        leftEle = original_list_of_entities[listIdx-1]
                         self.entitystorage.addConfirmedPCrelationshipById(infixEle[0], leftEle[0], 0) #leftEle[0]=nodeId # interTree and IntraTree
+                        rightEle = original_list_of_entities[listIdx+1]
                         self.entitystorage.addConfirmedPCrelationshipById(infixEle[0], rightEle[0], 1) #rightEle[0]=nodeId # interTree and IntraTree
                         #remove left|right from original_list_of_entities
                         original_list_of_entities.remove(leftEle)
                         original_list_of_entities.remove(rightEle)
+                        if len(original_list_of_entities) <= 1:
+                            break
                     print('doneWith infixes_list ಠ_ಠ (๑˃̵ᴗ˂̵)و ﾞ ♥ •͈ᴗ•͈  ಥ_ಥ (ؑ‷ᵕؑ̇‷)◞✧ ♡  ◡̈   ٩(^‿^)۶')
-                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', level)
-
+                    openClose__rootOfSubTree[(openPosition, closePosition)] = infixEle
+                print('openClose__rootOfSubTree ', openClose__rootOfSubTree, ' SUBBERRRRRRSUSBUBSUBSUBSUBSUBSUBSUBSUBSUSBUSBUSB ')
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', level, ' topOfEqualSubTree: ', infixEle)
+            #make the connection between OVEREquals and topOfEqualSubTree
+            if prevOVERALLEquals is not None:
+                equalEntity = OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd[idx-1]
+                self.entitystorage.addConfirmedPCrelationshipById(equalEntity[0], prevOVERALLEquals[0], 0)
+                self.entitystorage.addConfirmedPCrelationshipById(equalEntity[0], infixEle[0], 1)
+                print('*******ADDDDDD EQUALS'); import pdb;pdb.set_trace()
+            prevOVERALLEquals = infixEle
 
 
 
@@ -2288,7 +2288,7 @@ class BracketStorage:
         #bracket accounting
         def bracketAccounting(startPos, endPos):
             close__open = dict(zip(BracketType.closeBras(), BracketType.openBras()))
-            open__level = dict(zip(BracketType.openBras(), len(BracketType.openBras()) * [0]))
+            open__level = dict(zip(BracketType.openBras(), len(BracketType.openBras()) * [1])) # because 0 is the top level
             open__listOfPosition = dict(zip(BracketType.openBras(), len(BracketType.openBras()) * [[]]))#listOfPosition contains openPosition
             parent__listOfChildren = {} # returnable
             openPosition__closePosition = {} # returnable
@@ -2324,13 +2324,25 @@ class BracketStorage:
                     openBraPos, closeBraPos = i, i+1 # +1 is the len of the char
                     handleOpenBracket(openBraPos)
                     handleCloseBracket(closeBraPos)
-
             return parent__listOfChildren, openPosition__closePosition, openPosition__level
         #find the equation segments given by listOfOverallEqualPos, do bracketAccounting on each segment
         tuple_startPos_endPos__NAMES__fromBracketAccounting = {}
         for idx in range(0, len(listOfOverallEqualPos)-1):
             startPos, endPos = listOfOverallEqualPos[idx], listOfOverallEqualPos[idx+1]
-            parent__listOfChildren, openPosition__closePosition, openPosition__level = bracketAccounting(startPos, endPos)
+            parent__listOfChildren, openPosition__closePosition, openPosition__level = bracketAccounting(startPos, endPos+1) # include endPos
+            #START add the TopLevel Parent that is startPos and endPos
+            new_parent__listOfChildren = {}
+            for parent, listOfChildren in parent__listOfChildren.items():
+                if parent is None:
+                    parent = startPos -1
+                new_parent__listOfChildren[parent] = listOfChildren
+            new_parent__listOfChildren[None] = [startPos-1]
+
+            parent__listOfChildren = new_parent__listOfChildren
+            openPosition__closePosition[startPos-1]=endPos
+            openPosition__level[startPos-1] = 0
+            #END add the TopLevel Parent that is startPos and endPos
+
             tuple_startPos_endPos__NAMES__fromBracketAccounting[(startPos, endPos)] = {
                 'parent__listOfChildren':parent__listOfChildren,
                 'openPosition__closePosition':openPosition__closePosition,

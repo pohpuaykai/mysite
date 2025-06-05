@@ -316,10 +316,10 @@ def test__match_child_to_parent_input0(verbose=False):
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
-    # if verbose:
+    if verbose:
         
-    #     print(str(parser.bracketstorage))
-    #     print(str(parser.entitystorage))
+        print(str(parser.bracketstorage))
+        print(str(parser.entitystorage))
         
 
 
@@ -349,9 +349,10 @@ def test__format_to_pyStyledAST0(verbose=False):
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
+    
     if verbose:
-        print(str(parser.bracketstorage))
-        print(str(parser.entitystorage))
+    #     print(str(parser.bracketstorage))
+        # print(str(parser.entitystorage))
         print(parser.latexAST)
 
 
@@ -384,7 +385,7 @@ if __name__=='__main__':
     # test__find_infixes_arg_brackets_width0(True) # this will need to take implicit multiply as,, but they are not FOUND YET<<<<<<<<<<
     # test__update_all_width_by_enclosing_brackets_width_remove0(True)
     # test__find_implicit_multiply0(True) # if make this before test__find_infixes_arg_brackets_width0, we need the full_width
-    test__match_child_to_parent_input0(True)
-    # test__format_to_pyStyledAST0(True)
+    # test__match_child_to_parent_input0(True)
+    test__format_to_pyStyledAST0(True)
     #test__convert_to_schemeStyledAST0(True)
     #test__get_statistics0(True)
