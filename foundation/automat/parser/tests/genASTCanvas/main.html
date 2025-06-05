@@ -14,11 +14,12 @@
 
 
 <script>
-var c = document.getElementById("myCanvas");var ctx = c.getContext("2d");ctx.moveTo(0, 5);ctx.lineTo(20, 5);
-    ctx.lineTo(20, 25);ctx.lineTo(0, 25);ctx.lineTo(0, 5);ctx.stroke();ctx.fillText("=", 10, 15);ctx.moveTo(0, 30);ctx.lineTo(20, 30);
-    ctx.lineTo(20, 50);ctx.lineTo(0, 50);ctx.lineTo(0, 30);ctx.stroke();ctx.fillText("2", 10, 40);ctx.moveTo(25, 30);ctx.lineTo(45, 30);
-    ctx.lineTo(45, 50);ctx.lineTo(25, 50);ctx.lineTo(25, 30);ctx.stroke();ctx.fillText("+", 35, 40);ctx.moveTo(0, 55);ctx.lineTo(20, 55);
-    ctx.lineTo(20, 75);ctx.lineTo(0, 75);ctx.lineTo(0, 55);ctx.stroke();ctx.fillText("1", 10, 65);ctx.moveTo(25, 55);ctx.lineTo(45, 55);
-    ctx.lineTo(45, 75);ctx.lineTo(25, 75);ctx.lineTo(25, 55);ctx.stroke();ctx.fillText("1", 35, 65);ctx.moveTo(0, 5);ctx.lineTo(25, 30);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();ctx.moveTo(0, 5);ctx.lineTo(0, 30);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();ctx.moveTo(25, 30);ctx.lineTo(25, 55);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();ctx.moveTo(25, 30);ctx.lineTo(0, 55);ctx.lineWidth=1;ctx.strokeStyle='#063C75';ctx.stroke();
+<svg width="512" height="512" viewBox="0 0 512 512"><style>
+.textStyle {
+    font: italic 40px serif;;
+    fill: #fff;
+}
+    </style>
+    <rect x="0" y="10" fill="#fff" stroke="#000" width="20" height="20"/><text x="10.0" y="20.0">=</text><rect x="0" y="40" fill="#fff" stroke="#000" width="20" height="20"/><text x="10.0" y="50.0">2</text><rect x="30" y="40" fill="#fff" stroke="#000" width="20" height="20"/><text x="40.0" y="50.0">+</text><rect x="0" y="70" fill="#fff" stroke="#000" width="20" height="20"/><text x="10.0" y="80.0">1</text><rect x="30" y="70" fill="#fff" stroke="#000" width="20" height="20"/><text x="40.0" y="80.0">1</text><polyline points="0,10 30,40 " stroke="#fff" stroke-width="3" fill="#000"/><polyline points="0,10 0,40 " stroke="#fff" stroke-width="3" fill="#000"/><polyline points="30,40 30,70 " stroke="#fff" stroke-width="3" fill="#000"/><polyline points="30,40 0,70 " stroke="#fff" stroke-width="3" fill="#000"/></svg>
 </script>
 </html>

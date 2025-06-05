@@ -1,11 +1,12 @@
-def genASTCanvas(ast, rootNode, canvasId):
+def genASTCanvas(tree, rootNode, getId, getLabel, canvasId, heightOfBox=20, widthOfBox=20, topPadding=10, leftPadding=10):
     content = f'var c = document.getElementById("{canvasId}");var ctx = c.getContext("2d");'
 
-    nodeId__funcName = {}
+    
+    nodeId__label = {}
     for parentNode, list_childNode in ast.items():
-        nodeId__funcName[parentNode[1]] = parentNode[0]
+        nodeId__label[getId(parentNode)] = getLabel(parentNode)
         for childNode in list_childNode:
-            nodeId__funcName[childNode[1]] = childNode[0]
+            nodeId__label[getId(childNode)] = getLabel(childNode)
 
     nodeId__pNodeId = {}
     level__list_nodeId = {}
@@ -15,7 +16,7 @@ def genASTCanvas(ast, rootNode, canvasId):
         #
         list_nodeId = level__list_nodeId.get(c['level'], [])
         list_nodeId.append({
-            "nodeId":c["node"][1],# nodeId
+            "nodeId":getId(c["node"]),# nodeId
             "parentId":c['parent']
         })
         level__list_nodeId[c['level']] = list_nodeId
@@ -28,9 +29,9 @@ def genASTCanvas(ast, rootNode, canvasId):
                 "parent":c['node'][1]
             })
             nodeId__pNodeId[node[1]]=c['node'][1]
-    #sort each level, by parent, then by id, then place it on the SVG
-    heightOfBox, widthOfBox, topPadding, leftPadding = 20, 20, 10, 10
-
+    #sort each level, by parent, then by id, then place it on the Canvas
+    
+    
     #position the nodes
     #all nodes are SVG rect
     # print('level__list_nodeId', level__list_nodeId)
@@ -49,8 +50,8 @@ def genASTCanvas(ast, rootNode, canvasId):
             content += text(widthOffset+widthOfBox/2, heightOffset+heightOfBox/2, nodeId__funcName[dic['nodeId']])
     #draw the connecting lines
     for cnid, pnid in nodeId__pNodeId.items():
-        cCoordDict = nodeId__label__coordinate[cnid]
-        pCoordDict = nodeId__label__coordinate[pnid]
+        cCoordDict = nodeId__label__coordinate[cnid]#topleft of nodeBox
+        pCoordDict = nodeId__label__coordinate[pnid]#topleft of nodeBox
         # content += polyline([
         #     (pCoordDict['widthOffset'], pCoordDict['heightOffset']),
         #     (cCoordDict['widthOffset'], cCoordDict['heightOffset']),
@@ -80,76 +81,11 @@ if __name__=="__main__":
         ("+", 1):[("1", 4), ("1", 5)]
     }
     rootNode = ("=", 0)
-
-    #sample EnclosureTree from CasCadE
-    sampleAST = {   (4, 5): [],
-    (4, 17): [   (4, 5),
-                 (5, 17),
-                 (6, 9),
-                 (9, 11),
-                 (12, 14),
-                 (14, 16),
-                 (6, 11),
-                 (7, 8),
-                 (8, 9),
-                 (12, 12),
-                 (12, 16)],
-    (5, 17): [   (6, 9),
-                 (9, 11),
-                 (12, 14),
-                 (14, 16),
-                 (6, 11),
-                 (7, 8),
-                 (8, 9),
-                 (12, 12),
-                 (12, 16)],
-    (6, 9): [(7, 8), (8, 9)],
-    (6, 11): [(6, 9), (9, 11), (7, 8), (8, 9)],
-    (7, 8): [],
-    (8, 9): [],
-    (9, 11): [],
-    (12, 12): [],
-    (12, 14): [(12, 12)],
-    (12, 16): [(12, 14), (14, 16), (12, 12)],
-    (14, 16): [],
-    (18, 20): [(19, 19), (19, 20)],
-    (19, 19): [],
-    (19, 20): [(19, 19)],
-    (19, 35): [   (24, 27),
-                  (27, 34),
-                  (19, 19),
-                  (24, 29),
-                  (29, 34),
-                  (24, 32),
-                  (32, 34),
-                  (19, 20),
-                  (24, 34),
-                  (25, 26),
-                  (26, 27),
-                  (30, 31),
-                  (31, 32)],
-    (24, 27): [(25, 26), (26, 27)],
-    (24, 29): [(24, 27), (25, 26), (26, 27)],
-    (24, 32): [(24, 27), (24, 29), (25, 26), (26, 27), (30, 31), (31, 32)],
-    (24, 34): [   (24, 27),
-                  (27, 34),
-                  (24, 29),
-                  (29, 34),
-                  (24, 32),
-                  (32, 34),
-                  (25, 26),
-                  (26, 27),
-                  (30, 31),
-                  (31, 32)],
-    (25, 26): [],
-    (26, 27): [],
-    (27, 34): [(29, 34), (32, 34), (30, 31), (31, 32)],
-    (29, 34): [(32, 34), (30, 31), (31, 32)],
-    (30, 31): [],
-    (31, 32): [],
-    (32, 34): []}
     
-    rootNode = 
-
-    CanvasContent = genASTCanvas(sampleAST, rootNode, "myCanvas")
+    def getId(node):
+        return node[1]
+    def getLabel(node):
+        return node[0]
+    
+    CanvasContent = genASTCanvas(sampleAST, rootNode, getId, getLabel, "myCanvas")
     print(CanvasContent)

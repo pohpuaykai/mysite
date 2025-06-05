@@ -140,6 +140,9 @@ def test__find_backslash0(verbose=False):
 ^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^
 0 123456789111111111 12222222222333
            012345678 90123456789012
+
+
+
     """
 
     equationStr = "\\sin((2x+1)(x+2))=\\sin(2x^2+3x+2)"
@@ -147,7 +150,7 @@ def test__find_backslash0(verbose=False):
     parser._find_matrices()
     parser._find_infix()
     parser._find_brackets()
-    parser._find_backslash()
+    parser._find_backslash()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<overscan to ^
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
@@ -220,8 +223,8 @@ def test__find_infixes_arg_brackets_width0(verbose=False):
     parser._find_brackets()
     parser._find_backslash()
     parser._find_variables_or_numbers()
-    parser._find_implicit_0()
     parser._find_infixes_arg_brackets_width()
+    parser._find_implicit_0()
 
 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', )
@@ -248,8 +251,8 @@ def test__update_all_width_by_enclosing_brackets_width_remove0(verbose=False):
     parser._find_brackets()
     parser._find_backslash()
     parser._find_variables_or_numbers()
-    parser._find_implicit_0()
     parser._find_infixes_arg_brackets_width()
+    parser._find_implicit_0()
     parser._update_all_width_by_enclosing_brackets_width_remove()
 
 
@@ -277,8 +280,8 @@ def test__find_implicit_multiply0(verbose=False):
     parser._find_brackets()
     parser._find_backslash()
     parser._find_variables_or_numbers()
-    parser._find_implicit_0()
     parser._find_infixes_arg_brackets_width()
+    parser._find_implicit_0()
     parser._update_all_width_by_enclosing_brackets_width_remove()
     parser._find_implicit_multiply()
 
@@ -305,8 +308,8 @@ def test__match_child_to_parent_input0(verbose=False):
     parser._find_brackets()
     parser._find_backslash()
     parser._find_variables_or_numbers()
-    parser._find_implicit_0()
     parser._find_infixes_arg_brackets_width()
+    parser._find_implicit_0()
     parser._update_all_width_by_enclosing_brackets_width_remove()
     parser._find_implicit_multiply()
     parser._match_child_to_parent_input()
