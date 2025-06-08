@@ -127,7 +127,20 @@ class Latexparser(Parser):
     # 'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
     ######
 
-    def getLatexSpecialCases(funcName):
+    def getLatexSpecialCases(self, funcName):
+        def addTrig():
+            l = {}
+            for trigFuncName in Latexparser.TRIGOFUNCTION:
+                l[trigFuncName] = {
+                '$0':0, #argIdx
+                '$1':1,
+                'resultTemplate':{
+                    ('^', ''):[(trigFuncName, ''), ('$0', '')],
+                    (trigFuncName, ''):[('$1', '')],
+                },
+                'insertToEntityStorage':['^']
+            }
+            return l
         LATEX_SPECIAL_CASES = {
             'sqrt': {
                 '$0':0, #argIdx
@@ -159,20 +172,8 @@ class Latexparser(Parser):
                 },
                 'insertToEntityStorage':[]
             },
-        }.update(addTrig())
-        def addTrig():
-            l = {}
-            for trigFuncName in TRIGOFUNCTION:
-                l[trigFuncName] = {
-                '$0':0, #argIdx
-                '$1':1,
-                'resultTemplate':{
-                    ('^', ''):[(trigFuncName, ''), ('$0', '')],
-                    (trigFuncName, ''):[('$1', '')],
-                },
-                'insertToEntityStorage':['^']
-            }
-            return l
+        }
+        LATEX_SPECIAL_CASES.update(addTrig())
         return LATEX_SPECIAL_CASES.get(funcName)
 
 
@@ -1567,7 +1568,7 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         self.ast = {}
         for pNode, existingChildrenList in self.latexAST.items():
             pFuncName, pNodeId = pNode
-            instructions = getLatexSpecialCases(pFuncName)
+            instructions = self.getLatexSpecialCases(pFuncName)
             if instructions:
                 replacement = {}
                 for rNode, rExistingChildrenList in instructions['resultTemplate'].items():
@@ -1603,7 +1604,7 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
                     replacement[(rFuncName, rNodeId)] = tExistingChildrenList
                 self.ast.update(replacement)
             else:
-                self.ast[pNode] = existingChildren
+                self.ast[pNode] = existingChildrenList
 
         
     def _get_statistics(self):

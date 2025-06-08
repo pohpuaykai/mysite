@@ -1278,22 +1278,22 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__contiguousLeftOvers__decimalPlaces(True)
-    # test__weirdVariables__variablesWithCurlyBracketsSimple(True)
-    # test__weirdVariables__variablesWithCurlyBracketsWithNums(True)
-    # test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets(True)
-    # test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex(True)
-    # test__weirdVariables__variablesWithCaret(True)
-    # test__weirdVariables__variablesWithCaretRealExponent(True)
-    # test__weirdVariables__variablesWithCaretMoreComplex(True)
-    # test__weirdVariables__variablesWithCurlyBracketsMinus(True)
+    test__contiguousLeftOvers__decimalPlaces()
+    test__weirdVariables__variablesWithCurlyBracketsSimple()
+    test__weirdVariables__variablesWithCurlyBracketsWithNums()
+    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets()
+    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex()
+    test__weirdVariables__variablesWithCaret()
+    test__weirdVariables__variablesWithCaretRealExponent()
+    test__weirdVariables__variablesWithCaretMoreComplex()
+    test__weirdVariables__variablesWithCurlyBracketsMinus()
     # test__weirdVariables__variablesWithCurlyBracketsFrac(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0(True)
     # test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1(True)
     # test__makeSubject__manyVariablesStandingTogether(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
-    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
-    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True)
-    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower(True)
+    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower()
     # test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower0(True)
     # test__findingBackSlashAndInfixOperations__Trig0(True)
     # test__findingBackSlashAndInfixOperations__Trig1(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
@@ -1304,18 +1304,18 @@ if __name__=='__main__':
     # test__findingBackSlashAndInfixOperations__Frac(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__findingBackSlashAndInfixOperations__Log0(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__findingBackSlashAndInfixOperations__Log1(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
-    # test__findingBackSlashAndInfixOperations__tildeVariable(True)
-    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(True)
+    test__findingBackSlashAndInfixOperations__tildeVariable()
+    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
     # test__infixInBackslash__paraboloid(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__sqrtWithPowerCaretRightOtherInfix__hill(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
-    # test__nonInfixBrackets__addImplicitMultiply(True)
-    # test__nonInfixBrackets__addImplicitMultiply0(True)
-    # test__nonInfixBrackets__addImplicitMultiply1(True)
+    test__nonInfixBrackets__addImplicitMultiply()
+    test__nonInfixBrackets__addImplicitMultiply0()
+    test__nonInfixBrackets__addImplicitMultiply1()
     # test__BODMAS__priorityBetweenInfixForBrackets(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__BODMAS__enclosingBracketInBackslashArg(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__BODMAS__enclosingBracketInBackslashArgWithExponent(True)
     # test__BODMAS__enclosingBracketInBackslashArgImplicitZero(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
-    # test__BODMAS__enclosingBracket(True)
+    test__BODMAS__enclosingBracket()
     # test__manyFracCaretEnclosingBrac__partialFrac(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__fracWithLogNoBase__changeLogBaseFormula(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__backslashInfixInBackslash__sqrtInSqrt(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
