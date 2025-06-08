@@ -33,6 +33,8 @@ class EntityType(Enum):
     COMPOSITE_VARIABLE = 'composite_variable' # example V^{Q1}_{BE}, Voltage between B and E of transistor Q1
     MATRIX = 'matrix'
 
+    FROM_CONVERSION = 'from_conversion' # entities added pendant conversion of latexAST to schemeAST
+
 class Latexparser(Parser):
     
     """
@@ -124,6 +126,57 @@ class Latexparser(Parser):
     # 'arccsc', 'csc', 'arcsec', 'sec', 'arccot', 'cot', 'arsinh', 'sinh', 'arcosh', 'cosh', 
     # 'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
     ######
+
+    def getLatexSpecialCases(funcName):
+        LATEX_SPECIAL_CASES = {
+            'sqrt': {
+                '$0':0, #argIdx
+                '$1':1,
+                'resultTemplate':{
+                    ('nroot', ''):[('$0', ''), ('$1', '')],#$0 is OPTIONAL...
+                },
+                'insertToEntityStorage':[]
+            },
+            'ln':{
+                '$0':0, #argIdx
+                'resultTemplate':{
+                    ('log', ''):[('e', ''), ('$0', '')],
+                },
+                'insertToEntityStorage':[]
+            },
+            'log':{
+                '$0':0, #argIdx
+                'resultTemplate':{
+                    ('log', ''):[('10', ''), ('$0', '')],
+                },
+                'insertToEntityStorage':[]
+            },
+            'frac':{
+                '$0':0, #argIdx
+                '$1':1,
+                'resultTemplate':{
+                    ('/', ''):[('$0', ''),('$1', '')],
+                },
+                'insertToEntityStorage':[]
+            },
+        }.update(addTrig())
+        def addTrig():
+            l = {}
+            for trigFuncName in TRIGOFUNCTION:
+                l[trigFuncName] = {
+                '$0':0, #argIdx
+                '$1':1,
+                'resultTemplate':{
+                    ('^', ''):[(trigFuncName, ''), ('$0', '')],
+                    (trigFuncName, ''):[('$1', '')],
+                },
+                'insertToEntityStorage':['^']
+            }
+            return l
+        return LATEX_SPECIAL_CASES.get(funcName)
+
+
+
     def getPriority(self, funcName):
         if funcName == 'frac':
             funcName = '/'
@@ -1467,7 +1520,6 @@ class Latexparser(Parser):
 
 self.entitystorage.tuple_nodeId_argIdx__pNodeId
         """
-
         pNode__list_tuple_argId_cNode = {}
         for (nodeId, argIdx), pNodeId in self.entitystorage.tuple_nodeId_argIdx__pNodeId.items():
             pFuncName = self.entitystorage.nodeId__funcName[pNodeId]
@@ -1484,16 +1536,10 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
                 list_cNode.append(cNode)
             self.latexAST[pNode] = list_cNode
 
-        ######################## TEMPORARY: please do _convert_to_schemeStyledAST
-        self.ast = self.latexAST
-        ########################
 
 
     def _convert_to_schemeStyledAST(self):
         """
-
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<take from   getPriority
-
     ~~~Handle special cases of Latex~~~
     1. (sqrt a) => (nroot 2 a)
     2. (ln a) => (log e a)
@@ -1518,7 +1564,47 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
     \\begin{vmatrix}\\end{vmatrix}
     \\begin{Vmatrix}\\end{Vmatrix}
         """
-        pass
+        self.ast = {}
+        for pNode, existingChildrenList in self.latexAST.items():
+            pFuncName, pNodeId = pNode
+            instructions = getLatexSpecialCases(pFuncName)
+            if instructions:
+                replacement = {}
+                for rNode, rExistingChildrenList in instructions['resultTemplate'].items():
+                    rFuncName, _ = rNode
+                    if rFuncName in instructions['insertToEntityStorage']:
+                        parentNodeId, argIdx = getParentAndArgId(pNodeId) # just to fill up the form
+                        rNodeId = self.entitystorage.insert(
+                            rFuncName, 
+                            self.entitystorage.nodeId__funcStart[pNodeId], 
+                            self.entitystorage.nodeId__funcEnd[pNodeId], 
+                            self.entitystorage.nodeId__entityType[pNodeId], 
+                            parentNodeId=parentNodeId, 
+                            argIdx=argIdx, 
+                            widthStart=self.entitystorage.nodeId__widthStart[pNodeId], 
+                            widthEnd=self.entitystorage.nodeId__widthEnd[pNodeId], 
+                            bracketstorage=None)# stay as None
+                    else:
+                        rNodeId = pNodeId
+                    tExistingChildrenList = []
+                    for argIdx, node in enumerate(rExistingChildrenList):
+                        if node[0] in instructions:
+                            replacementNode = existingChildrenList[instructions[node[0]]] #existing, no need to insert back to entitystorage
+                        else:
+                            #insert node to entityStorage <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                            replacementFuncName = node[0]
+                            replacementNodeId = self.entitystorage.insert(
+                                replacementFuncName,
+                                -1, -1, EntityType.FROM_CONVERSION,
+                                parentNodeId=rNodeId, argIdx=argIdx, widthStart=0, widthEnd=0, bracketstorage=None
+                            )
+                            replacementNode = (replacementFuncName, replacementNodeId)
+                        tExistingChildrenList.append(replacementNode) # the order is according to instructions['resultTemplate'], which has rExistingChildrenList
+                    replacement[(rFuncName, rNodeId)] = tExistingChildrenList
+                self.ast.update(replacement)
+            else:
+                self.ast[pNode] = existingChildren
+
         
     def _get_statistics(self):
         """
@@ -2196,6 +2282,13 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         return list(self.nodeId__funcStart.keys())
 
 
+    def getParentAndArgId(self, nodeId):
+        for (cNodeId, argIdx), pNodeId in self.tuple_nodeId_argIdx__pNodeId.items():
+            if nodeId == cNodeId:
+                return pNodeId, argIdx
+        return None, None
+
+
     def getAllEntityBetween(self, openPos, closePos): 
         """element=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)"""
         allEntities = []
@@ -2643,7 +2736,6 @@ class BracketStorage:
         # print('returning from toTree')
         # import pdb;pdb.set_trace()
         return tuple_startPos_endPos__NAMES__fromBracketAccounting
-
 
 
 
