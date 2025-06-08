@@ -1565,14 +1565,15 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
     \\begin{vmatrix}\\end{vmatrix}
     \\begin{Vmatrix}\\end{Vmatrix}
         """
-        self.ast = {}
+        self.ast, current__replaced = {}, {}
         for pNode, existingChildrenList in self.latexAST.items():
             pFuncName, pNodeId = pNode
             instructions = self.getLatexSpecialCases(pFuncName)
             if instructions:
                 replacement = {}
                 for rNode, rExistingChildrenList in instructions['resultTemplate'].items():
-                    rFuncName, _ = rNode
+                    current__replaced[pNode] = rNode
+                    rFuncName, _ = rNode##these might be children of some other existing unchanged
                     if rFuncName in instructions['insertToEntityStorage']:
                         parentNodeId, argIdx = getParentAndArgId(pNodeId) # just to fill up the form
                         rNodeId = self.entitystorage.insert(
@@ -1592,7 +1593,6 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
                         if node[0] in instructions:
                             replacementNode = existingChildrenList[instructions[node[0]]] #existing, no need to insert back to entitystorage
                         else:
-                            #insert node to entityStorage <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                             replacementFuncName = node[0]
                             replacementNodeId = self.entitystorage.insert(
                                 replacementFuncName,
@@ -1603,8 +1603,15 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
                         tExistingChildrenList.append(replacementNode) # the order is according to instructions['resultTemplate'], which has rExistingChildrenList
                     replacement[(rFuncName, rNodeId)] = tExistingChildrenList
                 self.ast.update(replacement)
-            else:
-                self.ast[pNode] = existingChildrenList
+        
+        for pNode, existingChildrenList in self.latexAST.items():
+            pFuncName, pNodeId = pNode
+            instructions = self.getLatexSpecialCases(pFuncName)
+            if not instructions:
+                newExistingChildrenList = []
+                for cNode in existingChildrenList:
+                    newExistingChildrenList.append(current__replaced.get(cNode, cNode))#the replaced might NOT have happened
+                self.ast[pNode] = newExistingChildrenList
 
         
     def _get_statistics(self):

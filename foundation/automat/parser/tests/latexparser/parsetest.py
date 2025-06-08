@@ -1278,16 +1278,16 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__contiguousLeftOvers__decimalPlaces()
-    test__weirdVariables__variablesWithCurlyBracketsSimple()
-    test__weirdVariables__variablesWithCurlyBracketsWithNums()
-    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets()
-    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex()
-    test__weirdVariables__variablesWithCaret()
-    test__weirdVariables__variablesWithCaretRealExponent()
-    test__weirdVariables__variablesWithCaretMoreComplex()
-    test__weirdVariables__variablesWithCurlyBracketsMinus()
-    # test__weirdVariables__variablesWithCurlyBracketsFrac(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
+    # test__contiguousLeftOvers__decimalPlaces()
+    # test__weirdVariables__variablesWithCurlyBracketsSimple()
+    # test__weirdVariables__variablesWithCurlyBracketsWithNums()
+    # test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets()
+    # test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex()
+    # test__weirdVariables__variablesWithCaret()
+    # test__weirdVariables__variablesWithCaretRealExponent()
+    # test__weirdVariables__variablesWithCaretMoreComplex()
+    # test__weirdVariables__variablesWithCurlyBracketsMinus()
+    test__weirdVariables__variablesWithCurlyBracketsFrac(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
     # test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0(True)
     # test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1(True)
     # test__makeSubject__manyVariablesStandingTogether(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LATEXspecialcase
