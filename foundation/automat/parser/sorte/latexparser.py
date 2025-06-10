@@ -596,10 +596,10 @@ class Latexparser(Parser):
             for rowIdx, row in enumerate(self.equationStr[matrixPropDict["innerStartPos"]:matrixPropDict["innerEndPos"]].split("\\")):
                 for colIdx, cell in enumerate(row.split("&")):
                     print(cell, (rowIdx, colIdx), '********************')
-                    # parser = Latexparser(cell, verbose=self.verbose)#TODO cannot handle single letter E
-                    # parser._parse()
-                    # print(parser.ast)
-                    # #merge ast back to main.... HOW to store this information with (rowIdx, colIdx)? If seperateTree, will be difficult to DFS...
+                    parser = Latexparser(cell, verbose=self.verbose)#TODO cannot handle single letter E
+                    parser._parse()
+                    print(parser.ast)
+                    #merge ast back to main.... HOW to store this information with (rowIdx, colIdx)? If seperateTree, will be difficult to DFS...
                     print('***********************')
         pass
 
@@ -2639,8 +2639,8 @@ class BracketStorage:
         else:
             theDict__sortedPosList = self.closeBraType__sortedPosList
             typeOfBracket = typeOfBracket.value[1] # the close version of typeOfBracket
-
-        return bracketPos in theDict__sortedPosList[typeOfBracket]
+        # import pdb;pdb.set_trace()
+        return bracketPos in theDict__sortedPosList.get(typeOfBracket, [])
 
     def getCorrespondingCloseBraPos(self, openBraPos):
         if openBraPos not in self.openBraPos__bracketId:
