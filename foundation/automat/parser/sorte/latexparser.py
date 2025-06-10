@@ -128,49 +128,63 @@ class Latexparser(Parser):
     ######
 
     def getLatexSpecialCases(self, funcName):
+        """
+        True|False is "whether or not this node is optional to output", 
+
+        resultTemplate:[
+( ((), ), [ ((), ), ((), ), ...]) # top row to match input row ((funcName, nodeId), True|False, templateId)
+
+]
+        """
         def addTrig():
             l = {}
             for trigFuncName in Latexparser.TRIGOFUNCTION:
                 l[trigFuncName] = {
-                '$0':0, #argIdx
-                '$1':1,
-                'resultTemplate':{
-                    ('^', ''):[(trigFuncName, ''), ('$0', '')],
-                    (trigFuncName, ''):[('$1', '')],
-                },
-                'insertToEntityStorage':['^']
-            }
+                    'inputTemplate':( ((trigFuncName, '$0'), False, 0), [ (('$1', '$2'), True, 1), (('$3', '$4'), False, 2)]),
+                    'outputTemplate':[
+                        ( ((trigFuncName, '$0'), False, 0), [ (('$3', '$4'), False, 1)]),
+                        ( (('^', '$5'), True, 2), [ ((trigFuncName, '$0'), False, 0), (('$1', '$2'), False, 3)]) # if parentNode is present, then Are_the_children_optional?
+                    ],
+                    'insertToEntityStorage':['^'],
+                    'rootOfResultTemplate': 2# for parent replacement in childrenList
+                }
             return l
         LATEX_SPECIAL_CASES = {
             'sqrt': {
-                '$0':0, #argIdx
-                '$1':1,
-                'resultTemplate':{
-                    ('nroot', ''):[('$0', ''), ('$1', '')],#$0 is OPTIONAL...
-                },
-                'insertToEntityStorage':[]
+                'inputTemplate':( (('sqrt', '$0'), False, 0), [ (('$1', '$2'), True, 1), (('$3', '$4'), False, 2)]),
+                'outputTemplate':[
+                    ( (('nroot', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
+                ],
+                'insertToEntityStorage':[],
+                'var__defaults':{'$1':'2'},
+                'rootOfResultTemplate': 0# for parent replacement in childrenList
             },
             'ln':{
-                '$0':0, #argIdx
-                'resultTemplate':{
-                    ('log', ''):[('e', ''), ('$0', '')],
-                },
-                'insertToEntityStorage':[]
+                'inputTemplate':( (('ln', '$0'), False, 0), [ (('$3', '$4'), False, 2)]),
+                'outputTemplate':[
+                    ( (('log', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
+                ],
+                'var__defaults':{'$1':'e'},
+                'insertToEntityStorage':[],
+                'rootOfResultTemplate': 0# for parent replacement in childrenList
+
             },
             'log':{
-                '$0':0, #argIdx
-                'resultTemplate':{
-                    ('log', ''):[('10', ''), ('$0', '')],
-                },
-                'insertToEntityStorage':[]
+                'inputTemplate':( (('ln', '$0'), False, 0), [ (('$1', '$2'), True, 2), (('$3', '$4'), False, 3)]),
+                'outputTemplate':[
+                    ( (('log', '$0'), False, 0), [ (('$1', '$2'), True, 2), (('$3', '$4'), False, 3)]),
+                ],
+                'var__defaults':{'$1':'10'},
+                'insertToEntityStorage':[],
+                'rootOfResultTemplate': 0# for parent replacement in childrenList
             },
             'frac':{
-                '$0':0, #argIdx
-                '$1':1,
-                'resultTemplate':{
-                    ('/', ''):[('$0', ''),('$1', '')],
-                },
-                'insertToEntityStorage':[]
+                'inputTemplate':( (('frac', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
+                'outputTemplate':[
+                    ( (('/', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
+                ],
+                'insertToEntityStorage':[],
+                'rootOfResultTemplate': 0# for parent replacement in childrenList
             },
         }
         LATEX_SPECIAL_CASES.update(addTrig())
@@ -206,6 +220,11 @@ class Latexparser(Parser):
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
 
+        '_{C}^{O}{O}': [#[int']
+                {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
+                {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
+            ],
         '_{C}^{C}{C}': [#['sum', 'prod', 'int']
                 {'argId':0, 'preSym':'_', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'^', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
@@ -270,7 +289,8 @@ class Latexparser(Parser):
     '^{O}(C)': ['TRIG'],
 
     '_{C}(C)': ['lim'],
-    '_{C}^{C}{C}': ['sum', 'prod', 'int'],
+    '_{C}^{O}{O}':['int'],
+    '_{C}^{C}{C}': ['sum', 'prod'],
     '_{C}^{O}{C}': ['iint', 'iiint', 'oint', 'oiint'],
     '_{O}(C)': ['log'],
     '_{O}^{O}{C}': ['partial', 'nabla', 'Delta'],
@@ -285,6 +305,8 @@ class Latexparser(Parser):
             return self.BACKSLASH_EXPECTED_INPUTS['^{O}(C)']
         if funcName in ['lim']:
             return self.BACKSLASH_EXPECTED_INPUTS['_{C}{C}']
+        if funcName in ['int']:
+            return self.BACKSLASH_EXPECTED_INPUTS['_{C}^{O}{O}']
         if funcName in ['sum', 'prod', 'int']:
             return self.BACKSLASH_EXPECTED_INPUTS['_{C}^{C}{C}']
         if funcName in ['iint', 'iiint', 'oint', 'oiint']:
@@ -1565,53 +1587,119 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
     \\begin{vmatrix}\\end{vmatrix}
     \\begin{Vmatrix}\\end{Vmatrix}
         """
+
+        def replaceChildWithNewParent(current__replaced, children, parent):
+            newChildren = []
+            for child in children:
+                replacementRoot = current__replaced.get(child, child)#UIOP! # TODO
+                if parent != replacementRoot:
+                    newChildren.append(replacementRoot)
+                else:
+                    newChildren.append(child)
+            return newChildren
+
+        def makeReplacementNode(pFuncName, pNodeId, var__val, instructions):
+            if pFuncName in instructions['insertToEntityStorage']:
+                replacementNodeId = self.entitystorage.insert(
+                    pFuncName, -1, -1, EntityType.FROM_CONVERSION,
+                    parentNodeId=None, #UIOP!
+                    argIdx=None, #UIOP!
+                    widthStart=-1, widthEnd=-1, bracketstorage=None)# stay as None
+                replacementNode = (pFuncName, replacementNodeId)
+            elif pNodeId in var__val:
+                replacementNode = (var__val.get(pFuncName, pFuncName), var__val[pNodeId])
+            elif pFuncName in instructions.get('var__defaults', {}):
+                replacementFuncName = instructions.get('var__defaults', {})[pFuncName]
+                replacementNodeId = self.entitystorage.insert(
+                    replacementFuncName, -1, -1, EntityType.FROM_CONVERSION,
+                    parentNodeId=None, #UIOP!
+                    argIdx=None, #UIOP!
+                    widthStart=-1, widthEnd=-1, bracketstorage=None)# stay as None
+                replacementNode = (replacementFuncName, replacementNodeId)
+            else:# then like the TRIG with exponential, but the user did not give it, and the whole outputRow should be abandoned
+                # import pdb;pdb.set_trace()
+                replacementNode = None
+            return replacementNode
+
         self.ast, current__replaced = {}, {}
-        for pNode, existingChildrenList in self.latexAST.items():
-            pFuncName, pNodeId = pNode
+        for pNode, input_children in self.latexAST.items():
+            # print(pNode, input_children)
+            (pFuncName, pNodeId), var__val = pNode, {}
             instructions = self.getLatexSpecialCases(pFuncName)
             if instructions:
-                replacement = {}
-                for rNode, rExistingChildrenList in instructions['resultTemplate'].items():
-                    current__replaced[pNode] = rNode
-                    rFuncName, _ = rNode##these might be children of some other existing unchanged
-                    if rFuncName in instructions['insertToEntityStorage']:
-                        parentNodeId, argIdx = getParentAndArgId(pNodeId) # just to fill up the form
-                        rNodeId = self.entitystorage.insert(
-                            rFuncName, 
-                            self.entitystorage.nodeId__funcStart[pNodeId], 
-                            self.entitystorage.nodeId__funcEnd[pNodeId], 
-                            self.entitystorage.nodeId__entityType[pNodeId], 
-                            parentNodeId=parentNodeId, 
-                            argIdx=argIdx, 
-                            widthStart=self.entitystorage.nodeId__widthStart[pNodeId], 
-                            widthEnd=self.entitystorage.nodeId__widthEnd[pNodeId], 
-                            bracketstorage=None)# stay as None
-                    else:
-                        rNodeId = pNodeId
-                    tExistingChildrenList = []
-                    for argIdx, node in enumerate(rExistingChildrenList):
-                        if node[0] in instructions:
-                            replacementNode = existingChildrenList[instructions[node[0]]] #existing, no need to insert back to entitystorage
-                        else:
-                            replacementFuncName = node[0]
-                            replacementNodeId = self.entitystorage.insert(
-                                replacementFuncName,
-                                -1, -1, EntityType.FROM_CONVERSION,
-                                parentNodeId=rNodeId, argIdx=argIdx, widthStart=0, widthEnd=0, bracketstorage=None
-                            )
-                            replacementNode = (replacementFuncName, replacementNodeId)
-                        tExistingChildrenList.append(replacementNode) # the order is according to instructions['resultTemplate'], which has rExistingChildrenList
-                    replacement[(rFuncName, rNodeId)] = tExistingChildrenList
+                parentTemplate, childTemplates = instructions['inputTemplate'][0], instructions['inputTemplate'][1]
+                # print(parentTemplate, childTemplates)
+                #match input_parent with inputTemplate_parent
+                parentNodeIdVar = parentTemplate[0][1]
+                var__val[parentNodeIdVar] = pNode[1]
+                #START match input_children with inputTemplate_children
+                # import pdb;pdb.set_trace()
+                if len(input_children) > len(childTemplates):
+                    raise Exception()
+
+                #t[1][1] is optional_or_not, only for funcName, WE_ASSUME if funcName is missing then nodeId is missing
+                templateIndicesOfCompulsory = sorted(list(map(lambda t: t[0], filter(lambda t: not t[1][1], enumerate(childTemplates)))))
+                templateIndicesOfOptional = sorted(list(map(lambda t: t[0], filter(lambda t: t[1][1], enumerate(childTemplates)))))
+                
+                if len(input_children) < len(templateIndicesOfCompulsory):
+                    #look for defaults
+                    if len(instructions.get('var__defaults', {})) != (len(templateIndicesOfCompulsory) - len(input_children)):
+                        raise Exception('NOT ENOUGH DEFAULT VALUES')
+                    var__val.update(instructions['var__defaults'])
+                    #remove defaults from templateIndicesOfCompulsory, WE_ASSUME only funcName will appear in var__defaults
+                    for idx, template in enumerate(childTemplates):
+                        if template[0][0] in var__val:
+                            templateIndicesOfCompulsory.remove(idx)
+                    #
+                #we try to match childrens in the order of the input and template
+                optionalIndicesToUse=templateIndicesOfOptional[:len(input_children)-len(templateIndicesOfCompulsory)]
+                templateIndicesToUse=sorted(templateIndicesOfCompulsory+optionalIndicesToUse)
+                for input_child, templateIdx in zip(input_children, templateIndicesToUse):
+                    # import pdb;pdb.set_trace()
+                    var__val[childTemplates[templateIdx][0][0]] = input_child[0]#[0] for funcName
+                    if '$' in childTemplates[templateIdx][0][1]:# if its a var
+                        var__val[childTemplates[templateIdx][0][1]] = input_child[1]
+                #END match input_children with inputTemplate_children
+
+                #heran, generate outputTemplate, darin we need to generate indices for instructions['insertToEntityStorage']
+                replacement, bad = {}, False
+                for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
+                    #parent
+                    pReplacementNode = makeReplacementNode(outputTemplateParent[0][0], outputTemplateParent[0][1], var__val, instructions)
+                    #
+                    if outputTemplateParent[2] == instructions['rootOfResultTemplate']:
+                        current__replaced[pNode] = pReplacementNode
+                    # print(current__replaced)
+                    #
+                    #children
+                    replacementChildren = []
+                    for outputTemplateChild in outputTemplateChildren:
+                        cReplacementNode = makeReplacementNode(outputTemplateChild[0][0], outputTemplateChild[0][1], var__val, instructions)
+                        if cReplacementNode is None:# then like the TRIG with exponential, but the user did not give it, and the whole outputRow should be abandoned
+                            self.entitystorage.removeById(pReplacementNode[1])
+                            del current__replaced[pNode]
+                            bad = True
+                            continue
+                        replacementChildren.append(cReplacementNode)
+                        
+                    #
+                    if not bad:
+                        replacement[pReplacementNode] = replacementChildren
+
+                #heran, we need to replace parent in children, with instructions['rootOfResultTemplate']
+                newReplacement = {}
+                for parent, children in replacement.items():
+                    newReplacement[parent] = replaceChildWithNewParent(current__replaced, children, parent)
+                replacement = newReplacement
+
+
                 self.ast.update(replacement)
-        
+        #put in the rest, while replace parent in children, with instructions['rootOfResultTemplate']
         for pNode, existingChildrenList in self.latexAST.items():
             pFuncName, pNodeId = pNode
             instructions = self.getLatexSpecialCases(pFuncName)
             if not instructions:
-                newExistingChildrenList = []
-                for cNode in existingChildrenList:
-                    newExistingChildrenList.append(current__replaced.get(cNode, cNode))#the replaced might NOT have happened
-                self.ast[pNode] = newExistingChildrenList
+                self.ast[pNode] = replaceChildWithNewParent(current__replaced, existingChildrenList, pNode)
 
         
     def _get_statistics(self):
@@ -2075,11 +2163,9 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         for funcStart in entitiesFuncStartToRemove:
             self.remove(funcStart)
 
+    def removeById(self, nodeId):#TODO REFACTOR WHOLE CODE to use this 'remove', instead
+        funcStart = self.nodeId__funcStart.pop(nodeId)
 
-    def remove(self, funcStart):
-        """This is used by _find_backslash, TODO unit_test
-        """
-        nodeId = self.funcStart__nodeId[funcStart]
         self.funcStart__nodeId.pop(funcStart, None)
 
         entityType = self.nodeId__entityType.pop(nodeId)
@@ -2096,7 +2182,7 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
         #TODO removal of p|c relationship<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< and all the argIdx all children,so we loop through
         new___tuple_nodeId_argIdx__pNodeId = {}
         for (nodeId0, argIdx), pNodeId in self.tuple_nodeId_argIdx__pNodeId.items():
-            if nodeId0 == nodeId or pNodeid == nodeId:
+            if nodeId0 == nodeId or pNodeId == nodeId:
                 continue
             new___tuple_nodeId_argIdx__pNodeId[(nodeId0, argIdx)] = pNodeId
         self.tuple_nodeId_argIdx__pNodeId = new___tuple_nodeId_argIdx__pNodeId 
@@ -2123,6 +2209,13 @@ self.tuple_nodeId_cArgIdx__tuple_openBra_openBraPos_closeBra_closeBraPos = {} #c
 
         if widthEnd is not None:
             self.list_tuple_widthEnd_nodeId.remove((widthEnd, nodeId))
+
+
+    def remove(self, funcStart):
+        """This is used by _find_backslash, TODO unit_test
+        """
+        nodeId = self.funcStart__nodeId[funcStart]
+        self.removeById(nodeId)
 
 
     def updateWidth(self, nodeId, widthStart, widthEnd): ##########<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<clean up the updatewidths, its confusing
