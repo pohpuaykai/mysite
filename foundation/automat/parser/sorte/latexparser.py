@@ -334,6 +334,7 @@ class Latexparser(Parser):
     EXCLUDE_BACKSLASH_INFIX = ['to'] #because its an infix
     
     def __init__(self, equationStr=None, ast=None, verbose=False):
+        self.verbose=verbose
         self.parserName = 'latex'#VAR:inheritance
 
         self.equationStr = equationStr #processed rawEquationStr
@@ -378,15 +379,16 @@ class Latexparser(Parser):
             endTagStartPos__endTagEndPos[endTagStartPos] = endTagEndPos
             list_tuple_pos_tagType.append((endTagStartPos, False, endTagName, endTagEndPos)) # False is close
 
+        # import pdb;pdb.set_trace()
 
         tagName__openPosStack = {}
-        for pos, isOpen, tagName, keepPos in sorted(list_tuple_pos_tagType, key=lambda tup: tup[0]): # if pos touch, then sort is bad
+        for innerPos, isOpen, tagName, keepPos in sorted(list_tuple_pos_tagType, key=lambda tup: tup[0]): # if pos touch, then sort is bad
             openPosStack = tagName__openPosStack.get(tagName, [])
             if isOpen:
-                openPosStack.append(keepPos)
+                openPosStack.append((keepPos, innerPos))
             else:
                 #found a matchingClose at pos
-                openPos = openPosStack.pop()
+                openPos, openInnerPos = openPosStack.pop()
                 nodeId = self.entitystorage.insert(tagName, openPos, keepPos, EntityType.MATRIX, None, None, openPos, keepPos)
                 self.matrices_pos_type.append(
                         {
@@ -397,6 +399,8 @@ class Latexparser(Parser):
                             'funcEnd':keepPos,
                             'widthStart':openPos,
                             'widthEnd':keepPos,
+                            'innerStartPos':openInnerPos,#only for matrices
+                            'innerEndPos':innerPos,#only for matrices
                             'args':[]
                         }
                 )
@@ -586,14 +590,29 @@ class Latexparser(Parser):
             self.mabracketstorage.insertBracket(self.mabracketstorageDefaultOpen, openTagPos, self.mabracketstorageDefaultClose, closeTagPos)
 
 
+    def _processEachElementOfMatrix(self):#This can be done in parallel with the main_process<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+        # print(self.matrices_pos_type)
+        for matrixPropDict in self.matrices_pos_type:
+            for rowIdx, row in enumerate(self.equationStr[matrixPropDict["innerStartPos"]:matrixPropDict["innerEndPos"]].split("\\")):
+                for colIdx, cell in enumerate(row.split("&")):
+                    print(cell, (rowIdx, colIdx), '********************')
+                    # parser = Latexparser(cell, verbose=self.verbose)#TODO cannot handle single letter E
+                    # parser._parse()
+                    # print(parser.ast)
+                    # #merge ast back to main.... HOW to store this information with (rowIdx, colIdx)? If seperateTree, will be difficult to DFS...
+                    print('***********************')
+        pass
+
     def isPosInMatrixTag(self, pos):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to EntityStorage TODO 
 
         """
         if there is matrix_tag enclosing pos, then pos is in a matrix_tag
 
+        the first exist is because the first \\ is ignore... TODO might be a off-by-one
         """
 
-        return len(list(self.mabracketstorage.getAllEnclosingBraOfPos(pos, self.mabracketstorageDefault))) > 0
+        return self.mabracketstorage.exists(pos, BracketType.ROUND, True) or\
+        len(list(self.mabracketstorage.getAllEnclosingBraOfPos(pos, self.mabracketstorageDefault))) > 0
 
 
     def _find_infix(self):
@@ -754,6 +773,14 @@ class Latexparser(Parser):
         import re
         list_backslashReResult = list(map(lambda m: (m.start(), m.end(), m.group(1)), re.finditer(r"\\([a-zA-Z]+)", self.equationStr)))
         for funcStart, funcEnd, funcName in list_backslashReResult:
+            # print(funcStart, funcEnd, funcName);import pdb;pdb.set_trace()
+            #process matrix
+            if self.mabracketstorage.exists(funcStart, BracketType.ROUND, True) or \
+                self.isPosInMatrixTag(funcEnd) or \
+                self.mabracketstorage.exists(funcStart, BracketType.ROUND, False):
+                # print(funcStart, funcEnd, funcName, 'skip');import pdb;pdb.set_trace()
+                continue
+            #
             if funcName in self.EXCLUDE_BACKSLASH_INFIX:
                 continue
             foundType = 'backslash_function'
@@ -922,9 +949,12 @@ class Latexparser(Parser):
                 continue # we skip these
             leftOverPosList.append(pos)
 
+        # import pdb;pdb.set_trace()
+
         accumulator, accumulatorStartPos, accumulatorEndPos, accumulatorType, prevLeftOverPos= None, None, None, None, None
         for leftOverPos in leftOverPosList:
             leftOverChar = self.equationStr[leftOverPos]
+            # print(leftOverChar)
             if accumulatorType is None:
                 accumulator = leftOverChar
                 accumulatorStartPos = leftOverPos
@@ -1718,6 +1748,7 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         #TODO Pool multiprocessing with method priorities (Chodai!) -- dependency ha chain desu yo, sou shitara, motto hayaku arimasu ka? import ast; find variable_dependency_network between methods
         
         self._find_matrices()
+        self._processEachElementOfMatrix() # <<<<<<<<<<<<<<<<<< this can be processed in parallel with the main_thread......
         self._find_infix()
         self._find_brackets()
         self._find_backslash()
