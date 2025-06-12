@@ -15,6 +15,8 @@ class Manipulate:
     1. Equation
 
 
+    https://en.wikipedia.org/wiki/Green%27s_identities<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+
     """
 
     _PATTERN_FILENAMES__CLASSNAMES = {}

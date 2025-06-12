@@ -13,8 +13,9 @@ def test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(verbose=False):
     ('-', 1):[('1', 2), ('+', 3)],
     ('+', 3):[('1', 4), ('1', 5)]
     }
+    rootOfTree = ('=', 0)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '1-(1+1)=-1'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -26,12 +27,13 @@ def test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(verbose=False):
 def test__contiguousLeftOvers__decimalPlaces(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('+', 5): [('-', 3), ('1.0', 6)],
-    ('-', 3): [('0', 2), ('0.5', 4)],
-    ('=', 0): [('+', 5), ('0.5', 1)]}
+    ast = {
+    ('+', 1): [('-', 0), ('1.0', 4)],
+    ('-', 0): [('0', 6), ('0.5', 3)],
+    ('=', 2): [('+', 1), ('0.5', 5)]}
+    rootOfTree = ('=', 2)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '-0.5+1.0=0.5'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -43,16 +45,17 @@ def test__contiguousLeftOvers__decimalPlaces(verbose=False):
 def test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 2): [('3', 1), ('^', 4)],
-    ('*', 6): [('*', 2), ('^', 8)],
-    ('*', 11): [('3', 10), ('^', 13)],
-    ('=', 0): [('*', 11), ('*', 6)],
-    ('^', 4): [('x', 3), ('2', 5)],
-    ('^', 8): [('x', 7), ('7', 9)],
-    ('^', 13): [('x', 12), ('9', 14)]}
+    ast = {
+    ('*', 12): [('3', 4), ('^', 0)],
+    ('*', 13): [('3', 7), ('^', 1)],
+    ('*', 14): [('*', 13), ('^', 2)],
+    ('=', 3): [('*', 12), ('*', 14)],
+    ('^', 0): [('x', 5), ('9', 6)],
+    ('^', 1): [('x', 8), ('2', 9)],
+    ('^', 2): [('x', 10), ('7', 11)]}
+    rootOfTree = ('=', 3)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '3x^9=3x^2x^7'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -64,16 +67,18 @@ def test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(ve
 def test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 3): [('19', 2), ('y', 4)],
-    ('*', 11): [('4', 10), ('^', 13)],
-    ('+', 5): [('*', 3), ('^', 7)],
-    ('+', 9): [('+', 5), ('*', 11)],
-    ('=', 0): [('^', 15), ('F', 1)],
-    ('^', 7): [('z', 6), ('4', 8)],
-    ('^', 13): [('w', 12), ('12', 14)],
-    ('^', 15): [('+', 9), ('30', 16)]}
+    ast = {
+    ('*', 15): [('19', 6), ('y', 7)],
+    ('*', 16): [('4', 10), ('^', 1)],
+    ('+', 3): [('*', 15), ('^', 0)],
+    ('+', 4): [('+', 3), ('*', 16)],
+    ('=', 5): [('^', 2), ('F', 14)],
+    ('^', 0): [('z', 8), ('4', 9)],
+    ('^', 1): [('w', 11), ('12', 12)],
+    ('^', 2): [('+', 4), ('30', 13)]}
+    rootOfTree = ('=', 5)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(19y+z^4+4w^{12})^{30}=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -90,8 +95,9 @@ def test__schemeToLatex__variablesWithCurlyBrackets(verbose=False):#TODO add to 
     ('/', 8): [('V_{BE}', 9), ('V_T', 10)],
     ('=', 0): [('I_E', 1), ('*', 2)],
     ('^', 5): [('e', 7), ('/', 8)]}
+    rootOfTree = ('=', 0)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'I_E =I_{ES} (e^{\\frac{V_{BE} }{V_T}}-1)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -102,18 +108,19 @@ def test__schemeToLatex__variablesWithCurlyBrackets(verbose=False):#TODO add to 
 def test__findingBackSlashAndInfixOperations__Trig0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 4): [('2', 3), ('sin', 5)],
-    ('*', 6): [('*', 4), ('cos', 7)],
-    ('*', 14): [('2', 13), ('x_0', 15)],
-    ('-', 2): [('0', 1), ('*', 6)],
-    ('-', 9): [('0', 8), ('sin', 10)],
-    ('=', 0): [('-', 9), ('-', 2)],
-    ('cos', 7): [('x_0', 12)],
-    ('sin', 5): [('x_0', 11)],
-    ('sin', 10): [('*', 14)]}
+    ast = {
+    ('*', 16): [('2', 6), ('x_0', 7)],
+    ('*', 17): [('2', 9), ('sin', 3)],
+    ('*', 18): [('*', 17), ('cos', 4)],
+    ('-', 0): [('0', 14), ('sin', 2)],
+    ('-', 1): [('0', 15), ('*', 18)],
+    ('=', 5): [('-', 0), ('-', 1)],
+    ('cos', 4): [('x_0', 12)],
+    ('sin', 2): [('*', 16)],
+    ('sin', 3): [('x_0', 10)]}
+    rootOfTree = ('=', 5)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '-\\sin(2x_0)=-2\\sin(x_0)\\cos(x_0)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -124,15 +131,16 @@ def test__findingBackSlashAndInfixOperations__Trig0(verbose=False):
 def test__findingBackSlashAndInfixOperations__Trig1(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('+', 3): [('^', 10), ('^', 9)],
-    ('=', 0): [('+', 3), ('1', 1)],
-    ('^', 9): [('cos', 4), ('2', 7)],
-    ('^', 10): [('sin', 2), ('2', 6)],
-    ('cos', 4): [('x', 8)],
-    ('sin', 2): [('x', 5)]}
+    ast = {
+    ('+', 2): [('^', 11), ('^', 12)],
+    ('=', 5): [('+', 2), ('1', 10)],
+    ('^', 11): [('sin', 3), ('2', 6)],
+    ('^', 12): [('cos', 4), ('2', 8)],
+    ('cos', 4): [('x', 9)],
+    ('sin', 3): [('x', 7)]}
+    rootOfTree = ('=', 5)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\sin^2(x)+\\cos^2(x)=1'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -143,15 +151,16 @@ def test__findingBackSlashAndInfixOperations__Trig1(verbose=False):
 def test__findingBackSlashAndInfixOperations__Trig2(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('+', 3): [('^', 10), ('^', 9)],
-    ('=', 0): [('+', 3), ('1', 1)],
-    ('^', 9): [('cos', 4), ('2', 5)],
-    ('^', 10): [('sin', 2), ('2', 7)],
-    ('cos', 4): [('x', 6)],
-    ('sin', 2): [('x', 8)]}
+    ast = {
+    ('+', 2): [('^', 11), ('^', 12)],
+    ('=', 5): [('+', 2), ('1', 10)],
+    ('^', 11): [('sin', 3), ('2', 6)],
+    ('^', 12): [('cos', 4), ('2', 8)],
+    ('cos', 4): [('x', 9)],
+    ('sin', 3): [('x', 7)]}
+    rootOfTree = ('=', 5)
 
-    parser = Latexparser(ast=ast, verbose=verbose)
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\sin^2(x)+\\cos^2(x)=1'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -163,8 +172,10 @@ def test__findingBackSlashAndInfixOperations__Trig2(verbose=False):
 def test__findingBackSlashAndInfixOperations__Sqrt0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {('=', 0): [('nroot', 1), ('2', 2)], ('nroot', 1): [(2, 4), ('4', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {('=', 1): [('nroot', 0), ('2', 3)], ('nroot', 0): [('2', 4), ('4', 2)]}
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\sqrt{4}=2'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -175,8 +186,10 @@ def test__findingBackSlashAndInfixOperations__Sqrt0(verbose=False):
 def test__findingBackSlashAndInfixOperations__Sqrt1(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {('=', 0): [('nroot', 2), ('2', 1)], ('nroot', 2): [('3', 3), ('9', 4)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {('=', 1): [('nroot', 0), ('2', 4)], ('nroot', 0): [('3', 2), ('8', 3)]}
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\sqrt[3]{9}=2'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -188,8 +201,10 @@ def test__findingBackSlashAndInfixOperations__Sqrt1(verbose=False):
 def test__findingBackSlashAndInfixOperations__Ln(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {('=', 0): [('log', 2), ('1', 1)], ('log', 2): [('e', 4), ('e', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {('=', 1): [('log', 0), ('1', 3)], ('log', 0): [('e', 4), ('e', 2)]}
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\ln(e)=1'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -201,10 +216,13 @@ def test__findingBackSlashAndInfixOperations__Ln(verbose=False):
 def test__findingBackSlashAndInfixOperations__Frac(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('/', 1): [('1000', 4), ('2000', 3)],
-    ('/', 2): [('12', 6), ('24', 5)],
-    ('=', 0): [('/', 2), ('/', 1)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('/', 0): [('12', 3), ('24', 4)],
+    ('/', 1): [('1000', 5), ('2000', 6)],
+    ('=', 2): [('/', 0), ('/', 1)]}
+    rootOfTree = ('=', 2)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{12}{24}=\\frac{1000}{2000}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -215,9 +233,12 @@ def test__findingBackSlashAndInfixOperations__Frac(verbose=False):
 def test__findingBackSlashAndInfixOperations__Log0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('=', 0): [('log', 2), ('12', 1)],
-    ('log', 2): [('12', 4), ('8916100448256', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('=', 1): [('log', 0), ('12', 4)],
+    ('log', 0): [('12', 2), ('8916100448256', 3)]}
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\log_{12}(8916100448256)=12'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -228,8 +249,10 @@ def test__findingBackSlashAndInfixOperations__Log0(verbose=False):
 def test__findingBackSlashAndInfixOperations__Log1(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {('=', 0): [('log', 1), ('2', 2)], ('log', 1): [(10, 4), ('100', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {('=', 1): [('log', 0), ('2', 3)], ('log', 0): [('10', 4), ('100', 2)]}
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\log(100)=2'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -240,8 +263,10 @@ def test__findingBackSlashAndInfixOperations__Log1(verbose=False):
 def test__findingBackSlashAndInfixOperations__tildeVariable(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {('=', 0): [('tilde', 1), ('2', 2)], ('tilde', 1): [('x', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {('=', 1): [('tilde', 0), ('2', 3)], ('tilde', 0): [('x', 2)]}
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\tilde{x}=2'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -252,12 +277,15 @@ def test__findingBackSlashAndInfixOperations__tildeVariable(verbose=False):
 def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 2): [('widehat', 1), ('Psi', 3)],
-    ('*', 5): [('widehat', 4), ('Psi', 6)],
-    ('=', 0): [('*', 5), ('*', 2)],
-    ('widehat', 1): [('E', 7)],
-    ('widehat', 4): [('H', 8)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 7): [('widehat', 0), ('Psi', 1)],
+    ('*', 8): [('widehat', 2), ('Psi', 3)],
+    ('=', 4): [('*', 7), ('*', 8)],
+    ('widehat', 0): [('H', 5)],
+    ('widehat', 2): [('E', 6)]}
+    rootOfTree = ('=', 4)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\widehat{H}\\Psi=\\widehat{E}\\Psi'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -268,13 +296,15 @@ def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=Fa
 def test__infixInBackslash__paraboloid(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('+', 6): [('^', 4), ('^', 8)],
-    ('=', 0): [('z', 2), ('nroot', 1)],
-    ('^', 4): [('x', 3), ('2', 5)],
-    ('^', 8): [('y', 7), ('2', 9)],
-    ('nroot', 1): [('2', 10), ('+', 6)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('+', 2): [('^', 0), ('^', 1)],
+    ('=', 4): [('z', 5), ('nroot', 3)],
+    ('^', 0): [('x', 6), ('2', 7)],
+    ('^', 1): [('y', 8), ('2', 9)],
+    ('nroot', 3): [('2', 10), ('+', 2)]}
+    rootOfTree = ('=', 4)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'z=\\sqrt{x^2+y^2}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -285,13 +315,16 @@ def test__infixInBackslash__paraboloid(verbose=False):
 def test__sqrtWithPowerCaretRightOtherInfix__hill(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('+', 8): [('^', 6), ('^', 10)],
-    ('-', 2): [('0', 1), ('nroot', 3)],
-    ('=', 0): [('z', 4), ('-', 2)],
-    ('^', 6): [('x', 5), ('2', 7)],
-    ('^', 10): [('y', 9), ('2', 11)],
-    ('nroot', 3): [('2', 12), ('+', 8)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('+', 3): [('^', 0), ('^', 1)],
+    ('-', 2): [('0', 12), ('nroot', 4)],
+    ('=', 5): [('z', 6), ('-', 2)],
+    ('^', 0): [('x', 8), ('2', 9)],
+    ('^', 1): [('y', 10), ('2', 11)],
+    ('nroot', 4): [('2', 7), ('+', 3)]}
+    rootOfTree = ('=', 5)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'z=-\\sqrt{x^2+y^2}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -302,16 +335,18 @@ def test__sqrtWithPowerCaretRightOtherInfix__hill(verbose=False):
 def test__nonInfixBrackets__addImplicitMultiply(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 9): [('+', 3), ('+', 15)],
-    ('+', 3): [('1', 2), ('+', 5)],
-    ('+', 5): [('1', 4), ('+', 7)],
-    ('+', 7): [('1', 6), ('1', 8)],
-    ('+', 11): [('1', 10), ('1', 12)],
-    ('+', 13): [('+', 11), ('1', 14)],
-    ('+', 15): [('+', 13), ('1', 16)],
-    ('=', 0): [('*', 9), ('16', 1)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 16): [('+', 0), ('+', 5)],
+    ('+', 0): [('1', 7), ('+', 1)],
+    ('+', 1): [('1', 8), ('+', 2)],
+    ('+', 2): [('1', 9), ('1', 10)],
+    ('+', 3): [('1', 11), ('1', 12)],
+    ('+', 4): [('+', 3), ('1', 13)],
+    ('+', 5): [('+', 4), ('1', 14)],
+    ('=', 6): [('*', 16), ('16', 15)]}
+    rootOfTree = ('=', 6)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(1+1+1+1)(1+1+1+1)=16'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -322,15 +357,17 @@ def test__nonInfixBrackets__addImplicitMultiply(verbose=False):
 def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 6): [('+', 4), ('+', 8)],
-    ('+', 2): [('1', 1), ('*', 6)],
-    ('+', 4): [('1', 3), ('1', 5)],
-    ('+', 8): [('1', 7), ('1', 9)],
-    ('+', 10): [('+', 2), ('1', 11)],
-    ('+', 12): [('+', 10), ('1', 13)],
-    ('=', 0): [('+', 12), ('7', 14)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 14): [('+', 1), ('+', 2)],
+    ('+', 0): [('1', 6), ('*', 14)],
+    ('+', 1): [('1', 7), ('1', 8)],
+    ('+', 2): [('1', 9), ('1', 10)],
+    ('+', 3): [('+', 0), ('1', 11)],
+    ('+', 4): [('+', 3), ('1', 12)],
+    ('=', 5): [('+', 4), ('7', 13)]}
+    rootOfTree = ('=', 5)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '1+(1+1)(1+1)+1+1=7'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -341,17 +378,20 @@ def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
 def test__nonInfixBrackets__addImplicitMultiply1(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 9): [('+', 3), ('+', 15)],
-    ('+', 3): [('1', 2), ('+', 5)],
-    ('+', 5): [('1', 4), ('+', 7)],
-    ('+', 7): [('1', 6), ('1', 8)],
-    ('+', 11): [('1', 10), ('1', 12)],
-    ('+', 13): [('+', 11), ('1', 14)],
-    ('+', 15): [('+', 13), ('1', 16)],
-    ('+', 17): [('*', 9), ('1', 18)],
-    ('+', 19): [('+', 17), ('1', 20)],
-    ('=', 0): [('+', 19), ('18', 1)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 20): [('+', 0), ('+', 5)],
+    ('+', 0): [('1', 9), ('+', 1)],
+    ('+', 1): [('1', 10), ('+', 2)],
+    ('+', 2): [('1', 11), ('1', 12)],
+    ('+', 3): [('1', 13), ('1', 14)],
+    ('+', 4): [('+', 3), ('1', 15)],
+    ('+', 5): [('+', 4), ('1', 16)],
+    ('+', 6): [('*', 20), ('1', 17)],
+    ('+', 7): [('+', 6), ('1', 18)],
+    ('=', 8): [('+', 7), ('18', 19)]}
+    rootOfTree = ('=', 8)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(1+1+1+1)(1+1+1+1)+1+1=18'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -362,13 +402,15 @@ def test__nonInfixBrackets__addImplicitMultiply1(verbose=False):
 def test__BODMAS__priorityBetweenInfixForBrackets(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 6): [('-', 4), ('+', 8)],
-    ('+', 8): [('x', 7), ('1', 9)],
-    ('-', 4): [('x', 3), ('1', 5)],
-    ('/', 2): [('2', 10), ('*', 6)],
-    ('=', 0): [('/', 2), ('c', 1)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 10): [('-', 0), ('+', 1)],
+    ('+', 1): [('x', 7), ('1', 8)],
+    ('-', 0): [('x', 5), ('1', 6)],
+    ('/', 2): [('2', 4), ('*', 10)],
+    ('=', 3): [('/', 2), ('c', 9)]}
+    rootOfTree = ('=', 3)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{2}{(x-1)(x+1)}=c'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -379,17 +421,20 @@ def test__BODMAS__priorityBetweenInfixForBrackets(verbose=False):
 def test__BODMAS__enclosingBracketInBackslashArg(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 8): [('-', 6), ('+', 10)],
-    ('+', 10): [('x', 9), ('1', 11)],
-    ('+', 19): [('x', 18), ('1', 20)],
-    ('-', 3): [('/', 2), ('/', 4)],
-    ('-', 6): [('x', 5), ('1', 7)],
-    ('-', 15): [('x', 14), ('1', 16)],
-    ('/', 1): [('2', 12), ('*', 8)],
-    ('/', 2): [('1', 13), ('-', 15)],
-    ('/', 4): [('1', 17), ('+', 19)],
-    ('=', 0): [('/', 1), ('-', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 20): [('-', 0), ('+', 3)],
+    ('+', 3): [('x', 12), ('1', 13)],
+    ('+', 4): [('x', 18), ('1', 19)],
+    ('-', 0): [('x', 10), ('1', 11)],
+    ('-', 1): [('x', 15), ('1', 16)],
+    ('-', 2): [('/', 6), ('/', 7)],
+    ('/', 5): [('2', 9), ('*', 20)],
+    ('/', 6): [('1', 14), ('-', 1)],
+    ('/', 7): [('1', 17), ('+', 4)],
+    ('=', 8): [('/', 5), ('-', 2)]}
+    rootOfTree = ('=', 8)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{2}{(x-1)(x+1)}=\\frac{1}{x-1}-\\frac{1}{x+1}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -400,11 +445,14 @@ def test__BODMAS__enclosingBracketInBackslashArg(verbose=False):
 def test__BODMAS__enclosingBracketInBackslashArgWithExponent(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('-', 4): [('x', 3), ('3', 5)],
-    ('=', 0): [('c', 2), ('sin', 1)],
-    ('^', 6): [('-', 4), ('2', 7)],
-    ('sin', 1): [('^', 6)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('-', 1): [('x', 5), ('3', 6)],
+    ('=', 3): [('c', 4), ('sin', 2)],
+    ('^', 0): [('-', 1), ('2', 7)],
+    ('sin', 2): [('^', 0)]}
+    rootOfTree = ('=', 3)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'c=\\sin((x-3)^2)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -415,18 +463,21 @@ def test__BODMAS__enclosingBracketInBackslashArgWithExponent(verbose=False):
 def test__BODMAS__enclosingBracketInBackslashArgImplicitZero(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 8): [('-', 6), ('+', 10)],
-    ('+', 3): [('/', 2), ('/', 4)],
-    ('+', 10): [('x', 9), ('1', 11)],
-    ('+', 21): [('x', 20), ('1', 22)],
-    ('-', 6): [('x', 5), ('1', 7)],
-    ('-', 15): [('0', 14), ('1', 16)],
-    ('-', 18): [('x', 17), ('1', 19)],
-    ('/', 1): [('2', 12), ('*', 8)],
-    ('/', 2): [('1', 13), ('-', 18)],
-    ('/', 4): [('-', 15), ('+', 21)],
-    ('=', 0): [('/', 1), ('+', 3)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 22): [('-', 0), ('+', 3)],
+    ('+', 3): [('x', 13), ('1', 14)],
+    ('+', 4): [('/', 7), ('/', 8)],
+    ('+', 5): [('x', 19), ('1', 20)],
+    ('-', 0): [('x', 11), ('1', 12)],
+    ('-', 1): [('x', 16), ('1', 17)],
+    ('-', 2): [('0', 21), ('1', 18)],
+    ('/', 6): [('2', 10), ('*', 22)],
+    ('/', 7): [('1', 15), ('-', 1)],
+    ('/', 8): [('-', 2), ('+', 5)],
+    ('=', 9): [('/', 6), ('+', 4)]}
+    rootOfTree = ('=', 9)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{2}{(x-1)(x+1)}=\\frac{1}{x-1}+\\frac{-1}{x+1}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -437,14 +488,17 @@ def test__BODMAS__enclosingBracketInBackslashArgImplicitZero(verbose=False):
 def test__BODMAS__enclosingBracket(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 6): [('6', 5), ('x', 7)],
-    ('+', 8): [('-', 4), ('9', 9)],
-    ('-', 4): [('^', 2), ('*', 6)],
-    ('-', 11): [('x', 10), ('3', 12)],
-    ('=', 0): [('+', 8), ('^', 13)],
-    ('^', 2): [('x', 1), ('2', 3)],
-    ('^', 13): [('-', 11), ('2', 14)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 14): [('6', 8), ('x', 9)],
+    ('+', 4): [('-', 2), ('9', 10)],
+    ('-', 2): [('^', 0), ('*', 14)],
+    ('-', 3): [('x', 11), ('3', 12)],
+    ('=', 5): [('+', 4), ('^', 1)],
+    ('^', 0): [('x', 6), ('2', 7)],
+    ('^', 1): [('-', 3), ('2', 13)]}
+    rootOfTree = ('=', 5)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'x^2-6x+9=(x-3)^2'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -455,24 +509,27 @@ def test__BODMAS__enclosingBracket(verbose=False):
 def test__manyFracCaretEnclosingBrac__partialFrac(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 13): [('-', 11), ('^', 17)],
-    ('+', 3): [('/', 2), ('/', 4)],
-    ('+', 5): [('+', 3), ('/', 6)],
-    ('-', 11): [('x', 10), ('2', 12)],
-    ('-', 15): [('x', 14), ('3', 16)],
-    ('-', 21): [('x', 20), ('2', 22)],
-    ('-', 24): [('x', 23), ('3', 25)],
-    ('-', 29): [('0', 28), ('3', 30)],
-    ('-', 33): [('x', 32), ('3', 34)],
-    ('/', 1): [('^', 8), ('*', 13)],
-    ('/', 2): [('4', 19), ('-', 21)],
-    ('/', 4): [('-', 29), ('-', 33)],
-    ('/', 6): [('9', 31), ('^', 26)],
-    ('=', 0): [('/', 1), ('+', 5)],
-    ('^', 8): [('x', 7), ('2', 9)],
-    ('^', 17): [('-', 15), ('2', 18)],
-    ('^', 26): [('-', 24), ('2', 27)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 34): [('-', 3), ('^', 1)],
+    ('+', 9): [('/', 12), ('/', 13)],
+    ('+', 10): [('+', 9), ('/', 14)],
+    ('-', 3): [('x', 18), ('2', 19)],
+    ('-', 4): [('x', 20), ('3', 21)],
+    ('-', 5): [('x', 24), ('2', 25)],
+    ('-', 6): [('0', 33), ('3', 26)],
+    ('-', 7): [('x', 27), ('3', 28)],
+    ('-', 8): [('x', 30), ('3', 31)],
+    ('/', 11): [('^', 0), ('*', 34)],
+    ('/', 12): [('4', 23), ('-', 5)],
+    ('/', 13): [('-', 6), ('-', 7)],
+    ('/', 14): [('9', 29), ('^', 2)],
+    ('=', 15): [('/', 11), ('+', 10)],
+    ('^', 0): [('x', 16), ('2', 17)],
+    ('^', 1): [('-', 4), ('2', 22)],
+    ('^', 2): [('-', 8), ('2', 32)]}
+    rootOfTree = ('=', 15)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{x^2}{(x-2)(x-3)^2}=\\frac{4}{x-2}+\\frac{-3}{x-3}+\\frac{9}{(x-3)^2}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -483,13 +540,15 @@ def test__manyFracCaretEnclosingBrac__partialFrac(verbose=False):
 def test__fracWithLogNoBase__changeLogBaseFormula(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('/', 1): [('log', 4), ('log', 3)],
-    ('=', 0): [('log', 2), ('/', 1)],
-    ('log', 2): [('b', 5), ('a', 6)],
-    ('log', 3): [('c', 8), ('b', 7)],
-    ('log', 4): [('c', 10), ('a', 9)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('/', 1): [('log', 2), ('log', 3)],
+    ('=', 4): [('log', 0), ('/', 1)],
+    ('log', 0): [('b', 5), ('a', 6)],
+    ('log', 2): [('c', 7), ('a', 8)],
+    ('log', 3): [('c', 9), ('b', 10)]}
+    rootOfTree = ('=', 4)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\log_b(a)=\\frac{\\log_c(a)}{\\log_c(b)}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -500,14 +559,16 @@ def test__fracWithLogNoBase__changeLogBaseFormula(verbose=False):
 def test__backslashInfixInBackslash__sqrtInSqrt(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('/', 5): [('pi', 9), ('22', 8)],
-    ('=', 0): [('nroot', 2), ('F', 1)],
-    ('nroot', 2): [('nroot', 3), ('nroot', 4)],
-    ('nroot', 3): [(2, 11), ('/', 5)],
-    ('nroot', 4): [('sin', 7), ('pi', 6)],
-    ('sin', 7): [('pi', 10)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('/', 2): [('pi', 3), ('22', 9)],
+    ('=', 8): [('nroot', 0), ('F', 10)],
+    ('nroot', 0): [('nroot', 1), ('nroot', 4)],
+    ('nroot', 1): [('2', 12), ('/', 2)],
+    ('nroot', 4): [('sin', 5), ('pi', 7)],
+    ('sin', 5): [('pi', 6)]}
+    rootOfTree = ('=', 8)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\sqrt[\\sqrt{\\frac{\\pi }{22}}]{\\sqrt[\\sin(\\pi )]{\\pi}}=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -518,20 +579,22 @@ def test__backslashInfixInBackslash__sqrtInSqrt(verbose=False):
 def test__backslashInfixInBackslash__trigInTrig(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('+', 3): [('^', 19), ('5', 4)],
-    ('-', 6): [('9', 5), ('^', 20)],
-    ('-', 9): [('20', 8), ('^', 21)],
-    ('-', 14): [('1', 13), ('/', 15)],
-    ('/', 15): [('pi', 18), ('5', 17)],
-    ('=', 0): [('+', 3), ('F', 1)],
-    ('^', 19): [('sin', 2), ('-', 9)],
-    ('^', 20): [('tan', 7), ('4', 12)],
-    ('^', 21): [('cos', 10), ('43', 16)],
-    ('cos', 10): [('-', 14)],
-    ('sin', 2): [('-', 6)],
-    ('tan', 7): [('theta', 11)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('+', 6): [('^', 24), ('5', 20)],
+    ('-', 3): [('20', 14), ('^', 22)],
+    ('-', 4): [('1', 16), ('/', 9)],
+    ('-', 5): [('9', 18), ('^', 23)],
+    ('/', 9): [('pi', 10), ('5', 17)],
+    ('=', 13): [('+', 6), ('F', 21)],
+    ('^', 22): [('cos', 8), ('43', 15)],
+    ('^', 23): [('tan', 11), ('4', 19)],
+    ('^', 24): [('sin', 7), ('-', 3)],
+    ('cos', 8): [('-', 4)],
+    ('sin', 7): [('-', 5)],
+    ('tan', 11): [('theta', 12)]}
+    rootOfTree = ('=', 13)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\sin^{20-\\cos^{43}(1-\\frac{\\pi }{5})}(9-\\tan^4(\\theta))+5=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -542,14 +605,16 @@ def test__backslashInfixInBackslash__trigInTrig(verbose=False):
 def test__backslashInfixInBackslash__logInLog(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('-', 9): [('90', 8), ('x', 10)],
-    ('=', 0): [('log', 2), ('F', 1)],
-    ('^', 6): [('z', 5), ('5', 7)],
-    ('log', 2): [('log', 4), ('log', 3)],
-    ('log', 3): [(10, 11), ('^', 6)],
-    ('log', 4): [('e', 12), ('-', 9)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('-', 1): [('90', 6), ('x', 7)],
+    ('=', 5): [('log', 2), ('F', 10)],
+    ('^', 0): [('z', 8), ('5', 9)],
+    ('log', 2): [('log', 3), ('log', 4)],
+    ('log', 3): [('e', 11), ('-', 1)],
+    ('log', 4): [('10', 12), ('^', 0)]}
+    rootOfTree = ('=', 5)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\log_{\\ln(90-x)}(\\log(z^5))=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -560,32 +625,34 @@ def test__backslashInfixInBackslash__logInLog(verbose=False):
 def test__backslashInfixInBackslash__fracInFrac(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 18): [('2', 17), ('x', 19)],
-    ('*', 21): [('2', 20), ('x', 22)],
-    ('*', 24): [('2', 23), ('x', 25)],
-    ('*', 27): [('2', 26), ('x', 28)],
-    ('+', 6): [('cos', 5), ('sin', 7)],
-    ('+', 12): [('^', 40), ('^', 39)],
-    ('-', 9): [('cos', 8), ('sin', 10)],
-    ('-', 15): [('^', 38), ('^', 37)],
-    ('/', 2): [('/', 4), ('/', 3)],
-    ('/', 3): [('-', 9), ('+', 6)],
-    ('/', 4): [('+', 12), ('-', 15)],
-    ('=', 0): [('/', 2), ('F', 1)],
-    ('^', 37): [('cos', 16), ('2', 36)],
-    ('^', 38): [('sin', 14), ('2', 34)],
-    ('^', 39): [('cos', 13), ('2', 30)],
-    ('^', 40): [('sin', 11), ('2', 31)],
-    ('cos', 5): [('*', 21)],
-    ('cos', 8): [('*', 27)],
-    ('cos', 13): [('x', 29)],
-    ('cos', 16): [('x', 35)],
-    ('sin', 7): [('*', 18)],
-    ('sin', 10): [('*', 24)],
-    ('sin', 11): [('x', 32)],
-    ('sin', 14): [('x', 33)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 37): [('2', 28), ('x', 29)],
+    ('*', 38): [('2', 30), ('x', 31)],
+    ('*', 39): [('2', 32), ('x', 33)],
+    ('*', 40): [('2', 34), ('x', 35)],
+    ('+', 6): [('^', 41), ('^', 42)],
+    ('+', 7): [('cos', 17), ('sin', 18)],
+    ('-', 4): [('^', 43), ('^', 44)],
+    ('-', 5): [('cos', 15), ('sin', 16)],
+    ('/', 8): [('/', 9), ('/', 14)],
+    ('/', 9): [('+', 6), ('-', 4)],
+    ('/', 14): [('-', 5), ('+', 7)],
+    ('=', 19): [('/', 8), ('F', 36)],
+    ('^', 41): [('sin', 10), ('2', 20)],
+    ('^', 42): [('cos', 11), ('2', 22)],
+    ('^', 43): [('sin', 12), ('2', 24)],
+    ('^', 44): [('cos', 13), ('2', 26)],
+    ('cos', 11): [('x', 23)],
+    ('cos', 13): [('x', 27)],
+    ('cos', 15): [('*', 37)],
+    ('cos', 17): [('*', 39)],
+    ('sin', 10): [('x', 21)],
+    ('sin', 12): [('x', 25)],
+    ('sin', 16): [('*', 38)],
+    ('sin', 18): [('*', 40)]}
+    rootOfTree = ('=', 19)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{\\frac{\\sin^2(x)+\\cos^2(x)}{\\sin^2(x)-\\cos^2(x)}}{\\frac{\\cos(2x)-\\sin(2x)}{\\cos(2x)+\\sin(2x)}}=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -596,25 +663,27 @@ def test__backslashInfixInBackslash__fracInFrac(verbose=False):
 def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 2): [('P', 1), ('x', 3)],
-    ('*', 5): [('7', 4), ('^', 7)],
-    ('*', 11): [('3', 10), ('^', 13)],
-    ('*', 17): [('5', 16), ('^', 19)],
-    ('*', 23): [('nroot', 22), ('^', 25)],
-    ('*', 29): [('pi', 28), ('^', 31)],
-    ('+', 15): [('-', 9), ('-', 21)],
-    ('+', 27): [('+', 15), ('-', 33)],
-    ('-', 9): [('*', 5), ('*', 11)],
-    ('-', 21): [('*', 17), ('*', 23)],
-    ('-', 33): [('*', 29), ('42', 34)],
-    ('=', 0): [('*', 2), ('+', 27)],
-    ('^', 7): [('x', 6), ('13', 8)],
-    ('^', 13): [('x', 12), ('9', 14)],
-    ('^', 19): [('x', 18), ('8', 20)],
-    ('^', 25): [('x', 24), ('4', 26)],
-    ('^', 31): [('x', 30), ('2', 32)],
-    ('nroot', 22): [(2, 36), ('2', 35)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 29): [('7', 14), ('^', 0)],
+    ('*', 30): [('3', 17), ('^', 1)],
+    ('*', 31): [('5', 20), ('^', 2)],
+    ('*', 32): [('nroot', 10), ('^', 3)],
+    ('*', 33): [('pi', 11), ('^', 4)],
+    ('+', 8): [('-', 5), ('-', 6)],
+    ('+', 9): [('+', 8), ('-', 7)],
+    ('-', 5): [('*', 29), ('*', 30)],
+    ('-', 6): [('*', 31), ('*', 32)],
+    ('-', 7): [('*', 33), ('42', 28)],
+    ('=', 12): [('P', 13), ('+', 9)],
+    ('^', 0): [('x', 15), ('13', 16)],
+    ('^', 1): [('x', 18), ('9', 19)],
+    ('^', 2): [('x', 21), ('8', 22)],
+    ('^', 3): [('x', 24), ('4', 25)],
+    ('^', 4): [('x', 26), ('2', 27)],
+    ('nroot', 10): [('2', 34), ('2', 23)]}
+    rootOfTree = ('=', 12)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'Px=7x^{13}-3x^9+5x^8-\\sqrt{2}x^4+\\pi x^2-42'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -625,23 +694,25 @@ def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False):
 def test__hassliche__nestedPolynomial(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 6): [('2', 5), ('^', 8)],
-    ('*', 12): [('5', 11), ('x', 13)],
-    ('*', 26): [('3', 25), ('^', 28)],
-    ('*', 31): [('Q', 30), ('x', 32)],
-    ('+', 10): [('-', 4), ('-', 14)],
-    ('+', 24): [('^', 22), ('*', 26)],
-    ('-', 4): [('^', 2), ('*', 6)],
-    ('-', 14): [('*', 12), ('7', 15)],
-    ('-', 18): [('^', 16), ('+', 24)],
-    ('-', 20): [('x', 19), ('1', 21)],
-    ('=', 0): [('*', 31), ('-', 18)],
-    ('^', 2): [('x', 1), ('3', 3)],
-    ('^', 8): [('x', 7), ('2', 9)],
-    ('^', 16): [('+', 10), ('2', 17)],
-    ('^', 22): [('-', 20), ('3', 23)],
-    ('^', 28): [('x', 27), ('21', 29)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 28): [('2', 15), ('^', 1)],
+    ('*', 29): [('5', 18), ('x', 19)],
+    ('*', 30): [('3', 25), ('^', 4)],
+    ('+', 9): [('-', 5), ('-', 6)],
+    ('+', 10): [('-', 7), ('*', 30)],
+    ('-', 5): [('^', 0), ('*', 28)],
+    ('-', 6): [('*', 29), ('7', 20)],
+    ('-', 7): [('^', 2), ('^', 3)],
+    ('-', 8): [('x', 22), ('1', 23)],
+    ('=', 11): [('Q', 12), ('+', 10)],
+    ('^', 0): [('x', 13), ('3', 14)],
+    ('^', 1): [('x', 16), ('2', 17)],
+    ('^', 2): [('+', 9), ('2', 21)],
+    ('^', 3): [('-', 8), ('3', 24)],
+    ('^', 4): [('x', 26), ('21', 27)]}
+    rootOfTree = ('=', 11)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'Qx=(x^3-2x^2+5x-7)^2-((x-1)^3+3x^{21})'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -652,24 +723,26 @@ def test__hassliche__nestedPolynomial(verbose=False):
 def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 2): [('R', 1), ('x', 3)],
-    ('*', 7): [('0.5', 6), ('^', 9)],
-    ('*', 13): [('3.14', 12), ('^', 15)],
-    ('*', 19): [('/', 18), ('^', 21)],
-    ('*', 25): [('1.618', 24), ('^', 27)],
-    ('+', 11): [('-', 5), ('-', 17)],
-    ('+', 23): [('+', 11), ('-', 29)],
-    ('-', 5): [('0', 4), ('*', 7)],
-    ('-', 17): [('*', 13), ('*', 19)],
-    ('-', 29): [('*', 25), ('/', 30)],
-    ('/', 18): [('2', 31), ('3', 32)],
-    ('/', 30): [('1', 33), ('x', 34)],
-    ('=', 0): [('*', 2), ('+', 23)],
-    ('^', 9): [('x', 8), ('10', 10)],
-    ('^', 15): [('x', 14), ('8', 16)],
-    ('^', 21): [('x', 20), ('5', 22)],
-    ('^', 27): [('x', 26), ('3', 28)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 29): [('0.5', 13), ('^', 0)],
+    ('*', 30): [('3.14', 16), ('^', 1)],
+    ('*', 31): [('/', 9), ('^', 2)],
+    ('*', 32): [('1.618', 23), ('^', 3)],
+    ('+', 7): [('-', 4), ('-', 5)],
+    ('+', 8): [('+', 7), ('-', 6)],
+    ('-', 4): [('0', 28), ('*', 29)],
+    ('-', 5): [('*', 30), ('*', 31)],
+    ('-', 6): [('*', 32), ('/', 10)],
+    ('/', 9): [('2', 19), ('3', 20)],
+    ('/', 10): [('1', 26), ('x', 27)],
+    ('=', 11): [('R', 12), ('+', 8)],
+    ('^', 0): [('x', 14), ('10', 15)],
+    ('^', 1): [('x', 17), ('8', 18)],
+    ('^', 2): [('x', 21), ('5', 22)],
+    ('^', 3): [('x', 24), ('3', 25)]}
+    rootOfTree = ('=', 11)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'Rx=-0.5x^{10}+3.14x^8-\\frac{2}{3}x^5+1.618x^3-\\frac{1}{x}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -680,28 +753,28 @@ def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=F
 def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(verbose=False):#TODO does not handle S(x, y) very well.
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 2): [('S', 1), ('*', 4)],
-    ('*', 4): [('x,', 3), ('y', 5)],
-    ('*', 9): [('^', 7), ('^', 11)],
-    ('*', 15): [('7', 14), ('^', 17)],
-    ('*', 19): [('*', 15), ('^', 21)],
-    ('*', 25): [('2', 24), ('^', 27)],
-    ('*', 37): [('^', 35), ('y', 38)],
-    ('+', 23): [('-', 13), ('-', 29)],
-    ('+', 33): [('+', 23), ('-', 39)],
-    ('-', 13): [('*', 9), ('*', 19)],
-    ('-', 29): [('*', 25), ('^', 31)],
-    ('-', 39): [('*', 37), ('4', 40)],
-    ('=', 0): [('*', 2), ('+', 33)],
-    ('^', 7): [('x', 6), ('5', 8)],
-    ('^', 11): [('y', 10), ('4', 12)],
-    ('^', 17): [('x', 16), ('3', 18)],
-    ('^', 21): [('y', 20), ('2', 22)],
-    ('^', 27): [('x', 26), ('2', 28)],
-    ('^', 31): [('y', 30), ('3', 32)],
-    ('^', 35): [('x', 34), ('2', 36)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 32): [('^', 0), ('^', 1)],
+    ('*', 33): [('7', 18), ('^', 2)],
+    ('*', 34): [('*', 33), ('^', 3)],
+    ('*', 35): [('2', 23), ('^', 4)],
+    ('*', 36): [('^', 6), ('y', 30)],
+    ('+', 10): [('-', 7), ('-', 8)],
+    ('+', 11): [('+', 10), ('-', 9)],
+    ('-', 7): [('*', 32), ('*', 34)],
+    ('-', 8): [('*', 35), ('^', 5)],
+    ('-', 9): [('*', 36), ('4', 31)],
+    ('=', 12): [('S', 13), ('+', 11)],
+    ('^', 0): [('x', 14), ('5', 15)],
+    ('^', 1): [('y', 16), ('4', 17)],
+    ('^', 2): [('x', 19), ('3', 20)],
+    ('^', 3): [('y', 21), ('2', 22)],
+    ('^', 4): [('x', 24), ('2', 25)],
+    ('^', 5): [('y', 26), ('3', 27)],
+    ('^', 6): [('x', 28), ('2', 29)]}
+    rootOfTree = ('=', 12)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'S\\x, y=x^5y^4-7x^3y^2+2x^2-y^3+x^2y-4' # TODO ugly
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -712,23 +785,24 @@ def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(
 def test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 2): [('T', 1), ('x', 3)],
-    ('*', 9): [('cos', 8), ('^', 11)],
-    ('*', 17): [('^', 15), ('sin', 18)],
-    ('+', 13): [('-', 7), ('-', 19)],
-    ('+', 26): [('^', 24), ('1', 27)],
-    ('-', 7): [('^', 5), ('*', 9)],
-    ('-', 19): [('*', 17), ('log', 20)],
-    ('=', 0): [('*', 2), ('+', 13)],
-    ('^', 5): [('e', 4), ('x', 6)],
-    ('^', 11): [('x', 10), ('4', 12)],
-    ('^', 15): [('x', 14), ('3', 16)],
-    ('^', 24): [('x', 23), ('2', 25)],
-    ('cos', 8): [('x', 21)],
-    ('log', 20): [('e', 28), ('+', 26)],
-    ('sin', 18): [('x', 22)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 24): [('cos', 8), ('^', 1)],
+    ('*', 25): [('^', 2), ('sin', 9)],
+    ('+', 6): [('-', 4), ('-', 5)],
+    ('+', 7): [('^', 3), ('1', 23)],
+    ('-', 4): [('^', 0), ('*', 24)],
+    ('-', 5): [('*', 25), ('log', 10)],
+    ('=', 11): [('T', 12), ('+', 6)],
+    ('^', 0): [('e', 13), ('x', 14)],
+    ('^', 1): [('x', 16), ('4', 17)],
+    ('^', 2): [('x', 18), ('3', 19)],
+    ('^', 3): [('x', 21), ('2', 22)],
+    ('cos', 8): [('x', 15)],
+    ('log', 10): [('e', 28), ('+', 7)],
+    ('sin', 9): [('x', 20)]}
+    rootOfTree = ('=', 11)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = 'Tx=e^x-\\cos(x)x^4+x^3\\sin(x)-\\ln(x^2+1)'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -739,31 +813,33 @@ def test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(verbos
 def test__hassliche__degree5(verbose=False):#TODO ugly.... ?
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 6): [('3', 5), ('^', 8)],
-    ('*', 12): [('32', 11), ('^', 14)],
-    ('*', 18): [('94', 17), ('^', 20)],
-    ('*', 24): [('31', 23), ('x', 25)],
-    ('*', 31): [('-', 29), ('+', 33)],
-    ('*', 35): [('*', 31), ('-', 37)],
-    ('*', 39): [('*', 35), ('+', 41)],
-    ('*', 43): [('*', 39), ('-', 45)],
-    ('+', 16): [('-', 10), ('*', 18)],
-    ('+', 22): [('+', 16), ('-', 26)],
-    ('+', 33): [('x', 32), ('2', 34)],
-    ('+', 41): [('x', 40), ('4', 42)],
-    ('-', 4): [('^', 2), ('*', 6)],
-    ('-', 10): [('-', 4), ('*', 12)],
-    ('-', 26): [('*', 24), ('120', 27)],
-    ('-', 29): [('x', 28), ('1', 30)],
-    ('-', 37): [('x', 36), ('3', 38)],
-    ('-', 45): [('x', 44), ('5', 46)],
-    ('=', 0): [('*', 43), ('+', 22)],
-    ('^', 2): [('x', 1), ('5', 3)],
-    ('^', 8): [('x', 7), ('4', 9)],
-    ('^', 14): [('x', 13), ('3', 15)],
-    ('^', 20): [('x', 19), ('2', 21)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 39): [('-', 4), ('+', 10)],
+    ('*', 40): [('*', 39), ('-', 5)],
+    ('*', 41): [('*', 40), ('+', 11)],
+    ('*', 42): [('*', 41), ('-', 6)],
+    ('*', 43): [('3', 27), ('^', 1)],
+    ('*', 44): [('32', 30), ('^', 2)],
+    ('*', 45): [('94', 33), ('^', 3)],
+    ('*', 46): [('31', 36), ('x', 37)],
+    ('+', 10): [('x', 17), ('2', 18)],
+    ('+', 11): [('x', 21), ('4', 22)],
+    ('+', 12): [('-', 8), ('*', 45)],
+    ('+', 13): [('+', 12), ('-', 9)],
+    ('-', 4): [('x', 15), ('1', 16)],
+    ('-', 5): [('x', 19), ('3', 20)],
+    ('-', 6): [('x', 23), ('5', 24)],
+    ('-', 7): [('^', 0), ('*', 43)],
+    ('-', 8): [('-', 7), ('*', 44)],
+    ('-', 9): [('*', 46), ('120', 38)],
+    ('=', 14): [('*', 42), ('+', 13)],
+    ('^', 0): [('x', 25), ('5', 26)],
+    ('^', 1): [('x', 28), ('4', 29)],
+    ('^', 2): [('x', 31), ('3', 32)],
+    ('^', 3): [('x', 34), ('2', 35)]}
+    rootOfTree = ('=', 14)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(x-1)(x+2)(x-3)(x+4)(x-5)=(x^5-3x^4)-(32x^3)+94x^2+31x-120'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -774,36 +850,38 @@ def test__hassliche__degree5(verbose=False):#TODO ugly.... ?
 def test__hassliche__degree6(verbose=False):#TODO ugly
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 6): [('5', 5), ('^', 8)],
-    ('*', 12): [('35', 11), ('^', 14)],
-    ('*', 18): [('75', 17), ('^', 20)],
-    ('*', 24): [('368', 23), ('^', 26)],
-    ('*', 30): [('246', 29), ('x', 31)],
-    ('*', 37): [('-', 35), ('-', 39)],
-    ('*', 41): [('*', 37), ('+', 43)],
-    ('*', 45): [('*', 41), ('+', 47)],
-    ('*', 49): [('*', 45), ('-', 51)],
-    ('*', 53): [('*', 49), ('+', 55)],
-    ('+', 4): [('^', 2), ('-', 16)],
-    ('+', 22): [('+', 4), ('*', 24)],
-    ('+', 28): [('+', 22), ('-', 32)],
-    ('+', 43): [('x', 42), ('3', 44)],
-    ('+', 47): [('x', 46), ('4', 48)],
-    ('+', 55): [('x', 54), ('6', 56)],
-    ('-', 10): [('*', 6), ('*', 12)],
-    ('-', 16): [('-', 10), ('*', 18)],
-    ('-', 32): [('*', 30), ('720', 33)],
-    ('-', 35): [('x', 34), ('1', 36)],
-    ('-', 39): [('x', 38), ('2', 40)],
-    ('-', 51): [('x', 50), ('5', 52)],
-    ('=', 0): [('*', 53), ('+', 28)],
-    ('^', 2): [('x', 1), ('6', 3)],
-    ('^', 8): [('x', 7), ('5', 9)],
-    ('^', 14): [('x', 13), ('4', 15)],
-    ('^', 20): [('x', 19), ('3', 21)],
-    ('^', 26): [('x', 25), ('2', 27)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 47): [('-', 5), ('-', 6)],
+    ('*', 48): [('*', 47), ('+', 11)],
+    ('*', 49): [('*', 48), ('+', 12)],
+    ('*', 50): [('*', 49), ('-', 7)],
+    ('*', 51): [('*', 50), ('+', 13)],
+    ('*', 52): [('5', 32), ('^', 1)],
+    ('*', 53): [('35', 35), ('^', 2)],
+    ('*', 54): [('75', 38), ('^', 3)],
+    ('*', 55): [('368', 41), ('^', 4)],
+    ('*', 56): [('246', 44), ('x', 45)],
+    ('+', 11): [('x', 22), ('3', 23)],
+    ('+', 12): [('x', 24), ('4', 25)],
+    ('+', 13): [('x', 28), ('6', 29)],
+    ('+', 14): [('^', 0), ('-', 9)],
+    ('+', 15): [('+', 14), ('*', 55)],
+    ('+', 16): [('+', 15), ('-', 10)],
+    ('-', 5): [('x', 18), ('1', 19)],
+    ('-', 6): [('x', 20), ('2', 21)],
+    ('-', 7): [('x', 26), ('5', 27)],
+    ('-', 8): [('*', 52), ('*', 53)],
+    ('-', 9): [('-', 8), ('*', 54)],
+    ('-', 10): [('*', 56), ('720', 46)],
+    ('=', 17): [('*', 51), ('+', 16)],
+    ('^', 0): [('x', 30), ('6', 31)],
+    ('^', 1): [('x', 33), ('5', 34)],
+    ('^', 2): [('x', 36), ('4', 37)],
+    ('^', 3): [('x', 39), ('3', 40)],
+    ('^', 4): [('x', 42), ('2', 43)]}
+    rootOfTree = ('=', 17)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(x-1)(x-2)(x+3)(x+4)(x-5)(x+6)=x^6+(5x^5-35x^4)-(75x^3)+368x^2+246x-720'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -814,41 +892,43 @@ def test__hassliche__degree6(verbose=False):#TODO ugly
 def test__hassliche__degree7(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 6): [('4', 5), ('^', 8)],
-    ('*', 12): [('37', 11), ('^', 14)],
-    ('*', 18): [('58', 17), ('^', 20)],
-    ('*', 24): [('520', 23), ('^', 26)],
-    ('*', 30): [('201', 29), ('^', 32)],
-    ('*', 36): [('2156', 35), ('x', 37)],
-    ('*', 43): [('-', 41), ('+', 45)],
-    ('*', 47): [('*', 43), ('-', 49)],
-    ('*', 51): [('*', 47), ('+', 53)],
-    ('*', 55): [('*', 51), ('-', 57)],
-    ('*', 59): [('*', 55), ('+', 61)],
-    ('*', 63): [('*', 59), ('-', 65)],
-    ('+', 4): [('^', 2), ('-', 16)],
-    ('+', 22): [('+', 4), ('*', 24)],
-    ('+', 28): [('+', 22), ('-', 34)],
-    ('+', 38): [('+', 28), ('5040', 39)],
-    ('+', 45): [('x', 44), ('2', 46)],
-    ('+', 53): [('x', 52), ('4', 54)],
-    ('+', 61): [('x', 60), ('6', 62)],
-    ('-', 10): [('*', 6), ('*', 12)],
-    ('-', 16): [('-', 10), ('*', 18)],
-    ('-', 34): [('*', 30), ('*', 36)],
-    ('-', 41): [('x', 40), ('1', 42)],
-    ('-', 49): [('x', 48), ('3', 50)],
-    ('-', 57): [('x', 56), ('5', 58)],
-    ('-', 65): [('x', 64), ('7', 66)],
-    ('=', 0): [('*', 63), ('+', 38)],
-    ('^', 2): [('x', 1), ('7', 3)],
-    ('^', 8): [('x', 7), ('6', 9)],
-    ('^', 14): [('x', 13), ('5', 15)],
-    ('^', 20): [('x', 19), ('4', 21)],
-    ('^', 26): [('x', 25), ('3', 27)],
-    ('^', 32): [('x', 31), ('2', 33)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 55): [('-', 6), ('+', 13)],
+    ('*', 56): [('*', 55), ('-', 7)],
+    ('*', 57): [('*', 56), ('+', 14)],
+    ('*', 58): [('*', 57), ('-', 8)],
+    ('*', 59): [('*', 58), ('+', 15)],
+    ('*', 60): [('*', 59), ('-', 9)],
+    ('*', 61): [('4', 37), ('^', 1)],
+    ('*', 62): [('37', 40), ('^', 2)],
+    ('*', 63): [('58', 43), ('^', 3)],
+    ('*', 64): [('520', 46), ('^', 4)],
+    ('*', 65): [('201', 49), ('^', 5)],
+    ('*', 66): [('2156', 52), ('x', 53)],
+    ('+', 13): [('x', 23), ('2', 24)],
+    ('+', 14): [('x', 27), ('4', 28)],
+    ('+', 15): [('x', 31), ('6', 32)],
+    ('+', 16): [('^', 0), ('-', 11)],
+    ('+', 17): [('+', 16), ('*', 64)],
+    ('+', 18): [('+', 17), ('-', 12)],
+    ('+', 19): [('+', 18), ('5040', 54)],
+    ('-', 6): [('x', 21), ('1', 22)],
+    ('-', 7): [('x', 25), ('3', 26)],
+    ('-', 8): [('x', 29), ('5', 30)],
+    ('-', 9): [('x', 33), ('7', 34)],
+    ('-', 10): [('*', 61), ('*', 62)],
+    ('-', 11): [('-', 10), ('*', 63)],
+    ('-', 12): [('*', 65), ('*', 66)],
+    ('=', 20): [('*', 60), ('+', 19)],
+    ('^', 0): [('x', 35), ('7', 36)],
+    ('^', 1): [('x', 38), ('6', 39)],
+    ('^', 2): [('x', 41), ('5', 42)],
+    ('^', 3): [('x', 44), ('4', 45)],
+    ('^', 4): [('x', 47), ('3', 48)],
+    ('^', 5): [('x', 50), ('2', 51)]}
+    rootOfTree = ('=', 20)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(x-1)(x+2)(x-3)(x+4)(x-5)(x+6)(x-7)=x^7+(4x^6-37x^5)-(58x^4)+520x^3+201x^2-2156x+5040'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -859,51 +939,54 @@ def test__hassliche__degree7(verbose=False):
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 6): [('4', 5), ('^', 8)],
-    ('*', 12): [('2', 11), ('^', 14)],
-    ('*', 18): [('41', 17), ('^', 20)],
-    ('*', 24): [('69', 23), ('^', 26)],
-    ('*', 30): [('142', 29), ('^', 32)],
-    ('*', 36): [('420', 35), ('^', 38)],
-    ('*', 42): [('567', 41), ('^', 44)],
-    ('*', 48): [('174', 47), ('^', 50)],
-    ('*', 54): [('185', 53), ('x', 55)],
-    ('*', 61): [('2', 60), ('^', 63)],
-    ('*', 69): [('^', 67), ('^', 77)],
-    ('*', 79): [('*', 69), ('+', 83)],
-    ('*', 85): [('2', 84), ('x', 86)],
-    ('+', 4): [('^', 2), ('-', 22)],
-    ('+', 28): [('+', 4), ('*', 30)],
-    ('+', 34): [('+', 28), ('-', 46)],
-    ('+', 52): [('+', 34), ('-', 56)],
-    ('+', 59): [('x', 58), ('-', 65)],
-    ('+', 75): [('-', 73), ('1', 76)],
-    ('+', 83): [('^', 81), ('-', 87)],
-    ('-', 10): [('*', 6), ('*', 12)],
-    ('-', 16): [('-', 10), ('*', 18)],
-    ('-', 22): [('-', 16), ('*', 24)],
-    ('-', 40): [('*', 36), ('*', 42)],
-    ('-', 46): [('-', 40), ('*', 48)],
-    ('-', 56): [('*', 54), ('75', 57)],
-    ('-', 65): [('*', 61), ('3', 66)],
-    ('-', 73): [('^', 71), ('x', 74)],
-    ('-', 87): [('*', 85), ('5', 88)],
-    ('=', 0): [('*', 79), ('+', 52)],
-    ('^', 2): [('x', 1), ('10', 3)],
-    ('^', 8): [('x', 7), ('9', 9)],
-    ('^', 14): [('x', 13), ('8', 15)],
-    ('^', 20): [('x', 19), ('7', 21)],
-    ('^', 26): [('x', 25), ('6', 27)],
-    ('^', 32): [('x', 31), ('5', 33)],
-    ('^', 38): [('x', 37), ('4', 39)],
-    ('^', 44): [('x', 43), ('3', 45)],
-    ('^', 50): [('x', 49), ('2', 51)],
-    ('^', 63): [('x', 62), ('2', 64)],
-    ('^', 67): [('+', 59), ('2', 68)],
-    ('^', 71): [('x', 70), ('2', 72)],
-    ('^', 77): [('+', 75), ('3', 78)],
-    ('^', 81): [('x', 80), ('3', 82)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 76): [('^', 1), ('^', 3)],
+    ('*', 77): [('*', 76), ('+', 25)],
+    ('*', 78): [('2', 32), ('^', 0)],
+    ('*', 79): [('2', 44), ('x', 45)],
+    ('*', 80): [('4', 49), ('^', 6)],
+    ('*', 81): [('2', 52), ('^', 7)],
+    ('*', 82): [('41', 55), ('^', 8)],
+    ('*', 83): [('69', 58), ('^', 9)],
+    ('*', 84): [('142', 61), ('^', 10)],
+    ('*', 85): [('420', 64), ('^', 11)],
+    ('*', 86): [('567', 67), ('^', 12)],
+    ('*', 87): [('174', 70), ('^', 13)],
+    ('*', 88): [('185', 73), ('x', 74)],
+    ('+', 23): [('x', 31), ('-', 14)],
+    ('+', 24): [('-', 15), ('1', 40)],
+    ('+', 25): [('^', 4), ('-', 16)],
+    ('+', 26): [('^', 5), ('-', 19)],
+    ('+', 27): [('+', 26), ('*', 84)],
+    ('+', 28): [('+', 27), ('-', 21)],
+    ('+', 29): [('+', 28), ('-', 22)],
+    ('-', 14): [('*', 78), ('3', 35)],
+    ('-', 15): [('^', 2), ('x', 39)],
+    ('-', 16): [('*', 79), ('5', 46)],
+    ('-', 17): [('*', 80), ('*', 81)],
+    ('-', 18): [('-', 17), ('*', 82)],
+    ('-', 19): [('-', 18), ('*', 83)],
+    ('-', 20): [('*', 85), ('*', 86)],
+    ('-', 21): [('-', 20), ('*', 87)],
+    ('-', 22): [('*', 88), ('75', 75)],
+    ('=', 30): [('*', 77), ('+', 29)],
+    ('^', 0): [('x', 33), ('2', 34)],
+    ('^', 1): [('+', 23), ('2', 36)],
+    ('^', 2): [('x', 37), ('2', 38)],
+    ('^', 3): [('+', 24), ('3', 41)],
+    ('^', 4): [('x', 42), ('3', 43)],
+    ('^', 5): [('x', 47), ('10', 48)],
+    ('^', 6): [('x', 50), ('9', 51)],
+    ('^', 7): [('x', 53), ('8', 54)],
+    ('^', 8): [('x', 56), ('7', 57)],
+    ('^', 9): [('x', 59), ('6', 60)],
+    ('^', 10): [('x', 62), ('5', 63)],
+    ('^', 11): [('x', 65), ('4', 66)],
+    ('^', 12): [('x', 68), ('3', 69)],
+    ('^', 13): [('x', 71), ('2', 72)]}
+    rootOfTree = ('=', 30)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(x+2x^2-3)^2(x^2-x+1)^3(x^3+2x-5)=x^{10}+((4x^9-2x^8)-(41x^7))-(69x^6)+142x^5+(420x^4-567x^3)-(174x^2)+185x-75'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -914,51 +997,54 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(verbose=Fal
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 6): [('3', 5), ('^', 8)],
-    ('*', 12): [('20', 11), ('^', 14)],
-    ('*', 18): [('60', 17), ('^', 20)],
-    ('*', 24): [('161', 23), ('^', 26)],
-    ('*', 30): [('260', 29), ('^', 32)],
-    ('*', 36): [('385', 35), ('^', 38)],
-    ('*', 42): [('494', 41), ('^', 44)],
-    ('*', 48): [('509', 47), ('^', 50)],
-    ('*', 54): [('378', 53), ('x', 55)],
-    ('*', 67): [('^', 65), ('^', 77)],
-    ('*', 73): [('2', 72), ('x', 74)],
-    ('*', 79): [('*', 67), ('+', 83)],
-    ('*', 85): [('3', 84), ('x', 86)],
-    ('+', 16): [('-', 10), ('*', 18)],
-    ('+', 22): [('+', 16), ('-', 34)],
-    ('+', 40): [('+', 22), ('*', 42)],
-    ('+', 46): [('+', 40), ('-', 52)],
-    ('+', 56): [('+', 46), ('196', 57)],
-    ('+', 61): [('^', 59), ('-', 63)],
-    ('+', 75): [('-', 71), ('4', 76)],
-    ('+', 83): [('^', 81), ('-', 87)],
-    ('-', 4): [('^', 2), ('*', 6)],
-    ('-', 10): [('-', 4), ('*', 12)],
-    ('-', 28): [('*', 24), ('*', 30)],
-    ('-', 34): [('-', 28), ('*', 36)],
-    ('-', 52): [('*', 48), ('*', 54)],
-    ('-', 63): [('x', 62), ('1', 64)],
-    ('-', 71): [('^', 69), ('*', 73)],
-    ('-', 87): [('*', 85), ('7', 88)],
-    ('=', 0): [('*', 79), ('+', 56)],
-    ('^', 2): [('x', 1), ('10', 3)],
-    ('^', 8): [('x', 7), ('9', 9)],
-    ('^', 14): [('x', 13), ('8', 15)],
-    ('^', 20): [('x', 19), ('7', 21)],
-    ('^', 26): [('x', 25), ('6', 27)],
-    ('^', 32): [('x', 31), ('5', 33)],
-    ('^', 38): [('x', 37), ('4', 39)],
-    ('^', 44): [('x', 43), ('3', 45)],
-    ('^', 50): [('x', 49), ('2', 51)],
-    ('^', 59): [('x', 58), ('2', 60)],
-    ('^', 65): [('+', 61), ('2', 66)],
-    ('^', 69): [('x', 68), ('3', 70)],
-    ('^', 77): [('+', 75), ('2', 78)],
-    ('^', 81): [('x', 80), ('2', 82)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 76): [('^', 1), ('^', 3)],
+    ('*', 77): [('*', 76), ('+', 24)],
+    ('*', 78): [('2', 38), ('x', 39)],
+    ('*', 79): [('3', 44), ('x', 45)],
+    ('*', 80): [('3', 49), ('^', 6)],
+    ('*', 81): [('20', 52), ('^', 7)],
+    ('*', 82): [('60', 55), ('^', 8)],
+    ('*', 83): [('161', 58), ('^', 9)],
+    ('*', 84): [('260', 61), ('^', 10)],
+    ('*', 85): [('385', 64), ('^', 11)],
+    ('*', 86): [('494', 67), ('^', 12)],
+    ('*', 87): [('509', 70), ('^', 13)],
+    ('*', 88): [('378', 73), ('x', 74)],
+    ('+', 22): [('^', 0), ('-', 14)],
+    ('+', 23): [('-', 15), ('4', 40)],
+    ('+', 24): [('^', 4), ('-', 16)],
+    ('+', 25): [('-', 18), ('*', 82)],
+    ('+', 26): [('+', 25), ('-', 20)],
+    ('+', 27): [('+', 26), ('*', 86)],
+    ('+', 28): [('+', 27), ('-', 21)],
+    ('+', 29): [('+', 28), ('196', 75)],
+    ('-', 14): [('x', 33), ('1', 34)],
+    ('-', 15): [('^', 2), ('*', 78)],
+    ('-', 16): [('*', 79), ('7', 46)],
+    ('-', 17): [('^', 5), ('*', 80)],
+    ('-', 18): [('-', 17), ('*', 81)],
+    ('-', 19): [('*', 83), ('*', 84)],
+    ('-', 20): [('-', 19), ('*', 85)],
+    ('-', 21): [('*', 87), ('*', 88)],
+    ('=', 30): [('*', 77), ('+', 29)],
+    ('^', 0): [('x', 31), ('2', 32)],
+    ('^', 1): [('+', 22), ('2', 35)],
+    ('^', 2): [('x', 36), ('3', 37)],
+    ('^', 3): [('+', 23), ('2', 41)],
+    ('^', 4): [('x', 42), ('2', 43)],
+    ('^', 5): [('x', 47), ('10', 48)],
+    ('^', 6): [('x', 50), ('9', 51)],
+    ('^', 7): [('x', 53), ('8', 54)],
+    ('^', 8): [('x', 56), ('7', 57)],
+    ('^', 9): [('x', 59), ('6', 60)],
+    ('^', 10): [('x', 62), ('5', 63)],
+    ('^', 11): [('x', 65), ('4', 66)],
+    ('^', 12): [('x', 68), ('3', 69)],
+    ('^', 13): [('x', 71), ('2', 72)]}
+    rootOfTree = ('=', 30)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(x^2+x-1)^2(x^3-2x+4)^2(x^2+3x-7)=(x^{10}-3x^9)-(20x^8)+60x^7+(161x^6-260x^5)-(385x^4)+494x^3+509x^2-378x+196'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -969,67 +1055,70 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(verbose=Fa
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 6): [('8', 5), ('^', 8)],
-    ('*', 12): [('14', 11), ('^', 14)],
-    ('*', 18): [('191', 17), ('^', 20)],
-    ('*', 24): [('48', 23), ('^', 26)],
-    ('*', 30): [('1218', 29), ('^', 32)],
-    ('*', 36): [('60', 35), ('^', 38)],
-    ('*', 42): [('2700', 41), ('^', 44)],
-    ('*', 48): [('1452', 47), ('^', 50)],
-    ('*', 54): [('4375', 53), ('^', 56)],
-    ('*', 60): [('3476', 59), ('^', 62)],
-    ('*', 66): [('2922', 65), ('^', 68)],
-    ('*', 72): [('1685', 71), ('^', 74)],
-    ('*', 78): [('655', 77), ('^', 80)],
-    ('*', 84): [('103', 83), ('x', 85)],
-    ('*', 93): [('2', 92), ('^', 95)],
-    ('*', 101): [('^', 99), ('^', 109)],
-    ('*', 111): [('*', 101), ('+', 115)],
-    ('*', 117): [('3', 116), ('x', 118)],
-    ('+', 4): [('^', 2), ('-', 16)],
-    ('+', 22): [('+', 4), ('*', 24)],
-    ('+', 28): [('+', 22), ('-', 46)],
-    ('+', 52): [('+', 28), ('*', 54)],
-    ('+', 58): [('+', 52), ('-', 70)],
-    ('+', 76): [('+', 58), ('*', 78)],
-    ('+', 82): [('+', 76), ('-', 86)],
-    ('+', 91): [('^', 89), ('-', 97)],
-    ('+', 107): [('-', 105), ('2', 108)],
-    ('+', 115): [('^', 113), ('-', 119)],
-    ('-', 10): [('*', 6), ('*', 12)],
-    ('-', 16): [('-', 10), ('*', 18)],
-    ('-', 34): [('*', 30), ('*', 36)],
-    ('-', 40): [('-', 34), ('*', 42)],
-    ('-', 46): [('-', 40), ('*', 48)],
-    ('-', 64): [('*', 60), ('*', 66)],
-    ('-', 70): [('-', 64), ('*', 72)],
-    ('-', 86): [('*', 84), ('400', 87)],
-    ('-', 97): [('*', 93), ('4', 98)],
-    ('-', 105): [('^', 103), ('x', 106)],
-    ('-', 119): [('*', 117), ('5', 120)],
-    ('=', 0): [('*', 111), ('+', 82)],
-    ('^', 2): [('x', 1), ('15', 3)],
-    ('^', 8): [('x', 7), ('14', 9)],
-    ('^', 14): [('x', 13), ('13', 15)],
-    ('^', 20): [('x', 19), ('12', 21)],
-    ('^', 26): [('x', 25), ('11', 27)],
-    ('^', 32): [('x', 31), ('10', 33)],
-    ('^', 38): [('x', 37), ('9', 39)],
-    ('^', 44): [('x', 43), ('8', 45)],
-    ('^', 50): [('x', 49), ('7', 51)],
-    ('^', 56): [('x', 55), ('6', 57)],
-    ('^', 62): [('x', 61), ('5', 63)],
-    ('^', 68): [('x', 67), ('4', 69)],
-    ('^', 74): [('x', 73), ('3', 75)],
-    ('^', 80): [('x', 79), ('2', 81)],
-    ('^', 89): [('x', 88), ('2', 90)],
-    ('^', 95): [('x', 94), ('3', 96)],
-    ('^', 99): [('+', 91), ('3', 100)],
-    ('^', 103): [('x', 102), ('2', 104)],
-    ('^', 109): [('+', 107), ('2', 110)],
-    ('^', 113): [('x', 112), ('3', 114)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 103): [('^', 2), ('^', 4)],
+    ('*', 104): [('*', 103), ('+', 33)],
+    ('*', 105): [('2', 44), ('^', 1)],
+    ('*', 106): [('3', 56), ('x', 57)],
+    ('*', 107): [('8', 61), ('^', 7)],
+    ('*', 108): [('14', 64), ('^', 8)],
+    ('*', 109): [('191', 67), ('^', 9)],
+    ('*', 110): [('48', 70), ('^', 10)],
+    ('*', 111): [('1218', 73), ('^', 11)],
+    ('*', 112): [('60', 76), ('^', 12)],
+    ('*', 113): [('2700', 79), ('^', 13)],
+    ('*', 114): [('1452', 82), ('^', 14)],
+    ('*', 115): [('4375', 85), ('^', 15)],
+    ('*', 116): [('3476', 88), ('^', 16)],
+    ('*', 117): [('2922', 91), ('^', 17)],
+    ('*', 118): [('1685', 94), ('^', 18)],
+    ('*', 119): [('655', 97), ('^', 19)],
+    ('*', 120): [('103', 100), ('x', 101)],
+    ('+', 31): [('^', 0), ('-', 20)],
+    ('+', 32): [('-', 21), ('2', 52)],
+    ('+', 33): [('^', 5), ('-', 22)],
+    ('+', 34): [('^', 6), ('-', 24)],
+    ('+', 35): [('+', 34), ('*', 110)],
+    ('+', 36): [('+', 35), ('-', 27)],
+    ('+', 37): [('+', 36), ('*', 115)],
+    ('+', 38): [('+', 37), ('-', 29)],
+    ('+', 39): [('+', 38), ('*', 119)],
+    ('+', 40): [('+', 39), ('-', 30)],
+    ('-', 20): [('*', 105), ('4', 47)],
+    ('-', 21): [('^', 3), ('x', 51)],
+    ('-', 22): [('*', 106), ('5', 58)],
+    ('-', 23): [('*', 107), ('*', 108)],
+    ('-', 24): [('-', 23), ('*', 109)],
+    ('-', 25): [('*', 111), ('*', 112)],
+    ('-', 26): [('-', 25), ('*', 113)],
+    ('-', 27): [('-', 26), ('*', 114)],
+    ('-', 28): [('*', 116), ('*', 117)],
+    ('-', 29): [('-', 28), ('*', 118)],
+    ('-', 30): [('*', 120), ('400', 102)],
+    ('=', 41): [('*', 104), ('+', 40)],
+    ('^', 0): [('x', 42), ('2', 43)],
+    ('^', 1): [('x', 45), ('3', 46)],
+    ('^', 2): [('+', 31), ('3', 48)],
+    ('^', 3): [('x', 49), ('2', 50)],
+    ('^', 4): [('+', 32), ('2', 53)],
+    ('^', 5): [('x', 54), ('3', 55)],
+    ('^', 6): [('x', 59), ('15', 60)],
+    ('^', 7): [('x', 62), ('14', 63)],
+    ('^', 8): [('x', 65), ('13', 66)],
+    ('^', 9): [('x', 68), ('12', 69)],
+    ('^', 10): [('x', 71), ('11', 72)],
+    ('^', 11): [('x', 74), ('10', 75)],
+    ('^', 12): [('x', 77), ('9', 78)],
+    ('^', 13): [('x', 80), ('8', 81)],
+    ('^', 14): [('x', 83), ('7', 84)],
+    ('^', 15): [('x', 86), ('6', 87)],
+    ('^', 16): [('x', 89), ('5', 90)],
+    ('^', 17): [('x', 92), ('4', 93)],
+    ('^', 18): [('x', 95), ('3', 96)],
+    ('^', 19): [('x', 98), ('2', 99)]}
+    rootOfTree = ('=', 41)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '(x^2+2x^3-4)^3(x^2-x+2)^2(x^3+3x-5)=x^{15}+(8x^{14}-14x^{13})-(191x^{12})+48x^{11}+((1218x^{10}-60x^9)-(2700x^8))-(1452x^7)+4375x^6+(3476x^5-2922x^4)-(1685x^3)+655x^2+103x-400'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -1038,20 +1127,314 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=Fa
 
 
 
+def test__newSymbolsLimitTheorem__sumRule(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 25): [('+', 3), ('x', 16)],
+    ('*', 26): [('f', 19), ('x', 20)],
+    ('*', 27): [('g', 23), ('x', 24)],
+    ('+', 3): [('f', 14), ('g', 15)],
+    ('+', 4): [('lim', 7), ('lim', 9)],
+    ('=', 11): [('lim', 5), ('+', 4)],
+    ('\\to', 0): [('x', 12), ('bar', 6)],
+    ('\\to', 1): [('x', 17), ('bar', 8)],
+    ('\\to', 2): [('x', 21), ('bar', 10)],
+    ('bar', 6): [('x', 13)],
+    ('bar', 8): [('x', 18)],
+    ('bar', 10): [('x', 22)],
+    ('lim', 5): [('\\to', 0), ('*', 25)],
+    ('lim', 7): [('\\to', 1), ('*', 26)],
+    ('lim', 9): [('\\to', 2), ('*', 27)]}
+    rootOfTree = ('=', 11)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbolsLimitTheorem__productRule(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 23): [('*', 25), ('x', 14)],
+    ('*', 24): [('lim', 5), ('lim', 7)],
+    ('*', 25): [('f', 12), ('g', 13)],
+    ('*', 26): [('f', 17), ('x', 18)],
+    ('*', 27): [('g', 21), ('x', 22)],
+    ('=', 9): [('lim', 3), ('*', 24)],
+    ('\\to', 0): [('x', 10), ('bar', 4)],
+    ('\\to', 1): [('x', 15), ('bar', 6)],
+    ('\\to', 2): [('x', 19), ('bar', 8)],
+    ('bar', 4): [('x', 11)],
+    ('bar', 6): [('x', 16)],
+    ('bar', 8): [('x', 20)],
+    ('lim', 3): [('\\to', 0), ('*', 23)],
+    ('lim', 5): [('\\to', 1), ('*', 26)],
+    ('lim', 7): [('\\to', 2), ('*', 27)]}
+    rootOfTree = ('=', 9)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbolsLimitTheorem__constantTimesRule(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 17): [('*', 18), ('x', 11)],
+    ('*', 18): [('c', 9), ('f', 10)],
+    ('*', 19): [('c', 12), ('lim', 4)],
+    ('*', 20): [('f', 15), ('x', 16)],
+    ('=', 6): [('lim', 2), ('*', 19)],
+    ('\\to', 0): [('x', 7), ('bar', 3)],
+    ('\\to', 1): [('x', 13), ('bar', 5)],
+    ('bar', 3): [('x', 8)],
+    ('bar', 5): [('x', 14)],
+    ('lim', 2): [('\\to', 0), ('*', 17)],
+    ('lim', 4): [('\\to', 1), ('*', 20)]}
+    rootOfTree = ('=', 6)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbolsLimitTheorem__quotientRule(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 25): [('/', 5), ('x', 16)],
+    ('*', 26): [('f', 19), ('x', 20)],
+    ('*', 27): [('g', 23), ('x', 24)],
+    ('/', 5): [('f', 14), ('g', 15)],
+    ('/', 6): [('lim', 7), ('lim', 9)],
+    ('=', 11): [('lim', 3), ('/', 6)],
+    ('\\to', 0): [('x', 12), ('bar', 4)],
+    ('\\to', 1): [('x', 17), ('bar', 8)],
+    ('\\to', 2): [('x', 21), ('bar', 10)],
+    ('bar', 4): [('x', 13)],
+    ('bar', 8): [('x', 18)],
+    ('bar', 10): [('x', 22)],
+    ('lim', 3): [('\\to', 0), ('*', 25)],
+    ('lim', 7): [('\\to', 1), ('*', 26)],
+    ('lim', 9): [('\\to', 2), ('*', 27)]}
+    rootOfTree = ('=', 11)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbols__fourierSeries(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 48): [('*', 49), ('^', 4)],
+    ('*', 49): [('/', 16), ('int', 17)],
+    ('*', 50): [('f', 30), ('x', 31)],
+    ('*', 51): [('*', 50), ('^', 3)],
+    ('*', 52): [('i', 33), ('2', 34)],
+    ('*', 53): [('*', 52), ('pi', 18)],
+    ('*', 54): [('*', 53), ('/', 19)],
+    ('*', 55): [('*', 54), ('x', 37)],
+    ('*', 56): [('*', 51), ('dx', 38)],
+    ('*', 57): [('i', 40), ('2', 41)],
+    ('*', 58): [('*', 57), ('pi', 20)],
+    ('*', 59): [('*', 58), ('/', 21)],
+    ('*', 60): [('*', 59), ('x', 44)],
+    ('-', 7): [('0', 45), ('theta', 14)],
+    ('-', 8): [('0', 46), ('/', 6)],
+    ('-', 9): [('0', 47), ('*', 55)],
+    ('/', 5): [('P', 26), ('2', 27)],
+    ('/', 6): [('P', 28), ('2', 29)],
+    ('/', 16): [('1', 24), ('P', 25)],
+    ('/', 19): [('n', 35), ('P', 36)],
+    ('/', 21): [('n', 42), ('P', 43)],
+    ('=', 22): [('n', 23), ('-', 7)],
+    ('\\to', 0): [('theta', 11), ('infty', 12)],
+    ('^', 3): [('e', 32), ('-', 9)],
+    ('^', 4): [('e', 39), ('*', 60)],
+    ('int', 17): [('/', 5), ('-', 8), ('*', 56)],
+    ('lim', 10): [('\\to', 0), ('sum', 13)],
+    ('sum', 13): [('=', 22), ('theta', 15), ('*', 48)]}
+    rootOfTree = ('=', 22)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbols__parallelSumOfCapacitance(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('/', 4): [('prod', 5), ('sum', 6)],
+    ('/', 7): [('prod', 8), ('C_{k_1}', 34)],
+    ('=', 9): [('C^{parallelTotal}_{k}', 13), ('/', 4)],
+    ('=', 10): [('k_0', 16), ('1', 18)],
+    ('=', 11): [('k_1', 23), ('1', 25)],
+    ('=', 12): [('k_0', 27), ('1', 29)],
+    ('prod', 5): [('=', 10), ('k', 19), ('C_{k_0}', 20)],
+    ('prod', 8): [('=', 12), ('k', 30), ('C_{k_0}', 31)],
+    ('sum', 6): [('=', 11), ('k', 26), ('/', 7)]}
+    rootOfTree = ('=', 9)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbols__faradayIntegralForm(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 24): [('\\cdot', 0), ('vec', 7)],
+    ('*', 25): [('d', 18), ('t', 19)],
+    ('*', 26): [('/', 8), ('iint', 9)],
+    ('*', 27): [('\\cdot', 1), ('vec', 12)],
+    ('-', 2): [('0', 23), ('*', 26)],
+    ('/', 8): [('d', 17), ('*', 25)],
+    ('=', 13): [('oint', 3), ('-', 2)],
+    ('\\cdot', 0): [('vec', 6), ('d', 15)],
+    ('\\cdot', 1): [('vec', 11), ('d', 21)],
+    ('iint', 9): [('Omega', 10), ('*', 27)],
+    ('oint', 3): [('partial', 4), ('*', 24)],
+    ('partial', 4): [('Omega', 5)],
+    ('vec', 6): [('E', 14)],
+    ('vec', 7): [('l', 16)],
+    ('vec', 11): [('B', 20)],
+    ('vec', 12): [('S', 22)]}
+    rootOfTree = ('=', 13)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbols__faradayDifferentialForm(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('-', 1): [('0', 12), ('/', 4)],
+    ('/', 4): [('partial', 5), ('partial', 7)],
+    ('=', 8): [('\\times', 0), ('-', 1)],
+    ('\\times', 0): [('nabla', 2), ('vec', 3)],
+    ('partial', 5): [('vec', 6)],
+    ('partial', 7): [('t', 11)],
+    ('vec', 3): [('E', 9)],
+    ('vec', 6): [('B', 10)]}
+    rootOfTree = ('=', 8)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbols__gaussIntegralForm(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 18): [('\\cdot', 0), ('vec', 5)],
+    ('*', 19): [('/', 6), ('iiint', 8)],
+    ('*', 20): [('rho', 10), ('d', 16)],
+    ('*', 21): [('*', 20), ('V', 17)],
+    ('/', 6): [('1', 15), ('epsilon', 7)],
+    ('=', 11): [('oiint', 1), ('*', 19)],
+    ('\\cdot', 0): [('vec', 4), ('d', 13)],
+    ('iiint', 8): [('Omega', 9), ('*', 21)],
+    ('oiint', 1): [('partial', 2), ('*', 18)],
+    ('partial', 2): [('Omega', 3)],
+    ('vec', 4): [('E', 12)],
+    ('vec', 5): [('S', 14)]}
+    rootOfTree = ('=', 11)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+
+def test__newSymbols__greenSecondVectorIdentityDifferentialForm(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+    ('*', 17): [('p', 9), ('Delta', 3)],
+    ('*', 18): [('q', 11), ('Delta', 4)],
+    ('*', 19): [('p', 13), ('nabla', 6)],
+    ('*', 20): [('*', 19), ('q', 14)],
+    ('*', 21): [('q', 15), ('nabla', 7)],
+    ('*', 22): [('*', 21), ('p', 16)],
+    ('-', 1): [('*', 17), ('*', 18)],
+    ('-', 2): [('*', 20), ('*', 22)],
+    ('=', 8): [('-', 1), ('\\cdot', 0)],
+    ('Delta', 3): [('q', 10)],
+    ('Delta', 4): [('p', 12)],
+    ('\\cdot', 0): [('nabla', 5), ('-', 2)]}
+    rootOfTree = ('=', 8)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
 #
 def test__paveWayForDifferentiation__productRule(verbose=False):#TODO ugly
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   
-    ('*', 2): [('/', 1), ('uv', 3)],
-    ('*', 5): [('u', 4), ('/', 6)],
-    ('*', 9): [('v', 8), ('/', 10)],
-    ('+', 7): [('*', 5), ('*', 9)],
-    ('/', 1): [('d', 12), ('dx', 11)],
-    ('/', 6): [('dv', 16), ('dx', 15)],
-    ('/', 10): [('du', 14), ('dx', 13)],
-    ('=', 0): [('*', 2), ('+', 7)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 17): [('/', 1), ('u', 7)],
+    ('*', 18): [('*', 17), ('v', 8)],
+    ('*', 19): [('u', 9), ('/', 2)],
+    ('*', 20): [('d', 10), ('v', 11)],
+    ('*', 21): [('v', 13), ('/', 3)],
+    ('*', 22): [('d', 14), ('u', 15)],
+    ('+', 0): [('*', 19), ('*', 21)],
+    ('/', 1): [('d', 5), ('dx', 6)],
+    ('/', 2): [('*', 20), ('dx', 12)],
+    ('/', 3): [('*', 22), ('dx', 16)],
+    ('=', 4): [('*', 18), ('+', 0)]}
+    rootOfTree = ('=', 4)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{d}{\\dx}\\uv=u\\frac{\\dv }{\\dx}+v\\frac{\\du }{\\dx}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -1062,14 +1445,19 @@ def test__paveWayForDifferentiation__productRule(verbose=False):#TODO ugly
 def test__paveWayForDifferentiation__sumRule(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 2): [('/', 1), ('+', 4)],
-    ('+', 4): [('u', 3), ('v', 5)],
-    ('+', 7): [('/', 6), ('/', 8)],
-    ('/', 1): [('d', 10), ('dx', 9)],
-    ('/', 6): [('du', 12), ('dx', 11)],
-    ('/', 8): [('dv', 14), ('dx', 13)],
-    ('=', 0): [('*', 2), ('+', 7)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 16): [('/', 2), ('+', 0)],
+    ('*', 17): [('d', 10), ('u', 11)],
+    ('*', 18): [('d', 13), ('v', 14)],
+    ('+', 0): [('u', 8), ('v', 9)],
+    ('+', 1): [('/', 3), ('/', 4)],
+    ('/', 2): [('d', 6), ('dx', 7)],
+    ('/', 3): [('*', 17), ('dx', 12)],
+    ('/', 4): [('*', 18), ('dx', 15)],
+    ('=', 5): [('*', 16), ('+', 1)]}
+    rootOfTree = ('=', 5)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\frac{d}{\\dx}(u+v)=\\frac{\\du }{\\dx}+\\frac{\\dv }{\\dx}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -1080,22 +1468,25 @@ def test__paveWayForDifferentiation__sumRule(verbose=False):
 def test__paveWayForIntegration__enclosingBracketNonBackslash(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = {   ('*', 2): [('int', 1), ('dx', 3)],
-    ('*', 5): [('/', 4), ('^', 7)],
-    ('*', 11): [('3', 10), ('^', 13)],
-    ('*', 17): [('3', 16), ('x', 18)],
-    ('*', 24): [('-', 22), ('+', 26)],
-    ('+', 19): [('-', 15), ('C', 20)],
-    ('+', 26): [('x', 25), ('1', 27)],
-    ('-', 9): [('*', 5), ('*', 11)],
-    ('-', 15): [('-', 9), ('*', 17)],
-    ('-', 22): [('x', 21), ('3', 23)],
-    ('/', 4): [('1', 28), ('3', 29)],
-    ('=', 0): [('*', 2), ('+', 19)],
-    ('^', 7): [('x', 6), ('3', 8)],
-    ('^', 13): [('x', 12), ('2', 14)],
-    ('int', 1): [('*', 24)]}
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 25): [('-', 2), ('+', 5)],
+    ('*', 26): [('int', 7), ('dx', 14)],
+    ('*', 27): [('/', 8), ('^', 0)],
+    ('*', 28): [('3', 19), ('^', 1)],
+    ('*', 29): [('3', 22), ('x', 23)],
+    ('+', 5): [('x', 12), ('1', 13)],
+    ('+', 6): [('-', 4), ('C', 24)],
+    ('-', 2): [('x', 10), ('3', 11)],
+    ('-', 3): [('*', 27), ('*', 28)],
+    ('-', 4): [('-', 3), ('*', 29)],
+    ('/', 8): [('1', 15), ('3', 16)],
+    ('=', 9): [('*', 26), ('+', 6)],
+    ('^', 0): [('x', 17), ('3', 18)],
+    ('^', 1): [('x', 20), ('2', 21)],
+    ('int', 7): [('*', 25)]}
+    rootOfTree = ('=', 9)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\int{(x-3)(x+1)}\\dx=(\\frac{1}{3}x^3-3x^2)-(3x)+C'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -1106,8 +1497,30 @@ def test__paveWayForIntegration__enclosingBracketNonBackslash(verbose=False):
 def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    ast = None # waiting for parsertest
-    parser = Latexparser(ast=ast, verbose=verbose)
+    ast = {
+    ('*', 35): [('-', 4), ('^', 0)],
+    ('*', 36): [('int', 10), ('dx', 20)],
+    ('*', 37): [('/', 11), ('^', 1)],
+    ('*', 38): [('/', 12), ('^', 2)],
+    ('*', 39): [('/', 13), ('^', 3)],
+    ('+', 7): [('x', 17), ('1', 18)],
+    ('+', 8): [('*', 37), ('-', 6)],
+    ('+', 9): [('+', 8), ('C', 34)],
+    ('-', 4): [('x', 15), ('1', 16)],
+    ('-', 5): [('*', 38), ('*', 39)],
+    ('-', 6): [('-', 5), ('x', 33)],
+    ('/', 11): [('1', 21), ('4', 22)],
+    ('/', 12): [('1', 25), ('3', 26)],
+    ('/', 13): [('1', 29), ('2', 30)],
+    ('=', 14): [('*', 36), ('+', 9)],
+    ('^', 0): [('+', 7), ('2', 19)],
+    ('^', 1): [('x', 23), ('4', 24)],
+    ('^', 2): [('x', 27), ('3', 28)],
+    ('^', 3): [('x', 31), ('2', 32)],
+    ('int', 10): [('*', 35)]}
+    rootOfTree = ('=', 14)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
     expected_eqsStr = '\\int{(x-1)(x+1)^2}dx=\\frac{1}{4}x^4+\\frac{1}{3}x^3-\\frac{1}{2}x^2-x+C'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
@@ -1116,49 +1529,49 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
-    test__contiguousLeftOvers__decimalPlaces()
-    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
-    test__schemeToLatex__variablesWithCurlyBrackets()
-    test__findingBackSlashAndInfixOperations__Trig0()
-    test__findingBackSlashAndInfixOperations__Trig1()
-    test__findingBackSlashAndInfixOperations__Trig2()
-    test__findingBackSlashAndInfixOperations__Sqrt0()
-    test__findingBackSlashAndInfixOperations__Sqrt1()
-    test__findingBackSlashAndInfixOperations__Ln()
-    test__findingBackSlashAndInfixOperations__Frac()
-    test__findingBackSlashAndInfixOperations__Log0()
-    test__findingBackSlashAndInfixOperations__Log1()
-    test__findingBackSlashAndInfixOperations__tildeVariable()
-    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
-    test__infixInBackslash__paraboloid()
-    test__sqrtWithPowerCaretRightOtherInfix__hill()
-    test__nonInfixBrackets__addImplicitMultiply()
-    test__nonInfixBrackets__addImplicitMultiply0()
-    test__nonInfixBrackets__addImplicitMultiply1()
-    test__BODMAS__priorityBetweenInfixForBrackets()
-    test__BODMAS__enclosingBracketInBackslashArg()
-    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
-    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
-    test__BODMAS__enclosingBracket()
-    test__manyFracCaretEnclosingBrac__partialFrac()
-    test__fracWithLogNoBase__changeLogBaseFormula()
-    test__backslashInfixInBackslash__sqrtInSqrt()
-    test__backslashInfixInBackslash__trigInTrig()
-    test__backslashInfixInBackslash__logInLog()
-    test__backslashInfixInBackslash__fracInFrac()
-    test__hassliche__highPowersAndRandomCoefficientsPITEST()
-    test__hassliche__nestedPolynomial()
-    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
-    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
-    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
-    test__hassliche__degree5()
-    test__hassliche__degree6()
-    test__hassliche__degree7()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
+    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(True)
+    # test__contiguousLeftOvers__decimalPlaces(True)
+    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True)
+    # test__schemeToLatex__variablesWithCurlyBrackets(True)
+    # test__findingBackSlashAndInfixOperations__Trig0(True)
+    # test__findingBackSlashAndInfixOperations__Trig1(True)
+    # test__findingBackSlashAndInfixOperations__Trig2(True)
+    # test__findingBackSlashAndInfixOperations__Sqrt0(True)
+    # test__findingBackSlashAndInfixOperations__Sqrt1(True)
+    # test__findingBackSlashAndInfixOperations__Ln(True)
+    # test__findingBackSlashAndInfixOperations__Frac(True)
+    # test__findingBackSlashAndInfixOperations__Log0(True)
+    # test__findingBackSlashAndInfixOperations__Log1(True)
+    # test__findingBackSlashAndInfixOperations__tildeVariable(True)
+    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(True)
+    # test__infixInBackslash__paraboloid(True)
+    # test__sqrtWithPowerCaretRightOtherInfix__hill(True)
+    # test__nonInfixBrackets__addImplicitMultiply(True)
+    # test__nonInfixBrackets__addImplicitMultiply0(True)
+    # test__nonInfixBrackets__addImplicitMultiply1(True)
+    # test__BODMAS__priorityBetweenInfixForBrackets(True)
+    # test__BODMAS__enclosingBracketInBackslashArg(True)
+    # test__BODMAS__enclosingBracketInBackslashArgWithExponent(True)
+    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero(True)
+    # test__BODMAS__enclosingBracket(True)
+    # test__manyFracCaretEnclosingBrac__partialFrac(True)
+    # test__fracWithLogNoBase__changeLogBaseFormula(True)
+    # test__backslashInfixInBackslash__sqrtInSqrt(True)
+    # test__backslashInfixInBackslash__trigInTrig(True)
+    # test__backslashInfixInBackslash__logInLog(True)
+    # test__backslashInfixInBackslash__fracInFrac(True)
+    # test__hassliche__highPowersAndRandomCoefficientsPITEST(True)
+    # test__hassliche__nestedPolynomial(True)
+    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(True)
+    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(True)
+    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(True)
+    # test__hassliche__degree5(True)
+    # test__hassliche__degree6(True)
+    # test__hassliche__degree7(True)
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True)
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True)
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(True)
     # test__paveWayForDifferentiation__productRule(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
     # test__paveWayForDifferentiation__sumRule(True)  # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
     # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
