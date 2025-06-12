@@ -1,8 +1,6 @@
 https://threejs.org/examples/webgl_animation_keyframes.html
 
 
-https://threejs.org/examples/webgl_geometry_text.html
-
 https://threejs.org/examples/webgl_geometry_text_shapes.html
 -FontLoader.js mimics handwriting, moveTo lifts the pen, lineTo|quadraticCurveTo|bezierCurveTo draws, the fontfile that it takes, has specific data on the coordinates to move the pen.
 -to use this for mathML|latex, need to find those points....
@@ -10,12 +8,18 @@ https://threejs.org/examples/webgl_geometry_text_shapes.html
 https://threejs.org/examples/misc_uv_tests
 
 
-file:///D:/p6/three.module.js
-
 
 python3 -m http.server # python 3
 
 
-DISPLAY MATHML &| LATEX 
-OG:
-font.generateShapes(message, 100);
+
+
+
+https://fred-wang.github.io/TeXZilla/examples/toImageWebGL.html
+
+
+REFERENCE PAGE
+https://threejs.org/docs/#examples/en/geometries/TextGeometry
+
+
+http://localhost:8000/public/index.html

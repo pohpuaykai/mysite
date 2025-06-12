@@ -1,0 +1,5 @@
+remove Django?
+do 
+merge cubeTutorial and textTutorial
+https://threejs.org/manual/#en/drawing-lines
+https://threejs.org/manual/#en/loading-3d-models

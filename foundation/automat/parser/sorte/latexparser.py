@@ -3,7 +3,7 @@ from enum import Enum
 import re
 
 from foundation.automat.arithmetic.function import Function
-from foundation.automat.common import BinarySearch, isNum, lenOrZero
+from foundation.automat.common import BinarySearch, isNum, lenOrZero, FindTreeInTree
 from foundation.automat.parser.parser import Parser
 
 class BracketType(Enum):
@@ -128,7 +128,7 @@ class Latexparser(Parser):
     ######
 
 
-    def getLatexSpecialCases(self, funcName):
+    def getLatexSpecialCases(self, funcName, reverse=False):
         """
         True|False is "whether or not this node is optional to output", 
 
@@ -147,7 +147,8 @@ class Latexparser(Parser):
                         ( (('^', '$5'), True, 2), [ ((trigFuncName, '$0'), False, 0), (('$1', '$2'), False, 3)]) # if parentNode is present, then Are_the_children_optional?
                     ],
                     'insertToEntityStorage':['^'],
-                    'rootOfResultTemplate': 2# for parent replacement in childrenList
+                    'rootOfResultTemplate': 2,# for parent replacement in childrenList
+                    'reverseTag':trigFuncName
                 }
             return l
         LATEX_SPECIAL_CASES = {
@@ -158,7 +159,8 @@ class Latexparser(Parser):
                 ],
                 'insertToEntityStorage':[],
                 'var__defaults':{'$1':'2'},
-                'rootOfResultTemplate': 0# for parent replacement in childrenList
+                'rootOfResultTemplate': 0,# for parent replacement in childrenList
+                'reverseTag':'nroot'
             },
             'ln':{
                 'inputTemplate':( (('ln', '$0'), False, 0), [ (('$3', '$4'), False, 2)]),
@@ -167,7 +169,8 @@ class Latexparser(Parser):
                 ],
                 'var__defaults':{'$1':'e'},
                 'insertToEntityStorage':[],
-                'rootOfResultTemplate': 0# for parent replacement in childrenList
+                'rootOfResultTemplate': 0,# for parent replacement in childrenList
+                'reverseTag':'log'
 
             },
             'log':{
@@ -177,7 +180,8 @@ class Latexparser(Parser):
                 ],
                 'var__defaults':{'$1':'10'},
                 'insertToEntityStorage':[],
-                'rootOfResultTemplate': 0# for parent replacement in childrenList
+                'rootOfResultTemplate': 0,# for parent replacement in childrenList
+                'reverseTag':'log'
             },
             'frac':{
                 'inputTemplate':( (('frac', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
@@ -185,11 +189,19 @@ class Latexparser(Parser):
                     ( (('/', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
                 ],
                 'insertToEntityStorage':[],
-                'rootOfResultTemplate': 0# for parent replacement in childrenList
+                'rootOfResultTemplate': 0,# for parent replacement in childrenList
+                'reverseTag':'/'
             },
         }
         LATEX_SPECIAL_CASES.update(addTrig())
-        return LATEX_SPECIAL_CASES.get(funcName)
+        if reverse:
+            list_instructions = []
+            for _, instructions in LATEX_SPECIAL_CASES.items():
+                if instructions['reverseTag'] == funcName:
+                    list_instructions.append(instructions)
+            return list_instructions
+        else:
+            return LATEX_SPECIAL_CASES.get(funcName)
 
 
 
@@ -1854,6 +1866,30 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
 #####################################################
 
     def _convertASTToLatexStyleAST(self):
+        """
+        find all outputTemplate(subtree) in input
+        - find root in input
+        - DFS together
+        """
+        def nodeMatch(gesuchteNode, targetNode):
+            if gesuchteNode[0].startswith('$'): #its a variable
+                return True# variables match anything in targetTree, ignores Optional|Compulsory
+            return gesuchteNode[0] == targetNode[0]
+        
+        self.latexAST = {}
+        for pNode, children in self.ast.items():
+            for instructions in getLatexSpecialCases(self, pNode[0], reverse=True):
+                outputTemplateRoot = None
+                for outputTemplateParent in instructions['outputTemplate'].keys():
+                    if outputTemplateParent[1] == instructions['rootOfResultTemplate']: #only the id
+                        outputTemplateRoot=outputTemplateParent
+                        break
+                for matchedOutputTree in FindTreeInTree.findAllTreeInTree(instructions['outputTemplate'], outputTemplateRoot, self.ast, nodeMatch):
+                    #match the variables
+                    #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
+                    #update matched_inputTemplate -> self.latexAST
+                    self.latexAST
+
         """
 
     WHAT ABOUT THE NEW FUNCTIONS?

@@ -1,0 +1,2 @@
+gen SVG 
+https://commons.m.wikimedia.org/wiki/File:Electrical_symbols_library.svg
