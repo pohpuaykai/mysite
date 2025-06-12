@@ -1838,6 +1838,7 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
     2. functions count
     3. primitives count
     4. variables count
+    5. matrices count
         """
         pass#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -1878,17 +1879,68 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         
         self.latexAST = {}
         for pNode, children in self.ast.items():
-            for instructions in getLatexSpecialCases(self, pNode[0], reverse=True):
+            list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
+            print(pNode, children, len(list_instructions));import pdb;pdb.set_trace()
+            for instructions in list_instructions:
                 outputTemplateRoot = None
                 for outputTemplateParent in instructions['outputTemplate'].keys():
                     if outputTemplateParent[1] == instructions['rootOfResultTemplate']: #only the id
                         outputTemplateRoot=outputTemplateParent
                         break
-                for matchedOutputTree in FindTreeInTree.findAllTreeInTree(instructions['outputTemplate'], outputTemplateRoot, self.ast, nodeMatch):
+                # need to strip the outputTemplate of all the unnecessary arguments
+                stripStack, outputTemplate = [outputTemplateRoot], {}
+                while len(stripStack) > 0:
+                    c = stripStack.pop()
+                    strippedChildren = []
+                    for child in instructions['outputTemplate'][c]:
+                        strippedChildren.append(child[0])
+                        stripStack.append(child)
+                    outputTemplate[c[0]] = strippedChildren
+                outputTemplateRoot = outputTemplateRoot[0]
+                #
+                for rootOfMatched, matchedOutputTree in FindTreeInTree.findAllTreeInTree(outputTemplate, outputTemplateRoot, self.ast, nodeMatch):
                     #match the variables
-                    #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
-                    #update matched_inputTemplate -> self.latexAST
-                    self.latexAST
+                    templateStack, matchedStack, var__val = [outputTemplateRoot], [rootOfMatched], {}
+                    while len(templateStack) > 0 or len(matchedStack) > 0:
+                        (templateName, templateId), (matchedName, matchedId) = templateStack.pop(), matchedStack.pop()
+                        if templateName.startswith('$'):
+                            var__val[templateName] = matchedName
+                        if templateId.startswith('$'):
+                            var__val[templateId] = matchedId
+                        templateStack += outputTemplate[(templateName, templateId)]
+                        matchedStack += matchedOutputTree[(matchedName, matchedId)]
+                #
+
+                #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
+                templateParent, templateChildren = instructions['inputTemplate'] # we expecting only 1 line for instructions['inputTemplate']
+                filledParentName = var__val.get(templateParent[0], templateParent[0])
+                filledParentId = var__val.get(templateParent[1], templateParent[1])
+                filledChildren = []
+                for templateChild in templateChildren:
+                    filledChildName = var__val.get(templateChild[0], templateChild[0])
+                    filledChildId = var__val.get(templateChild[1], templateChild[1])
+                    filledChildren.append((filledChildname, filledChildId))
+                self.latexAST[(filledParentName, filledParentId)] = filledChildren#nothing is added... only removed, so no 
+
+            if len(list_instructions) == 0:
+                self.latexAST[pNode] = children
+
+
+        # from foundation.automat.common.termsofbaseop import TermsOfBaseOp
+        # groupingByRightIdWithEarliestJoiner, groupsWithBaseOp = TermsOfBaseOp.nodeOfBaseOpByGroup(self.ast, '+') # should also return root of grouping, then we can check if parent of root is - TODO
+        # from foundation.automat.common.flattener import Flattener
+        # self.headsOfPlusTrees = []
+        # groupingByRightId = []
+        # # import pdb;pdb.set_trace()
+        # for infoDict in groupingByRightIdWithEarliestJoiner:
+        #     groupingByRightId.append(infoDict['group'])
+        #     # import pdb;pdb.set_trace()
+        #     # if len(infoDict['group']) > 1: # need the head and another, a group with just a head, then the head is not a head 
+        #     self.headsOfPlusTrees.append(infoDict['earliestJoiner'])
+        # self.plusIdsThatDoNotNeedBrackets = Flattener.flatten(groupingByRightId)
+
+
+        #below for bracket formating, or we can use bracketstorage to add the old brackets back?
 
         """
 
@@ -1921,126 +1973,113 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         """
 
 
-        childToParent = {} # invertedTree, for easy manipulation later
+        # childToParent = {} # invertedTree, for easy manipulation later
 
-        import copy
+        # import copy
 
-        self.leaves = set()
-        self.latexAST = {}
-        print('self.rootOfTree', self.rootOfTree);import pdb;pdb.set_trace()
-        stack = [self.rootOfTree]#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<OVERALLEquals?<<<<<<<<<<<<<<<<<
-        while len(stack) > 0:
-            currentNode = stack.pop()
-            nodeName, nodeId = currentNode
-            children = copy.deepcopy(self.ast.get(currentNode))
-            # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<_convertASTToLatexStyleAST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', currentNode, children)
-            # import pdb;pdb.set_trace()
-            if children is not None:
-                stack += list(children)
-                modifiedParent = False
-                if nodeName == '*':
-                    # print('IS MULTIPLY')
-                    # HANDLE IMPLICIT-MULITPLY *********************
-                    nodeName = ''
-                    modifiedParent = True
-                    # HANDLE IMPLICIT-MULTIPLY *********************
-                elif nodeName == 'nroot':
-                    nodeName = 'sqrt'
-                    childToParent[children[0]] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
-                    if str(children[0][0]) == '2':
-                        children = [('', children[0][1]), children[1]]
-                    modifiedParent = True
-                elif nodeName == '/':
-                    nodeName = 'frac'
-                    modifiedParent = True
-                elif nodeName == 'log':
-                    #we assume that the first argument is the base
-                    baseNode = children[0]
-                    if baseNode[0] == 'e': #cest ln
-                        nodeName = 'ln'
-                        children = [children[1]] # take out the base.
-                        childToParent[baseNode] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
-                        modifiedParent = True
-                    elif str(baseNode[0]) == '10':
-                        #same nodeName
-                        children = [children[1]] # take out the base.
-                        childToParent[baseNode] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
-                        modifiedParent = True
-                elif nodeName in Latexparser.TRIGOFUNCTION:
-                    # print(currentNode, '()())()()()')
-                    # import pdb;pdb.set_trace()
-                    #remove exponent above it, if any
-                    parentName, parentId = childToParent[currentNode]
-                    if parentName == '^':
-                        #find the exponentNode
-                        firstChild, secondChild = self.ast[(parentName, parentId)]
-                        if firstChild[1] == currentNode[1]: # id(firstChild)==id(currentNode), then secondChild is the exponentNode
-                            exponentNode = secondChild
-                        else: # else firstChild is the exponentNode
-                            exponentNode = firstChild
+        # self.leaves = set()
+        # self.latexAST = {}
+        # print('self.rootOfTree', self.rootOfTree);import pdb;pdb.set_trace()
+        # stack = [self.rootOfTree]#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<OVERALLEquals?<<<<<<<<<<<<<<<<<
+        # while len(stack) > 0:
+        #     currentNode = stack.pop()
+        #     nodeName, nodeId = currentNode
+        #     children = copy.deepcopy(self.ast.get(currentNode))
+        #     # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<_convertASTToLatexStyleAST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', currentNode, children)
+        #     # import pdb;pdb.set_trace()
+        #     if children is not None:
+        #         stack += list(children)
+        #         modifiedParent = False
+        #         if nodeName == '*':
+        #             # print('IS MULTIPLY')
+        #             # HANDLE IMPLICIT-MULITPLY *********************
+        #             nodeName = ''
+        #             modifiedParent = True
+        #             # HANDLE IMPLICIT-MULTIPLY *********************
+        #         elif nodeName == 'nroot':
+        #             nodeName = 'sqrt'
+        #             childToParent[children[0]] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
+        #             if str(children[0][0]) == '2':
+        #                 children = [('', children[0][1]), children[1]]
+        #             modifiedParent = True
+        #         elif nodeName == '/':
+        #             nodeName = 'frac'
+        #             modifiedParent = True
+        #         elif nodeName == 'log':
+        #             #we assume that the first argument is the base
+        #             baseNode = children[0]
+        #             if baseNode[0] == 'e': #cest ln
+        #                 nodeName = 'ln'
+        #                 children = [children[1]] # take out the base.
+        #                 childToParent[baseNode] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
+        #                 modifiedParent = True
+        #             elif str(baseNode[0]) == '10':
+        #                 #same nodeName
+        #                 children = [children[1]] # take out the base.
+        #                 childToParent[baseNode] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
+        #                 modifiedParent = True
+        #         elif nodeName in Latexparser.TRIGOFUNCTION:
+        #             # print(currentNode, '()())()()()')
+        #             # import pdb;pdb.set_trace()
+        #             #remove exponent above it, if any
+        #             parentName, parentId = childToParent[currentNode]
+        #             if parentName == '^':
+        #                 #find the exponentNode
+        #                 firstChild, secondChild = self.ast[(parentName, parentId)]
+        #                 if firstChild[1] == currentNode[1]: # id(firstChild)==id(currentNode), then secondChild is the exponentNode
+        #                     exponentNode = secondChild
+        #                 else: # else firstChild is the exponentNode
+        #                     exponentNode = firstChild
 
-                        #make a new node with exponent as first argument
-                        children = [exponentNode, children[0]]
-                        del self.latexAST[(parentName, parentId)]
-                        parentOfParent = childToParent[(parentName, parentId)]
-                        childrenOfParentOfParent = self.ast[parentOfParent]
-                        #replace parent with currentNode in childrenOfParentOfParent
-                        theChildIdx = None
-                        for childIdx, child in enumerate(childrenOfParentOfParent):
-                            if child[1] == parentId:
-                                theChildIdx = childIdx
-                                break
-                        childrenOfParentOfParent[theChildIdx] = currentNode
-                        self.latexAST[parentOfParent] = childrenOfParentOfParent
-                        # print('<<<<<<<<<<<<<<<<<<EXPONENTTRIG', currentNode)
-                        # import pdb;pdb.set_trace()
-                        # print((nodeName, nodeId), 'children: ', children)
-                        # import pdb;pdb.set_trace()
-                        # childToParent = updateChildToParent()
-                        #TODO make id number consecutive again?
-                    #if no exponentialParent, then no change :)
-                self.latexAST[(nodeName, nodeId)] = children
-                if modifiedParent:
-                    parent = childToParent[currentNode]
-                    childrenOfParent = self.latexAST[parent]
-                    #find which child newNode is in
-                    theChildIdx = None
-                    for childIdx, child in enumerate(childrenOfParent):
-                        if child[1] == nodeId:
-                            theChildIdx = childIdx
-                    childrenOfParent[theChildIdx] = (nodeName, nodeId)#replace oldChild with newChild
-                for child in children:
-                    childToParent[child] = (nodeName, nodeId)
-            else:
-                parent = childToParent[currentNode]
-                childrenOfParent = self.latexAST[parent]
-                #find which child newNode is in
-                theChildIdx = None
-                for childIdx, child in enumerate(childrenOfParent):
-                    if child[1] == nodeId:
-                        theChildIdx = childIdx
-                #if the children[0] is a weird constant like \pi, we need to put a space behind the \pi
-                if theChildIdx == 0 and not any(c.isdigit() for c in str(nodeName)) and len(nodeName) > 1: # weird constant
-                    #is it first child?
-                    newName = nodeName + ' '
-                    self.latexAST[parent][0] = (newName, nodeId)
-                    self.leaves.add(newName)
-                else:
-                    self.leaves.add(nodeName)
+        #                 #make a new node with exponent as first argument
+        #                 children = [exponentNode, children[0]]
+        #                 del self.latexAST[(parentName, parentId)]
+        #                 parentOfParent = childToParent[(parentName, parentId)]
+        #                 childrenOfParentOfParent = self.ast[parentOfParent]
+        #                 #replace parent with currentNode in childrenOfParentOfParent
+        #                 theChildIdx = None
+        #                 for childIdx, child in enumerate(childrenOfParentOfParent):
+        #                     if child[1] == parentId:
+        #                         theChildIdx = childIdx
+        #                         break
+        #                 childrenOfParentOfParent[theChildIdx] = currentNode
+        #                 self.latexAST[parentOfParent] = childrenOfParentOfParent
+        #                 # print('<<<<<<<<<<<<<<<<<<EXPONENTTRIG', currentNode)
+        #                 # import pdb;pdb.set_trace()
+        #                 # print((nodeName, nodeId), 'children: ', children)
+        #                 # import pdb;pdb.set_trace()
+        #                 # childToParent = updateChildToParent()
+        #                 #TODO make id number consecutive again?
+        #             #if no exponentialParent, then no change :)
+        #         self.latexAST[(nodeName, nodeId)] = children
+        #         if modifiedParent:
+        #             parent = childToParent[currentNode]
+        #             childrenOfParent = self.latexAST[parent]
+        #             #find which child newNode is in
+        #             theChildIdx = None
+        #             for childIdx, child in enumerate(childrenOfParent):
+        #                 if child[1] == nodeId:
+        #                     theChildIdx = childIdx
+        #             childrenOfParent[theChildIdx] = (nodeName, nodeId)#replace oldChild with newChild
+        #         for child in children:
+        #             childToParent[child] = (nodeName, nodeId)
+        #     else:
+        #         parent = childToParent[currentNode]
+        #         childrenOfParent = self.latexAST[parent]
+        #         #find which child newNode is in
+        #         theChildIdx = None
+        #         for childIdx, child in enumerate(childrenOfParent):
+        #             if child[1] == nodeId:
+        #                 theChildIdx = childIdx
+        #         #if the children[0] is a weird constant like \pi, we need to put a space behind the \pi
+        #         if theChildIdx == 0 and not any(c.isdigit() for c in str(nodeName)) and len(nodeName) > 1: # weird constant
+        #             #is it first child?
+        #             newName = nodeName + ' '
+        #             self.latexAST[parent][0] = (newName, nodeId)
+        #             self.leaves.add(newName)
+        #         else:
+        #             self.leaves.add(nodeName)
 
-
-        from foundation.automat.common.termsofbaseop import TermsOfBaseOp
-        groupingByRightIdWithEarliestJoiner, groupsWithBaseOp = TermsOfBaseOp.nodeOfBaseOpByGroup(self.ast, '+') # should also return root of grouping, then we can check if parent of root is - TODO
-        from foundation.automat.common.flattener import Flattener
-        self.headsOfPlusTrees = []
-        groupingByRightId = []
-        # import pdb;pdb.set_trace()
-        for infoDict in groupingByRightIdWithEarliestJoiner:
-            groupingByRightId.append(infoDict['group'])
-            # import pdb;pdb.set_trace()
-            # if len(infoDict['group']) > 1: # need the head and another, a group with just a head, then the head is not a head 
-            self.headsOfPlusTrees.append(infoDict['earliestJoiner'])
-        self.plusIdsThatDoNotNeedBrackets = Flattener.flatten(groupingByRightId)
 
 
     def _unparse(self): # TODO from AST to LaTeX string... 

@@ -36,7 +36,7 @@ class FindTreeInTree:
                         targetTreeStack+=targetCurrentChildren
                 if matchedTargetTree is not None:
                     if len(matchedTargetTree) > 0: 
-                        allMatchedTrees.append(matchedTargetTree)
+                        allMatchedTrees.append((targetTreeRoot, matchedTargetTree))
                     else:
-                        allMatchedTrees.append({lastLeafMatched:[]})
+                        allMatchedTrees.append((targetTreeRoot, {lastLeafMatched:[]}))
             return allMatchedTrees
