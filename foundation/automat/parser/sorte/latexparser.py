@@ -148,7 +148,8 @@ class Latexparser(Parser):
                     ],
                     'insertToEntityStorage':['^'],
                     'rootOfResultTemplate': 2,# for parent replacement in childrenList
-                    'reverseTag':trigFuncName
+                    'reverseTag':trigFuncName,
+                    'reversePriority':0
                 }
             return l
         LATEX_SPECIAL_CASES = {
@@ -160,7 +161,8 @@ class Latexparser(Parser):
                 'insertToEntityStorage':[],
                 'var__defaults':{'$1':'2'},
                 'rootOfResultTemplate': 0,# for parent replacement in childrenList
-                'reverseTag':'nroot'
+                'reverseTag':'nroot',
+                'reversePriority':0
             },
             'ln':{
                 'inputTemplate':( (('ln', '$0'), False, 0), [ (('$3', '$4'), False, 2)]),
@@ -170,7 +172,8 @@ class Latexparser(Parser):
                 'var__defaults':{'$1':'e'},
                 'insertToEntityStorage':[],
                 'rootOfResultTemplate': 0,# for parent replacement in childrenList
-                'reverseTag':'log'
+                'reverseTag':'log',
+                'reversePriority':0
 
             },
             'log':{
@@ -181,7 +184,8 @@ class Latexparser(Parser):
                 'var__defaults':{'$1':'10'},
                 'insertToEntityStorage':[],
                 'rootOfResultTemplate': 0,# for parent replacement in childrenList
-                'reverseTag':'log'
+                'reverseTag':'log',
+                'reversePriority':1
             },
             'frac':{
                 'inputTemplate':( (('frac', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
@@ -190,7 +194,8 @@ class Latexparser(Parser):
                 ],
                 'insertToEntityStorage':[],
                 'rootOfResultTemplate': 0,# for parent replacement in childrenList
-                'reverseTag':'/'
+                'reverseTag':'/',
+                'reversePriority':0
             },
         }
         LATEX_SPECIAL_CASES.update(addTrig())
@@ -981,7 +986,7 @@ class Latexparser(Parser):
             return o, (0, end0), (start1, len(s))
 
         def isNume(numStr):
-            return isNum(numStr) or numStr in ['.', ',']
+            return isNum(numStr) or numStr in ['.', ',']#its a char (string with len 1)
 
         infixName_occupied = []
         for nodeId, funcName, widthStart, widthEnd, funcStart, funcEnd in self.entitystorage.getAllNodeIdFuncNameWidthStartWidthEnd(EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX):
@@ -1812,26 +1817,26 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
     def _get_statistics(self):
         """
 
+count by EntityType:
+    IMPLICIT_INFIX = 'implicit_infix'
+    PURE_INFIX = 'pure_infix'
+    BACKSLASH_INFIX = 'backslash_infix'
 
 
-        #last pass to get the statistics
-        self.totalNodeCount = 0
-        stack = [self.equalTuple]
-        while len(stack) > 0:
-            nodeName, nodeId = stack.pop()
-            self.totalNodeCount += 1
-            children = self.ast.get((nodeName, nodeId), [])
-            stack += children
-            if nodeName != '=' and len(children) > 0: #do not count equals
-                originalCount = self.functions.get(nodeName, 0)
-                self.functions[nodeName] = originalCount + 1
-            if len(children) == 0:
-                if isNum(str(nodeName)):
-                    # self.primitives += 1
-                    self.primitives[str(nodeName)] = self.primitives.get(str(nodeName), 0) + 1
-                else: #TODO refactor to look like above
-                    # originalCount = self.variables.get(str(nodeName), 0)
-                    self.variables[str(nodeName)] = self.variables.get(str(nodeName), 0) + 1
+    BACKSLASH_FUNCTION = 'backslash_function'
+
+
+    PURE_NUMBER = 'pure_number'
+    PURE_VARIABLE = 'pure_variable'
+    BACKSLASH_VARIABLE = 'backslash_variable'
+    BACKSLASH_NUMBER = 'backslash_number'
+    COMPOSITE_VARIABLE = 'composite_variable' # example V^{Q1}_{BE}, Voltage between B and E of transistor Q1
+
+
+
+    MATRIX = 'matrix'
+
+    FROM_CONVERSION = 'from_conversion' # entities added pendant conversion of latexAST to schemeAST NOT HERE
 
     ~~~Get statistics~~~
     1. totalNodeCount
@@ -1872,60 +1877,183 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         - find root in input
         - DFS together
         """
+        import pprint;pp = pprint.PrettyPrinter(indent=4)
+
         def nodeMatch(gesuchteNode, targetNode):
             if gesuchteNode[0].startswith('$'): #its a variable
                 return True# variables match anything in targetTree, ignores Optional|Compulsory
             return gesuchteNode[0] == targetNode[0]
+
+        def differenceBetweenOutputAndInput(instructions):
+            # print('output versus input')
+            # print(set(dict(instructions['outputTemplate']).keys()));
+            # print(set([instructions['inputTemplate'][0]]));
+            # print(list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]])))
+
+            # import pdb;pdb.set_trace()
+
+            #if set_difference compares by nodeId ONLY, then it will be right
+            nodeDifferences, inNodeIds = [], set([instructions['inputTemplate'][0][0][1]])
+            for inputTemplateParentNode in dict(instructions['outputTemplate']).keys():
+                if inputTemplateParentNode[0][1] not in inNodeIds:
+                    nodeDifferences.append(inputTemplateParentNode)
+            import pdb;pdb.set_trace()
+            return nodeDifferences
+            # return list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]]))
         
-        self.latexAST = {}
-        for pNode, children in self.ast.items():
+        #current__replaced-> for replacing child in parent's children
+        self.latexAST, current__replaced, badNodes, parentIdDifferenceToRemove = {}, {}, [], []
+        usedMatchedTrees = []
+
+        #topological_sort_BFS(top->bottom;left->bottom) for self.ast.items(), also to match the findTreeInTree
+        items = []
+        queue = [self.rootOfTree]
+        while len(queue) > 0:
+            jetzt = queue.pop(0) # BFS
+            kinder = self.ast.get(jetzt, [])
+            queue += kinder
+            if len(kinder) > 0:
+                items.append((jetzt, kinder))
+
+
+
+        # for pNode, children in self.ast.items():#if this was processed from bottoms-up(topological_sort), then current__replaced will not have a problem| just do one more pass to replace parent's children
+        for pNode, children in items:
             list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
-            print(pNode, children, len(list_instructions));import pdb;pdb.set_trace()
-            for instructions in list_instructions:
+            # print(pNode, children);import pdb;pdb.set_trace()
+            candidateReplacements, candidateIndex__defaultsMatchedCount = [], dict(map(lambda t: (t[0], t[1]['reversePriority']), enumerate(list_instructions)))
+            for candidateIndex, instructions in enumerate(list_instructions):####gives a list of candidate replacement......
+                ######
+                print('instructions')
+                pp.pprint(instructions)
+                ######
+                templateNodeDifferenceToRemove = differenceBetweenOutputAndInput(instructions)
+                candidate___current__replaced = {}
                 outputTemplateRoot = None
-                for outputTemplateParent in instructions['outputTemplate'].keys():
-                    if outputTemplateParent[1] == instructions['rootOfResultTemplate']: #only the id
+                for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
+                    # import pdb;pdb.set_trace()
+                    if outputTemplateParent[2] == instructions['rootOfResultTemplate']: #only the id
                         outputTemplateRoot=outputTemplateParent
                         break
                 # need to strip the outputTemplate of all the unnecessary arguments
                 stripStack, outputTemplate = [outputTemplateRoot], {}
                 while len(stripStack) > 0:
-                    c = stripStack.pop()
+                    tup = stripStack.pop()
                     strippedChildren = []
-                    for child in instructions['outputTemplate'][c]:
+                    # print(dict(instructions['outputTemplate']));import pdb;pdb.set_trace()
+                    for child in dict(instructions['outputTemplate']).get(tup, []):
                         strippedChildren.append(child[0])
                         stripStack.append(child)
-                    outputTemplate[c[0]] = strippedChildren
+                    if len(strippedChildren)>0:
+                        outputTemplate[tup[0]] = strippedChildren
                 outputTemplateRoot = outputTemplateRoot[0]
                 #
-                for rootOfMatched, matchedOutputTree in FindTreeInTree.findAllTreeInTree(outputTemplate, outputTemplateRoot, self.ast, nodeMatch):
+                print('matching pNode: ', pNode)
+                print('usedMatchedTrees', usedMatchedTrees)
+                var__val = {}
+                #for same funcName (outputTemplateRoot), outputTemplateRoot:[matchedOutputTree] is CACHABLE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                #matchedTrees should be order in which self.ast is processed, top->bottom;left->right
+                #if here is top->bottom;left->right, then the above (self.ast.items) should also be top->bottom;left->right
+                rootOfMatched = None
+                for rootOfMatched, matchedOutputTree in FindTreeInTree.findAllTreeInTree(outputTemplate, outputTemplateRoot, self.ast, self.rootOfTree, nodeMatch):
+                    if (rootOfMatched, matchedOutputTree) in usedMatchedTrees:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        continue
+                    print('~~~matchedOutputTree:', matchedOutputTree);import pdb;pdb.set_trace()
+                    #if tree has been matched, DO NOT USE IT AGAIN<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     #match the variables
-                    templateStack, matchedStack, var__val = [outputTemplateRoot], [rootOfMatched], {}
-                    while len(templateStack) > 0 or len(matchedStack) > 0:
+                    templateStack, matchedStack = [outputTemplateRoot], [rootOfMatched]
+                    while len(templateStack) > 0 and len(matchedStack) > 0:
                         (templateName, templateId), (matchedName, matchedId) = templateStack.pop(), matchedStack.pop()
                         if templateName.startswith('$'):
                             var__val[templateName] = matchedName
+                            print('$$$$$$$matchedName', matchedName, instructions.get('var__defaults', {}).values()) # the default is 1, so we add 2 to choose this
+                            if matchedName in instructions.get('var__defaults', {}).values():
+                                candidateIndex__defaultsMatchedCount[candidateIndex] += 2
                         if templateId.startswith('$'):
                             var__val[templateId] = matchedId
-                        templateStack += outputTemplate[(templateName, templateId)]
-                        matchedStack += matchedOutputTree[(matchedName, matchedId)]
+                        # print(var__val);import pdb;pdb.set_trace()
+                        templateStack += outputTemplate.get((templateName, templateId), [])
+                        matchedStack += matchedOutputTree.get((matchedName, matchedId), [])
+                    break # just need one matched tree, this means last_used rootOfMatched will be put into usedMatchedTrees
+                print('var__val', var__val);import pdb;pdb.set_trace()
                 #
 
                 #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
                 templateParent, templateChildren = instructions['inputTemplate'] # we expecting only 1 line for instructions['inputTemplate']
-                filledParentName = var__val.get(templateParent[0], templateParent[0])
-                filledParentId = var__val.get(templateParent[1], templateParent[1])
+                filledParentName = var__val.get(templateParent[0][0], templateParent[0][0])
+                filledParentId = var__val.get(templateParent[0][1], templateParent[0][1])
+                print('filledParent:', (filledParentName, filledParentId));import pdb;pdb.set_trace()
                 filledChildren = []
                 for templateChild in templateChildren:
-                    filledChildName = var__val.get(templateChild[0], templateChild[0])
-                    filledChildId = var__val.get(templateChild[1], templateChild[1])
-                    filledChildren.append((filledChildname, filledChildId))
-                self.latexAST[(filledParentName, filledParentId)] = filledChildren#nothing is added... only removed, so no 
+                    filledChildName = var__val.get(templateChild[0][0], templateChild[0][0])#
+                    print('filledChildName', filledChildName, 'defaults: ', instructions.get('var__defaults', {}).values())
+                    if filledChildName in instructions.get('var__defaults', {}).values(): #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<the more defaults it fits, the higher the priority of this candidateReplacement
+                        candidateIndex__defaultsMatchedCount[candidateIndex] += 1
+                        print('matchedDefault, optional::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::', );import pdb;pdb.set_trace()
+                        if templateChild[1]:#skip if optional
+                            print('skipping child$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                            continue
+                    filledChildId = var__val.get(templateChild[0][1], templateChild[0][1])#
+                    print(templateChild);import pdb;pdb.set_trace()
+                    #
+                    if filledChildName.startswith('$') or str(filledChildId).startswith('$'):
+                        continue#don't add this child
+                    # parentIdDifferenceToRemove using templateNodeDifferenceToRemove
+                    #fill up the nodes to ignore
+                    for templateNodeToRemove in templateNodeDifferenceToRemove:
+                        templateNodeName, templateNodeId = templateNodeToRemove[0]
+                        nodeToRemove = (var__val.get(templateNodeName, templateNodeName), var__val.get(templateNodeId, templateNodeId))
+                        parentIdDifferenceToRemove.append(nodeToRemove)
+                        candidate___current__replaced[nodeToRemove] = (filledParentName, filledParentId)
+                    #
+                    # print('parentIdDifferenceToRemove', parentIdDifferenceToRemove);import pdb;pdb.set_trace()
+                    filledChildren.append((filledChildName, filledChildId))
+                    print(filledChildren, 'filedChildren<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                if len(filledChildren) == 0:#<<<< this is not accurate, if we cannot find child in var__val, should do optional|compulsory_matching with children (of pNode) TODO
+                    filledChildren = children
+                    filledParentName, filledParentId = pNode
+                # print('latexAST',self.latexAST);import pdb;pdb.set_trace()
+                # print('current__replaced', current__replaced)
+                candidate___current__replaced[pNode] = (filledParentName, filledParentId)
+                print('candidate: ', {'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced})
+                candidateReplacements.append({'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced}) 
+            #
+            if len(candidateIndex__defaultsMatchedCount) > 0: 
+                print('candidateReplacements:', candidateReplacements)
+                print('candidateIndex__defaultsMatchedCount', candidateIndex__defaultsMatchedCount);import pdb;pdb.set_trace()
+                
+                candidateReplacement = candidateReplacements[max(candidateIndex__defaultsMatchedCount.items(), key=lambda t:t[1])[0]]#IF DRAW?????????<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                filledParent, filledChildren = list(candidateReplacement['candidate'].items())[0]
+                current__replaced.update(candidateReplacement['current__replaced'])
+                self.latexAST[filledParent] = filledChildren#
+                if rootOfMatched is not None:
+                    usedMatchedTrees.append((rootOfMatched, matchedOutputTree))
 
-            if len(list_instructions) == 0:
-                self.latexAST[pNode] = children
+                print('latexAST:', self.latexAST)
+                print('current__replaced:', current__replaced)
+                #take out the difference between the instructions['outputTemplate'] and the instructions['inputTemplate']
+
+            # if len(list_instructions) == 0:
+            #     self.latexAST[pNode] = children
+
+        # print('badNodes', badNodes);import pdb;pdb.set_trace()
+        for pNode, children in self.ast.items():
+            list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
+            if len(list_instructions) == 0 and pNode not in parentIdDifferenceToRemove:
+                newChildren = []
+                for child in children:
+                    newChildren.append(current__replaced.get(child, child))
+                self.latexAST[pNode] = newChildren
+
+            # #secondpass to replace parent's children, because we don't want to do topological_sort at the start
+            # if len(list_instructions) > 0:
+            #     newParent, newChildren = current__replaced.get(pNode, pNode), []
+            #     for child in self.latexAST[newParent]:
+            #         newChildren.append(current__replaced.get(child, child))
+            #     self.latexAST[newParent] = newChildren
 
 
+        #<<<<<<<<<<<<<<<<<<<<<<<<< for polynomials, like test__nonInfixBrackets__addImplicitMultiply; example: 1+(1+(1+1))=4, should be 1+1+1+1=4
         # from foundation.automat.common.termsofbaseop import TermsOfBaseOp
         # groupingByRightIdWithEarliestJoiner, groupsWithBaseOp = TermsOfBaseOp.nodeOfBaseOpByGroup(self.ast, '+') # should also return root of grouping, then we can check if parent of root is - TODO
         # from foundation.automat.common.flattener import Flattener
@@ -1973,124 +2101,59 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         """
 
 
-        # childToParent = {} # invertedTree, for easy manipulation later
+    def _classifyEntityType(self):
+        #self.entitystorage.nodeId__entityType[nodeId]
+        # self.entitystorage = EntityStorage()
+        self.nodeId__entityType = {}
+        stack = [self.rootOfTree]
+        list_multiplicationNode = []
+        while len(stack) > 0:
+            node = stack.pop()
+            if node[0] == '*':
+                list_multiplicationNode.append(node)
+            #
+            if node[0] == '-' and self.latexAST[node][0][0] == '0':#implicit -
+                self.nodeId__entityType[node[1]] = EntityType.IMPLICIT_INFIX
+            elif node[0] in self.BACKSLASH_INFIX:
+                self.nodeId__entityType[node[1]] = EntityType.BACKSLASH_INFIX
+            elif node[0] in self.PRIOIRITIZED_INFIX+['=']:#PURE_INFIX
+                self.nodeId__entityType[node[1]] = EntityType.PURE_INFIX
+            elif node[0] in self.VARIABLENAMESTAKEANARG:
+                self.nodeId__entityType[node[1]] = EntityType.BACKSLASH_VARIABLE
+            elif isNum(node[0]):
+                self.nodeId__entityType[node[1]] = EntityType.PURE_NUMBER
+            elif self._getExpectedBackslashInputs(node[0]) is not None:
+                self.nodeId__entityType[node[1]] = EntityType.BACKSLASH_FUNCTION
+            elif self._getExpectedBackslashInputs(node[0]) is None and len(node[0]) <=1:
+                self.nodeId__entityType[node[1]] = EntityType.PURE_VARIABLE
+            elif self._getExpectedBackslashInputs(node[0]) is None and len(node[0]) > 1 and ('_' in node[0] or '^' in node[0]):
+                self.nodeId__entityType[node[1]] = EntityType.COMPOSITE_VARIABLE
+            elif self._getExpectedBackslashInputs(node[0]) is None and len(node[0]) > 1 and ('_' not in node[0] and '^' not in node[0]):
+                self.nodeId__entityType[node[1]] = EntityType.BACKSLASH_NUMBER 
 
-        # import copy
-
-        # self.leaves = set()
-        # self.latexAST = {}
-        # print('self.rootOfTree', self.rootOfTree);import pdb;pdb.set_trace()
-        # stack = [self.rootOfTree]#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<OVERALLEquals?<<<<<<<<<<<<<<<<<
-        # while len(stack) > 0:
-        #     currentNode = stack.pop()
-        #     nodeName, nodeId = currentNode
-        #     children = copy.deepcopy(self.ast.get(currentNode))
-        #     # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<_convertASTToLatexStyleAST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', currentNode, children)
-        #     # import pdb;pdb.set_trace()
-        #     if children is not None:
-        #         stack += list(children)
-        #         modifiedParent = False
-        #         if nodeName == '*':
-        #             # print('IS MULTIPLY')
-        #             # HANDLE IMPLICIT-MULITPLY *********************
-        #             nodeName = ''
-        #             modifiedParent = True
-        #             # HANDLE IMPLICIT-MULTIPLY *********************
-        #         elif nodeName == 'nroot':
-        #             nodeName = 'sqrt'
-        #             childToParent[children[0]] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
-        #             if str(children[0][0]) == '2':
-        #                 children = [('', children[0][1]), children[1]]
-        #             modifiedParent = True
-        #         elif nodeName == '/':
-        #             nodeName = 'frac'
-        #             modifiedParent = True
-        #         elif nodeName == 'log':
-        #             #we assume that the first argument is the base
-        #             baseNode = children[0]
-        #             if baseNode[0] == 'e': #cest ln
-        #                 nodeName = 'ln'
-        #                 children = [children[1]] # take out the base.
-        #                 childToParent[baseNode] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
-        #                 modifiedParent = True
-        #             elif str(baseNode[0]) == '10':
-        #                 #same nodeName
-        #                 children = [children[1]] # take out the base.
-        #                 childToParent[baseNode] = (nodeName, nodeId) # to prevent the modification of children[0] if children[0][0] == 2
-        #                 modifiedParent = True
-        #         elif nodeName in Latexparser.TRIGOFUNCTION:
-        #             # print(currentNode, '()())()()()')
-        #             # import pdb;pdb.set_trace()
-        #             #remove exponent above it, if any
-        #             parentName, parentId = childToParent[currentNode]
-        #             if parentName == '^':
-        #                 #find the exponentNode
-        #                 firstChild, secondChild = self.ast[(parentName, parentId)]
-        #                 if firstChild[1] == currentNode[1]: # id(firstChild)==id(currentNode), then secondChild is the exponentNode
-        #                     exponentNode = secondChild
-        #                 else: # else firstChild is the exponentNode
-        #                     exponentNode = firstChild
-
-        #                 #make a new node with exponent as first argument
-        #                 children = [exponentNode, children[0]]
-        #                 del self.latexAST[(parentName, parentId)]
-        #                 parentOfParent = childToParent[(parentName, parentId)]
-        #                 childrenOfParentOfParent = self.ast[parentOfParent]
-        #                 #replace parent with currentNode in childrenOfParentOfParent
-        #                 theChildIdx = None
-        #                 for childIdx, child in enumerate(childrenOfParentOfParent):
-        #                     if child[1] == parentId:
-        #                         theChildIdx = childIdx
-        #                         break
-        #                 childrenOfParentOfParent[theChildIdx] = currentNode
-        #                 self.latexAST[parentOfParent] = childrenOfParentOfParent
-        #                 # print('<<<<<<<<<<<<<<<<<<EXPONENTTRIG', currentNode)
-        #                 # import pdb;pdb.set_trace()
-        #                 # print((nodeName, nodeId), 'children: ', children)
-        #                 # import pdb;pdb.set_trace()
-        #                 # childToParent = updateChildToParent()
-        #                 #TODO make id number consecutive again?
-        #             #if no exponentialParent, then no change :)
-        #         self.latexAST[(nodeName, nodeId)] = children
-        #         if modifiedParent:
-        #             parent = childToParent[currentNode]
-        #             childrenOfParent = self.latexAST[parent]
-        #             #find which child newNode is in
-        #             theChildIdx = None
-        #             for childIdx, child in enumerate(childrenOfParent):
-        #                 if child[1] == nodeId:
-        #                     theChildIdx = childIdx
-        #             childrenOfParent[theChildIdx] = (nodeName, nodeId)#replace oldChild with newChild
-        #         for child in children:
-        #             childToParent[child] = (nodeName, nodeId)
-        #     else:
-        #         parent = childToParent[currentNode]
-        #         childrenOfParent = self.latexAST[parent]
-        #         #find which child newNode is in
-        #         theChildIdx = None
-        #         for childIdx, child in enumerate(childrenOfParent):
-        #             if child[1] == nodeId:
-        #                 theChildIdx = childIdx
-        #         #if the children[0] is a weird constant like \pi, we need to put a space behind the \pi
-        #         if theChildIdx == 0 and not any(c.isdigit() for c in str(nodeName)) and len(nodeName) > 1: # weird constant
-        #             #is it first child?
-        #             newName = nodeName + ' '
-        #             self.latexAST[parent][0] = (newName, nodeId)
-        #             self.leaves.add(newName)
-        #         else:
-        #             self.leaves.add(nodeName)
-
+            #
+            stack += self.latexAST.get(node, [])
+        #check if these * are implicit
+        for multiplicationNode in list_multiplicationNode:
+            leftChild, rightChild = self.latexAST[multiplicationNode]
+            leftChildEntityType, rightChildEntityType = self.nodeId__entityType[leftChild[1]], self.nodeId__entityType[rightChild[1]]
+            #if both children are not INFIXES, then multiplicationNode is IMPLICIT_INFIX
+            if (leftChildEntityType not in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX] or leftChild[0]!='^') or \
+                (rightChildEntityType not in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX] or rightChild[0]!='^'):
+                self.nodeId__entityType[multiplicationNode[1]] = EntityType.IMPLICIT_INFIX
 
 
     def _unparse(self): # TODO from AST to LaTeX string... 
         self._convertASTToLatexStyleAST()
         ###
-        print(self.latexAST)
+        import pprint;pp = pprint.PrettyPrinter(indent=4)
+        print('latexAST:', pp.pformat(self.latexAST));import pdb;pdb.set_trace()
         ###
-        # return self._recursiveUnparse(self.equalTuple)#we have OVERALLEquals self.overallEqual_startPos
+        self._classifyEntityType()
+        return self._recursiveUnparse(self.rootOfTree, None)#we have OVERALLEquals self.overallEqual_startPos
 
 
-    def _recursiveUnparse(self, keyTuple):
+    def _recursiveUnparse(self, node, parentNode):
         """
 EntityTypes to handle:
     IMPLICIT_INFIX = 'implicit_infix'
@@ -2114,7 +2177,90 @@ EntityTypes to handle:
     FROM_CONVERSION = 'from_conversion' # entities added pendant conversion of latexAST to schemeAST NOT HERE
 
         """
-        pass
+        nodeName, nodeId = node
+        entityType = self.nodeId__entityType[nodeId]#for unparser we do not have self.entitystorage yet.
+        if entityType in [EntityType.COMPOSITE_VARIABLE]:
+            #its a leaf
+            return nodeName
+        if entityType in [EntityType.PURE_NUMBER, EntityType.PURE_VARIABLE]:
+            parentEntityType = self.nodeId__entityType[parentNode[1]]
+            if parentEntityType in [EntityType.BACKSLASH_FUNCTION, EntityType.PURE_INFIX, EntityType.IMPLICIT_INFIX]:
+                return nodeName
+            return f'{nodeName} '# TODO do not put space if direct_parent, is enclosed by brackets, or direct_parent is infix<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        if entityType in [EntityType.BACKSLASH_NUMBER]:# this also wrongly includes i, e 
+            parentEntityType = self.nodeId__entityType[parentNode[1]]
+            if parentEntityType in [EntityType.BACKSLASH_FUNCTION, EntityType.BACKSLASH_INFIX]:
+                return f'\\{nodeName}'
+            return f'\\{nodeName} '
+        if entityType in [EntityType.BACKSLASH_VARIABLE]:
+            #should only have 1 variable as child?
+            childNode = self.latexAST[node][0]
+            return f'\\{nodeName}{{{childNode[0]}}}'
+        if entityType in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX]:
+            #ignore and put together, if infix, then with brackets, else just put together
+            # print(node);import pdb;pdb.set_trace()
+            leftNode, rightNode = self.latexAST[node][0], self.latexAST[node][1]
+            leftStr, rightStr = self._recursiveUnparse(leftNode, node), self._recursiveUnparse(rightNode, node)
+            leftEntityType, rightEntityType = self.nodeId__entityType[leftNode[1]], self.nodeId__entityType[rightNode[1]]
+            if nodeName not in ['='] and (leftEntityType in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX] and leftNode[0]!='^'):
+                leftStr = f'({leftStr})'
+            if nodeName not in ['='] and (rightEntityType in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX] and rightNode[0]!='^'):
+                rightStr = f'({rightStr})'
+            if nodeName == '^' and len(rightNode[0])>1:
+                rightStr = f'{{{rightStr}}}'
+            if entityType in [EntityType.BACKSLASH_INFIX]:
+                return f"{leftStr}{nodeName} {rightStr}"
+            return f"{leftStr}{nodeName}{rightStr}"
+        if entityType in [EntityType.BACKSLASH_FUNCTION]:
+            childStrs = []
+            for childNode in self.latexAST[node]:
+                childStrs.append(self._recursiveUnparse(childNode, node))
+            templates = sorted(self._getExpectedBackslashInputs(nodeName), key=lambda d:d['argId'])
+            #match optional|compulsory<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            optionalIndices = sorted(list(map(lambda d: d['argId'], filter(lambda d: d['optional'], templates))))
+            compulsoryIndices = sorted(list(map(lambda d: d['argId'], filter(lambda d: not d['optional'], templates))))
+            if len(childStrs)<len(compulsoryIndices): # not enough to fill up compulsory
+                raise Exception()
+            optionalIndicesToTake = optionalIndices[:len(childStrs)-len(compulsoryIndices)]
+            indicesToTake = compulsoryIndices+optionalIndicesToTake
+            templatesToUse = []
+            for template in templates:
+                if template['argId'] in indicesToTake:
+                    templatesToUse.append(template)
+            #
+            #use preSym, and brackets to get the resulting string<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            resultingStr = f'\\{nodeName}'
+            for template, childStr in zip(templatesToUse, childStrs):
+                # print(template, childStr)
+                if len(childStr) >  1 or template['braOptional']=='False':
+                    childStr = f'{template["openBra"]}{childStr}{template["closeBra"]}'
+                resultingStr+=f'{template['preSym']}{childStr}'
+            return resultingStr
+
+        #handle implicit_infix, we only have 2 types, - and *
+        if entityType in [EntityType.IMPLICIT_INFIX]:
+            if nodeName == '-':
+                #remove the 0
+                rightNode = self.latexAST[node][1]
+                rightStr = self._recursiveUnparse(rightNode, node)
+                return f'-{rightStr}'
+            elif nodeName == '*':
+                #ignore and put together, if infix, then with brackets, else just put together
+                leftNode, rightNode = self.latexAST[node][0], self.latexAST[node][1]
+                leftStr, rightStr = self._recursiveUnparse(leftNode, node), self._recursiveUnparse(rightNode, node)
+                leftEntityType, rightEntityType = self.nodeId__entityType[leftNode[1]], self.nodeId__entityType[rightNode[1]]
+                if (leftEntityType in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX] and leftNode[0]!='^'):
+                    leftStr = f'({leftStr})'
+                if (rightEntityType in [EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX] and rightNode[0]!='^'):
+                    rightStr = f'({rightStr})'
+                return f"{leftStr}{rightStr}"
+            else:
+                raise Exception()
+
+
+        raise Exception(f"unHandled entityType: {entityType}")
+
+
 
 class EntityStorage:
     """
