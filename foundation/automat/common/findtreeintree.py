@@ -1,7 +1,7 @@
 class FindTreeInTree:
 
     @classmethod
-    def findAllTreeInTree(cls, gesuchteTree, gesuchteTreeRoot, targetTree, targetTreeRoot, _nodeMatch): # assume gesuchteTree & targetTree are both connected_trees
+    def findAllTreeInTree(cls, gesuchteTree, gesuchteTreeRoot, targetTree, targetTreeRoot, _nodeMatch, callbackForMatchCompletion=lambda x: x, callbackForTreeTreeMatchingStart=lambda x: x): # assume gesuchteTree & targetTree are both connected_trees
         """
         MUST be BFS to match the whole TREE?
 
@@ -25,6 +25,8 @@ class FindTreeInTree:
                 if _nodeMatch(gesuchteTreeRoot, child):
                     list_of_matches.append(child)
         #
+        print('list_of_matches<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        print(list_of_matches)
 
 
         if len(list_of_matches) > 0:#some found => list_of_matches (different nodeId)
@@ -32,14 +34,16 @@ class FindTreeInTree:
             for targetTreeRoot in list_of_matches:
                 gesuchteTreeStack, targetTreeStack = [gesuchteTreeRoot], [targetTreeRoot]
                 matchedTargetTree, lastLeafMatched = None, None # for getting nodeId
+                callbackForTreeTreeMatchingStart(targetTreeRoot)
+                print('rooting at ', targetTreeRoot)
+                print('___________________________________________________________________')
                 while len(gesuchteTreeStack) > 0 and len(targetTreeStack) > 0:
                     gesuchteCurrent, targetCurrent = gesuchteTreeStack.pop(0), targetTreeStack.pop(0) # BFS
                     gesuchteCurrentChildren = gesuchteTree.get(gesuchteCurrent, [])
                     gesuchteTreeStack+=gesuchteCurrentChildren
-                    # print('popped:', gesuchteCurrent, targetCurrent)
+                    print('popped:', gesuchteCurrent, targetCurrent); import pdb;pdb.set_trace()
                     # print('gesuchteTreeStack', gesuchteTreeStack)
                     # print('targetTreeStack', targetTreeStack)
-                    # print('___________________________________________________________________')
                     # if gesuchteCurrent[0] != targetCurrent[0]: #no_match #<<<<<<<<<<<<<<<<<<<<<<<<<<<funcmatching
                     if not _nodeMatch(gesuchteCurrent, targetCurrent):
                         break
@@ -56,13 +60,14 @@ class FindTreeInTree:
                         # gesuchteTreeStack+=sorted(gesuchteTree.get(gesuchteCurrent, []), key=lambda child: child[0])
                         targetTreeStack+=targetCurrentChildren
                     # print(gesuchteTreeStack, 'gesuchteTreeStack')
-                    # print(targetTreeStack, 'targetTreeStack');import pdb;pdb.set_trace()
-                if matchedTargetTree is not None and len(gesuchteTreeStack)==0: # (len(gesuchteTreeStack)==0)~need to check if it matched the_whole_gesuchteTree
+                    # print(targetTreeStack, 'targetTreeStack')
+                if matchedTargetTree is not None and len(gesuchteTreeStack)==0 and len(targetTreeStack) == 0: # (len(gesuchteTreeStack)==0)~need to check if it matched the_whole_gesuchteTree
+                    callbackForMatchCompletion(targetTreeRoot)
                     if len(matchedTargetTree) > 0: 
                         allMatchedTrees.append((targetTreeRoot, matchedTargetTree))
                     else:
                         allMatchedTrees.append((targetTreeRoot, {lastLeafMatched:[]}))
-                # print('allMatchedTrees', allMatchedTrees, '0000000000000000000000000000000000000000000000000000000000000000')
+                # print('allMatchedTrees', allMatchedTrees, '0000000000000000000000000000000000000000000000000000000000000000');import pdb;pdb.set_trace()
             # print('~~~~~')
             # print(allMatchedTrees)
             # print('~~~~~')

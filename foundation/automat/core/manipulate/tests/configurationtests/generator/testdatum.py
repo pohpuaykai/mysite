@@ -396,5 +396,48 @@ TEST_DATUM = {
             "input": "(= a (+ (* (cos b) (cos c)) (* (sin b) (sin c))))",
             "expected": "(= a (cos (- b c)))"
         }
+    },
+    'todifferentialoperator': {
+        ('vor', '0'): {
+            "input": "(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))",
+            "expected": "(= (D (* u v) x) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))"
+        },
+        ('hin', '0'): {
+            "input": "(= (D (* u v) x) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))",
+            "expected": "(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))"
+        },
+
+        ('vor', '1'): {
+            "input": "(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))",
+            "expected": "(= (* (/ d (* d x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))"
+        },
+        ('hin', '1'): {
+            "input": "(= (* (/ d (* d x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))",
+            "expected": "(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))"
+        },
+
+
+
+
+
+        ('vor', '2'): {
+            "input": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))",
+            "expected": "(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))"
+        },
+        ('hin', '2'): {
+            "input": "(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))",
+            "expected": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))"
+        },
+
+        ('vor', '3'): {
+            "input": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))",
+            "expected": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))"
+        },
+        ('hin', '3'): {
+            "input": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))",
+            "expected": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))"
+        },
+
+
     }
 }

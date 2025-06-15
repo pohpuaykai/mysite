@@ -3,9 +3,9 @@ import pprint
 
 from foundation.automat.parser.sorte import Schemeparser
 
+pp = pprint.PrettyPrinter(indent=4)
 
 def test__schemeParserTest__add(verbose=False):
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= a (+ b c))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -23,7 +23,6 @@ def test__schemeParserTest__add(verbose=False):
 
 def test__schemeParserTest__harmonicMean(verbose=False):
     #HARMONIC MEAN : https://en.wikipedia.org/wiki/Harmonic_mean
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= (/ 1 a) (+ (/ 1 b) (/ 1 c)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -42,7 +41,6 @@ def test__schemeParserTest__harmonicMean(verbose=False):
 
 def test__schemeParserTest__phasorDiagram(verbose=False):
     #Phasor Diagram : https://en.wikipedia.org/wiki/Euler%27s_formula
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= (^ e (* i x)) (+ (cos x) (* i (sin x))))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -63,7 +61,6 @@ def test__schemeParserTest__phasorDiagram(verbose=False):
 
 def test__schemeParserTest__ebersMollModelp1(verbose=False):
     #Ebers-Moll model : https://en.wikipedia.org/wiki/Bipolar_junction_transistor#Ebers%E2%80%93Moll_model
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T)) 1)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -81,7 +78,6 @@ def test__schemeParserTest__ebersMollModelp1(verbose=False):
 
 def test__schemeParserTest__earlyEffectModel(verbose=False):
     #https://en.wikipedia.org/wiki/Early_effect#Large-signal_model
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= I_E (* I_S (* (^ e (/ V_{BE} V_T)) (+ 1 (/ V_{CE} V_A)))))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -97,9 +93,37 @@ def test__schemeParserTest__earlyEffectModel(verbose=False):
     unparsedStr = parser._unparse()
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', (equationStr==unparsedStr) and (ast==expected_ast))
 
+
+def test__schemeParserTest__productRule(verbose=False):
+
+    expected_ast = {
+        ('*', 20): [('/', 1), ('*', 22)],
+        ('*', 21): [('d', 6), ('x', 7)],
+        ('*', 22): [('u', 8), ('v', 9)],
+        ('*', 23): [('u', 10), ('/', 2)],
+        ('*', 24): [('d', 11), ('v', 12)],
+        ('*', 25): [('d', 13), ('x', 14)],
+        ('*', 26): [('v', 15), ('/', 3)],
+        ('*', 27): [('d', 16), ('u', 17)],
+        ('*', 28): [('d', 18), ('x', 19)],
+        ('+', 0): [('*', 23), ('*', 26)],
+        ('/', 1): [('d', 5), ('*', 21)],
+        ('/', 2): [('*', 24), ('*', 25)],
+        ('/', 3): [('*', 27), ('*', 28)],
+        ('=', 4): [('*', 20), ('+', 0)]
+    }
+    equationStr = '(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))'
+    parser = Schemeparser(ast=expected_ast, verbose=verbose)
+    # ast = parser.ast
+    # pp.pprint(ast)
+    unparsedStr = parser._unparse()
+    print(unparsedStr)
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', (equationStr==unparsedStr))# and (ast==expected_ast))
+
 if __name__=='__main__':
-    test__schemeParserTest__add()
-    test__schemeParserTest__harmonicMean()
-    test__schemeParserTest__phasorDiagram()
-    test__schemeParserTest__ebersMollModelp1()
-    test__schemeParserTest__earlyEffectModel()
+    # test__schemeParserTest__add()
+    # test__schemeParserTest__harmonicMean()
+    # test__schemeParserTest__phasorDiagram()
+    # test__schemeParserTest__ebersMollModelp1()
+    # test__schemeParserTest__earlyEffectModel()
+    test__schemeParserTest__productRule(True)# TODO USE in SchemeGrammarParser

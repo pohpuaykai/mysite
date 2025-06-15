@@ -1,0 +1,34 @@
+---
+className: "ToDifferentialOperator"
+type: "essential"
+manipulations:
+  - type: "regex"
+    vor:
+      scheme: '(* (/ d (* d $1)) $0)'
+      return: '(D $0 $1)'
+    hin:
+      scheme: "(D $0 $1)"
+      return: "(* (/ d (* d $1)) $0)"
+  - type: "regex"
+    vor:
+      scheme: '(/ (* d $0) (* d $1))'
+      return: '(D $0 $1)'
+    hin:
+      scheme: "(D $0 $1)"
+      return: "(/ (* d $0) (* d $1))"
+
+
+  - type: "regex"
+    vor:
+      scheme: '(* (/ partial (* partial $1)) $1)'
+      return: '(D $0 $1)'
+    hin:
+      scheme: "(D $0 $1)"
+      return: "(* (/ partial (* partial $1)) $1)"
+  - type: "regex"
+    vor:
+      scheme: '(/ (* partial $0) (* partial $1))'
+      return: '(D $0 $1)'
+    hin:
+      scheme: "(D $0 $1)"
+      return: "(/ (* partial $0) (* partial $1))"

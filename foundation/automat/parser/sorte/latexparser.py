@@ -238,7 +238,7 @@ class Latexparser(Parser):
                 {'argId':1, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
         ],
 
-        '_{C}^{O}{O}': [#[int']
+        '_{O}^{O}{C}': [#[int']
                 {'argId':0, 'preSym':'_', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':1, 'preSym':'^', 'optional':True, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'},
                 {'argId':2, 'preSym':'', 'optional':False, 'openBra':'{', 'closeBra':'}', 'braOptional':'False'}
@@ -331,7 +331,7 @@ class Latexparser(Parser):
         if funcName in ['lim']:
             return self.BACKSLASH_EXPECTED_INPUTS['_{C}{C}']
         if funcName in ['int']:
-            return self.BACKSLASH_EXPECTED_INPUTS['_{C}^{O}{O}']
+            return self.BACKSLASH_EXPECTED_INPUTS['_{O}^{O}{C}']
         if funcName in ['sum', 'prod', 'int']:
             return self.BACKSLASH_EXPECTED_INPUTS['_{C}^{C}{C}']
         if funcName in ['iint', 'iiint', 'oint', 'oiint']:
@@ -386,6 +386,7 @@ class Latexparser(Parser):
 
             self.latexAST = None #VAR:OUTPUTS
             self.functions, self.variables, self.primitives, self.totalNodeCount, = None, None, None, None #VAR:OUTPUTS
+            self.list_of_ast_roots = []
         else: # unparse Mode
             self.ast = ast
             self.rootOfTree = rootOfTree
@@ -931,14 +932,24 @@ class Latexparser(Parser):
         # import pdb;pdb.set_trace()
         self.overallEqual_startPos = []
         for start, end, _ in equals_pos_type_list:
-            isOverallEqual = False
+            ###OLD : no brackets around this =
+            # isOverallEqual = False
+            # for bracketType in list(BracketType.__members__.values()):
+            #     selectedOpenClosePos = self.bracketstorage.getTightestEnclosingPos(start, bracketType)
+            #     if selectedOpenClosePos is None:
+            #         isOverallEqual = True
+            #         break
+            ###OLD
+            isOverallEqual = True
             for bracketType in list(BracketType.__members__.values()):
-                selectedOpenClosePos = self.bracketstorage.getTightestEnclosingPos(start, bracketType)
-                if selectedOpenClosePos is None:
-                    isOverallEqual = True
+                if len(list(self.bracketstorage.getAllEnclosingBraOfPos(end, bracketType))) >0:
+                    import pdb;pdb.set_trace()
+                    isOverallEqual = False
                     break
+
             if isOverallEqual:# this is a overall bracket
                 self.overallEqual_startPos.append(start)
+        print('self.overallEqual_startPos', self.overallEqual_startPos)
         #overallEquals SPLIT the equationStr into equal parts
         self.overallEqual_startPos = sorted(self.overallEqual_startPos)
         self.overallEqual_startPos.insert(0, 0)
@@ -962,6 +973,7 @@ class Latexparser(Parser):
             nodeIdx = self.entitystorage.insert(group, start, end, EntityType.PURE_INFIX, widthStart=widthStart, widthEnd=widthEnd)
             if start in self.overallEqual_startPos:
                 self.overallEqual_nodes.append(('=', nodeIdx))
+        print('self.overallEqual_nodes', self.overallEqual_nodes)
 
 
         # print(str(self.entitystorage))
@@ -1482,23 +1494,41 @@ class Latexparser(Parser):
 
     def _match_child_to_parent_input(self):
         """
-    ***everything has width at_this_point
-    ~~~ASTree construction~~~ by widest enclosing position? there is no need for brackets? 
-    #process those_with_inputs(BACKSLASH&INFIX) by position (left to right)
-    we only need to process: (MAYBE 2 list, like a bipartite_graph?, then iterate until (list_1 only has 1)|(list_2 is empty))
-    1. those without parent but needs to have parents : EVERYTHING EXCEPT the top (usually =) MATRICES&INFIX&BACKSLASH&VARIABLE&NUMBERS
-    2. those without children but need to have children : BACKSLASH & INFIXES  <<<<<<<<start from the SLOTs with smallest width
+        0. Update all the entities to the widest possible width
+        1. Get all overall_equals attributes: nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd
+        2. Use self.bracketstorage.toTree to make a tree by whether or not brackets are enclosing, returns
+            0. parent__listOfChildren
+            1. openPosition__closePosition
+            2. openPosition__level
+            3. openPosition__bracketLen
+        3. Use self.overallEqual_startPos = [0, ..., len(self.equationStr)], where the ... are the startPos of the overall_equals; as TOP level
+            0. Use openPosition__level to go level-by-level
+                0. Use openPosition__closePosition to get (openPosition, closePosition)
+                    0. Get all the Entity attributes between (openPosition, closePosition) -> original_list_of_entities, attributes=(nodeId, funcName, entityType, funcStart, funcEnd, widthStart, widthEnd)
+                    1. exclude OverallEquals from original_list_of_entities
+                    2. Use parent__listOfChildren & openPosition__closePosition & replaceBetween & openClose__rootOfSubTree, to replace entities_that_have_been_treefied_in_some_position
+                        0. Use parent__listOfChildren to get bracket_children of openPosition -> cOpenPosition
+                        1. Use openPosition__closePosition to get cClosePosition of cOpenPosition
+                        2. Use (cOpenPosition, cClosePosition) to get openClose__rootOfSubTree, to get the rootOfSubTree of all entities_that_have_been_treefied_in_some_position
+                        3. Use replaceBetween, to replace all entities_that_have_been_treefied_in_some_position between (openPosition, closePosition), with rootOfSubTree, in original_list_of_entities
+                    3. Get backslashes_list from original_list_of_entities
+                    4. Use openClose__rootOfSubTree & getSlots & addConfirmedPCrelationshipById, to replace rootOfSubTree in backslash's arguments from backslashes_list in original_list_of_entities
+                        0. Use getSlots on backslash_node_id to get all arguments (slotStartPos, slotEndPos, argIdx)
+                        1. Use openClose__rootOfSubTree, to get rootOfSubTree between (slotStartPos, slotEndPos)
+                        2. Use addConfirmedPCrelationshipById to add parent|child relationship between backslash and rootOfSubTree
+                    5. Get all infixes from original_list_of_entities -> infixes_list
+                    6. Going by infixes_list, each infix's left and right in original_list_of_entities, connect them as parent|child, until we have only 1 infix left -> that 1 infix is the infixRoot
+        4. Connect infixRoot to overallEqual as parent|child
 
-        SOME HOW, there is no need for SLOTs? mySlots does not have hiearchy, so cannot "intergrenze"
-        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>remove Slots and all its book_keeping TODO after you clear all the old_tests
-
-
+        WHERE IS THE ROOTs? either
+        0. all the overallEquals
+        1. the last infixRoot<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         """
         self.bracketstorage = self.entitystorage._EntityStorage__updateEntityToWiderWidth(self.entitystorage.getAllNodeIds(), self.bracketstorage, self)
 
         # print(str(self.entitystorage))
         # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-
+        self.list_of_ast_roots = []
         OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd = []
         for nodeId in self.entitystorage.getAllNodeIds():
             funcName, funcStart = self.entitystorage.nodeId__funcName[nodeId], self.entitystorage.nodeId__funcStart[nodeId]
@@ -1506,6 +1536,7 @@ class Latexparser(Parser):
                 OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd.append((
                     nodeId, self.entitystorage.nodeId__entityType[nodeId] ,funcStart, self.entitystorage.nodeId__funcEnd[nodeId] , self.entitystorage.nodeId__widthStart[nodeId], self.entitystorage.nodeId__widthEnd[nodeId] ,
                 ))
+                self.list_of_ast_roots.append(('=', nodeId))
         OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd = sorted(OVERALLEquals_list_nodeId_funcName_entityType_funcStart_funcEnd_widthStart_widthEnd, key=lambda ele: ele[3])
         prevOVERALLEquals = None
         # print('self.overallEqual_startPos', self.overallEqual_startPos)
@@ -1642,6 +1673,9 @@ class Latexparser(Parser):
             prevOVERALLEquals = infixEle
 
         # print(str(self.entitystorage))
+        if len(self.list_of_ast_roots) == 0:
+            # print('this should not happen if there is an overallEquals')
+            self.list_of_ast_roots.append((infixEle[1], infixEle[0]))
 
 
 
@@ -1681,8 +1715,11 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
     4. (frac a b) => (/ a b)
     5. (TRIG p t) => (^ (TRIG t) p)
     WHAT ABOUT THE NEW FUNCTIONS?
-    6. (* (/ d (* d t)) A) => (d A t)
-    7. (/ (* d u) (* d t)) => (d u t)
+    6. (* (/ d (* d t)) A) => (ð A t) # d will collide with differential symbol
+    7. (/ (* d u) (* d t)) => (ð u t)
+    8. (*  (/ partial (partial t) A)
+    9. (/ (partial u) (partial t)) => (ð u t)
+    10.  => (∫ )
     
     \\int \\iint \\iiint \\oint \\oiint
     \\lim  (\\to is an infix)
@@ -1813,6 +1850,143 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
             if not instructions:
                 self.ast[pNode] = replaceChildWithNewParent(current__replaced, existingChildrenList, pNode)
 
+        # #SPECIAL CASE FOR DIFFERENTIAL OPERATORS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<better to use SchemeGrammarParser for this?
+        """
+        Is it better to use SchemeGrammarParser?
+        
+        FindTreeInTree misses 
+        (d/dx)(uv), because a misses a tree, by popping u instead of d
+
+        """
+        # """
+
+        # 6. (* (/ d (* d t)) A) => (ð A t) # d will collide with differential symbol
+        # 7. (/ (* d u) (* d t)) => (ð u t)
+        # 8. (*  (/ partial (partial t) A)
+        # 9. (/ (partial u) (partial t)) => (ð u t)
+        # """
+        # differentialOperatorSigns = ['d', 'partial']
+        # differentialOperatorReplacementSign = '$$'
+        # differentialTreePatterns = [
+        #     {
+        #     'tree':{#6 & 8
+        #             ('*', '$0'):[('/', '$1'), ('$2', '$3')],
+        #             ('/', '$1'):[('$$', '$4'), ('*', '$5')],
+        #             ('*', '$5'):[('$$', '$6'), ('$7', '$8')]
+        #         },
+        #     'root':('*', '$0'),
+        #     'replacementPattern':{
+        #             ('ð', '$4'):[('$2', '$3'), ('$7', '$8')]
+        #         },
+        #     'replacementPatternRoot':('ð', '$4')
+        #     },
+        #     {
+        #     'tree':{#7 & 9
+        #             ('/', '$0'):[('*', '$1'), ('*', '$2')],
+        #             ('*', '$1'):[('$$', '$3'), ('$4', '$5')],
+        #             ('*', '$2'):[('$$', '$6'), ('$7', '$8')]
+        #         },
+        #     'root':('/', '$0'),
+        #     'replacementPattern':{
+        #             ('ð', '$3'):[('$4', '$5'), ('$7', '$8')]
+        #         },
+        #     'replacementPatternRoot':('ð', '$3')
+        #     }
+        # ]
+        # def treeReplacement(tree, root, updateComponentOfNode):
+        #     def updateNode(node):
+        #         #assume each node is a tuple
+        #         newNode = []
+        #         for nodeComponent in list(node):
+        #             newNode.append(updateComponentOfNode(nodeComponent))
+        #         return tuple(newNode)
+        #     stack, returnedTree = [root], {}
+        #     while len(stack) > 0:
+        #         jetzt = stack.pop()
+        #         children = tree.get(jetzt, [])
+        #         stack += children
+        #         jetzt = updateNode(jetzt)
+        #         newChildren = []
+        #         for child in children:
+        #             child = updateNode(child)
+        #             newChildren.append(child)
+        #         if len(newChildren) > 0:
+        #             returnedTree[jetzt] = newChildren
+        #     newRoot = updateNode(root)
+        #     return newRoot, returnedTree
+
+        # current__replaced = {}
+        # newAst, nodesToAvoidInNewAst = {}, []
+        # for differentialOperatorSign in differentialOperatorSigns:
+        #     for differentialTreePattern in differentialTreePatterns:
+        #         def replaceDifferentialOperatorSign(nodeComponent):
+        #             if nodeComponent == differentialOperatorReplacementSign:
+        #                 return differentialOperatorSign
+        #             return nodeComponent
+        #         treePatternRoot, treePattern = treeReplacement(differentialTreePattern['tree'], differentialTreePattern['root'], replaceDifferentialOperatorSign)
+        #         print('searching for treePattern: ', treePattern)
+        #         treeRoot__matchedVar__val = {}
+        #         global GLOBAL___matchedVar__val
+        #         GLOBAL___matchedVar__val = None
+        #         def callbackForTreeTreeMatchingStart(targetTreeRoot):
+        #             global GLOBAL___matchedVar__val
+        #             GLOBAL___matchedVar__val = {}
+        #             # print('initialized matchedVar__val', GLOBAL___matchedVar__val)
+
+        #         def _nodeMatch(gesuchteCurrent, targetCurrent):
+        #             global GLOBAL___matchedVar__val
+        #             # print('_nodeMatch: matchedVar__val', GLOBAL___matchedVar__val)
+        #             if GLOBAL___matchedVar__val is not None and gesuchteCurrent[1].startswith('$'):
+        #                 GLOBAL___matchedVar__val[gesuchteCurrent[1]]=targetCurrent[1]
+        #                 # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<_nodeMatch:', GLOBAL___matchedVar__val)
+
+        #             if gesuchteCurrent[0].startswith('$'): #its a variable
+        #                 if GLOBAL___matchedVar__val is not None:
+        #                     GLOBAL___matchedVar__val[gesuchteCurrent[0]]=targetCurrent[0]
+        #                 # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<_nodeMatch:', GLOBAL___matchedVar__val)
+        #                 return True# variables match anything in targetTree, ignores Optional|Compulsory
+        #             return gesuchteCurrent[0] == targetCurrent[0]
+        #         def callbackForMatchCompletion(targetTreeRoot):#<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the _unparse with this NEW_FUNCTION
+        #             global GLOBAL___matchedVar__val
+        #             treeRoot__matchedVar__val[targetTreeRoot] = GLOBAL___matchedVar__val
+        #             # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>treeRoot__matchedVar__val:', treeRoot__matchedVar__val)
+        #             GLOBAL___matchedVar__val = None
+
+
+        #         def componentUpdate(nodeComponent, var__val):
+        #             # print('nodeComponent', nodeComponent, var__val.get(nodeComponent, nodeComponent));import pdb;pdb.set_trace()
+        #             return var__val.get(nodeComponent, nodeComponent)
+        #         for rootNode in self.list_of_ast_roots:
+        #             print(rootNode, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        #             for treeRoot, matchedTree in FindTreeInTree.findAllTreeInTree(
+        #                 treePattern, treePatternRoot, self.ast, rootNode, 
+        #                 _nodeMatch, 
+        #                 callbackForMatchCompletion, 
+        #                 callbackForTreeTreeMatchingStart):
+
+        #                 replacementRoot, replacementTree = treeReplacement(differentialTreePattern['replacementPattern'], differentialTreePattern['replacementPatternRoot'], lambda x: componentUpdate(x, treeRoot__matchedVar__val[treeRoot]))
+        #                 nodesToAvoidInNewAst += list(set(matchedTree.keys()) - set([treeRoot]))
+        #                 newAst.update(replacementTree)
+        #                 current__replaced[treeRoot] = replacementRoot
+        #                 print('treeRoot', treeRoot)
+        #                 print('matchedTree', matchedTree)
+        #                 print('matchedVar__val', treeRoot__matchedVar__val[treeRoot])
+        #                 print('replacementTree', replacementTree)
+        #                 print('nodesToAvoidInNewAst', nodesToAvoidInNewAst)
+        #                 print('_______________________________________________________________________');import pdb;pdb.set_trace()
+        #                 #also need to replace the parent's children with new Nodes... the differential is a new node
+        #                 #remove every node in matchedTree from newAst
+        # for pNode, children in self.ast.items():
+        #     if pNode not in nodesToAvoidInNewAst:
+        #         newChildren = []
+        #         for child in children:
+        #             newChildren.append(current__replaced.get(child, child))
+        #         newAst[pNode] = newChildren
+        # print('newAst**********************')
+        # print(newAst)
+
+
+
         
     def _get_statistics(self):
         """
@@ -1821,15 +1995,15 @@ count by EntityType:
     IMPLICIT_INFIX = 'implicit_infix'
     PURE_INFIX = 'pure_infix'
     BACKSLASH_INFIX = 'backslash_infix'
-
-
     BACKSLASH_FUNCTION = 'backslash_function'
 
 
     PURE_NUMBER = 'pure_number'
+    BACKSLASH_NUMBER = 'backslash_number'
+
+
     PURE_VARIABLE = 'pure_variable'
     BACKSLASH_VARIABLE = 'backslash_variable'
-    BACKSLASH_NUMBER = 'backslash_number'
     COMPOSITE_VARIABLE = 'composite_variable' # example V^{Q1}_{BE}, Voltage between B and E of transistor Q1
 
 
@@ -1845,7 +2019,25 @@ count by EntityType:
     4. variables count
     5. matrices count
         """
-        pass#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        
+        self.totalNodeCount = 0
+        self.functions = {}
+        self.primitives = {}
+        self.variables = {}
+        stack = deepcopy(self.list_of_ast_roots)
+        while len(stack) > 0:
+            jetzt = stack.pop()
+            children = self.ast.get(jetzt, [])
+            stack += children
+            self.totalNodeCount += 1
+            entityType = self.entitystorage.nodeId__entityType[jetzt[1]]
+            if entityType in [EntityType.IMPLICIT_INFIX, EntityType.PURE_INFIX, EntityType.BACKSLASH_INFIX, EntityType.BACKSLASH_FUNCTION]:
+                self.functions[jetzt[0]] = self.functions.get(jetzt[0], 0) + 1
+            elif entityType in [EntityType.PURE_NUMBER, EntityType.BACKSLASH_NUMBER]:
+                self.primitives[jetzt[0]] = self.primitives.get(jetzt[0], 0) + 1
+            elif entityType in [EntityType.PURE_VARIABLE, EntityType.BACKSLASH_VARIABLE, EntityType.COMPOSITE_VARIABLE]:
+                self.variables[jetzt[0]] = self.variables.get(jetzt[0], 0) + 1
+            #TODO matrix
 
 
     def _parse(self):
@@ -1877,7 +2069,7 @@ count by EntityType:
         - find root in input
         - DFS together
         """
-        import pprint;pp = pprint.PrettyPrinter(indent=4)
+        # import pprint;pp = pprint.PrettyPrinter(indent=4)
 
         def nodeMatch(gesuchteNode, targetNode):
             if gesuchteNode[0].startswith('$'): #its a variable
@@ -1897,7 +2089,7 @@ count by EntityType:
             for inputTemplateParentNode in dict(instructions['outputTemplate']).keys():
                 if inputTemplateParentNode[0][1] not in inNodeIds:
                     nodeDifferences.append(inputTemplateParentNode)
-            import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
             return nodeDifferences
             # return list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]]))
         
@@ -1924,8 +2116,8 @@ count by EntityType:
             candidateReplacements, candidateIndex__defaultsMatchedCount = [], dict(map(lambda t: (t[0], t[1]['reversePriority']), enumerate(list_instructions)))
             for candidateIndex, instructions in enumerate(list_instructions):####gives a list of candidate replacement......
                 ######
-                print('instructions')
-                pp.pprint(instructions)
+                # print('instructions')
+                # pp.pprint(instructions)
                 ######
                 templateNodeDifferenceToRemove = differenceBetweenOutputAndInput(instructions)
                 candidate___current__replaced = {}
@@ -1948,8 +2140,8 @@ count by EntityType:
                         outputTemplate[tup[0]] = strippedChildren
                 outputTemplateRoot = outputTemplateRoot[0]
                 #
-                print('matching pNode: ', pNode)
-                print('usedMatchedTrees', usedMatchedTrees)
+                # print('matching pNode: ', pNode)
+                # print('usedMatchedTrees', usedMatchedTrees)
                 var__val = {}
                 #for same funcName (outputTemplateRoot), outputTemplateRoot:[matchedOutputTree] is CACHABLE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 #matchedTrees should be order in which self.ast is processed, top->bottom;left->right
@@ -1958,15 +2150,16 @@ count by EntityType:
                 for rootOfMatched, matchedOutputTree in FindTreeInTree.findAllTreeInTree(outputTemplate, outputTemplateRoot, self.ast, self.rootOfTree, nodeMatch):
                     if (rootOfMatched, matchedOutputTree) in usedMatchedTrees:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         continue
-                    print('~~~matchedOutputTree:', matchedOutputTree);import pdb;pdb.set_trace()
+                    # print('~~~matchedOutputTree:', matchedOutputTree);import pdb;pdb.set_trace()
                     #if tree has been matched, DO NOT USE IT AGAIN<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     #match the variables
+                    #callbackForMatchCompletion(targetTreeRoot):#<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the _unparse with this NEW_FUNCTION
                     templateStack, matchedStack = [outputTemplateRoot], [rootOfMatched]
                     while len(templateStack) > 0 and len(matchedStack) > 0:
                         (templateName, templateId), (matchedName, matchedId) = templateStack.pop(), matchedStack.pop()
                         if templateName.startswith('$'):
                             var__val[templateName] = matchedName
-                            print('$$$$$$$matchedName', matchedName, instructions.get('var__defaults', {}).values()) # the default is 1, so we add 2 to choose this
+                            # print('$$$$$$$matchedName', matchedName, instructions.get('var__defaults', {}).values()) # the default is 1, so we add 2 to choose this
                             if matchedName in instructions.get('var__defaults', {}).values():
                                 candidateIndex__defaultsMatchedCount[candidateIndex] += 2
                         if templateId.startswith('$'):
@@ -1975,26 +2168,26 @@ count by EntityType:
                         templateStack += outputTemplate.get((templateName, templateId), [])
                         matchedStack += matchedOutputTree.get((matchedName, matchedId), [])
                     break # just need one matched tree, this means last_used rootOfMatched will be put into usedMatchedTrees
-                print('var__val', var__val);import pdb;pdb.set_trace()
+                # print('var__val', var__val);import pdb;pdb.set_trace()
                 #
 
                 #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
                 templateParent, templateChildren = instructions['inputTemplate'] # we expecting only 1 line for instructions['inputTemplate']
                 filledParentName = var__val.get(templateParent[0][0], templateParent[0][0])
                 filledParentId = var__val.get(templateParent[0][1], templateParent[0][1])
-                print('filledParent:', (filledParentName, filledParentId));import pdb;pdb.set_trace()
+                # print('filledParent:', (filledParentName, filledParentId));import pdb;pdb.set_trace()
                 filledChildren = []
                 for templateChild in templateChildren:
                     filledChildName = var__val.get(templateChild[0][0], templateChild[0][0])#
-                    print('filledChildName', filledChildName, 'defaults: ', instructions.get('var__defaults', {}).values())
+                    # print('filledChildName', filledChildName, 'defaults: ', instructions.get('var__defaults', {}).values())
                     if filledChildName in instructions.get('var__defaults', {}).values(): #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<the more defaults it fits, the higher the priority of this candidateReplacement
                         candidateIndex__defaultsMatchedCount[candidateIndex] += 1
-                        print('matchedDefault, optional::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::', );import pdb;pdb.set_trace()
+                        # print('matchedDefault, optional::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::', );import pdb;pdb.set_trace()
                         if templateChild[1]:#skip if optional
-                            print('skipping child$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                            # print('skipping child$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
                             continue
                     filledChildId = var__val.get(templateChild[0][1], templateChild[0][1])#
-                    print(templateChild);import pdb;pdb.set_trace()
+                    # print(templateChild);import pdb;pdb.set_trace()
                     #
                     if filledChildName.startswith('$') or str(filledChildId).startswith('$'):
                         continue#don't add this child
@@ -2008,19 +2201,19 @@ count by EntityType:
                     #
                     # print('parentIdDifferenceToRemove', parentIdDifferenceToRemove);import pdb;pdb.set_trace()
                     filledChildren.append((filledChildName, filledChildId))
-                    print(filledChildren, 'filedChildren<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                    # print(filledChildren, 'filedChildren<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                 if len(filledChildren) == 0:#<<<< this is not accurate, if we cannot find child in var__val, should do optional|compulsory_matching with children (of pNode) TODO
                     filledChildren = children
                     filledParentName, filledParentId = pNode
                 # print('latexAST',self.latexAST);import pdb;pdb.set_trace()
                 # print('current__replaced', current__replaced)
                 candidate___current__replaced[pNode] = (filledParentName, filledParentId)
-                print('candidate: ', {'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced})
+                # print('candidate: ', {'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced})
                 candidateReplacements.append({'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced}) 
             #
             if len(candidateIndex__defaultsMatchedCount) > 0: 
-                print('candidateReplacements:', candidateReplacements)
-                print('candidateIndex__defaultsMatchedCount', candidateIndex__defaultsMatchedCount);import pdb;pdb.set_trace()
+                # print('candidateReplacements:', candidateReplacements)
+                # print('candidateIndex__defaultsMatchedCount', candidateIndex__defaultsMatchedCount);import pdb;pdb.set_trace()
                 
                 candidateReplacement = candidateReplacements[max(candidateIndex__defaultsMatchedCount.items(), key=lambda t:t[1])[0]]#IF DRAW?????????<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 filledParent, filledChildren = list(candidateReplacement['candidate'].items())[0]
@@ -2029,8 +2222,8 @@ count by EntityType:
                 if rootOfMatched is not None:
                     usedMatchedTrees.append((rootOfMatched, matchedOutputTree))
 
-                print('latexAST:', self.latexAST)
-                print('current__replaced:', current__replaced)
+                # print('latexAST:', self.latexAST)
+                # print('current__replaced:', current__replaced)
                 #take out the difference between the instructions['outputTemplate'] and the instructions['inputTemplate']
 
             # if len(list_instructions) == 0:
@@ -2146,8 +2339,8 @@ count by EntityType:
     def _unparse(self): # TODO from AST to LaTeX string... 
         self._convertASTToLatexStyleAST()
         ###
-        import pprint;pp = pprint.PrettyPrinter(indent=4)
-        print('latexAST:', pp.pformat(self.latexAST));import pdb;pdb.set_trace()
+        # import pprint;pp = pprint.PrettyPrinter(indent=4)
+        # print('latexAST:', pp.pformat(self.latexAST));import pdb;pdb.set_trace()
         ###
         self._classifyEntityType()
         return self._recursiveUnparse(self.rootOfTree, None)#we have OVERALLEquals self.overallEqual_startPos
@@ -2213,7 +2406,7 @@ EntityTypes to handle:
             return f"{leftStr}{nodeName}{rightStr}"
         if entityType in [EntityType.BACKSLASH_FUNCTION]:
             childStrs = []
-            for childNode in self.latexAST[node]:
+            for childNode in self.latexAST.get(node, []):
                 childStrs.append(self._recursiveUnparse(childNode, node))
             templates = sorted(self._getExpectedBackslashInputs(nodeName), key=lambda d:d['argId'])
             #match optional|compulsory<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2232,7 +2425,7 @@ EntityTypes to handle:
             resultingStr = f'\\{nodeName}'
             for template, childStr in zip(templatesToUse, childStrs):
                 # print(template, childStr)
-                if len(childStr) >  1 or template['braOptional']=='False':
+                if len(childStr) >  1 or template['braOptional']=='False' or nodeName in ['nabla']: # ULGY
                     childStr = f'{template["openBra"]}{childStr}{template["closeBra"]}'
                 resultingStr+=f'{template['preSym']}{childStr}'
             return resultingStr
@@ -3177,30 +3370,9 @@ class BracketStorage:
         return touchingBrasPoss
 
     def getAllEnclosingBraOfPos(self, pos, typeOfBracket):
-        """
-        Find 
-        closest_close_left_of_pos :
-        closest_open_right_of_pos :
-         in id__tuple_openPos_openBraType_closePos_closeBraType
-         remove all tuple__closePos<=closest_close_left_of_pos
-         remove all tuple__openPos>=closest_open_right_of_pos
-        if empty, there is no enclosing brackets for pos
-
-        else
-            get all the remaining id, find smallest_width in list_tuple_width_id 
-        
-
-        :param typeOfBracket: BracketType.ROUND, BracketType.SQUARE, BracketType.CURLY
-        :type typeOfBracket: BracketType Enum
-        """
-
-        nearest_close_left_of_pos = self.getBraPosImmediateLeftOfPos(pos, typeOfBracket, False) #no such thing...-inf
-        nearest_open_right_of_pos = self.getBraPosImmediateRightOfPos(pos, typeOfBracket, True) #no such thing...inf
-        filt__list_tuple_width_id_openPos_closePos = filter(
-            lambda tuple_width_id_openPos_closePos: 
-                nearest_close_left_of_pos<tuple_width_id_openPos_closePos[3] and \
-                tuple_width_id_openPos_closePos[2]<nearest_open_right_of_pos, 
-            self.list_tuple_width_id_openPos_closePos)
+        filt__list_tuple_width_id_openPos_closePos = filter(lambda tuple_width_id_openPos_closePos:
+            tuple_width_id_openPos_closePos[2]<pos and pos<=tuple_width_id_openPos_closePos[3]
+            , self.list_tuple_width_id_openPos_closePos)
         return filt__list_tuple_width_id_openPos_closePos
 
     def getAllEnclosingTouchingBraOfPos(self, pos, widthStart, widthEnd, typeOfBracket):

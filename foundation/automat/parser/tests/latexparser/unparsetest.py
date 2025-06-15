@@ -1357,7 +1357,7 @@ def test__newSymbols__faradayDifferentialForm(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\nabla\\times\\vec{E}=-\\frac{\\partial{\\vec{B}}}{\\partial{t}}'
+    expected_eqsStr = '\\nabla\\times \\vec{E}=-\\frac{\\partial{\\vec{B}}}{\\partial{t}}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1411,7 +1411,7 @@ def test__newSymbols__greenSecondVectorIdentityDifferentialForm(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'p\\Delta{q}-q\\Delta{p}=\\nabla\\cdot(p\\nabla{q}-q\\nabla{p})'
+    expected_eqsStr = 'p\\Delta{q}-q\\Delta{p}=\\nabla \\cdot (p\\nabla{q}-q\\nabla{p})'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1529,12 +1529,12 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    # test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(True)
-    # test__contiguousLeftOvers__decimalPlaces(True)
-    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
-    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True)
-    # test__schemeToLatex__variablesWithCurlyBrackets(True)
-    # test__findingBackSlashAndInfixOperations__Trig0(True)
+    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(True)
+    test__contiguousLeftOvers__decimalPlaces(True)
+    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True)
+    test__schemeToLatex__variablesWithCurlyBrackets(True)
+    test__findingBackSlashAndInfixOperations__Trig0(True)
     # test__findingBackSlashAndInfixOperations__Trig1(True)
     # test__findingBackSlashAndInfixOperations__Trig2(True)
     # test__findingBackSlashAndInfixOperations__Sqrt0(True)
@@ -1579,10 +1579,10 @@ if __name__=='__main__':
     # test__newSymbols__fourierSeries(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
     # test__newSymbols__parallelSumOfCapacitance(True)
     # test__newSymbols__faradayIntegralForm(True)
-    # test__newSymbols__faradayDifferentialForm(True)#<<< missing nabla<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    # test__newSymbols__faradayDifferentialForm(True)
     # test__newSymbols__gaussIntegralForm(True)
-    # test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< missing nabla<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< missing nabla<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     # test__paveWayForDifferentiation__productRule(True) 
     # test__paveWayForDifferentiation__sumRule(True)  
-    # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # not tested yet =>  UGLY differentiation, functions u and v... (same problem as S(x, y))
-    test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(True) # not tested yet << still throws, TODO refactor brackslash args into a list, ... and the rest of the code...
+    # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # functions u and v... (same problem as S(x, y))
+    # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(True) #  TODO refactor brackslash args into a list, ... and the rest of the code...

@@ -14,9 +14,14 @@ def test__contiguousLeftOvers__decimalPlaces(verbose=False):
     ('+', 1): [('-', 0), ('1.0', 4)],
     ('-', 0): [('0', 6), ('0.5', 3)],
     ('=', 2): [('+', 1), ('0.5', 5)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 2)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -27,9 +32,14 @@ def test__weirdVariables__variablesWithCurlyBracketsSimple(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 0): [('V_{BE}', 1), ('V', 3)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 0)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -40,9 +50,14 @@ def test__weirdVariables__variablesWithCurlyBracketsWithNums(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 0): [('V_{Z1}', 1), ('V', 3)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 0)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets(verbose=False):
@@ -52,9 +67,14 @@ def test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets(verbose=
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 0): [('V_{Z_{1}}', 1), ('V', 4)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 0)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -68,9 +88,14 @@ def test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreCompl
     ('*', 10): [('R', 4), ('I_R', 5)],
     ('+', 0): [('*', 10), ('V_{Z_{1}}', 7)],
     ('=', 1): [('V_{in}', 2), ('+', 0)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -82,9 +107,14 @@ def test__weirdVariables__variablesWithCaret(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 1): [('V', 2), ('V^{Q_{1}}_{BE}', 3)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -98,9 +128,14 @@ def test__weirdVariables__variablesWithCaretRealExponent(verbose=False):
     ('=', 3): [('^', 0), ('^', 2)],
     ('^', 0): [('V', 4), ('x', 5)],
     ('^', 2): [('V^{Q_{1}}_{BE}', 6), ('x', 10)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -116,9 +151,14 @@ def test__weirdVariables__variablesWithCaretMoreComplex(verbose=False):
     ('-', 1): [('*', 17), ('V^{Q_{1}}_{BE}', 9)],
     ('-', 2): [('-', 1), ('*', 18)],
     ('=', 3): [('-', 2), ('0', 16)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -129,9 +169,14 @@ def test__weirdVariables__variablesWithCurlyBracketsMinus(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('-', 0): [('V_B', 2), ('V_{BE}', 4)], ('=', 1): [('-', 0), ('V', 6)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -145,9 +190,14 @@ def test__weirdVariables__variablesWithCurlyBracketsFrac(verbose=False):
     ('-', 0): [('V_B', 3), ('V_{BE}', 5)],
     ('/', 1): [('-', 0), ('R_B', 7)],
     ('=', 2): [('/', 1), ('V', 9)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 2)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -159,12 +209,17 @@ def test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0(verbose=Fa
     parser._parse()
     expected_ast = {
     ('*', 8): [('V_{rms}', 4), ('I_{rms}', 6)],
-    ('*', 9): [('*', 8), ('\\cos', 0)],
+    ('*', 9): [('*', 8), ('cos', 0)],
     ('=', 2): [('P', 3), ('*', 9)],
-    ('\\cos', 0): [('\\phi', 1)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    ('cos', 0): [('phi', 1)]}
+    expected_list_of_ast_roots = [('=', 2)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -178,12 +233,17 @@ def test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1(verbose=Fa
     ('*', 12): [('a_{bc}', 3), ('d_{ef}', 5)],
     ('*', 13): [('*', 12), ('g_{hi}', 7)],
     ('*', 14): [('*', 13), ('j_{k}', 9)],
-    ('*', 15): [('*', 14), ('\\cos', 0)],
+    ('*', 15): [('*', 14), ('cos', 0)],
     ('=', 2): [('*', 15), ('O', 11)],
-    ('\\cos', 0): [('\\phi', 1)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    ('cos', 0): [('phi', 1)]}
+    expected_list_of_ast_roots = [('=', 2)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -200,9 +260,14 @@ def test__makeSubject__manyVariablesStandingTogether(verbose=False):
     ('+', 1): [('1', 10), ('*', 16)],
     ('/', 2): [('R_2', 8), ('+', 1)],
     ('=', 3): [('A_v', 4), ('+', 0)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -220,9 +285,14 @@ def test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(ve
     ('^', 0): [('x', 5), ('9', 6)],
     ('^', 1): [('x', 8), ('2', 9)],
     ('^', 2): [('x', 10), ('7', 11)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -241,9 +311,14 @@ def test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(verbose=Fa
     ('^', 0): [('z', 8), ('4', 9)],
     ('^', 1): [('w', 11), ('12', 12)],
     ('^', 2): [('+', 4), ('30', 13)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -257,9 +332,14 @@ def test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePow
     ('-', 1): [('0', 6), ('1', 4)],
     ('=', 2): [('^', 0), ('1', 5)],
     ('^', 0): [('1', 3), ('-', 1)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 2)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -274,9 +354,14 @@ def test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePow
     ('=', 3): [('^', 0), ('1', 7)],
     ('^', 0): [('1', 4), ('-', 1)],
     ('sin', 2): [('x', 5)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Trig0(verbose=False):
@@ -295,9 +380,14 @@ def test__findingBackSlashAndInfixOperations__Trig0(verbose=False):
     ('cos', 4): [('x_0', 12)],
     ('sin', 2): [('*', 16)],
     ('sin', 3): [('x_0', 10)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast) # rename ast to latex_ast 
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Trig1(verbose=False):
@@ -313,9 +403,14 @@ def test__findingBackSlashAndInfixOperations__Trig1(verbose=False):
     ('^', 12): [('cos', 4), ('2', 8)],
     ('cos', 4): [('x', 9)],
     ('sin', 3): [('x', 7)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Trig2(verbose=False):
@@ -331,9 +426,14 @@ def test__findingBackSlashAndInfixOperations__Trig2(verbose=False):
     ('^', 12): [('cos', 4), ('2', 8)],
     ('cos', 4): [('x', 9)],
     ('sin', 3): [('x', 7)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Sqrt0(verbose=False):
@@ -343,9 +443,14 @@ def test__findingBackSlashAndInfixOperations__Sqrt0(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 1): [('nroot', 0), ('2', 3)], ('nroot', 0): [('2', 4), ('4', 2)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Sqrt1(verbose=False):
@@ -355,9 +460,14 @@ def test__findingBackSlashAndInfixOperations__Sqrt1(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 1): [('nroot', 0), ('2', 4)], ('nroot', 0): [('3', 2), ('8', 3)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Ln(verbose=False):
@@ -367,9 +477,14 @@ def test__findingBackSlashAndInfixOperations__Ln(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 1): [('log', 0), ('1', 3)], ('log', 0): [('e', 4), ('e', 2)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Frac(verbose=False):
@@ -382,9 +497,14 @@ def test__findingBackSlashAndInfixOperations__Frac(verbose=False):
     ('/', 0): [('12', 3), ('24', 4)],
     ('/', 1): [('1000', 5), ('2000', 6)],
     ('=', 2): [('/', 0), ('/', 1)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 2)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Log0(verbose=False):
@@ -396,9 +516,14 @@ def test__findingBackSlashAndInfixOperations__Log0(verbose=False):
     expected_ast = {
     ('=', 1): [('log', 0), ('12', 4)],
     ('log', 0): [('12', 2), ('8916100448256', 3)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__Log1(verbose=False):
@@ -408,9 +533,14 @@ def test__findingBackSlashAndInfixOperations__Log1(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 1): [('log', 0), ('2', 3)], ('log', 0): [('10', 4), ('100', 2)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__tildeVariable(verbose=False):
@@ -420,9 +550,14 @@ def test__findingBackSlashAndInfixOperations__tildeVariable(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {('=', 1): [('tilde', 0), ('2', 3)], ('tilde', 0): [('x', 2)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 1)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=False):
@@ -437,9 +572,14 @@ def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=Fa
     ('=', 4): [('*', 7), ('*', 8)],
     ('widehat', 0): [('H', 5)],
     ('widehat', 2): [('E', 6)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 4)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__infixInBackslash__paraboloid(verbose=False):
@@ -454,9 +594,14 @@ def test__infixInBackslash__paraboloid(verbose=False):
     ('^', 0): [('x', 6), ('2', 7)],
     ('^', 1): [('y', 8), ('2', 9)],
     ('nroot', 3): [('2', 10), ('+', 2)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 4)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__sqrtWithPowerCaretRightOtherInfix__hill(verbose=False):
@@ -472,9 +617,14 @@ def test__sqrtWithPowerCaretRightOtherInfix__hill(verbose=False):
     ('^', 0): [('x', 8), ('2', 9)],
     ('^', 1): [('y', 10), ('2', 11)],
     ('nroot', 4): [('2', 7), ('+', 3)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__nonInfixBrackets__addImplicitMultiply(verbose=False):
@@ -492,9 +642,14 @@ def test__nonInfixBrackets__addImplicitMultiply(verbose=False):
     ('+', 4): [('+', 3), ('1', 13)],
     ('+', 5): [('+', 4), ('1', 14)],
     ('=', 6): [('*', 16), ('16', 15)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 6)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
@@ -511,9 +666,14 @@ def test__nonInfixBrackets__addImplicitMultiply0(verbose=False):
     ('+', 3): [('+', 0), ('1', 11)],
     ('+', 4): [('+', 3), ('1', 12)],
     ('=', 5): [('+', 4), ('7', 13)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__nonInfixBrackets__addImplicitMultiply1(verbose=False):
@@ -533,9 +693,14 @@ def test__nonInfixBrackets__addImplicitMultiply1(verbose=False):
     ('+', 6): [('*', 20), ('1', 17)],
     ('+', 7): [('+', 6), ('1', 18)],
     ('=', 8): [('+', 7), ('18', 19)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 8)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__BODMAS__priorityBetweenInfixForBrackets(verbose=False):
@@ -550,9 +715,14 @@ def test__BODMAS__priorityBetweenInfixForBrackets(verbose=False):
     ('-', 0): [('x', 5), ('1', 6)],
     ('/', 2): [('2', 4), ('*', 10)],
     ('=', 3): [('/', 2), ('c', 9)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__BODMAS__enclosingBracketInBackslashArg(verbose=False):
@@ -572,9 +742,14 @@ def test__BODMAS__enclosingBracketInBackslashArg(verbose=False):
     ('/', 6): [('1', 14), ('-', 1)],
     ('/', 7): [('1', 17), ('+', 4)],
     ('=', 8): [('/', 5), ('-', 2)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 8)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__BODMAS__enclosingBracketInBackslashArgWithExponent(verbose=False):
@@ -588,9 +763,14 @@ def test__BODMAS__enclosingBracketInBackslashArgWithExponent(verbose=False):
     ('=', 3): [('c', 4), ('sin', 2)],
     ('^', 0): [('-', 1), ('2', 7)],
     ('sin', 2): [('^', 0)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 3)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__BODMAS__enclosingBracketInBackslashArgImplicitZero(verbose=False):
@@ -611,9 +791,14 @@ def test__BODMAS__enclosingBracketInBackslashArgImplicitZero(verbose=False):
     ('/', 7): [('1', 15), ('-', 1)],
     ('/', 8): [('-', 2), ('+', 5)],
     ('=', 9): [('/', 6), ('+', 4)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 9)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__BODMAS__enclosingBracket(verbose=False):
@@ -630,9 +815,14 @@ def test__BODMAS__enclosingBracket(verbose=False):
     ('=', 5): [('+', 4), ('^', 1)],
     ('^', 0): [('x', 6), ('2', 7)],
     ('^', 1): [('-', 3), ('2', 13)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__manyFracCaretEnclosingBrac__partialFrac(verbose=False):
@@ -659,9 +849,14 @@ def test__manyFracCaretEnclosingBrac__partialFrac(verbose=False):
     ('^', 0): [('x', 16), ('2', 17)],
     ('^', 1): [('-', 4), ('2', 22)],
     ('^', 2): [('-', 8), ('2', 32)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 15)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__fracWithLogNoBase__changeLogBaseFormula(verbose=False):
@@ -676,9 +871,14 @@ def test__fracWithLogNoBase__changeLogBaseFormula(verbose=False):
     ('log', 0): [('b', 5), ('a', 6)],
     ('log', 2): [('c', 7), ('a', 8)],
     ('log', 3): [('c', 9), ('b', 10)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 4)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__backslashInfixInBackslash__sqrtInSqrt(verbose=False):
@@ -694,9 +894,14 @@ def test__backslashInfixInBackslash__sqrtInSqrt(verbose=False):
     ('nroot', 1): [('2', 12), ('/', 2)],
     ('nroot', 4): [('sin', 5), ('pi', 7)],
     ('sin', 5): [('pi', 6)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 8)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__backslashInfixInBackslash__trigInTrig(verbose=False):
@@ -718,9 +923,14 @@ def test__backslashInfixInBackslash__trigInTrig(verbose=False):
     ('cos', 8): [('-', 4)],
     ('sin', 7): [('-', 5)],
     ('tan', 11): [('theta', 12)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 13)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__backslashInfixInBackslash__logInLog(verbose=False):
@@ -736,9 +946,14 @@ def test__backslashInfixInBackslash__logInLog(verbose=False):
     ('log', 2): [('log', 3), ('log', 4)],
     ('log', 3): [('e', 11), ('-', 1)],
     ('log', 4): [('10', 12), ('^', 0)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__backslashInfixInBackslash__fracInFrac(verbose=False):
@@ -772,9 +987,14 @@ def test__backslashInfixInBackslash__fracInFrac(verbose=False):
     ('sin', 12): [('x', 25)],
     ('sin', 16): [('*', 38)],
     ('sin', 18): [('*', 40)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 19)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False): # TODO not entirely correct... should treat P(x) differently... not sure how yet
@@ -801,9 +1021,14 @@ def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False): # TOD
     ('^', 3): [('x', 24), ('4', 25)],
     ('^', 4): [('x', 26), ('2', 27)],
     ('nroot', 10): [('2', 34), ('2', 23)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 12)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__nestedPolynomial(verbose=False): # TODO not entirely correct... should treat Q(x) differently... not sure how yet
@@ -828,9 +1053,14 @@ def test__hassliche__nestedPolynomial(verbose=False): # TODO not entirely correc
     ('^', 2): [('+', 9), ('2', 21)],
     ('^', 3): [('-', 8), ('3', 24)],
     ('^', 4): [('x', 26), ('21', 27)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 11)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=False): # TODO not entirely correct... should treat R(x) differently... not sure how yet
@@ -856,9 +1086,14 @@ def test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(verbose=F
     ('^', 1): [('x', 17), ('8', 18)],
     ('^', 2): [('x', 21), ('5', 22)],
     ('^', 3): [('x', 24), ('3', 25)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 11)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(verbose=False): # TODO not entirely correct... should treat S(x, y) differently... not sure how yet
@@ -886,9 +1121,14 @@ def test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(
     ('^', 4): [('x', 24), ('2', 25)],
     ('^', 5): [('y', 26), ('3', 27)],
     ('^', 6): [('x', 28), ('2', 29)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 12)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(verbose=False): # TODO not entirely correct... should treat T(x) differently... not sure how yet
@@ -912,9 +1152,14 @@ def test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(verbos
     ('cos', 8): [('x', 15)],
     ('log', 10): [('e', 28), ('+', 7)],
     ('sin', 9): [('x', 20)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 11)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__degree5(verbose=False):
@@ -947,9 +1192,14 @@ def test__hassliche__degree5(verbose=False):
     ('^', 1): [('x', 28), ('4', 29)],
     ('^', 2): [('x', 31), ('3', 32)],
     ('^', 3): [('x', 34), ('2', 35)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 14)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__degree6(verbose=False):
@@ -987,9 +1237,14 @@ def test__hassliche__degree6(verbose=False):
     ('^', 2): [('x', 36), ('4', 37)],
     ('^', 3): [('x', 39), ('3', 40)],
     ('^', 4): [('x', 42), ('2', 43)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 17)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__degree7(verbose=False):
@@ -1032,9 +1287,14 @@ def test__hassliche__degree7(verbose=False):
     ('^', 3): [('x', 44), ('4', 45)],
     ('^', 4): [('x', 47), ('3', 48)],
     ('^', 5): [('x', 50), ('2', 51)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 20)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(verbose=False):
@@ -1088,9 +1348,14 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(verbose=Fal
     ('^', 11): [('x', 65), ('4', 66)],
     ('^', 12): [('x', 68), ('3', 69)],
     ('^', 13): [('x', 71), ('2', 72)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 30)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(verbose=False):
@@ -1144,9 +1409,14 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(verbose=Fa
     ('^', 11): [('x', 65), ('4', 66)],
     ('^', 12): [('x', 68), ('3', 69)],
     ('^', 13): [('x', 71), ('2', 72)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 30)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=False):
@@ -1216,9 +1486,14 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=Fa
     ('^', 17): [('x', 92), ('4', 93)],
     ('^', 18): [('x', 95), ('3', 96)],
     ('^', 19): [('x', 98), ('2', 99)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 41)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -1244,9 +1519,14 @@ def test__newSymbolsLimitTheorem__sumRule(verbose=False):
     ('lim', 5): [('\\to', 0), ('*', 25)],
     ('lim', 7): [('\\to', 1), ('*', 26)],
     ('lim', 9): [('\\to', 2), ('*', 27)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 11)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__newSymbolsLimitTheorem__productRule(verbose=False):
@@ -1271,9 +1551,14 @@ def test__newSymbolsLimitTheorem__productRule(verbose=False):
     ('lim', 3): [('\\to', 0), ('*', 23)],
     ('lim', 5): [('\\to', 1), ('*', 26)],
     ('lim', 7): [('\\to', 2), ('*', 27)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 9)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__newSymbolsLimitTheorem__constantTimesRule(verbose=False):
@@ -1294,9 +1579,14 @@ def test__newSymbolsLimitTheorem__constantTimesRule(verbose=False):
     ('bar', 5): [('x', 14)],
     ('lim', 2): [('\\to', 0), ('*', 17)],
     ('lim', 4): [('\\to', 1), ('*', 20)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 6)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__newSymbolsLimitTheorem__quotientRule(verbose=False):
@@ -1321,9 +1611,14 @@ def test__newSymbolsLimitTheorem__quotientRule(verbose=False):
     ('lim', 3): [('\\to', 0), ('*', 25)],
     ('lim', 7): [('\\to', 1), ('*', 26)],
     ('lim', 9): [('\\to', 2), ('*', 27)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 11)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -1362,9 +1657,14 @@ def test__newSymbols__fourierSeries(verbose=False):
     ('int', 17): [('/', 5), ('-', 8), ('*', 56)],
     ('lim', 10): [('\\to', 0), ('sum', 13)],
     ('sum', 13): [('=', 22), ('theta', 15), ('*', 48)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('lim', 10)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 def test__newSymbols__parallelSumOfCapacitance(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -1384,9 +1684,14 @@ def test__newSymbols__parallelSumOfCapacitance(verbose=False):
     ('prod', 8): [('=', 12), ('k', 30), ('C_{k_0}', 31)],
     ('sum', 6): [('=', 11), ('k', 26), ('/', 7)]}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 9)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 def test__newSymbols__faradayIntegralForm(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -1412,9 +1717,14 @@ def test__newSymbols__faradayIntegralForm(verbose=False):
     ('vec', 11): [('B', 20)],
     ('vec', 12): [('S', 22)]}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 13)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 def test__newSymbols__faradayDifferentialForm(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -1432,9 +1742,14 @@ def test__newSymbols__faradayDifferentialForm(verbose=False):
     ('vec', 3): [('E', 9)],
     ('vec', 6): [('B', 10)]}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 8)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 def test__newSymbols__gaussIntegralForm(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -1456,9 +1771,14 @@ def test__newSymbols__gaussIntegralForm(verbose=False):
     ('vec', 4): [('E', 12)],
     ('vec', 5): [('S', 14)]}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 8)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__newSymbols__greenSecondVectorIdentityDifferentialForm(verbose=False):
@@ -1481,9 +1801,14 @@ def test__newSymbols__greenSecondVectorIdentityDifferentialForm(verbose=False):
     ('Delta', 4): [('p', 12)],
     ('\\cdot', 0): [('nabla', 5), ('-', 2)]}
 
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 8)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
@@ -1491,30 +1816,38 @@ def test__newSymbols__greenSecondVectorIdentityDifferentialForm(verbose=False):
 def test__paveWayForDifferentiation__productRule(verbose=False):# TODO not entirely correct, have to group the \frac{d}{dx} together as one NODE
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = '\\frac{d}{dx}u v=u\\frac{d v}{dx}+v\\frac{d u}{dx}'#the space between u v is important for this parser
+    equationStr = '\\frac{d}{d x}(u v)=u\\frac{d v}{d x}+v\\frac{d u}{d x}'#the space between u v is important for this parser
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {
-    ('*', 17): [('/', 1), ('u', 7)],
-    ('*', 18): [('*', 17), ('v', 8)],
-    ('*', 19): [('u', 9), ('/', 2)],
-    ('*', 20): [('d', 10), ('v', 11)],
-    ('*', 21): [('v', 13), ('/', 3)],
-    ('*', 22): [('d', 14), ('u', 15)],
-    ('+', 0): [('*', 19), ('*', 21)],
-    ('/', 1): [('d', 5), ('dx', 6)],
-    ('/', 2): [('*', 20), ('dx', 12)],
-    ('/', 3): [('*', 22), ('dx', 16)],
-    ('=', 4): [('*', 18), ('+', 0)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    ('*', 20): [('d', 6), ('x', 7)],
+    ('*', 21): [('/', 1), ('u', 8)],
+    ('*', 22): [('*', 21), ('v', 9)],
+    ('*', 23): [('u', 10), ('/', 2)],
+    ('*', 24): [('d', 11), ('v', 12)],
+    ('*', 25): [('d', 13), ('x', 14)],
+    ('*', 26): [('v', 15), ('/', 3)],
+    ('*', 27): [('d', 16), ('u', 17)],
+    ('*', 28): [('d', 18), ('x', 19)],
+    ('+', 0): [('*', 23), ('*', 26)],
+    ('/', 1): [('d', 5), ('*', 20)],
+    ('/', 2): [('*', 24), ('*', 25)],
+    ('/', 3): [('*', 27), ('*', 28)],
+    ('=', 4): [('*', 22), ('+', 0)]}
+    expected_list_of_ast_roots = [('=', 4)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__paveWayForDifferentiation__sumRule(verbose=False):# TODO not entirely correct, have to group the \frac{d}{dx} together as one NODE
     pp = pprint.PrettyPrinter(indent=4)
 
-    equationStr = '\\frac{d}{dx}(u+v)=\\frac{d u}{dx}+\\frac{d v}{dx}'
+    equationStr = '\\frac{d}{d x}(u+v)=\\frac{d u}{d x}+\\frac{d v}{d x}'
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = {
@@ -1527,9 +1860,14 @@ def test__paveWayForDifferentiation__sumRule(verbose=False):# TODO not entirely 
     ('/', 3): [('*', 17), ('dx', 12)],
     ('/', 4): [('*', 18), ('dx', 15)],
     ('=', 5): [('*', 16), ('+', 1)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 5)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 #
 
 def test__paveWayForIntegration__enclosingBracketNonBackslash(verbose=False): # TODO not entirely correct, have to group the \int{}*dx together as one NODE, and also DEFINITE INTEGRALS
@@ -1554,9 +1892,14 @@ def test__paveWayForIntegration__enclosingBracketNonBackslash(verbose=False): # 
     ('^', 0): [('x', 17), ('3', 18)],
     ('^', 1): [('x', 20), ('2', 21)],
     ('int', 7): [('*', 25)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 9)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
@@ -1586,9 +1929,14 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
     ('^', 2): [('x', 27), ('3', 28)],
     ('^', 3): [('x', 31), ('2', 32)],
     ('int', 10): [('*', 35)]}
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = [('=', 14)]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 def test__matrix__determinantMetricTensor(verbose=False):
@@ -1598,85 +1946,90 @@ def test__matrix__determinantMetricTensor(verbose=False):
     parser = Latexparser(equationStr, verbose=verbose)
     parser._parse()
     expected_ast = None
-    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_ast == parser.ast)
+    expected_list_of_ast_roots = None
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected_ast == parser.ast and \
+        expected_list_of_ast_roots == parser.list_of_ast_roots
+    )
     if verbose:
         pp.pprint(parser.ast)
+        print(parser.list_of_ast_roots)
 
 
 
 
 if __name__=='__main__':
-    test__contiguousLeftOvers__decimalPlaces()
-    test__weirdVariables__variablesWithCurlyBracketsSimple()
-    test__weirdVariables__variablesWithCurlyBracketsWithNums()
-    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets()
-    test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex()
-    test__weirdVariables__variablesWithCaret()
-    test__weirdVariables__variablesWithCaretRealExponent()
-    test__weirdVariables__variablesWithCaretMoreComplex()
-    test__weirdVariables__variablesWithCurlyBracketsMinus()
-    test__weirdVariables__variablesWithCurlyBracketsFrac()
-    test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0()
-    test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1()
-    test__makeSubject__manyVariablesStandingTogether()
-    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower0()
-    test__findingBackSlashAndInfixOperations__Trig0()
-    test__findingBackSlashAndInfixOperations__Trig1()
-    test__findingBackSlashAndInfixOperations__Trig2()
-    test__findingBackSlashAndInfixOperations__Sqrt0()
-    test__findingBackSlashAndInfixOperations__Sqrt1()
-    test__findingBackSlashAndInfixOperations__Ln()
-    test__findingBackSlashAndInfixOperations__Frac()
-    test__findingBackSlashAndInfixOperations__Log0()
-    test__findingBackSlashAndInfixOperations__Log1()
-    test__findingBackSlashAndInfixOperations__tildeVariable()
-    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()
-    test__infixInBackslash__paraboloid()
-    test__sqrtWithPowerCaretRightOtherInfix__hill()
-    test__nonInfixBrackets__addImplicitMultiply()
-    test__nonInfixBrackets__addImplicitMultiply0()
-    test__nonInfixBrackets__addImplicitMultiply1()
-    test__BODMAS__priorityBetweenInfixForBrackets()
-    test__BODMAS__enclosingBracketInBackslashArg()
-    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
-    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
-    test__BODMAS__enclosingBracket()
-    test__manyFracCaretEnclosingBrac__partialFrac()
-    test__fracWithLogNoBase__changeLogBaseFormula()
-    test__backslashInfixInBackslash__sqrtInSqrt()
-    test__backslashInfixInBackslash__trigInTrig()
-    test__backslashInfixInBackslash__logInLog()
-    test__backslashInfixInBackslash__fracInFrac()
-    test__hassliche__highPowersAndRandomCoefficientsPITEST()
-    test__hassliche__nestedPolynomial()
-    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
-    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
-    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
-    test__hassliche__degree5()
-    test__hassliche__degree6()
-    test__hassliche__degree7()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
-    test__newSymbolsLimitTheorem__sumRule()
-    test__newSymbolsLimitTheorem__productRule()
-    test__newSymbolsLimitTheorem__constantTimesRule()
-    test__newSymbolsLimitTheorem__quotientRule()
-    test__newSymbols__fourierSeries()
-    test__newSymbols__parallelSumOfCapacitance()
-    test__newSymbols__faradayIntegralForm()
-    test__newSymbols__faradayDifferentialForm()
-    test__newSymbols__gaussIntegralForm()
-    test__newSymbols__greenSecondVectorIdentityDifferentialForm()
-    #
-    #
-    test__paveWayForDifferentiation__productRule()
-    test__paveWayForDifferentiation__sumRule()
-    test__paveWayForIntegration__enclosingBracketNonBackslash()
-    test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash()
+    # test__contiguousLeftOvers__decimalPlaces(True)
+    # test__weirdVariables__variablesWithCurlyBracketsSimple(True)
+    # test__weirdVariables__variablesWithCurlyBracketsWithNums(True)
+    # test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBrackets(True)
+    # test__weirdVariables__variablesWithCurlyBracketsWithInCurlyBracketsMoreComplex(True)
+    # test__weirdVariables__variablesWithCaret(True)
+    # test__weirdVariables__variablesWithCaretRealExponent(True)
+    # test__weirdVariables__variablesWithCaretMoreComplex(True)
+    # test__weirdVariables__variablesWithCurlyBracketsMinus(True)
+    # test__weirdVariables__variablesWithCurlyBracketsFrac(True)
+    # test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply0(True)
+    # test__weirdVariables__variablesWithCurlyBracketsImplicitMultiply1(True)
+    # test__makeSubject__manyVariablesStandingTogether(True)
+    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True)
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower(True)
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBracketsNegativePower0(True)
+    # test__findingBackSlashAndInfixOperations__Trig0(True)
+    # test__findingBackSlashAndInfixOperations__Trig1(True)
+    # test__findingBackSlashAndInfixOperations__Trig2(True)
+    # test__findingBackSlashAndInfixOperations__Sqrt0(True)
+    # test__findingBackSlashAndInfixOperations__Sqrt1(True)
+    # test__findingBackSlashAndInfixOperations__Ln(True)
+    # test__findingBackSlashAndInfixOperations__Frac(True)
+    # test__findingBackSlashAndInfixOperations__Log0(True)
+    # test__findingBackSlashAndInfixOperations__Log1(True)
+    # test__findingBackSlashAndInfixOperations__tildeVariable(True)
+    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(True)
+    # test__infixInBackslash__paraboloid(True)
+    # test__sqrtWithPowerCaretRightOtherInfix__hill(True)
+    # test__nonInfixBrackets__addImplicitMultiply(True)
+    # test__nonInfixBrackets__addImplicitMultiply0(True)
+    # test__nonInfixBrackets__addImplicitMultiply1(True)
+    # test__BODMAS__priorityBetweenInfixForBrackets(True)
+    # test__BODMAS__enclosingBracketInBackslashArg(True)
+    # test__BODMAS__enclosingBracketInBackslashArgWithExponent(True)
+    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero(True)
+    # test__BODMAS__enclosingBracket(True)
+    # test__manyFracCaretEnclosingBrac__partialFrac(True)
+    # test__fracWithLogNoBase__changeLogBaseFormula(True)
+    # test__backslashInfixInBackslash__sqrtInSqrt(True)
+    # test__backslashInfixInBackslash__trigInTrig(True)
+    # test__backslashInfixInBackslash__logInLog(True)
+    # test__backslashInfixInBackslash__fracInFrac(True)
+    # test__hassliche__highPowersAndRandomCoefficientsPITEST(True)
+    # test__hassliche__nestedPolynomial(True)
+    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(True)
+    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(True)
+    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(True)
+    # test__hassliche__degree5(True)
+    # test__hassliche__degree6(True)
+    # test__hassliche__degree7(True)
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True)
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True)
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(True)
+    # test__newSymbolsLimitTheorem__sumRule(True)
+    # test__newSymbolsLimitTheorem__productRule(True)
+    # test__newSymbolsLimitTheorem__constantTimesRule(True)
+    # test__newSymbolsLimitTheorem__quotientRule(True)
+    # test__newSymbols__fourierSeries(True)
+    # test__newSymbols__parallelSumOfCapacitance(True)
+    # test__newSymbols__faradayIntegralForm(True)
+    # test__newSymbols__faradayDifferentialForm(True)
+    # test__newSymbols__gaussIntegralForm(True)
+    # test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)
+    # #
+    # #
+    test__paveWayForDifferentiation__productRule(True)
+    # test__paveWayForDifferentiation__sumRule(True)
+    # test__paveWayForIntegration__enclosingBracketNonBackslash(True)
+    # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(True)
     #matrix test cases
     # test__matrix__determinantMetricTensor(True)
     #Test Metric_Tensor? Good for Mechanical Engineering later :) See ChatGPT for test case

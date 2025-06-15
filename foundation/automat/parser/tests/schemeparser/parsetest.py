@@ -3,10 +3,9 @@ import pprint
 
 from foundation.automat.parser.sorte import Schemeparser
 
+pp = pprint.PrettyPrinter(indent=4)
 
 def test__schemeParserTest__add(verbose=False):
-    pp = pprint.PrettyPrinter(indent=4)
-
     equationStr = '(= a (+ b c))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
@@ -32,7 +31,6 @@ def test__schemeParserTest__add(verbose=False):
 
 def test__schemeParserTest__harmonicMean(verbose=False):
     #HARMONIC MEAN : https://en.wikipedia.org/wiki/Harmonic_mean
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= (/ 1 a) (+ (/ 1 b) (/ 1 c)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -61,7 +59,6 @@ def test__schemeParserTest__harmonicMean(verbose=False):
 
 def test__schemeParserTest__phasorDiagram(verbose=False):
     #Phasor Diagram : https://en.wikipedia.org/wiki/Euler%27s_formula
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= (^ e (* i x)) (+ (cos x) (* i (sin x))))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -118,7 +115,6 @@ def test__schemeParserTest__phasorDiagram(verbose=False):
 
 def test__schemeParserTest__ebersMollModelp1(verbose=False):
     #Ebers-Moll model : https://en.wikipedia.org/wiki/Bipolar_junction_transistor#Ebers%E2%80%93Moll_model
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= I_E (* I_{ES} (- (^ e (/ V_{BE} V_T)) 1)))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -147,7 +143,6 @@ def test__schemeParserTest__ebersMollModelp1(verbose=False):
 
 def test__schemeParserTest__earlyEffectModel(verbose=False):
     #https://en.wikipedia.org/wiki/Early_effect#Large-signal_model
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= I_E (* I_S (* (^ e (/ V_{BE} V_T)) (+ 1 (/ V_{CE} V_A)))))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -208,7 +203,6 @@ def test__schemeParserTest__earlyEffectModel(verbose=False):
 
 def test__makeSubject__linearEliminationBySubstitution(verbose=False):
     #https://en.wikipedia.org/wiki/Early_effect#Large-signal_model
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= (* I_{R} R) (- (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}) 0))'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
@@ -237,7 +231,6 @@ def test__makeSubject__linearEliminationBySubstitution(verbose=False):
 
 def test__makeSubject__linearEliminationBySubstitution0(verbose=False):
     #https://en.wikipedia.org/wiki/Early_effect#Large-signal_model
-    pp = pprint.PrettyPrinter(indent=4)
 
     equationStr = '(= (- (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}) (* I_{R} R)) 0)'
     parser = Schemeparser(equationStr=equationStr, verbose=verbose)
