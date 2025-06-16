@@ -6,6 +6,9 @@ import {FontLoader} from './static/three/FontLoader.js';
 import {GLTFLoader} from './static/three/GLTFLoader.js';
 
 import {mesh as cylinder_mesh} from './static/meshes/mesh_cylinder.js';
+import {mesh as wall_mesh} from './static/meshes/mesh_wall.js';
+import {mesh as trench_mesh} from './static/meshes/mesh_trench.js';
+import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
 
 
 
@@ -19,7 +22,7 @@ const near = 1;//Camera frustum near plane
 const far = 10000;//Camera frustum far plane
 
 camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, near, far );
-camera.position.set( 0, - 400, 600 );
+camera.position.set( 0, - 20, 30 );
 renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -38,7 +41,6 @@ function onWindowResize() {
     
     render();
 }
-//cubeTutorial();
 
 //permanentFUNCTIONS
 function addCube(size, color) {
@@ -63,6 +65,9 @@ function addCube(size, color) {
 
 
 scene.add(cylinder_mesh); render();
+scene.add(wall_mesh); render();
+scene.add(trench_mesh); render();
+// scene.add(resistor_outline_mesh); render();
 
 function addText(message, position, color, materialName) {
     const loader = new FontLoader();
@@ -153,3 +158,4 @@ window.addEventListener( 'resize', onWindowResize );
 
 
 //permanentFUNCTIONS
+render();
