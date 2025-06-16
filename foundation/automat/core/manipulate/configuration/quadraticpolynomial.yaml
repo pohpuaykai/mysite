@@ -2,3 +2,14 @@
 className: "Quadraticpolynomial"
 type: "essential"
 manipulations:
+
+
+  - type: "regex"
+    vor:
+      scheme: ''
+      return: ''
+    hin:
+      scheme: ''
+      return: ''
+
+#complete the square

@@ -1,12 +1,24 @@
-from foundation.nDisplay.core.mesh.sampler.rotateSampler import RotateSampler
-from foundation.nDisplay.core.mesh.mesh import Mesh
+import pprint
+
+# from foundation.nDisplay.core.mesh.sampler.rotateSampler import RotateSampler
+# from foundation.nDisplay.core.mesh.mesh import Mesh
+from foundation.nDisplay.sampler.rotatesampler import RotateSampler
+
+pp = pprint.PrettyPrinter(indent=4)
 
 def test__meshgenerator__cylinder(verbose=False):
     #TEST 1: cylinder
-    formulaStr = 'hx'
-    formulaLambda = lambda x: eval(formulaStr, locals={'h':1})
-    vertices = RotateSampler.rotateSample(formulaLambda, -1, 1, 0.1, 0, 360, 45)
-    mesh = Mesh(vertices)
+    formulaStr = 'h'
+    formulaLambda = lambda x: eval(formulaStr, locals={'h':100, 'x':x})
+    vertices, indices = RotateSampler.rotateSample(formulaLambda, -150, 150, 15, 0, 360, 3)
+    # mesh = Mesh(vertices)
+    if verbose:
+        # print('vertices')
+        # pp.pprint(vertices)
+        # print('indices')
+        # pp.pprint(indices)
+        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
+        THREEMeshGenerator().generateMeshFile('cylinder', vertices, indices, '0xff0000')
 
 
 def test__meshgenerator__wall(verbose=False):
@@ -14,14 +26,24 @@ def test__meshgenerator__wall(verbose=False):
     formulaStr = 'h/(1+math.pow(math.e, -s * x))' # l is the height of the slope, s is the steepness of the slope
     formulaLambda = lambda x: eval(formulaStr, locals={'h':1, 's':1, 'x':x})
     vertices = RotateSampler.rotateSample(formulaLambda, -1, 1, 0.1, 0, 360, 45)
-    mesh = Mesh(vertices)
+    # mesh = Mesh(vertices)
+    if verbose:
+        print('vertices')
+        pp.pprint(vertices)
+        print('indices')
+        pp.pprint(indices)
 
 def test__meshgenerator__trench(verbose=False):
     #TEST 3: trench (left-to-right)
     formulaStr = 'h/(1+math.pow(math.e, s * x))' # l is the height of the slope, s is the steepness of the slope
     formulaLambda = lambda x: eval(formulaStr, locals={'h':1, 's':1, 'x':x})
     vertices = RotateSampler.rotateSample(formulaStr, locals={'h':1, 's':1, 'x':x})
-    mesh = Mesh(vertices)
+    # mesh = Mesh(vertices)
+    if verbose:
+        print('vertices')
+        pp.pprint(vertices)
+        print('indices')
+        pp.pprint(indices)
 
 
 def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
@@ -55,7 +77,12 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
             'dStep':90
         }
     ])
-    mesh = Mesh(vertices)
+    # mesh = Mesh(vertices)
+    if verbose:
+        print('vertices')
+        pp.pprint(vertices)
+        print('indices')
+        pp.pprint(indices)
 
 
 #TEST 5 add colors, follow CUBE
@@ -63,6 +90,6 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
 
 if __name__=='__main__':
     test__meshgenerator__cylinder(True)
-    test__meshgenerator__wall(True)
-    test__meshgenerator__trench(True)
-    test__meshgenerator__piecewise_trench_cylinder_wall(True)
+    # test__meshgenerator__wall(True)
+    # test__meshgenerator__trench(True)
+    # test__meshgenerator__piecewise_trench_cylinder_wall(True)

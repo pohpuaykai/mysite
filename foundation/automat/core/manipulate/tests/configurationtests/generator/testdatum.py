@@ -415,11 +415,6 @@ TEST_DATUM = {
             "input": "(= (* (/ d (* d x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))",
             "expected": "(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))"
         },
-
-
-
-
-
         ('vor', '2'): {
             "input": "(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))",
             "expected": "(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))"

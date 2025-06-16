@@ -1,5 +1,10 @@
 remove Django?
 do 
-merge cubeTutorial and textTutorial
-https://threejs.org/manual/#en/drawing-lines
+https://threejs.org/manual/#en/drawing-lines<<<<<<<<<same as line text
+
+generate a resistor-shape using https://threejs.org/docs/index.html#api/en/core/BufferGeometry
+-use rotatesamplertest.py & file:///D:/p/_componentModelData/resistor/MBE04140C3001FC100/mbxsma.pdf
+
 https://threejs.org/manual/#en/loading-3d-models
+https://threejs.org/docs/#examples/en/loaders/GLTFLoader
+https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#concepts

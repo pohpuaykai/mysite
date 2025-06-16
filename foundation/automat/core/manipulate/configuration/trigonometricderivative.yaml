@@ -2,3 +2,56 @@
 className: "Trigonometricderivative"
 type: "derivative_trigonometric"
 manipulations:
+  - type: "regex"
+    vor:
+      scheme: '(D (sin $0) $1)'
+      return: '(* (cos $0) (D $0 $1))'
+    hin:
+      scheme: '(* (cos $0) (D $0 $1))'
+      return: '(D (sin $0) $1)'
+
+
+  - type: "regex"
+    vor:
+      scheme: '(D (cos $0) $1)'
+      return: '(* (- "0" (sin $0)) (D $0 $1))'
+    hin:
+      scheme: ''
+      return: ''
+
+
+  - type: "regex"
+    vor:
+      scheme: '(D (tan $0) $1)'
+      return: '(* (^ (sec $0) 2) (D $0 $1))'
+    hin:
+      scheme: ''
+      return: ''
+
+
+  - type: "regex"
+    vor:
+      scheme: '(D (sec $0) $1)'
+      return: '(* (* (sec $0) (tan $0)) (D $0 $1))'
+    hin:
+      scheme: ''
+      return: ''
+
+
+  - type: "regex"
+    vor:
+      scheme: '(D (cosec $0) $1)'
+      return: '(* (- "0" (* (cosec $0) (cot $0))) (D $0 $1))'
+    hin:
+      scheme: ''
+      return: ''
+
+
+  - type: "regex"
+    vor:
+      scheme: '(D (cot $0) $1)'
+      return: '(* (- "0" (^ cosec $0) 2) (D $0 $1))'
+    hin:
+      scheme: ''
+      return: ''
+

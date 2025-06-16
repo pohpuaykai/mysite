@@ -3,6 +3,7 @@ className: "Pythagoreanangle"
 type: "trigonometric_standard"
 #TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
 manipulations:
+#Elliptic
   - type: "regex"
     vor:
       scheme: "(+ (^ (sin $0) 2) (^ (cos $0) 2))"
@@ -10,3 +11,11 @@ manipulations:
     hin:
       scheme: "1"
       return: "(+ (^ (sin $0) 2) (^ (cos $0) 2))"
+#Hyperbolic
+  - type: "regex"
+    vor:
+      scheme: '(- (^ (sinh $0) "2") (^ (cosh $0) "2"))'
+      return: '1'
+    hin:
+      scheme: ''
+      return: ''

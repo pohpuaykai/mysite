@@ -1,0 +1,21 @@
+---
+className: "Exponentialderivative"
+type: "essential"
+manipulations:
+  - type: "regex"
+    vor:
+      scheme: '(D (^ "e" $0) $1)'
+      return: '(* (^ "e" $0) (D $0 $1))'
+    hin:
+      scheme: ''
+      return: ''
+#for base is a number<<<<<<<need to do symbolic_calculation first
+
+#general
+  - type: "regex"
+    vor:
+      scheme: ''
+      return: ''
+    hin:
+      scheme: ''
+      return: ''

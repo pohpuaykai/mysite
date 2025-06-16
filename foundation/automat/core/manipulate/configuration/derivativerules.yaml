@@ -1,0 +1,36 @@
+---
+className: "DerivativeRules"
+type: "essential"
+manipulations:
+#CHAIN rule VARs need type <<<<<<<<<
+  - type: "regex"
+    vor:
+      scheme: '(D ($0 $1) $2)' # $0 of $1, like $0 is sine.
+      return: '(* (* (D $0 $2) (D $1 $2)) (D $1 $2))'
+    hin:
+      scheme: ''
+      return: ''
+#SUM RULE VARs need type <<<<<<<<<
+  - type: "regex"
+    vor:
+      scheme: '(D (+ $0 $1) $2)'
+      return: '(+ (D $0 $2) (D $1 $2))'
+    hin:
+      scheme: ''
+      return: ''
+#PRODUCT RULE VARs need type <<<<<<<<<
+  - type: "regex"
+    vor:
+      scheme: '(D (* $0 $1) $2)'
+      return: '(+ (* $0 (D $1 $2)) (* $1 (D $0 $2)))'
+    hin:
+      scheme: ''
+      return: ''
+#QUOTIENT RULE VARs need type <<<<<<<<<
+  - type: "regex"
+    vor:
+      scheme: '(D (/ $0 $1) $2)'
+      return: '(/ (- (* $1 (D $0 $2)) (* $0 (D $1 $2))) (* $1 $1))'
+    hin:
+      scheme: ''
+      return: ''

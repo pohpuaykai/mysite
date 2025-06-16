@@ -1,0 +1,21 @@
+import * as THREE from '../three/three.module.js';
+
+const geometry = new THREE.BufferGeometry();
+
+const vertices = new Float32Array([
+{% for coordinate in coordinates %}{% set remainder = loop.index % 3 %}{{coordinate}}, {% if remainder == 0 %}
+{% endif %}{% endfor %}
+]);
+
+const indices = [
+{% for indice in indices %}{% set remainder = loop.index % 3 %}{{indice}}, {% if remainder == 0 %}
+{% endif %}{% endfor %}
+];
+
+geometry.setIndex( indices );
+geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+const material = new THREE.MeshBasicMaterial({ color:{{color}} });
+const mesh = new THREE.Mesh( geometry, material );
+
+export {mesh};

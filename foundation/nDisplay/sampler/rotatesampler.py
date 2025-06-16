@@ -1,3 +1,5 @@
+import math
+
 class RotateSampler:
     """
     Courtesy of Andrew of www.youtube.com/@GetIntoGameDev
@@ -24,7 +26,7 @@ class RotateSampler:
         rotates it about x-axis, and gives many points on the surface formed by the rotation
         the points are restricted by the sampling parameters
         [xStart:xEnd:xStep], this is the x input to formulaStr
-        [dStart:dEnd:dStep], this is the degrees of rotation
+        [dStart:dEnd:dStep], this is the degrees of rotation, in DEGREE
         
         we expect formulaStr to only take in x.
         If your formulaStr has other parameters , please fill it in with lambda first.
@@ -35,38 +37,26 @@ class RotateSampler:
         
         """
         #TODO check if [xStart:xEnd:xStep] and [dStart:dEnd:dStep] makes sense
-        triangles = []#return
-        vertices = []
-        vertexCount = 0
-        for xIdx, x in enumerate(frange(xStart, xEnd, xStep)):
-            f = formulaLambda(x) * formulaLambda(x)
-            upVertices, doVertices = [], []
-            vertexIdxList = []
-            for d in frange(dStart, dEnd, dStep):
-                y_p = math.sqrt((math.atan(d)+1)/(f))#positive y
-                z_p = y_p * math.atan(d)
-                upVertices.append((x, y_p, z_p))
-                doVertices.append((x, -y_p, -z_p))
-            cVertices = upVertices + reversed(doVertices)
-            vertices += cVertices
-            vertexIdxList = list(range(vertexCount,vertexCount+ len(cVertices)))
-            vertexCount += len(cVertices)
-            #pair with prevVertices
-            if xIdx > 0:# should be with vertexIdx....
-                ppv = zip(prevVertices, cVertices)
-                
-            #take pairs of zip to form quads
-                quads = []
-                for idx in range(0, len(vertexIdxList)-1):
-                    quads.append([vertexIdxList[idx], vertexIdxList[idx+1]])
-                quads.append([vertexIdxList[-1], vertexIdxList[0]])
-            #divide quads to form triangles
-            for quad in quads:
-                triangles.append([quad[0][0], quad[0][1], quad[1][0], quad[0][0]])
-                triangles.append([quad[1][0], quad[1][1], quad[0][1], quad[0][0]])
-            #prevVertices=cVertices
-            prevVertices = cVertices
-            return vertices, triangles
+        vertices, indices = [], []
+        xPoints, dPoints = list(cls.frange(xStart, xEnd, xStep)), list(cls.frange(dStart, dEnd, dStep))
+        for xIdx, x in enumerate(xPoints):#each wheel
+            f = formulaLambda(x)
+            for dIdx, d in enumerate(dPoints):#each point in each wheel
+                vertices.append((x, f*math.cos(math.radians(d)), f*math.sin(math.radians(d))))
+                #connect between wheels, this wheel and previous wheel
+                if xIdx > 0:
+                    prevWheelIdx, thisWheelIdx = xIdx-1, xIdx
+                    prevPointIdx, thisPointIdx = (dIdx-1)%len(dPoints), dIdx
+                    p00, p01, p10, p11 = (prevWheelIdx, prevPointIdx), (prevWheelIdx, thisPointIdx), (thisWheelIdx, prevPointIdx), (thisWheelIdx, thisPointIdx)
+                    #convert (wheelIdx, pointIdx) to vertexIdx
+                    def wheelIdxPointIdxTOvertexIdx(wheelIdx, pointIdx):
+                        return wheelIdx*len(dPoints)+pointIdx
+                    v00, v01, v10, v11 = wheelIdxPointIdxTOvertexIdx(p00[0], p00[1]), wheelIdxPointIdxTOvertexIdx(p01[0], p01[1]), wheelIdxPointIdxTOvertexIdx(p10[0], p10[1]), wheelIdxPointIdxTOvertexIdx(p11[0], p11[1])
+                    #form 2 triangles
+                    indices.append((v00, v01, v10));indices.append((v10, v11, v00))
+        return vertices, indices
+
+
 
 
 

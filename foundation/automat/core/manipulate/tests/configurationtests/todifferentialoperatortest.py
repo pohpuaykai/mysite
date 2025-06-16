@@ -111,10 +111,10 @@ def test__vor2__configTest(verbose=False):
     idx = 2
     eq0 = Equation(eqs, eqsType)
     ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (/ partial (* partial $1)) $1)
+    manipulatedSchemeEquation = ma0.apply() # (* (/ partial (* partial $1)) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x))))' # (D $0 $1)
+    expected = '(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # (D $0 $1)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -127,7 +127,7 @@ def test__vor2__configTest(verbose=False):
     
 
 def test__hin2__configTest(verbose=False):
-    eqs = '(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x))))' # fill it in
+    eqs = '(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # fill it in
     eqsType = 'scheme'
     #filename = 'todifferentialoperator'
     direction = 'hin'
@@ -137,7 +137,7 @@ def test__hin2__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D $0 $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # (* (/ partial (* partial $1)) $1)
+    expected = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # (* (/ partial (* partial $1)) $0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -160,7 +160,7 @@ def test__vor3__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (/ (* partial $0) (* partial $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (* (/ partial (* partial x)) (* u v))(+ (* u (D v x)) (* v (D u x))))' # (D $0 $1)
+    expected = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))' # (D $0 $1)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -173,7 +173,7 @@ def test__vor3__configTest(verbose=False):
     
 
 def test__hin3__configTest(verbose=False):
-    eqs = '(= (* (/ partial (* partial x)) (* u v))(+ (* u (D v x)) (* v (D u x))))' # fill it in
+    eqs = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))' # fill it in
     eqsType = 'scheme'
     #filename = 'todifferentialoperator'
     direction = 'hin'
@@ -197,12 +197,12 @@ def test__hin3__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest(True) # Not tested yet
-    test__hin0__configTest(True) # Not tested yet
-    test__vor1__configTest(True) # Not tested yet
-    test__hin1__configTest(True) # Not tested yet
-    test__vor2__configTest(True) # Not tested yet
-    test__hin2__configTest(True) # Not tested yet
-    test__vor3__configTest(True) # Not tested yet
-    test__hin3__configTest(True) # Not tested yet
+    test__vor0__configTest()
+    test__hin0__configTest()
+    test__vor1__configTest()
+    test__hin1__configTest()
+    test__vor2__configTest()
+    test__hin2__configTest()
+    test__vor3__configTest()
+    test__hin3__configTest()
     

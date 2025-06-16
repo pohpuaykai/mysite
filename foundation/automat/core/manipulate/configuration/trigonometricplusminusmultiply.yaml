@@ -3,6 +3,7 @@ className: "Trigonometricplusminusmultiply"
 type: "trigonometric_standard"
 #TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
 manipulations:
+#Elliptic
   - type: "regex"
     vor:
       scheme: "(sin (+ $0 $1))"
@@ -31,3 +32,11 @@ manipulations:
     hin:
       scheme: "(+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))"
       return: "(cos (- $0 $1))"
+#Hyperbolic
+  - type: "regex"
+    vor:
+      scheme: ''
+      return: ''
+    hin:
+      scheme: ''
+      return: ''

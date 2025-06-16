@@ -1,0 +1,19 @@
+---
+className: "HyperbolicTrigonometryDefinition"
+type: "essential"
+manipulations:
+  - type: "regex"
+    vor:
+      scheme: '(cosh $0)'
+      return: '(/ (- (^ "e" $0) (^ "e" (- "0" $0))) "2")'
+    hin:
+      scheme: ''
+      return: ''
+
+  - type: "regex"
+    vor:
+      scheme: '(sinh $0)'
+      return: '(/ (+ (^ "e" $0) (^ "e" (- "0" $0))) "2")'
+    hin:
+      scheme: ''
+      return: ''
