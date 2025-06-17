@@ -22,7 +22,7 @@ const near = 1;//Camera frustum near plane
 const far = 10000;//Camera frustum far plane
 
 camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, near, far );
-camera.position.set( 0, 0, 30 );
+camera.position.set( 0, 0, 10 );
 renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );

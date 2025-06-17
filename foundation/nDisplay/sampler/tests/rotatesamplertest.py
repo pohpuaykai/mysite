@@ -121,7 +121,7 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
             'xRange__color':{
                 (-2, -1.2):(81, 38, 39),#Brown band
                 (-0.4, 0.4):(15, 81, 144),#Blue band
-                (1.2, 2):(255, 33, 0),#Red band
+                (1.2, 2):(255, 3, 0),#Red band
             },
             'defaultColor':(96, 157, 167)
         },
@@ -134,7 +134,7 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
             'dEnd':360,
             'dStep':30,
             'xRange__color':{
-                (2.2, 3.7):(255, 33, 0),#Red
+                (2.2, 3.7):(255, 3, 0),#Red
             },
             'defaultColor':(96, 157, 167)
         },
@@ -171,7 +171,7 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
 
 
 if __name__=='__main__':
-    test__meshgenerator__cylinder(True)
-    test__meshgenerator__wall(True)
-    test__meshgenerator__trench(True)
+    # test__meshgenerator__cylinder(True)
+    # test__meshgenerator__wall(True)
+    # test__meshgenerator__trench(True)
     test__meshgenerator__piecewise_trench_cylinder_wall(True)

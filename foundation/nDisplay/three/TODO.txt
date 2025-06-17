@@ -4,8 +4,11 @@ https://threejs.org/manual/#en/drawing-lines<<<<<<<<<same as line text
 
 generate a resistor-shape using https://threejs.org/docs/index.html#api/en/core/BufferGeometry
 -use rotatesamplertest.py & file:///D:/p/_componentModelData/resistor/MBE04140C3001FC100/mbxsma.pdf
--outline DONE-> the color bands to show resistor value
--The color is hidden in the Material, which hides the color in its material.blending
+-color bends look ok, but the outline looks a bit weird, looks like fleshlight, SLOPE_NEEDS_TO_BE_SHARPER
+
+ZOOM_OUT
+PLACING multiple resistors AND
+CONNECT WITH BENDY_WIRES, USE facebook resistor meshes as examples
 
 https://threejs.org/manual/#en/loading-3d-models
 https://threejs.org/docs/#examples/en/loaders/GLTFLoader

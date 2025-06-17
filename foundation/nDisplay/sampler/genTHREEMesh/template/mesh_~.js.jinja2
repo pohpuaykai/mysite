@@ -14,7 +14,7 @@ const indices = new Uint16Array([
 ]);
 
 const colors = new Float32Array([
-{% for color in colors %}{% set remainder = loop.index % 9 %}{{color}}, {% if remainder == 0 %}
+{% for color in colors %}{% set remainder = loop.index % 3 %}{{color}}, {% if remainder == 0 %}
 {% endif %}{% endfor %}
 ]);
 

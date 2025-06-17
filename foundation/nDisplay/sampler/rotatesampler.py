@@ -38,7 +38,20 @@ class RotateSampler:
         """
         #TODO check if [xStart:xEnd:xStep] and [dStart:dEnd:dStep] makes sense
         list_tuple_xRange_color = sorted(xRange__color.items(), key=lambda t:t[0][0]) # ascending first coordinate of xRange
+        newlist_tuple_xRange_color = []
+        for xRange, color in list_tuple_xRange_color:
+            normalisedColor = []
+            for colorCoordinate in color:
+                normalisedColor.append(colorCoordinate/255.0) # web colors so base is 255.0 for each coordinate
+            newlist_tuple_xRange_color.append((xRange, tuple(normalisedColor)))
+        list_tuple_xRange_color = newlist_tuple_xRange_color
         # print(list_tuple_xRange_color); import pdb;pdb.set_trace()
+
+        normalisedColor = []
+        for colorCoordinate in defaultColor:
+            normalisedColor.append(colorCoordinate/255.0) # web colors so base is 255.0 for each coordinate
+        defaultColor = tuple(normalisedColor)
+        #
         def colorOfCoordinate(x):
             for (xStart, xEnd), color in list_tuple_xRange_color:
                 if xStart <= x < xEnd:
@@ -65,6 +78,15 @@ class RotateSampler:
                     #form 2 triangles
                     indices.append((v00, v10, v01));indices.append((v11, v01, v10)) # indices are triangles
                     #add the color_3_tuple of this triangle
+                    # colors.append(color); colors.append(color)
+        #convert indices&vertices to list_of_triangles, where each triangle is a 3-tuple of 3-coordinates(x, y, z)
+        # triangulatedVertices = []
+        # for triangle in indices:
+        #     newTriangle = []
+        #     for vertexIndex in triangle:
+        #         newTriangle.append(vertices[vertexIndex])
+        #     triangulatedVertices.append(tuple(newTriangle))
+        # return triangulatedVertices, colors, triangulatedVertices[:2*len(dPoints)], triangulatedVertices[-2*len(dPoints)]
         return vertices, indices, colors, indices[:2*len(dPoints)], indices[-2*len(dPoints):]# 2 triangles for each point on the wheel
 
 
