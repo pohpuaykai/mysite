@@ -17,20 +17,22 @@ class THREEMeshGenerator:
         if not os.path.isdir(self.outputFolder):
             os.makedirs(self.outputFolder)
 
-    def generateMeshFile(self, meshName, coordinates, indices, color):
+    def generateMeshFile(self, meshName, coordinates, indices, colors):
         templateName = "mesh_~.js.jinja2"
         environment = Environment(loader=FileSystemLoader(self.templateFolder))
         meshJSTemplate = environment.get_template(templateName)
         #flatten coordinates
         coordindates = Flattener.flatten(coordinates)
-        #flatten coordinates
-        indices = Flattener.flatten(indices)
+        #flatten indices
+        indices = Flattener.flatten(indices)# these are indices of coordinates, grouped to form triangles
+        #flatten colors
+        colors = Flattener.flatten(colors)#these are RGB_colors for each triangle in indices
         meshJSContent = meshJSTemplate.render({
             'coordinates':coordindates,
             'indices':indices,
-            'color':color
+            'colors':colors
         })
-        fileName = templateName.replace('~', meshName).replace('jinja2', '')
+        fileName = templateName.replace('~', meshName).replace('.jinja2', '')
         self.writeToFile(fileName, meshJSContent, verbose=self.verbose)
 
 

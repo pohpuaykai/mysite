@@ -12,10 +12,16 @@ const indices = [
 {% endif %}{% endfor %}
 ];
 
+const colors = new Float32Array([
+{% for color in colors %}{% set remainder = loop.index % 9 %}{{color}}, {% if remainder == 0 %}
+{% endif %}{% endfor %}
+]);
+
 geometry.setIndex( indices );
 geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-const material = new THREE.MeshBasicMaterial({ color:{{color}} });
+const material = new THREE.MeshBasicMaterial({ vertexColors:true});
 const mesh = new THREE.Mesh( geometry, material );
 
 export {mesh};

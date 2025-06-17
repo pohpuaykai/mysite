@@ -65,8 +65,8 @@ function addCube(size, color) {
 
 
 scene.add(cylinder_mesh); render();
-scene.add(wall_mesh); render();
-scene.add(trench_mesh); render();
+// scene.add(wall_mesh); render();
+// scene.add(trench_mesh); render();
 // scene.add(resistor_outline_mesh); render();
 
 function addText(message, position, color, materialName) {
