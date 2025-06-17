@@ -15,19 +15,24 @@ import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outli
 
 let camera, scene, renderer;
 scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xf0f0f0 );
+scene.background = new THREE.Color( 0x808080 );
 const fov = 45;//Camera frustum vertical field of view
 const aspect = window.innerWidth / window.innerHeight; //Camera frustum aspect ratio
 const near = 1;//Camera frustum near plane
 const far = 10000;//Camera frustum far plane
 
 camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, near, far );
-camera.position.set( 0, - 20, 30 );
+camera.position.set( 0, 0, 30 );
 renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 
 document.body.appendChild( renderer.domElement );
+
+//add pointlight TODO light seems to have no difference for MeshBasicMaterial
+// const light = new THREE.PointLight(0xffffff, 1, 10, 2);//color, intensity, range_of_light, decay_of_light
+// light.position.set(5, 5, 5);
+// scene.add(light);
 
 function render() {
     renderer.render(scene, camera);
@@ -64,10 +69,11 @@ function addCube(size, color) {
 // renderer.setAnimationLoop( animate );
 
 
-scene.add(cylinder_mesh); render();
+// cylinder_mesh.position.set(0, 0, 0);
+// scene.add(cylinder_mesh); render();
 // scene.add(wall_mesh); render();
 // scene.add(trench_mesh); render();
-// scene.add(resistor_outline_mesh); render();
+scene.add(resistor_outline_mesh); render();
 
 function addText(message, position, color, materialName) {
     const loader = new FontLoader();

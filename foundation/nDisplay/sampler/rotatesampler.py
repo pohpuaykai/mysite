@@ -38,6 +38,7 @@ class RotateSampler:
         """
         #TODO check if [xStart:xEnd:xStep] and [dStart:dEnd:dStep] makes sense
         list_tuple_xRange_color = sorted(xRange__color.items(), key=lambda t:t[0][0]) # ascending first coordinate of xRange
+        # print(list_tuple_xRange_color); import pdb;pdb.set_trace()
         def colorOfCoordinate(x):
             for (xStart, xEnd), color in list_tuple_xRange_color:
                 if xStart <= x < xEnd:
@@ -51,6 +52,7 @@ class RotateSampler:
             # print('wheelIdx', xIdx, ' each wheel has ', len(dPoints))
             for dIdx, d in enumerate(dPoints):#each point in each wheel
                 vertices.append((x, f*math.cos(math.radians(d)), f*math.sin(math.radians(d))))
+                colors.append(color)
                 #connect between wheels, this wheel and previous wheel
                 if xIdx > 0:
                     prevWheelIdx, thisWheelIdx = xIdx-1, xIdx
@@ -63,7 +65,6 @@ class RotateSampler:
                     #form 2 triangles
                     indices.append((v00, v10, v01));indices.append((v11, v01, v10)) # indices are triangles
                     #add the color_3_tuple of this triangle
-                    colors.append(color);colors.append(color)
         return vertices, indices, colors, indices[:2*len(dPoints)], indices[-2*len(dPoints):]# 2 triangles for each point on the wheel
 
 

@@ -6,4 +6,4 @@ db.sqlite3
 #foundation/automat/core/manipulate/pattern
 #foundation/automat/core/manipulate/tests/configurationtests
 foundation/automat/parser/tests/genASTSVG/examples/**
-#foundation/nDisplay/three/public/static/meshes/*
+# foundation/nDisplay/three/public/static/meshes/**
