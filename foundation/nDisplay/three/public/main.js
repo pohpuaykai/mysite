@@ -1,14 +1,17 @@
 // import * as THREE from './static/three/three.core.js';
 import * as THREE from './static/three/three.module.js';
 import {OrbitControls} from './static/three/OrbitControls.js';
-import {TextGeometry} from './static/three/TextGeometry.js';
-import {FontLoader} from './static/three/FontLoader.js';
+// import {TextGeometry} from './static/three/TextGeometry.js';
+// import {FontLoader} from './static/three/FontLoader.js';
 import {GLTFLoader} from './static/three/GLTFLoader.js';
 
-import {mesh as cylinder_mesh} from './static/meshes/mesh_cylinder.js';
-import {mesh as wall_mesh} from './static/meshes/mesh_wall.js';
-import {mesh as trench_mesh} from './static/meshes/mesh_trench.js';
-import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
+import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
+
+// import {mesh as cylinder_mesh} from './static/meshes/mesh_cylinder.js';
+// import {mesh as wall_mesh} from './static/meshes/mesh_wall.js';
+// import {mesh as trench_mesh} from './static/meshes/mesh_trench.js';
+// import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
+import {MeshResistor} from './static/meshes/MeshResistor.js';
 
 
 
@@ -73,83 +76,28 @@ function addCube(size, color) {
 // scene.add(cylinder_mesh); render();
 // scene.add(wall_mesh); render();
 // scene.add(trench_mesh); render();
-scene.add(resistor_outline_mesh); render();
+// scene.add(resistor_outline_mesh); render();
 
-function addText(message, position, color, materialName) {
-    const loader = new FontLoader();
-    loader.load('fonts/helvetiker_regular.typeface.json', function(font){
-        let material;
-        if (materialName == 'line') {
+const resistor0 = new MeshResistor({x:0, y:0, z:-10});
+resistor0.rotation.set(0, 0, Math.PI/2);
+scene.add(resistor0);render();
 
-        // console.log(color);
-            material = new THREE.LineBasicMaterial( {
-                color: color,
-                side: THREE.DoubleSide
-            } );
-            // console.log(material);
-        } else if (materialName == 'mesh') {
+const resistor1 = new MeshResistor({x:0, y:15, z:-10});
+resistor1.rotation.set(0, 0, Math.PI/2);
+scene.add(resistor1);render();
 
-        // console.log(color);
-            material = new THREE.MeshBasicMaterial( {
-                color: color,
-                transparent: true,
-                opacity: 0.4,
-                side: THREE.DoubleSide
-            } );
-            // console.log(material);
-        }
+console.log('boundingBox of resistor1: ');
+console.log(resistor1.geometry.boundingBox);
+// resistor1.geometry.computeBoundingBox();
+// console.log(resistor1.geometry.boundingBox);
+console.log(resistor1.leftConnectionBox);
+console.log(resistor1.rightConnectionBox);
+//draw orthogonal wires to connection resistors, example call: wire(resistor0, resistor1); and it should return the wire object, wire should take at most 3 bends, works like text?
 
-        // console.log(color);
-        //
-        const shapes = font.generateShapes( message, 100 );
-        const geometry = new THREE.ShapeGeometry( shapes );
-        geometry.computeBoundingBox();
-        const xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){
+    scene.add(textMesh); render();
+});
 
-        if (materialName == 'line') {
-
-            // make line shape ( N.B. edge view remains visible )
-            const holeShapes = [];
-
-            for ( let i = 0; i < shapes.length; i ++ ) {
-                const shape = shapes[ i ];
-                if ( shape.holes && shape.holes.length > 0 ) {
-                    for ( let j = 0; j < shape.holes.length; j ++ ) {
-                        const hole = shape.holes[ j ];
-                        holeShapes.push( hole );
-                    }
-                }
-            }
-
-            shapes.push( ...holeShapes );
-            const lineText = new THREE.Object3D();
-            for ( let i = 0; i < shapes.length; i ++ ) {
-                const shape = shapes[ i ];
-                const points = shape.getPoints();
-                const geometry = new THREE.BufferGeometry().setFromPoints( points );
-                geometry.translate( xMid, 0, 0 );
-                const lineMesh = new THREE.Line( geometry, material );
-                lineText.add( lineMesh );
-
-            }
-            scene.add( lineText );
-        } else if (materialName == 'mesh') {
-            geometry.translate( xMid, 0, 0 );
-            // make shape ( N.B. edge view not visible )
-            const text = new THREE.Mesh( geometry, material );
-            text.position.x = position.x;
-            text.position.y = position.y;
-            text.position.z = position.z;
-            scene.add( text );
-
-        }
-
-
-        render();
-    });
-}
-// addText("   Three.js\nSimple text.", {x:0, y:0, z:-150}, 0x006699, 'line');
-// addText("   Three.js\nSimple text.", {x:0, y:0, z:-150}, 0x006699, 'mesh');
 
 
 //controls

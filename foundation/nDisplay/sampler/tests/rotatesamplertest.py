@@ -29,8 +29,11 @@ def test__meshgenerator__cylinder(verbose=False):
         # pp.pprint(startPointIndices)
         # pp.pprint(endPointIndices)
         # import pdb;pdb.set_trace()
-        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
-        THREEMeshGenerator().generateMeshFile('cylinder', vertices, indices, colors)
+        # from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
+        # THREEMeshGenerator().generateMeshFile('cylinder', vertices, indices, colors)
+
+        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
+        THREEMeshClassGenerator().generateMeshFile('cylinder', vertices, indices, colors)
 
 
 def test__meshgenerator__wall(verbose=False):
@@ -54,8 +57,11 @@ def test__meshgenerator__wall(verbose=False):
         # pp.pprint(startPointIndices)
         # pp.pprint(endPointIndices)
         # import pdb;pdb.set_trace()
-        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
-        THREEMeshGenerator().generateMeshFile('wall', vertices, indices, colors)
+        # from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
+        # THREEMeshGenerator().generateMeshFile('wall', vertices, indices, colors)
+
+        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
+        THREEMeshClassGenerator().generateMeshFile('wall', vertices, indices, colors)
 
 def test__meshgenerator__trench(verbose=False):
     #TEST 3: trench (left-to-right)
@@ -76,12 +82,15 @@ def test__meshgenerator__trench(verbose=False):
         # pp.pprint(startPointIndices)
         # pp.pprint(endPointIndices)
         # import pdb;pdb.set_trace()
-        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
-        THREEMeshGenerator().generateMeshFile('trench', vertices, indices, colors)
+        # from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
+        # THREEMeshGenerator().generateMeshFile('trench', vertices, indices, colors)
+
+        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
+        THREEMeshClassGenerator().generateMeshFile('trench', vertices, indices, colors)
 
 
 def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
-    #TEST 4: piece-wise, trench-cylinder-wall==5_Band_Resistor_Brown_Brown_Blue_Red_Red==11.6kOhm_+2%
+    #TEST 4: piece-wise, trench-cylinder-wall==5_Band_Resistor_Brown_Brown_Blue_Red_Red==11.6kOhm-+2%
     import math; theMathModule = locals()['math'];
     vertices, indices, colors = RotateSampler.rotatePieceWiseSample([
         {#cylinder
@@ -163,8 +172,11 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
         # pp.pprint(startPointIndices)
         # pp.pprint(endPointIndices)
         # import pdb;pdb.set_trace()
-        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
-        THREEMeshGenerator().generateMeshFile('resistor_outline', vertices, indices, colors)
+        # from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshgenerator import THREEMeshGenerator
+        # THREEMeshGenerator().generateMeshFile('resistor_outline', vertices, indices, colors)
+
+        from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
+        THREEMeshClassGenerator().generateMeshFile('Resistor', vertices, indices, colors)
 
 
 #TEST 5 add colors, follow CUBE

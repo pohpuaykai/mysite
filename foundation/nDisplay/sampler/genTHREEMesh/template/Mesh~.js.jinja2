@@ -1,0 +1,56 @@
+import * as THREE from '../three/three.module.js';
+
+class Mesh{{className}} extends THREE.Mesh {
+    constructor(position, rotation={x:0, y:0, z:0}) {
+
+        const geometry = new THREE.BufferGeometry();
+
+        const vertices = new Float32Array([
+        {% for coordinate in coordinates %}{% set remainder = loop.index % 3 %}{{coordinate}}, {% if remainder == 0 %}
+        {% endif %}{% endfor %}
+        ]);
+
+        const indices = new Uint16Array([
+        {% for indice in indices %}{% set remainder = loop.index % 3 %}{{indice}}, {% if remainder == 0 %}
+        {% endif %}{% endfor %}
+        ]);
+
+        const colors = new Float32Array([
+        {% for color in colors %}{% set remainder = loop.index % 3 %}{{color}}, {% if remainder == 0 %}
+        {% endif %}{% endfor %}
+        ]);
+
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+        const material = new THREE.MeshBasicMaterial({
+            vertexColors: true,
+            flatShading: true, // this disables vertex interpolation, also known as Blending
+            side: THREE.DoubleSide //ensure backface shows color too
+        });
+
+        super(geometry, material);
+
+        this.position.set(position.x, position.y, position.z);
+        this.rotation.set(rotation.x, rotation.y, rotation.z);
+
+        this.computeLeftRightConnectionBox()
+
+
+    }
+
+    computeLeftRightConnectionBox(){
+
+        this.geometry.computeBoundingBox();
+        const bmax = this.geometry.boundingBox.max;
+        const bmin = this.geometry.boundingBox.min;
+        const width = bmax.x-bmin.x;
+        this.leftConnectionBox = new THREE.Box3(bmin, new THREE.Vector3(bmax.x-0.9*width, bmax.y, bmax.z));
+        this.rightConnectionBox = new THREE.Box3(new THREE.Vector3(bmin.x+0.9*width, bmin.y, bmin.z), bmax);
+
+    }
+}
+
+export { Mesh{{className}} };

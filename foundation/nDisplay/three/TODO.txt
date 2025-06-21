@@ -1,15 +1,49 @@
-remove Django?
-do 
-https://threejs.org/manual/#en/drawing-lines<<<<<<<<<same as line text
+draw a Mesh:
+0. Component~.js ~=Resistor
+1. Component~.js ~=Battery
+2. Component~.js ~=SignalGenerator (for pure sine)
+3. Component~.js ~=Capacitor
+4. Component~.js ~=Inductor
+5. Component~.js ~=Diode
+6. Component~.js ~=Transistor
+7. Component~.js ~=OpAmp (IC Chip)
+USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
+-Build this pipeline:
+--Manual Draw components in 3D
+--Extract Graph (Network) information=Gi
+--Generate 2D Symbolic Circuit Diagram with SVG (OPTIONAL for now)
+--Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with graph_algos and Gi
+--Use CAS to solve symbolic_equations, return solving_steps and solved_results to 3D, make pretty animation
 
-generate a resistor-shape using https://threejs.org/docs/index.html#api/en/core/BufferGeometry
--use rotatesamplertest.py & file:///D:/p/_componentModelData/resistor/MBE04140C3001FC100/mbxsma.pdf
--color bends look ok, but the outline looks a bit weird, looks like fleshlight, SLOPE_NEEDS_TO_BE_SHARPER
 
-ZOOM_OUT
-PLACING multiple resistors AND
-CONNECT WITH BENDY_WIRES, USE facebook resistor meshes as examples
+
+
+
+
+
+
+
+
+
+
+--scene acceleration (for later: mechanical engineering), ChatGPT recommends: (frontend render speed with user interaction)
+--
+import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
+THREE.Mesh.prototype.raycast = acceleratedRaycast; // override default raycast
+
+// Then build the BVH
+geometry.computeBoundsTree = MeshBVH;
+
+
+
+
+
 
 https://threejs.org/manual/#en/loading-3d-models
 https://threejs.org/docs/#examples/en/loaders/GLTFLoader
 https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#concepts
+
+
+
+
+remove Django?
