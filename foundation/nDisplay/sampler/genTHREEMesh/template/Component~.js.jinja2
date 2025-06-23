@@ -43,7 +43,7 @@ class Component{{className}} extends THREE.Mesh {
 
         const material = new THREE.MeshBasicMaterial({
             vertexColors: true,
-            flatShading: true, // this disables vertex interpolation, also known as Blending
+            // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
             side: THREE.DoubleSide //ensure backface shows color too
         });
 
@@ -58,13 +58,13 @@ class Component{{className}} extends THREE.Mesh {
             {
                 'touchingBoxesCoordinates':[
                     {% for touchingBoxPoint in touchingBoxPoints %}{{touchingBoxPoint[0]}}, {{touchingBoxPoint[1]}}, {{touchingBoxPoint[2]}},
-                    {% for touchingBoxPoint in touchingBoxPoints %}
+                    {% endfor %}
                 ],
                 'insertVectorCoordinates':[
-                    new Vector3({{insertVectorCoordinates[0][0]}}, {{insertVectorCoordinates[0][1]}}, {{insertVectorCoordinates[0][2]}}),//startPoint
-                    new Vector3({{insertVectorCoordinates[1][0]}}, {{insertVectorCoordinates[1][1]}}, {{insertVectorCoordinates[1][2]}}),//endPoint
+                    new THREE.Vector3({{insertVectorCoordinates[0][0]}}, {{insertVectorCoordinates[0][1]}}, {{insertVectorCoordinates[0][2]}}),//startPoint
+                    new THREE.Vector3({{insertVectorCoordinates[1][0]}}, {{insertVectorCoordinates[1][1]}}, {{insertVectorCoordinates[1][2]}}),//endPoint
                 ]
-            }
+            },
             {% endfor %}
         ],
         {% endfor %}
@@ -81,7 +81,7 @@ class Component{{className}} extends THREE.Mesh {
             let touchingBoxesInsertVectors = solderableLeads[i];
             for ( let j = 0; j < touchingBoxesInsertVectors.length; j ++ ) {
                 const touchingAttr = touchingBoxesInsertVectors[ j ];
-                const touchingBoxesCoordinates = touchingAttr['touchingBoxesCoordinates'];
+                const touchingBoxesCoordinates = new Float32Array(touchingAttr['touchingBoxesCoordinates']);
                 /**
                  * 0(left, up, in), 1(right, up, in), 2(right, up, out), 3(left, up, out),
                  * 4(left, down, in), 5(right, down, in), 6(right, down, out), 7(left, down, out)
@@ -98,34 +98,39 @@ class Component{{className}} extends THREE.Mesh {
                  * **/
                 const touchingBoxGeometry = new THREE.BufferGeometry();
                 touchingBoxGeometry.setAttribute('position', new THREE.BufferAttribute(touchingBoxesCoordinates, 3));
-                const touchingBoxColors = [//6 faces per cube, 12 triangles=12 rows,  each row is R G B, R G B, R G B,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                ];
+                const touchingBoxColors = new Float32Array([//6 faces per cube, 12 triangles=12 rows,  each row is R G B, R G B, R G B,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                ]);
                 touchingBoxGeometry.setAttribute('color', new THREE.BufferAttribute(touchingBoxColors, 3));
-                const touchingBoxIndices = [
+                const touchingBoxIndices = new Uint16Array([
                     0, 1, 3, 2, 3, 1, //top face
                     0, 3, 4, 7, 4, 3, //left face
                     1, 0, 5, 4, 5, 0, //back face
                     2, 1, 6, 5, 6, 1, //right face
                     3, 2, 7, 6, 7, 2, //front face
                     7, 6, 4, 5, 4, 6, //bottom face
-                ]
+                ]);
                 touchingBoxGeometry.setIndex(new THREE.BufferAttribute(touchingBoxIndices, 1));
+                const touchingBoxMaterial = new THREE.MeshBasicMaterial({
+                    vertexColors: true,
+                    // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
+                    side: THREE.DoubleSide //ensure backface shows color too
+                });
                 const touchingBox = new THREE.Mesh(touchingBoxGeometry, touchingBoxMaterial);
                 this.attach(touchingBox);
-                solderableLeadsIdx_touchingBoxesInsertVectorsIdx__attachmentId[[i, j]] = attachmentId;
-                attachmentId__solderableLeadsIdx_touchingBoxesInsertVectorsIdx[attachmentId] = [i, j];
+                solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = attachmentId;
+                attachmentId__solderableLeadsIdx_touchingBoxesIdx[attachmentId] = [i, j];
                 attachmentId ++;
                 //
                 const insertVectorCoordinates = touchingAttr['insertVectorCoordinates'];
@@ -133,7 +138,7 @@ class Component{{className}} extends THREE.Mesh {
                 const points =[ insertVectorCoordinates[0], insertVectorCoordinates[1]];
                 const line = new THREE.Line(
                     new THREE.BufferGeometry().setFromPoints( points ),
-                    new THREE.LineBasicMaterial( { color: 0x000000 } ) //should be transparent... 
+                    new THREE.LineBasicMaterial( { color: 0xf0f0f0 } ) //should be transparent... 
                 )
                 this.attach(line);
                 solderableLeadsIdx_insertVectorsIdx__attachmentId[[i, j]] = attachmentId;
