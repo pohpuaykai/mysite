@@ -17,20 +17,29 @@ class THREEMeshClassGenerator:
         if not os.path.isdir(self.outputFolder):
             os.makedirs(self.outputFolder)
 
-    def generateMeshFile(self, meshName, coordinates, indices, colors):
+    def generateMeshFile(self, meshName, listOfCoordinates, listOfIndices, listOfColors):
         templateName = "Mesh~.js.jinja2"
         environment = Environment(loader=FileSystemLoader(self.templateFolder))
         meshJSTemplate = environment.get_template(templateName)
         #flatten coordinates
-        coordindates = Flattener.flatten(coordinates)
+        listOfCoordinates___new = []
+        for coordinates in listOfCoordinates:
+            listOfCoordinates___new.append(Flattener.flatten(coordinates))
+        listOfCoordinates = listOfCoordinates___new
         #flatten indices
-        indices = Flattener.flatten(indices)# these are indices of coordinates, grouped to form triangles
+        listOfIndices___new = []
+        for indices in listOfIndices:
+            listOfIndices___new.append(Flattener.flatten(indices))# these are indices of coordinates, grouped to form triangles
+        listOfIndices = listOfIndices___new
         #flatten colors
-        colors = Flattener.flatten(colors)#these are RGB_colors for each triangle in indices
+        listOfColors___new = []
+        for colors in listOfColors:
+            listOfColors___new.append(Flattener.flatten(colors))#these are RGB_colors for each vertices|indices
+        listOfColors = listOfColors___new
         meshJSContent = meshJSTemplate.render({
-            'coordinates':coordindates,
-            'indices':indices,
-            'colors':colors,
+            'listOfCoordinates':listOfCoordinates,
+            'listOfIndices':listOfIndices,
+            'listOfColors':listOfColors,
             'className':meshName
         })
         fileName = templateName.replace('~', meshName).replace('.jinja2', '')

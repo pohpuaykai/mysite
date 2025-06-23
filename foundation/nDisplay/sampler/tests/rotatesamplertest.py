@@ -33,7 +33,7 @@ def test__meshgenerator__cylinder(verbose=False):
         # THREEMeshGenerator().generateMeshFile('cylinder', vertices, indices, colors)
 
         from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
-        THREEMeshClassGenerator().generateMeshFile('cylinder', vertices, indices, colors)
+        THREEMeshClassGenerator().generateMeshFile('cylinder', [vertices], [indices], [colors])
 
 
 def test__meshgenerator__wall(verbose=False):
@@ -61,7 +61,7 @@ def test__meshgenerator__wall(verbose=False):
         # THREEMeshGenerator().generateMeshFile('wall', vertices, indices, colors)
 
         from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
-        THREEMeshClassGenerator().generateMeshFile('wall', vertices, indices, colors)
+        THREEMeshClassGenerator().generateMeshFile('wall', [vertices], [indices], [colors])
 
 def test__meshgenerator__trench(verbose=False):
     #TEST 3: trench (left-to-right)
@@ -86,7 +86,7 @@ def test__meshgenerator__trench(verbose=False):
         # THREEMeshGenerator().generateMeshFile('trench', vertices, indices, colors)
 
         from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
-        THREEMeshClassGenerator().generateMeshFile('trench', vertices, indices, colors)
+        THREEMeshClassGenerator().generateMeshFile('trench', [vertices], [indices], [colors])
 
 
 def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
@@ -176,7 +176,7 @@ def test__meshgenerator__piecewise_trench_cylinder_wall(verbose=False):
         # THREEMeshGenerator().generateMeshFile('resistor_outline', vertices, indices, colors)
 
         from foundation.nDisplay.sampler.genTHREEMesh.reader.threemeshclassgenerator import THREEMeshClassGenerator
-        THREEMeshClassGenerator().generateMeshFile('Resistor', vertices, indices, colors)
+        THREEMeshClassGenerator().generateMeshFile('Resistor', [vertices], [indices], [colors])
 
 
 #TEST 5 add colors, follow CUBE

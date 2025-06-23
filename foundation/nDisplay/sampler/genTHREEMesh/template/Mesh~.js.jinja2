@@ -1,37 +1,48 @@
 import * as THREE from '../three/three.module.js';
 
-class Mesh{{className}} extends THREE.Mesh {
+class Mesh{{className}} extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
+        super();
 
-        const geometry = new THREE.BufferGeometry();
-
-        const vertices = new Float32Array([
+        const listOfVertices = [
+        {% for coordinates in listOfCoordinates %}new Float32Array([
         {% for coordinate in coordinates %}{% set remainder = loop.index % 3 %}{{coordinate}}, {% if remainder == 0 %}
         {% endif %}{% endfor %}
-        ]);
+        ]),{% endfor %}
+        ];//disjoint meshes
 
-        const indices = new Uint16Array([
+        const listOfIndices = [
+        {% for indices in listOfIndices %}new Uint16Array([
         {% for indice in indices %}{% set remainder = loop.index % 3 %}{{indice}}, {% if remainder == 0 %}
         {% endif %}{% endfor %}
-        ]);
+        ]),{% endfor %}
+        ];//disjoint meshes
 
-        const colors = new Float32Array([
+        const listOfColors = [
+        {% for colors in listOfColors %}new Float32Array([
         {% for color in colors %}{% set remainder = loop.index % 3 %}{{color}}, {% if remainder == 0 %}
         {% endif %}{% endfor %}
-        ]);
+        ]),{% endfor %}
+        ];//disjoint meshes
 
+        this.boundingBox = null;
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: true,
-            flatShading: true, // this disables vertex interpolation, also known as Blending
-            side: THREE.DoubleSide //ensure backface shows color too
-        });
-
-        super(geometry, material);
+        for(let i=0; i<listOfVertices.length; i++) {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = listOfVertices[i];
+            const indices = listOfIndices[i];
+            const colors = listOfColors[i];
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true, 
+                flatShading: true, // this disables vertex interpolation, also known as Blending
+                side: THREE.DoubleSide //ensure backface shows color too
+            });
+            const disjointMesh = new THREE.Mesh(geometry, material);
+            this.add(disjointMesh);
+        }
 
         this.position.set(position.x, position.y, position.z);
         this.rotation.set(rotation.x, rotation.y, rotation.z);
@@ -43,13 +54,23 @@ class Mesh{{className}} extends THREE.Mesh {
 
     computeLeftRightConnectionBox(){
 
-        this.geometry.computeBoundingBox();
-        const bmax = this.geometry.boundingBox.max;
-        const bmin = this.geometry.boundingBox.min;
+        this.computeBoundingBox();
+        const bmax = this.boundingBox.max;
+        const bmin = this.boundingBox.min;
         const width = bmax.x-bmin.x;
         this.leftConnectionBox = new THREE.Box3(bmin, new THREE.Vector3(bmax.x-0.9*width, bmax.y, bmax.z));
         this.rightConnectionBox = new THREE.Box3(new THREE.Vector3(bmin.x+0.9*width, bmin.y, bmin.z), bmax);
 
+    }
+
+    computeBoundingBox() {
+        this.boundingBox = new THREE.Box3();
+        for(let i=0; i<this.children.length; i++) {
+            const child = this.children[i];
+            child.geometry.computeBoundingBox();
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.min);
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.max);
+        }
     }
 }
 

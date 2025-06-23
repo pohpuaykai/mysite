@@ -12,6 +12,7 @@ import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
 // import {mesh as trench_mesh} from './static/meshes/mesh_trench.js';
 // import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
 // import {MeshResistor} from './static/meshes/MeshResistor.js';
+import {MeshCapacitor} from './static/meshes/MeshCapacitor.js';
 import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 import {ComponentBattery} from './static/meshes/ComponentBattery.js';
 import {ComponentDiode} from './static/meshes/ComponentDiode.js';
@@ -97,6 +98,8 @@ function addCube(size, color) {
 // console.log(resistor1.rightConnectionBox);
 //draw orthogonal wires to connection resistors, example call: wire(resistor0, resistor1); and it should return the wire object, wire should take at most 3 bends, works like text?
 
+const testCapacitor0 = new MeshCapacitor({x:0, y:0, z:10});
+scene.add(testCapacitor0); render();
 
 
 
@@ -106,8 +109,10 @@ function addCube(size, color) {
 // const battery0 = new ComponentBattery({x:0, y:0, z:10});
 // scene.add(battery0); render();
 
-const diode0 = new ComponentDiode({x:0, y:0, z:10});
-scene.add(diode0); render();
+// const diode0 = new ComponentDiode({x:0, y:0, z:10});
+// scene.add(diode0); render();
+
+
 
 
 asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){

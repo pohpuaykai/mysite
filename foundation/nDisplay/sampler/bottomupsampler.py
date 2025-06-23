@@ -29,13 +29,18 @@ class BottomUpSampler:
         :param zFormulaLambda: takes a v, can have y in its formulaStr, so needs y to be calculated first, and exist in locals()
         :param colorFunction: takes a x, y, z, and returns a RGB
         """
+        def normaliseColor(colorTup):
+            newColorTup = []
+            for colorCoordinate in list(colorTup):
+                newColorTup.append(colorCoordinate/255.0)
+            return tuple(newColorTup)
         vertices, indices, colors = [], [], []
         uPoints, vPoints = list(cls.frange(uStart, uEnd, uStep)), list(cls.frange(vStart, vEnd, vStep))
         for uIdx, u in enumerate(uPoints):
             y = yFormulaLambda(u)
             for vIdx, v in enumerate(vPoints):
-                x = xFormulaLambda(v); z = zFormulaLambda(v)
-                vertices.append((x, y, z)); colors.append(colorFunction(x, y, z))
+                x = xFormulaLambda(v, y); z = zFormulaLambda(v, y)
+                vertices.append((x, y, z)); colors.append(normaliseColor(colorFunction(x, y, z, u, v)))
                 #connect between wheels, this wheel and previous wheel
                 if uIdx > 0:
                     prevWheelIdx, thisWheelIdx = uIdx-1, uIdx
@@ -81,20 +86,28 @@ class BottomUpSampler:
         },
     ]
         """
-        prevTotalIndex = 0
-        touVertices, touIndices, touColors = [], [], []
+        # prevTotalIndex = 0
+        # touVertices, touIndices, touColors = [], [], []
+        # for pieceIdx, uVStartEnd in enumerate(uVStartEnds):
+        #     vertices, indices, colors = cls.bottomUpSample(**uVStartEnd)
+        #     touVertices += vertices
+        #     touColors += colors
+        #     if pieceIdx > 0:
+        #         newIndices = []
+        #         for indice in indices:
+        #             newIndice = []
+        #             for coordinate in indice:
+        #                 newIndice.append(coordinate+prevTotalIndex)
+        #             newIndices.append(newIndice)
+        #         indices = newIndices
+        #     touIndices += indices
+        #     prevTotalIndex += len(indices) *2 # +1 to disconnect the pieces
+        # return touVertices, touIndices, touColors
+        
+        listOfVertices, listOfIndices, listOfColors = [], [], []
         for pieceIdx, uVStartEnd in enumerate(uVStartEnds):
             vertices, indices, colors = cls.bottomUpSample(**uVStartEnd)
-            touVertices += vertices
-            touColors += colors
-            if pieceIdx > 0:
-                newIndices = []
-                for indice in indices:
-                    newIndice = []
-                    for coordinate in indice:
-                        newIndice.append(coordinate+prevTotalIndex)
-                    newIndices.append(newIndice)
-                indices = newIndices
-            touIndices += indices
-            prevTotalIndex += len(indices)
-        return touVertices, touIndices, touColors
+            listOfVertices.append(vertices)
+            listOfIndices.append(indices)
+            listOfColors.append(colors)
+        return listOfVertices, listOfIndices, listOfColors
