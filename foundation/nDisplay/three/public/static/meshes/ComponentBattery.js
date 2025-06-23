@@ -15,13 +15,13 @@ import * as THREE from '../three/three.module.js';
  * 
  * insertVector is a Vector3
  */
-class ComponentBattery extends THREE.Mesh {
+class ComponentBattery extends THREE.Object3D {
 
     constructor(position, rotation={x:0, y:0, z:0}) {
+        super();
 
-        const geometry = new THREE.BufferGeometry();
-
-        const vertices = new Float32Array([
+        const listOfVertices = [
+        new Float32Array([
         25.75, 3.5, -8.572527594031472e-16, 
         25.75, 3.0310889132455343, -1.7500000000000016, 
         25.75, 1.7500000000000004, -3.031088913245535, 
@@ -6614,9 +6614,11 @@ class ComponentBattery extends THREE.Mesh {
         -24.85, 2.3815698604072066, 1.3749999999999998, 
         -24.85, 2.75, 0.0, 
         
-        ]);
+        ]),
+        ];//disjoint meshes
 
-        const indices = new Uint16Array([
+        const listOfIndices = [
+        new Uint16Array([
         6590, 6577, 6589, 
         6576, 6589, 6577, 
         6589, 6576, 6588, 
@@ -19826,9 +19828,11 @@ class ComponentBattery extends THREE.Mesh {
         13, 0, 25, 
         12, 25, 0, 
         
-        ]);
+        ]),
+        ];//disjoint meshes
 
-        const colors = new Float32Array([
+        const listOfColors = [
+        new Float32Array([
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
@@ -26421,20 +26425,27 @@ class ComponentBattery extends THREE.Mesh {
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
         
-        ]);
+        ]),
+        ];//disjoint meshes
 
+        this.boundingBox = null;
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: true,
-            // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
-            side: THREE.DoubleSide //ensure backface shows color too
-        });
-
-        super(geometry, material);
+        for(let i=0; i<listOfVertices.length; i++) {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = listOfVertices[i];
+            const indices = listOfIndices[i];
+            const colors = listOfColors[i];
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true, 
+                flatShading: true, // this disables vertex interpolation, also known as Blending
+                side: THREE.DoubleSide //ensure backface shows color too
+            });
+            const disjointMesh = new THREE.Mesh(geometry, material);
+            this.add(disjointMesh);
+        }
 
 
         //touchingBoxes and their insertVector, for each solderable_lead, there is a list of touchingBoxesInsertVectors
@@ -26589,6 +26600,20 @@ class ComponentBattery extends THREE.Mesh {
             updatedSolderableLeads.push(updatedSolderableLead);
         }
         return updatedSolderableLeads;
+    }
+
+    /**
+     * computeBoundingBox for each children of this Object3D
+     * and then 'combine' all the children's boundingBoxes into this.boundingBox
+     * **/
+    computeBoundingBox() {
+        this.boundingBox = new THREE.Box3();
+        for(let i=0; i<this.children.length; i++) {
+            const child = this.children[i];
+            child.geometry.computeBoundingBox();
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.min);
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.max);
+        }
     }
 }
 

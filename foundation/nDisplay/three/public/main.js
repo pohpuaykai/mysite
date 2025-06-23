@@ -98,8 +98,8 @@ function addCube(size, color) {
 // console.log(resistor1.rightConnectionBox);
 //draw orthogonal wires to connection resistors, example call: wire(resistor0, resistor1); and it should return the wire object, wire should take at most 3 bends, works like text?
 
-const testCapacitor0 = new MeshCapacitor({x:0, y:0, z:10});
-scene.add(testCapacitor0); render();
+// const testCapacitor0 = new MeshCapacitor({x:0, y:0, z:10});
+// scene.add(testCapacitor0); render();
 
 
 
@@ -109,8 +109,8 @@ scene.add(testCapacitor0); render();
 // const battery0 = new ComponentBattery({x:0, y:0, z:10});
 // scene.add(battery0); render();
 
-// const diode0 = new ComponentDiode({x:0, y:0, z:10});
-// scene.add(diode0); render();
+const diode0 = new ComponentDiode({x:0, y:0, z:10});
+scene.add(diode0); render();
 
 
 

@@ -15,13 +15,13 @@ import * as THREE from '../three/three.module.js';
  * 
  * insertVector is a Vector3
  */
-class ComponentDiode extends THREE.Mesh {
+class ComponentDiode extends THREE.Object3D {
 
     constructor(position, rotation={x:0, y:0, z:0}) {
+        super();
 
-        const geometry = new THREE.BufferGeometry();
-
-        const vertices = new Float32Array([
+        const listOfVertices = [
+        new Float32Array([
         2.500000000000002, 1.35, -3.3065463576978537e-16, 
         2.500000000000002, 1.1691342951089918, -0.6750000000000006, 
         2.500000000000002, 0.6750000000000002, -1.1691342951089922, 
@@ -699,9 +699,11 @@ class ComponentDiode extends THREE.Mesh {
         -2.6, 1.1691342951089922, 0.6749999999999999, 
         -2.6, 1.35, 0.0, 
         
-        ]);
+        ]),
+        ];//disjoint meshes
 
-        const indices = new Uint16Array([
+        const listOfIndices = [
+        new Uint16Array([
         675, 662, 674, 
         661, 674, 662, 
         674, 661, 673, 
@@ -2029,9 +2031,11 @@ class ComponentDiode extends THREE.Mesh {
         13, 0, 25, 
         12, 25, 0, 
         
-        ]);
+        ]),
+        ];//disjoint meshes
 
-        const colors = new Float32Array([
+        const listOfColors = [
+        new Float32Array([
         0.0, 0.0, 0.0, 
         0.0, 0.0, 0.0, 
         0.0, 0.0, 0.0, 
@@ -2709,20 +2713,27 @@ class ComponentDiode extends THREE.Mesh {
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
         0.7529411764705882, 0.7529411764705882, 0.7529411764705882, 
         
-        ]);
+        ]),
+        ];//disjoint meshes
 
+        this.boundingBox = null;
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: true,
-            // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
-            side: THREE.DoubleSide //ensure backface shows color too
-        });
-
-        super(geometry, material);
+        for(let i=0; i<listOfVertices.length; i++) {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = listOfVertices[i];
+            const indices = listOfIndices[i];
+            const colors = listOfColors[i];
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true, 
+                flatShading: true, // this disables vertex interpolation, also known as Blending
+                side: THREE.DoubleSide //ensure backface shows color too
+            });
+            const disjointMesh = new THREE.Mesh(geometry, material);
+            this.add(disjointMesh);
+        }
 
 
         //touchingBoxes and their insertVector, for each solderable_lead, there is a list of touchingBoxesInsertVectors
@@ -2877,6 +2888,20 @@ class ComponentDiode extends THREE.Mesh {
             updatedSolderableLeads.push(updatedSolderableLead);
         }
         return updatedSolderableLeads;
+    }
+
+    /**
+     * computeBoundingBox for each children of this Object3D
+     * and then 'combine' all the children's boundingBoxes into this.boundingBox
+     * **/
+    computeBoundingBox() {
+        this.boundingBox = new THREE.Box3();
+        for(let i=0; i<this.children.length; i++) {
+            const child = this.children[i];
+            child.geometry.computeBoundingBox();
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.min);
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.max);
+        }
     }
 }
 

@@ -15,39 +15,50 @@ import * as THREE from '../three/three.module.js';
  * 
  * insertVector is a Vector3
  */
-class Component{{className}} extends THREE.Mesh {
+class Component{{className}} extends THREE.Object3D {
 
     constructor(position, rotation={x:0, y:0, z:0}) {
+        super();
 
-        const geometry = new THREE.BufferGeometry();
-
-        const vertices = new Float32Array([
+        const listOfVertices = [
+        {% for coordinates in listOfCoordinates %}new Float32Array([
         {% for coordinate in coordinates %}{% set remainder = loop.index % 3 %}{{coordinate}}, {% if remainder == 0 %}
         {% endif %}{% endfor %}
-        ]);
+        ]),{% endfor %}
+        ];//disjoint meshes
 
-        const indices = new Uint16Array([
+        const listOfIndices = [
+        {% for indices in listOfIndices %}new Uint16Array([
         {% for indice in indices %}{% set remainder = loop.index % 3 %}{{indice}}, {% if remainder == 0 %}
         {% endif %}{% endfor %}
-        ]);
+        ]),{% endfor %}
+        ];//disjoint meshes
 
-        const colors = new Float32Array([
+        const listOfColors = [
+        {% for colors in listOfColors %}new Float32Array([
         {% for color in colors %}{% set remainder = loop.index % 3 %}{{color}}, {% if remainder == 0 %}
         {% endif %}{% endfor %}
-        ]);
+        ]),{% endfor %}
+        ];//disjoint meshes
 
+        this.boundingBox = null;
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: true,
-            // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
-            side: THREE.DoubleSide //ensure backface shows color too
-        });
-
-        super(geometry, material);
+        for(let i=0; i<listOfVertices.length; i++) {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = listOfVertices[i];
+            const indices = listOfIndices[i];
+            const colors = listOfColors[i];
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true, 
+                flatShading: true, // this disables vertex interpolation, also known as Blending
+                side: THREE.DoubleSide //ensure backface shows color too
+            });
+            const disjointMesh = new THREE.Mesh(geometry, material);
+            this.add(disjointMesh);
+        }
 
 
         //touchingBoxes and their insertVector, for each solderable_lead, there is a list of touchingBoxesInsertVectors
@@ -177,6 +188,20 @@ class Component{{className}} extends THREE.Mesh {
             updatedSolderableLeads.push(updatedSolderableLead);
         }
         return updatedSolderableLeads;
+    }
+
+    /**
+     * computeBoundingBox for each children of this Object3D
+     * and then 'combine' all the children's boundingBoxes into this.boundingBox
+     * **/
+    computeBoundingBox() {
+        this.boundingBox = new THREE.Box3();
+        for(let i=0; i<this.children.length; i++) {
+            const child = this.children[i];
+            child.geometry.computeBoundingBox();
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.min);
+            this.boundingBox.expandByPoint(child.geometry.boundingBox.max);
+        }
     }
 }
 
