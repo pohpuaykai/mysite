@@ -11999,37 +11999,185 @@ class ComponentResistor extends THREE.Object3D {
             
             {
                 'touchingBoxesCoordinates':[
+                    -7.3125, 0.3, 0.3,
                     -4.875, 0.3, 0.3,
-                    -3.25, 0.3, 0.3,
-                    -3.25, 0.3, -0.3,
                     -4.875, 0.3, -0.3,
+                    -7.3125, 0.3, -0.3,
+                    -7.3125, -0.3, 0.3,
                     -4.875, -0.3, 0.3,
-                    -3.25, -0.3, 0.3,
-                    -3.25, -0.3, -0.3,
                     -4.875, -0.3, -0.3,
+                    -7.3125, -0.3, -0.3,
                     
                 ],
                 'insertVectorCoordinates':[
-                    new THREE.Vector3(-4.875, 0, 0),//startPoint
-                    new THREE.Vector3(-6.5, 0, 0),//endPoint
+                    new THREE.Vector3(-7.3125, 0, 0),//startPoint
+                    new THREE.Vector3(-4.875, 0, 0),//endPoint
                 ]
             },
             
             {
                 'touchingBoxesCoordinates':[
+                    -4.875, 0.44999999999999996, 0.3,
+                    -3.25, 0.44999999999999996, 0.3,
+                    -3.25, 0.44999999999999996, -0.3,
+                    -4.875, 0.44999999999999996, -0.3,
+                    -4.875, 0.3, 0.3,
+                    -3.25, 0.3, 0.3,
+                    -3.25, 0.3, -0.3,
+                    -4.875, 0.3, -0.3,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-4.0625, 0.44999999999999996, 0),//startPoint
+                    new THREE.Vector3(-4.0625, 0.3, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    -4.875, -0.3, 0.3,
+                    -3.25, -0.3, 0.3,
+                    -3.25, -0.3, -0.3,
+                    -4.875, -0.3, -0.3,
+                    -4.875, -0.44999999999999996, 0.3,
+                    -3.25, -0.44999999999999996, 0.3,
+                    -3.25, -0.44999999999999996, -0.3,
+                    -4.875, -0.44999999999999996, -0.3,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-4.0625, -0.44999999999999996, 0),//startPoint
+                    new THREE.Vector3(-4.0625, -0.3, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    -4.875, 0.3, -0.3,
+                    -3.25, 0.3, -0.3,
+                    -3.25, 0.3, -0.44999999999999996,
+                    -4.875, 0.3, -0.44999999999999996,
+                    -4.875, -0.3, -0.3,
+                    -3.25, -0.3, -0.3,
+                    -3.25, -0.3, -0.44999999999999996,
+                    -4.875, -0.3, -0.44999999999999996,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-4.0625, 0, -0.3),//startPoint
+                    new THREE.Vector3(-4.0625, 0, -0.44999999999999996),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    -4.875, 0.3, 0.44999999999999996,
+                    -3.25, 0.3, 0.44999999999999996,
+                    -3.25, 0.3, 0.3,
+                    -4.875, 0.3, 0.3,
+                    -4.875, -0.3, 0.44999999999999996,
+                    -3.25, -0.3, 0.44999999999999996,
+                    -3.25, -0.3, 0.3,
+                    -4.875, -0.3, 0.3,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-4.0625, 0, 0.3),//startPoint
+                    new THREE.Vector3(-4.0625, 0, 0.44999999999999996),//endPoint
+                ]
+            },
+            
+        ],
+        
+        [
+            
+            {
+                'touchingBoxesCoordinates':[
                     4.875, 0.3, 0.3,
-                    3.25, 0.3, 0.3,
-                    3.25, 0.3, -0.3,
+                    7.3125, 0.3, 0.3,
+                    7.3125, 0.3, -0.3,
                     4.875, 0.3, -0.3,
                     4.875, -0.3, 0.3,
-                    3.25, -0.3, 0.3,
-                    3.25, -0.3, -0.3,
+                    7.3125, -0.3, 0.3,
+                    7.3125, -0.3, -0.3,
                     4.875, -0.3, -0.3,
                     
                 ],
                 'insertVectorCoordinates':[
-                    new THREE.Vector3(4.875, 0, 0),//startPoint
-                    new THREE.Vector3(6.5, 0, 0),//endPoint
+                    new THREE.Vector3(7.3125, 0, 0),//startPoint
+                    new THREE.Vector3(4.875, 0, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    3.25, 0.44999999999999996, 0.3,
+                    4.875, 0.44999999999999996, 0.3,
+                    4.875, 0.44999999999999996, -0.3,
+                    3.25, 0.44999999999999996, -0.3,
+                    3.25, 0.3, 0.3,
+                    4.875, 0.3, 0.3,
+                    4.875, 0.3, -0.3,
+                    3.25, 0.3, -0.3,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(4.0625, 0.44999999999999996, 0),//startPoint
+                    new THREE.Vector3(4.0625, 0.3, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    3.25, -0.3, 0.3,
+                    4.875, -0.3, 0.3,
+                    4.875, -0.3, -0.3,
+                    3.25, -0.3, -0.3,
+                    3.25, -0.44999999999999996, 0.3,
+                    4.875, -0.44999999999999996, 0.3,
+                    4.875, -0.44999999999999996, -0.3,
+                    3.25, -0.44999999999999996, -0.3,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(4.0625, -0.44999999999999996, 0),//startPoint
+                    new THREE.Vector3(4.0625, -0.3, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    3.25, 0.3, 0.44999999999999996,
+                    4.875, 0.3, 0.44999999999999996,
+                    4.875, 0.3, 0.3,
+                    3.25, 0.3, 0.3,
+                    3.25, -0.3, 0.44999999999999996,
+                    4.875, -0.3, 0.44999999999999996,
+                    4.875, -0.3, 0.3,
+                    3.25, -0.3, 0.3,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(4.0625, 0, 0.44999999999999996),//startPoint
+                    new THREE.Vector3(4.0625, 0, 0.3),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    3.25, 0.3, -0.3,
+                    4.875, 0.3, -0.3,
+                    4.875, 0.3, -0.44999999999999996,
+                    3.25, 0.3, -0.44999999999999996,
+                    3.25, -0.3, -0.3,
+                    4.875, -0.3, -0.3,
+                    4.875, -0.3, -0.44999999999999996,
+                    3.25, -0.3, -0.44999999999999996,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(4.0625, 0, -0.44999999999999996),//startPoint
+                    new THREE.Vector3(4.0625, 0, -0.3),//endPoint
                 ]
             },
             
@@ -12094,7 +12242,7 @@ class ComponentResistor extends THREE.Object3D {
                     // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
                     side: THREE.DoubleSide //ensure backface shows color too
                 });
-                const touchingBox = new THREE.Mesh(touchingBoxGeometry, touchingBoxMaterial);
+                const touchingBox = new THREE.Line(touchingBoxGeometry, touchingBoxMaterial);
                 this.attach(touchingBox);
                 solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = attachmentId;
                 attachmentId__solderableLeadsIdx_touchingBoxesIdx[attachmentId] = [i, j];

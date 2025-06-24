@@ -138,7 +138,7 @@ class Component{{className}} extends THREE.Object3D {
                     // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
                     side: THREE.DoubleSide //ensure backface shows color too
                 });
-                const touchingBox = new THREE.Mesh(touchingBoxGeometry, touchingBoxMaterial);
+                const touchingBox = new THREE.Line(touchingBoxGeometry, touchingBoxMaterial);
                 this.attach(touchingBox);
                 solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = attachmentId;
                 attachmentId__solderableLeadsIdx_touchingBoxesIdx[attachmentId] = [i, j];

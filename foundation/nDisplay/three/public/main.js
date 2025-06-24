@@ -12,10 +12,11 @@ import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
 // import {mesh as trench_mesh} from './static/meshes/mesh_trench.js';
 // import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
 // import {MeshResistor} from './static/meshes/MeshResistor.js';
-import {MeshCapacitor} from './static/meshes/MeshCapacitor.js';
+// import {MeshCapacitor} from './static/meshes/MeshCapacitor.js';
 import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 import {ComponentBattery} from './static/meshes/ComponentBattery.js';
 import {ComponentDiode} from './static/meshes/ComponentDiode.js';
+import {ComponentCapacitor} from './static/meshes/ComponentCapacitor.js';
 
 
 
@@ -55,26 +56,6 @@ function onWindowResize() {
 }
 
 //permanentFUNCTIONS
-function addCube(size, color) {
-
-    //THE CUBE
-    const geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
-    const material = new THREE.MeshBasicMaterial( { color: color } );
-    const cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
-    function animate() {
-
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-        render();
-    }
-    return animate;
-
-}
-// let animate = addCube({x:64, y:64, z:64}, 0x00ff00)
-
-// renderer.setAnimationLoop( animate );
-
 
 // cylinder_mesh.position.set(0, 0, 0);
 // scene.add(cylinder_mesh); render();
@@ -106,20 +87,29 @@ function addCube(size, color) {
 // const resistor0 = new ComponentResistor({x:0, y:0, z:10});
 // scene.add(resistor0); render();
 
-// const battery0 = new ComponentBattery({x:0, y:0, z:10});
-// scene.add(battery0); render();
+const battery0 = new ComponentBattery({x:0, y:0, z:10});
+scene.add(battery0); render();
 
-const diode0 = new ComponentDiode({x:0, y:0, z:10});
-scene.add(diode0); render();
+// const diode0 = new ComponentDiode({x:0, y:0, z:10});
+// scene.add(diode0); render();
 
 
+// const capacitor0 = new ComponentCapacitor({x:0, y:0, z:0});
+// scene.add(capacitor0); render();
 
 
 asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){
     scene.add(textMesh); render();
 });
 
-
+//after placing all the Object3D into the scene, then we can start trying to animate the scene
+function animate(){
+    let rotatingObject = battery0;
+    // rotatingObject.rotation.x += (Math.PI/(360*6));
+    rotatingObject.rotation.y += (Math.PI/(360*6));
+    // rotatingObject.rotation.z += (Math.PI/(360*6));
+    render();
+}
 
 //controls
 
@@ -134,3 +124,5 @@ window.addEventListener( 'resize', onWindowResize );
 
 //permanentFUNCTIONS
 render();
+
+renderer.setAnimationLoop( animate );

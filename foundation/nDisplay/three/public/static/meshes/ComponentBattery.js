@@ -26455,37 +26455,185 @@ class ComponentBattery extends THREE.Object3D {
             
             {
                 'touchingBoxesCoordinates':[
+                    -55.91250000000001, 7.25, 7.25,
                     -37.275000000000006, 7.25, 7.25,
-                    -24.85, 7.25, 7.25,
-                    -24.85, 7.25, -7.25,
                     -37.275000000000006, 7.25, -7.25,
+                    -55.91250000000001, 7.25, -7.25,
+                    -55.91250000000001, -7.25, 7.25,
                     -37.275000000000006, -7.25, 7.25,
-                    -24.85, -7.25, 7.25,
-                    -24.85, -7.25, -7.25,
                     -37.275000000000006, -7.25, -7.25,
+                    -55.91250000000001, -7.25, -7.25,
                     
                 ],
                 'insertVectorCoordinates':[
-                    new THREE.Vector3(-37.275000000000006, 0, 0),//startPoint
-                    new THREE.Vector3(-49.7, 0, 0),//endPoint
+                    new THREE.Vector3(-55.91250000000001, 0, 0),//startPoint
+                    new THREE.Vector3(-37.275000000000006, 0, 0),//endPoint
                 ]
             },
             
             {
                 'touchingBoxesCoordinates':[
+                    -37.275000000000006, 10.875, 7.25,
+                    -24.85, 10.875, 7.25,
+                    -24.85, 10.875, -7.25,
+                    -37.275000000000006, 10.875, -7.25,
+                    -37.275000000000006, 7.25, 7.25,
+                    -24.85, 7.25, 7.25,
+                    -24.85, 7.25, -7.25,
+                    -37.275000000000006, 7.25, -7.25,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-31.0625, 10.875, 0),//startPoint
+                    new THREE.Vector3(-31.0625, 7.25, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    -37.275000000000006, -7.25, 7.25,
+                    -24.85, -7.25, 7.25,
+                    -24.85, -7.25, -7.25,
+                    -37.275000000000006, -7.25, -7.25,
+                    -37.275000000000006, -10.875, 7.25,
+                    -24.85, -10.875, 7.25,
+                    -24.85, -10.875, -7.25,
+                    -37.275000000000006, -10.875, -7.25,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-31.0625, -10.875, 0),//startPoint
+                    new THREE.Vector3(-31.0625, -7.25, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    -37.275000000000006, 7.25, -7.25,
+                    -24.85, 7.25, -7.25,
+                    -24.85, 7.25, -10.875,
+                    -37.275000000000006, 7.25, -10.875,
+                    -37.275000000000006, -7.25, -7.25,
+                    -24.85, -7.25, -7.25,
+                    -24.85, -7.25, -10.875,
+                    -37.275000000000006, -7.25, -10.875,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-31.0625, 0, -7.25),//startPoint
+                    new THREE.Vector3(-31.0625, 0, -10.875),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    -37.275000000000006, 7.25, 10.875,
+                    -24.85, 7.25, 10.875,
+                    -24.85, 7.25, 7.25,
+                    -37.275000000000006, 7.25, 7.25,
+                    -37.275000000000006, -7.25, 10.875,
+                    -24.85, -7.25, 10.875,
+                    -24.85, -7.25, 7.25,
+                    -37.275000000000006, -7.25, 7.25,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(-31.0625, 0, 7.25),//startPoint
+                    new THREE.Vector3(-31.0625, 0, 10.875),//endPoint
+                ]
+            },
+            
+        ],
+        
+        [
+            
+            {
+                'touchingBoxesCoordinates':[
                     37.275000000000006, 7.25, 7.25,
-                    24.85, 7.25, 7.25,
-                    24.85, 7.25, -7.25,
+                    55.91250000000001, 7.25, 7.25,
+                    55.91250000000001, 7.25, -7.25,
                     37.275000000000006, 7.25, -7.25,
                     37.275000000000006, -7.25, 7.25,
-                    24.85, -7.25, 7.25,
-                    24.85, -7.25, -7.25,
+                    55.91250000000001, -7.25, 7.25,
+                    55.91250000000001, -7.25, -7.25,
                     37.275000000000006, -7.25, -7.25,
                     
                 ],
                 'insertVectorCoordinates':[
-                    new THREE.Vector3(37.275000000000006, 0, 0),//startPoint
-                    new THREE.Vector3(49.7, 0, 0),//endPoint
+                    new THREE.Vector3(55.91250000000001, 0, 0),//startPoint
+                    new THREE.Vector3(37.275000000000006, 0, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    24.85, 10.875, 7.25,
+                    37.275000000000006, 10.875, 7.25,
+                    37.275000000000006, 10.875, -7.25,
+                    24.85, 10.875, -7.25,
+                    24.85, 7.25, 7.25,
+                    37.275000000000006, 7.25, 7.25,
+                    37.275000000000006, 7.25, -7.25,
+                    24.85, 7.25, -7.25,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(31.0625, 10.875, 0),//startPoint
+                    new THREE.Vector3(31.0625, 7.25, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    24.85, -7.25, 7.25,
+                    37.275000000000006, -7.25, 7.25,
+                    37.275000000000006, -7.25, -7.25,
+                    24.85, -7.25, -7.25,
+                    24.85, -10.875, 7.25,
+                    37.275000000000006, -10.875, 7.25,
+                    37.275000000000006, -10.875, -7.25,
+                    24.85, -10.875, -7.25,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(31.0625, -10.875, 0),//startPoint
+                    new THREE.Vector3(31.0625, -7.25, 0),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    24.85, 7.25, 10.875,
+                    37.275000000000006, 7.25, 10.875,
+                    37.275000000000006, 7.25, 7.25,
+                    24.85, 7.25, 7.25,
+                    24.85, -7.25, 10.875,
+                    37.275000000000006, -7.25, 10.875,
+                    37.275000000000006, -7.25, 7.25,
+                    24.85, -7.25, 7.25,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(31.0625, 0, 10.875),//startPoint
+                    new THREE.Vector3(31.0625, 0, 7.25),//endPoint
+                ]
+            },
+            
+            {
+                'touchingBoxesCoordinates':[
+                    24.85, 7.25, -7.25,
+                    37.275000000000006, 7.25, -7.25,
+                    37.275000000000006, 7.25, -10.875,
+                    24.85, 7.25, -10.875,
+                    24.85, -7.25, -7.25,
+                    37.275000000000006, -7.25, -7.25,
+                    37.275000000000006, -7.25, -10.875,
+                    24.85, -7.25, -10.875,
+                    
+                ],
+                'insertVectorCoordinates':[
+                    new THREE.Vector3(31.0625, 0, -10.875),//startPoint
+                    new THREE.Vector3(31.0625, 0, -7.25),//endPoint
                 ]
             },
             
@@ -26550,7 +26698,7 @@ class ComponentBattery extends THREE.Object3D {
                     // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
                     side: THREE.DoubleSide //ensure backface shows color too
                 });
-                const touchingBox = new THREE.Mesh(touchingBoxGeometry, touchingBoxMaterial);
+                const touchingBox = new THREE.Line(touchingBoxGeometry, touchingBoxMaterial);
                 this.attach(touchingBox);
                 solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = attachmentId;
                 attachmentId__solderableLeadsIdx_touchingBoxesIdx[attachmentId] = [i, j];
