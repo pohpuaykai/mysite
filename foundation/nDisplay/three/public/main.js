@@ -17,6 +17,7 @@ import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 import {ComponentBattery} from './static/meshes/ComponentBattery.js';
 import {ComponentDiode} from './static/meshes/ComponentDiode.js';
 import {ComponentCapacitor} from './static/meshes/ComponentCapacitor.js';
+import {ComponentInductor} from './static/meshes/ComponentInductor.js';
 
 
 
@@ -87,8 +88,8 @@ function onWindowResize() {
 // const resistor0 = new ComponentResistor({x:0, y:0, z:10});
 // scene.add(resistor0); render();
 
-const battery0 = new ComponentBattery({x:0, y:0, z:10});
-scene.add(battery0); render();
+// const battery0 = new ComponentBattery({x:0, y:0, z:10});
+// scene.add(battery0); render();
 
 // const diode0 = new ComponentDiode({x:0, y:0, z:10});
 // scene.add(diode0); render();
@@ -97,6 +98,9 @@ scene.add(battery0); render();
 // const capacitor0 = new ComponentCapacitor({x:0, y:0, z:0});
 // scene.add(capacitor0); render();
 
+const inductor0 = new ComponentInductor({x:0, y:0, z:10});
+scene.add(inductor0); render();
+
 
 asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){
     scene.add(textMesh); render();
@@ -104,7 +108,7 @@ asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0},
 
 //after placing all the Object3D into the scene, then we can start trying to animate the scene
 function animate(){
-    let rotatingObject = battery0;
+    let rotatingObject = inductor0;
     // rotatingObject.rotation.x += (Math.PI/(360*6));
     rotatingObject.rotation.y += (Math.PI/(360*6));
     // rotatingObject.rotation.z += (Math.PI/(360*6));

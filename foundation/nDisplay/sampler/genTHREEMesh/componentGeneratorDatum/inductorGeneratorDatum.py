@@ -3,44 +3,43 @@ import os
 from foundation.nDisplay.sampler.bottomupsampler import BottomUpSampler
 
 """
-Panasonic Aluminium Electrolytic Capacitors (Radial Lead Type)
-Radial Lead Type
-Series: M Type: A
+BOURNS RL181S Series - Radial Lead RF Choke
+RL181S-102J-RC 
 
-Cap. (miF) = 220
+Cap. (miF) = 1000
 
-Diameter of body = 5.5 mm
-Length of body = 12 mm
-Diameter of left_lead = 0.55 mm
-Length of left_lead = 14 mm
-Diameter of right_lead = 0.55 mm
-Length of right_lead = 17 mm
+Diameter of body = 10.5 mm
+Length of body = 14 mm
+Diameter of left_lead = 0.7 mm
+Length of left_lead = 5 mm
+Diameter of right_lead = 0.7 mm
+Length of right_lead = 5 mm
 """
 
 
 
 def bodyColorFunction(x, y, z, u, v):
-    if (3*math.pi/12)<=v and v<=(4*math.pi/12):
-        return (192, 192, 192)
-    return (0, 0, 0) # defaultColor
+    # if (3*math.pi/12)<=v and v<=(4*math.pi/12):
+    #     return (192, 192, 192)
+    return (10, 10, 10) # defaultColor, light-black
 def leftLeadColorFunction(x, y, z, u, v):
-    return (192, 192, 192)
+    return (192, 192, 192)#silver-grey
 def rightLeadColorFunction(x, y, z, u, v):
-    return (192, 192, 192)
+    return (192, 192, 192)#silver-grey
 import math; theMathModule = locals()['math'];
 
-body_diameter = 5.5
-body_length = 12
+body_diameter = 10.5
+body_length = 14
 
-left_lead_length = 14
-left_lead_diameter = 0.55
-right_lead_length = 17
-right_lead_diameter = 0.55
+left_lead_length = 5
+left_lead_diameter = 0.7
+right_lead_length = 5
+right_lead_diameter = 0.7
 
 left_lead_yStart = -left_lead_length
-left_lead_xzCentre = -1
+left_lead_xzCentre = -2.5
 right_lead_yStart = -right_lead_length
-right_lead_xzCentre = 1
+right_lead_xzCentre = 2.5
 
 
 listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseSampler([
@@ -52,8 +51,8 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'vStart':-math.pi,
         'vEnd':math.pi,
         'vStep':math.pi/12,
-        'xFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4)))-0.1*math.exp(-math.pow(8*(X+0.43), 2)))*math.cos(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
-        'zFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4)))-0.1*math.exp(-math.pow(8*(X+0.43), 2)))*math.sin(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'xFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4))))*math.cos(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'zFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4))))*math.sin(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
         'colorFunction':bodyColorFunction
     },
     {#left lead -ve (shorter)
@@ -380,7 +379,7 @@ solderableLeads += [
 
 
 if __name__=='__main__':
-    name = 'Capacitor'
+    name = 'Inductor'
     print(f'generating Component{name} from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
     THREEComponentGenerator().generateMeshFile(name, listOfVertices, listOfIndices, listOfColors, solderableLeads)
