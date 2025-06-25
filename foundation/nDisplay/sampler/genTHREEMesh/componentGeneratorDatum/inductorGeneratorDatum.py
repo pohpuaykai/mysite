@@ -6,7 +6,7 @@ from foundation.nDisplay.sampler.bottomupsampler import BottomUpSampler
 BOURNS RL181S Series - Radial Lead RF Choke
 RL181S-102J-RC 
 
-Cap. (miF) = 1000
+Ind. (miF) = 1000
 
 Diameter of body = 10.5 mm
 Length of body = 14 mm
@@ -51,8 +51,8 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'vStart':-math.pi,
         'vEnd':math.pi,
         'vStep':math.pi/12,
-        'xFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4))))*math.cos(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
-        'zFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4))))*math.sin(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'xFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 32))))*math.cos(v)', locals={'v':v, 'X': (y/(body_length-0)), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'zFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 32))))*math.sin(v)', locals={'v':v, 'X': (y/(body_length-0)), 'body_diameter':body_diameter, 'math':theMathModule}),
         'colorFunction':bodyColorFunction
     },
     {#left lead -ve (shorter)
