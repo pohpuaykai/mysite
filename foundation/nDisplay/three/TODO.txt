@@ -1,21 +1,4 @@
-draw a Mesh:
-0. Component~.js ~=Resistor>
-1. Component~.js ~=Battery>
-2. Component~.js ~=ACMicroGenerator<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
-"""
-(Overall size): 30mm×30mm×13.2mm (height)
-(Formed body): 28.5mm×10mm
-(Fixed plate): 30mm×30mm
-(Output shaft size): 3mm×31.5mm (length)
-(Output line length): about 70mm
-https://www.amazon.com/gp/product/B0DHNC3114
-"""
-3. Component~.js ~=Capacitor<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
-4. Component~.js ~=Inductor<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
-5. Component~.js ~=Diode>
-6. Component~.js ~=Oscillator<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
-7. Component~.js ~=Transistor<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
-8. Component~.js ~=OpAmp (IC Chip)<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
+Test and Fix Wire.js
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -Build this pipeline:
 --Manual Draw components in 3D
@@ -32,6 +15,24 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 
 
 
+
+
+
+
+
+TODO:
+###############################################################
+2. Component~.js ~=SignalGenerator[ACMicroGenerator]
+"""TODO
+(Overall size): 30mm×30mm×13.2mm (height)
+(Formed body): 28.5mm×10mm
+(Fixed plate): 30mm×30mm
+(Output shaft size): 3mm×31.5mm (length)
+(Output line length): about 70mm
+https://www.amazon.com/gp/product/B0DHNC3114
+"""
+8. Component~.js ~=OpAmp (IC Chip)<<<<<<<<<<<<<<<<<<<<<<BottomUpSampler
+###############################################################
 
 
 

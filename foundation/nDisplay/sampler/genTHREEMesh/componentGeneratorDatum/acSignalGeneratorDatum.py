@@ -3,20 +3,23 @@ import os
 from foundation.nDisplay.sampler.bottomupsampler import BottomUpSampler
 
 """
-BOURNS RL181S Series - Radial Lead RF Choke
-RL181S-102J-RC 
+NOT REAL
 
-Ind. (miF) = 1000
-
-Diameter of body = 10.5 mm
-Length of body = 14 mm
+Diameter of body = 140 mm
+Length of body = 50 mm
 Diameter of left_lead = 0.7 mm
-Length of left_lead = 5 mm
+Length of left_lead = 30 mm
 Diameter of right_lead = 0.7 mm
-Length of right_lead = 5 mm
+Length of right_lead = 30 mm
 """
 
 
+
+def realRoot(number, power):
+    if number < 0:
+        return -math.pow(abs(number), 1/power)
+    else:
+        return math.pow(number, 1/power)
 
 def bodyColorFunction(x, y, z, u, v):
     # if (3*math.pi/12)<=v and v<=(4*math.pi/12):
@@ -28,34 +31,34 @@ def rightLeadColorFunction(x, y, z, u, v):
     return (192, 192, 192)#silver-grey
 import math; theMathModule = locals()['math'];
 
-body_diameter = 10.5
-body_length = 14
+body_diameter = 140
+body_length = 50
 
-left_lead_length = 5
+left_lead_length = 30
 left_lead_diameter = 0.7
-right_lead_length = 5
+right_lead_length = 30
 right_lead_diameter = 0.7
 
 left_lead_yStart = -left_lead_length
-left_lead_xzCentre = -2.5
+left_lead_xzCentre = -10
 right_lead_yStart = -right_lead_length
-right_lead_xzCentre = 2.5
+right_lead_xzCentre = 10
 
 
 listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseSampler([
-    {#body of the inductor
+    {#body of the signalGenerator
         'uStart':0,
         'uEnd':body_length,
-        'uStep':0.1,
+        'uStep':1,
         'yFormulaLambda':lambda u: eval('u', locals={'u':u, 'math':theMathModule}),
-        'vStart':-math.pi,
-        'vEnd':math.pi,
-        'vStep':math.pi/12,
-        'xFormulaLambda':lambda v, y: eval('(body_diameter/2)*(math.sqrt(1-(math.pow(X , 32))))*math.cos(v)', locals={'v':v, 'X': (y/(body_length-0)), 'body_diameter':body_diameter, 'math':theMathModule}),
-        'zFormulaLambda':lambda v, y: eval('(body_diameter/2)*(math.sqrt(1-(math.pow(X , 32))))*math.sin(v)', locals={'v':v, 'X': (y/(body_length-0)), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'vStart':-1,
+        'vEnd':1,
+        'vStep':1/36,
+        'xFormulaLambda':lambda v, y: eval('(body_diameter/2)*(math.sqrt(1-(math.pow(X , 32))))*realRoot(math.cos(math.pi*v), 3)', locals={'v':v, 'X': (y/(body_length-0)), 'body_diameter':body_diameter, 'realRoot':realRoot, 'math':theMathModule}),
+        'zFormulaLambda':lambda v, y: eval('(body_diameter/2)*(math.sqrt(1-(math.pow(X , 32))))*math.sin(math.pi*v)', locals={'v':v, 'X': (y/(body_length-0)), 'body_diameter':body_diameter, 'realRoot':realRoot, 'math':theMathModule}),
         'colorFunction':bodyColorFunction
     },
-    {#left lead
+    {#left lead 
         'uStart':left_lead_yStart,#'uStart':-left_lead_length,
         'uEnd':left_lead_yStart+left_lead_length,#'uEnd':0,
         'uStep':1,
@@ -67,7 +70,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'zFormulaLambda':lambda v, y: eval('0.5*left_lead_diameter*math.sin(v)', locals={'v':v, 'y':y, 'left_lead_diameter':left_lead_diameter, 'left_lead_xzCentre':left_lead_xzCentre, 'math':theMathModule}),
         'colorFunction':leftLeadColorFunction
     },
-    {#right lead
+    {#right lead 
         'uStart':right_lead_yStart,#'uStart':-17,
         'uEnd':right_lead_yStart+right_lead_length,#'uEnd':0,
         'uStep':1,
@@ -379,7 +382,7 @@ solderableLeads += [
 
 
 if __name__=='__main__':
-    name = 'Inductor'
+    name = 'ACSignalGenerator'
     print(f'generating Component{name} from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
     THREEComponentGenerator().generateMeshFile(name, listOfVertices, listOfIndices, listOfColors, solderableLeads)

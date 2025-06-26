@@ -19,6 +19,8 @@ import {ComponentDiode} from './static/meshes/ComponentDiode.js';
 import {ComponentCapacitor} from './static/meshes/ComponentCapacitor.js';
 import {ComponentInductor} from './static/meshes/ComponentInductor.js';
 import {ComponentOscillator} from './static/meshes/ComponentOscillator.js';
+import {ComponentTransistor} from './static/meshes/ComponentTransistor.js';
+import {ComponentACSignalGenerator} from './static/meshes/ComponentACSignalGenerator.js';
 
 
 
@@ -105,6 +107,12 @@ function onWindowResize() {
 const oscillator0 = new ComponentOscillator({x:0, y:0, z:10});
 scene.add(oscillator0); render();
 
+// const transistor0 = new ComponentTransistor({x:0, y:0, z:10});
+// scene.add(transistor0); render();
+
+// const acSignalGenerator0 = new ComponentACSignalGenerator({x:0, y:0, z:10});
+// scene.add(acSignalGenerator0); render();
+
 
 asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){
     scene.add(textMesh); render();
@@ -112,9 +120,9 @@ asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0},
 
 //after placing all the Object3D into the scene, then we can start trying to animate the scene
 function animate(){
-    let rotatingObject = oscillator0;
+    let rotatingObject = inductor0;
     // rotatingObject.rotation.x += (Math.PI/(360*6));
-    rotatingObject.rotation.y += (Math.PI/(360*6));
+    // rotatingObject.rotation.y += (Math.PI/(360*6));
     // rotatingObject.rotation.z += (Math.PI/(360*6));
     render();
 }

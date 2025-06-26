@@ -52,8 +52,8 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'vStart':-math.pi,
         'vEnd':math.pi,
         'vStep':math.pi/12,
-        'xFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4)))-0.1*math.exp(-math.pow(8*(X+0.43), 2)))*math.cos(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
-        'zFormulaLambda':lambda v, y: eval('body_diameter*(math.sqrt(1-(math.pow(X , 4)))-0.1*math.exp(-math.pow(8*(X+0.43), 2)))*math.sin(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'xFormulaLambda':lambda v, y: eval('(body_diameter/2)*(math.sqrt(1-(math.pow(X , 4)))-0.1*math.exp(-math.pow(8*(X+0.43), 2)))*math.cos(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
+        'zFormulaLambda':lambda v, y: eval('(body_diameter/2)*(math.sqrt(1-(math.pow(X , 4)))-0.1*math.exp(-math.pow(8*(X+0.43), 2)))*math.sin(v)', locals={'v':v, 'X': (y-((0+12)/2))/(12-0), 'body_diameter':body_diameter, 'math':theMathModule}),
         'colorFunction':bodyColorFunction
     },
     {#left lead -ve (shorter)
@@ -65,7 +65,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'vEnd':math.pi,
         'vStep':math.pi/12,
         'xFormulaLambda':lambda v, y: eval('0.5*left_lead_diameter*math.cos(v)+left_lead_xzCentre', locals={'v':v, 'y':y, 'left_lead_diameter':left_lead_diameter, 'left_lead_xzCentre':left_lead_xzCentre, 'math':theMathModule}),
-        'zFormulaLambda':lambda v, y: eval('0.5*left_lead_diameter*math.sin(v)+left_lead_xzCentre', locals={'v':v, 'y':y, 'left_lead_diameter':left_lead_diameter, 'left_lead_xzCentre':left_lead_xzCentre, 'math':theMathModule}),
+        'zFormulaLambda':lambda v, y: eval('0.5*left_lead_diameter*math.sin(v)', locals={'v':v, 'y':y, 'left_lead_diameter':left_lead_diameter, 'left_lead_xzCentre':left_lead_xzCentre, 'math':theMathModule}),
         'colorFunction':leftLeadColorFunction
     },
     {#right lead +ve (longer)
@@ -77,7 +77,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'vEnd':math.pi,
         'vStep':math.pi/12,
         'xFormulaLambda':lambda v, y: eval('0.5*right_lead_diameter*math.cos(v)+right_lead_xzCentre', locals={'v':v, 'y':y, 'right_lead_diameter':right_lead_diameter, 'right_lead_xzCentre':right_lead_xzCentre, 'math':theMathModule}),
-        'zFormulaLambda':lambda v, y: eval('0.5*right_lead_diameter*math.sin(v)+right_lead_xzCentre', locals={'v':v, 'y':y, 'right_lead_diameter':right_lead_diameter, 'right_lead_xzCentre':right_lead_xzCentre, 'math':theMathModule}),
+        'zFormulaLambda':lambda v, y: eval('0.5*right_lead_diameter*math.sin(v)', locals={'v':v, 'y':y, 'right_lead_diameter':right_lead_diameter, 'right_lead_xzCentre':right_lead_xzCentre, 'math':theMathModule}),
         'colorFunction':rightLeadColorFunction
     },
 ])
@@ -100,8 +100,8 @@ down = yStart
 up = yStart+length
 left = xzCentre-(diameter*(1/2))-(diameter*(1/2))
 right = xzCentre-(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))
+in = (diameter*(1/2))
+out = -(diameter*(1/2))
 
 
 right_touchingBox
@@ -109,8 +109,8 @@ down = yStart
 up = yStart+length
 left = xzCentre+(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))+(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))
+in = (diameter*(1/2))
+out = -(diameter*(1/2))
 
 
 down_touchingBox
@@ -118,8 +118,8 @@ down = yStart-(length*(1/4))
 up = yStart
 left = xzCentre-(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))
+in = (diameter*(1/2))
+out = -(diameter*(1/2))
 
 
 in_touchingBox
@@ -127,8 +127,8 @@ down = yStart
 up = yStart+length
 left = xzCentre-(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))+(diameter*(1/2))
-out = xzCentre+(diameter*(1/2))
+in = (diameter*(1/2))+(diameter*(1/2))
+out = (diameter*(1/2))
 
 
 out_touchingBox
@@ -136,8 +136,8 @@ down = yStart
 up = yStart+length
 left = xzCentre-(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))
-in = xzCentre-(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))-(diameter*(1/2))
+in = -(diameter*(1/2))
+out = -(diameter*(1/2))-(diameter*(1/2))
 
 """
 
@@ -146,83 +146,83 @@ solderableLeads = [
     #left_lead
     [
         ([#left_touchingBox #left -> right
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre-(diameter*(1/2))-(diameter*(1/2)), yStart+(length*(1/2)), xzCentre), #startPoint
-            (xzCentre-(diameter*(1/2)), yStart+(length*(1/2)), xzCentre)  #endPoint
+            (xzCentre-(diameter*(1/2))-(diameter*(1/2)), yStart+(length*(1/2)), 0), #startPoint
+            (xzCentre-(diameter*(1/2)), yStart+(length*(1/2)), 0)  #endPoint
         )),
 #<<<<<<<<<<<<
 
         ([#right_touchingBox #right -> left <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre+(diameter*(1/2))+(diameter*(1/2)), yStart+(length*(1/2)), xzCentre), #startPoint
-            (xzCentre+(diameter*(1/2)), yStart+(length*(1/2)), xzCentre)  #endPoint
+            (xzCentre+(diameter*(1/2))+(diameter*(1/2)), yStart+(length*(1/2)), 0), #startPoint
+            (xzCentre+(diameter*(1/2)), yStart+(length*(1/2)), 0)  #endPoint
         )),
 #<<<<<<<<<<<<
 
         ([#down_touchingBox # down -> up
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre, yStart-(length*(1/4)), xzCentre), #startPoint
-            (xzCentre, yStart, xzCentre)  #endPoint
+            (xzCentre, yStart-(length*(1/4)), 0), #startPoint
+            (xzCentre, yStart, 0)  #endPoint
         )),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre, yStart+(length*(1/2)), xzCentre+(diameter*(1/2))+(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), xzCentre+(diameter*(1/2)))  #endPoint
+            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2))+(diameter*(1/2))), #startPoint
+            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2)))  #endPoint
         )),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox # out -> in
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre, yStart+(length*(1/2)), xzCentre-(diameter*(1/2))-(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), xzCentre-(diameter*(1/2)))  #endPoint
+            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2))-(diameter*(1/2))), #startPoint
+            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2)))  #endPoint
         )),
 #<<<<<<<<<<<<
 
@@ -239,8 +239,8 @@ down = yStart
 up = yStart+length
 left = xzCentre+(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))+(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))
+in = (diameter*(1/2))
+out = -(diameter*(1/2))
 
 
 left_touchingBox
@@ -248,8 +248,8 @@ down = yStart
 up = yStart+length
 left = xzCentre-(diameter*(1/2))-(diameter*(1/2))
 right = xzCentre-(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))
+in = (diameter*(1/2))
+out = -(diameter*(1/2))
 
 
 down_touchingBox
@@ -257,8 +257,8 @@ down = yStart-(length*(1/4))
 up = yStart
 left = xzCentre-(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))
+in = (diameter*(1/2))
+out = -(diameter*(1/2))
 
 
 in_touchingBox
@@ -266,8 +266,8 @@ down = yStart
 up = yStart+length
 left = xzCentre-(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))
-in = xzCentre+(diameter*(1/2))+(diameter*(1/2))
-out = xzCentre+(diameter*(1/2))
+in = (diameter*(1/2))+(diameter*(1/2))
+out = (diameter*(1/2))
 
 
 out_touchingBox
@@ -275,8 +275,8 @@ down = yStart
 up = yStart+length
 left = xzCentre-(diameter*(1/2))
 right = xzCentre+(diameter*(1/2))
-in = xzCentre-(diameter*(1/2))
-out = xzCentre-(diameter*(1/2))-(diameter*(1/2))
+in = -(diameter*(1/2))
+out = -(diameter*(1/2))-(diameter*(1/2))
 
 """
 
@@ -292,83 +292,83 @@ solderableLeads += [
     #right_lead
     [
         ([#right_touchingBox # right -> left
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre+(diameter*(1/2))+(diameter*(1/2)), yStart+(length*(1/2)), xzCentre), #startPoint
-            (xzCentre+(diameter*(1/2)), yStart+(length*(1/2)), xzCentre)  #endPoint
+            (xzCentre+(diameter*(1/2))+(diameter*(1/2)), yStart+(length*(1/2)), 0), #startPoint
+            (xzCentre+(diameter*(1/2)), yStart+(length*(1/2)), 0)  #endPoint
         )),
 #<<<<<<<<<<<<
 
         ([#left_touchingBox # left -> right
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre-(diameter*(1/2))-(diameter*(1/2)), yStart+(length*(1/2)), xzCentre), #startPoint
-            (xzCentre-(diameter*(1/2)), yStart+(length*(1/2)), xzCentre)  #endPoint
+            (xzCentre-(diameter*(1/2))-(diameter*(1/2)), yStart+(length*(1/2)), 0), #startPoint
+            (xzCentre-(diameter*(1/2)), yStart+(length*(1/2)), 0)  #endPoint
         )),
 #<<<<<<<<<<<<
 
         ([#down_touchingBox # down -> up
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  xzCentre-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre, yStart-(length*(1/4)), xzCentre), #startPoint
-            (xzCentre, yStart, xzCentre)  #endPoint
+            (xzCentre, yStart-(length*(1/4)), 0), #startPoint
+            (xzCentre, yStart, 0)  #endPoint
         )),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre+(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre+(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre, yStart+(length*(1/2)), xzCentre+(diameter*(1/2))+(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), xzCentre+(diameter*(1/2)))  #endPoint
+            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2))+(diameter*(1/2))), #startPoint
+            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2)))  #endPoint
         )),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox out -> in
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  xzCentre-(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
         ], 
         (
-            (xzCentre, yStart+(length*(1/2)), xzCentre-(diameter*(1/2))-(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), xzCentre-(diameter*(1/2)))  #endPoint
+            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2))-(diameter*(1/2))), #startPoint
+            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2)))  #endPoint
         )),
 #<<<<<<<<<<<<
 
