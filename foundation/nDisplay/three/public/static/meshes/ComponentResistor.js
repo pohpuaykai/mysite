@@ -2,18 +2,7 @@ import * as THREE from '../three/three.module.js';
 
 /**
  *
- * Is a Mesh, with a list of touchingBox and its corresponding insertVector, 
- * touchingBox is where one end of a wire will touch this component and it will be considered connected
- * to the other end of that wire.
- * insertVector is where the wire must be insert from.
- * 
- * touchingBox is a Mesh with BoxGeometry, Material that is transparent, and highlighted when touched
- * Using the coordinate system of THREE.js, where in-axis=z-axis=depth, up-axis=y-axis=height, right-axis=x-axis=width, the 3DCoordinates of touchingBox
- * are in touchingBoxPoint list are in this order (top-square clockwise, and then bottom square, from the same top point, clockwise):
- * (left, up, in), (right, up, in), (right, up, out), (left, up, out),
- * (left, down, in), (right, down, in), (right, down, out), (left, down, out)
- * 
- * insertVector is a Vector3
+ * Is a THREE.Object3D that has a few disjoint meshes, with a list of touchingFaces, whose corners wires will originate (and end)
  */
 class ComponentResistor extends THREE.Object3D {
 
@@ -11992,99 +11981,58 @@ class ComponentResistor extends THREE.Object3D {
         }
 
 
-        //touchingBoxes and their insertVector, for each solderable_lead, there is a list of touchingBoxesInsertVectors
         const solderableLeads = [
         
         [
             
             {
-                'touchingBoxesCoordinates':[
-                    -7.3125, 0.3, 0.3,
+                'touchingFaceCoordinates':[
                     -4.875, 0.3, 0.3,
                     -4.875, 0.3, -0.3,
-                    -7.3125, 0.3, -0.3,
-                    -7.3125, -0.3, 0.3,
                     -4.875, -0.3, 0.3,
                     -4.875, -0.3, -0.3,
-                    -7.3125, -0.3, -0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(-7.3125, 0, 0),//startPoint
-                    new THREE.Vector3(-4.875, 0, 0),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
+                'touchingFaceCoordinates':[
                     -4.875, 0.44999999999999996, 0.3,
                     -3.25, 0.44999999999999996, 0.3,
                     -3.25, 0.44999999999999996, -0.3,
                     -4.875, 0.44999999999999996, -0.3,
-                    -4.875, 0.3, 0.3,
-                    -3.25, 0.3, 0.3,
-                    -3.25, 0.3, -0.3,
-                    -4.875, 0.3, -0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(-4.0625, 0.44999999999999996, 0),//startPoint
-                    new THREE.Vector3(-4.0625, 0.3, 0),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
-                    -4.875, -0.3, 0.3,
-                    -3.25, -0.3, 0.3,
-                    -3.25, -0.3, -0.3,
-                    -4.875, -0.3, -0.3,
+                'touchingFaceCoordinates':[
                     -4.875, -0.44999999999999996, 0.3,
                     -3.25, -0.44999999999999996, 0.3,
                     -3.25, -0.44999999999999996, -0.3,
                     -4.875, -0.44999999999999996, -0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(-4.0625, -0.44999999999999996, 0),//startPoint
-                    new THREE.Vector3(-4.0625, -0.3, 0),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
-                    -4.875, 0.3, -0.3,
-                    -3.25, 0.3, -0.3,
-                    -3.25, 0.3, -0.44999999999999996,
+                'touchingFaceCoordinates':[
                     -4.875, 0.3, -0.44999999999999996,
-                    -4.875, -0.3, -0.3,
-                    -3.25, -0.3, -0.3,
-                    -3.25, -0.3, -0.44999999999999996,
+                    -3.25, 0.3, -0.44999999999999996,
                     -4.875, -0.3, -0.44999999999999996,
+                    -3.25, -0.3, -0.44999999999999996,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(-4.0625, 0, -0.3),//startPoint
-                    new THREE.Vector3(-4.0625, 0, -0.44999999999999996),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
-                    -4.875, 0.3, 0.44999999999999996,
+                'touchingFaceCoordinates':[
                     -3.25, 0.3, 0.44999999999999996,
-                    -3.25, 0.3, 0.3,
-                    -4.875, 0.3, 0.3,
-                    -4.875, -0.3, 0.44999999999999996,
+                    -4.875, 0.3, 0.44999999999999996,
                     -3.25, -0.3, 0.44999999999999996,
-                    -3.25, -0.3, 0.3,
-                    -4.875, -0.3, 0.3,
+                    -4.875, -0.3, 0.44999999999999996,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(-4.0625, 0, 0.3),//startPoint
-                    new THREE.Vector3(-4.0625, 0, 0.44999999999999996),//endPoint
-                ]
             },
             
         ],
@@ -12092,180 +12040,93 @@ class ComponentResistor extends THREE.Object3D {
         [
             
             {
-                'touchingBoxesCoordinates':[
+                'touchingFaceCoordinates':[
                     4.875, 0.3, 0.3,
-                    7.3125, 0.3, 0.3,
-                    7.3125, 0.3, -0.3,
                     4.875, 0.3, -0.3,
                     4.875, -0.3, 0.3,
-                    7.3125, -0.3, 0.3,
-                    7.3125, -0.3, -0.3,
                     4.875, -0.3, -0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(7.3125, 0, 0),//startPoint
-                    new THREE.Vector3(4.875, 0, 0),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
+                'touchingFaceCoordinates':[
                     3.25, 0.44999999999999996, 0.3,
                     4.875, 0.44999999999999996, 0.3,
                     4.875, 0.44999999999999996, -0.3,
                     3.25, 0.44999999999999996, -0.3,
-                    3.25, 0.3, 0.3,
-                    4.875, 0.3, 0.3,
-                    4.875, 0.3, -0.3,
-                    3.25, 0.3, -0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(4.0625, 0.44999999999999996, 0),//startPoint
-                    new THREE.Vector3(4.0625, 0.3, 0),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
-                    3.25, -0.3, 0.3,
-                    4.875, -0.3, 0.3,
-                    4.875, -0.3, -0.3,
-                    3.25, -0.3, -0.3,
+                'touchingFaceCoordinates':[
                     3.25, -0.44999999999999996, 0.3,
                     4.875, -0.44999999999999996, 0.3,
                     4.875, -0.44999999999999996, -0.3,
                     3.25, -0.44999999999999996, -0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(4.0625, -0.44999999999999996, 0),//startPoint
-                    new THREE.Vector3(4.0625, -0.3, 0),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
+                'touchingFaceCoordinates':[
                     3.25, 0.3, 0.44999999999999996,
                     4.875, 0.3, 0.44999999999999996,
-                    4.875, 0.3, 0.3,
-                    3.25, 0.3, 0.3,
                     3.25, -0.3, 0.44999999999999996,
                     4.875, -0.3, 0.44999999999999996,
-                    4.875, -0.3, 0.3,
-                    3.25, -0.3, 0.3,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(4.0625, 0, 0.44999999999999996),//startPoint
-                    new THREE.Vector3(4.0625, 0, 0.3),//endPoint
-                ]
             },
             
             {
-                'touchingBoxesCoordinates':[
-                    3.25, 0.3, -0.3,
-                    4.875, 0.3, -0.3,
+                'touchingFaceCoordinates':[
                     4.875, 0.3, -0.44999999999999996,
                     3.25, 0.3, -0.44999999999999996,
-                    3.25, -0.3, -0.3,
-                    4.875, -0.3, -0.3,
                     4.875, -0.3, -0.44999999999999996,
                     3.25, -0.3, -0.44999999999999996,
                     
                 ],
-                'insertVectorCoordinates':[
-                    new THREE.Vector3(4.0625, 0, -0.44999999999999996),//startPoint
-                    new THREE.Vector3(4.0625, 0, -0.3),//endPoint
-                ]
             },
             
         ],
         
         ];
-        this.solderableLeads = solderableLeads;
 
-        //also to note the indices of insert
-        let solderableLeadsIdx_touchingBoxesIdx__attachmentId = {};
-        let attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
-        let solderableLeadsIdx_insertVectorsIdx__attachmentId = {};
-        let attachmentId__solderableLeadsIdx_insertVectorsIdx = {};
-        let attachmentId = 1;
-        for ( let i = 0; i < solderableLeads.length; i ++ ) {
-            let touchingBoxesInsertVectors = solderableLeads[i];
-            for ( let j = 0; j < touchingBoxesInsertVectors.length; j ++ ) {
-                const touchingAttr = touchingBoxesInsertVectors[ j ];
-                const touchingBoxesCoordinates = new Float32Array(touchingAttr['touchingBoxesCoordinates']);
-                /**
-                 * 0(left, up, in), 1(right, up, in), 2(right, up, out), 3(left, up, out),
-                 * 4(left, down, in), 5(right, down, in), 6(right, down, out), 7(left, down, out)
-                 * 
-                 * face the cube_face, and counting the corners clockwise:
-                 * top face ~ 0123
-                 * left face ~ 0374
-                 * back face ~ 1045
-                 * right face ~ 2156
-                 * front face ~ 3267
-                 * bottom face ~ 7654
-                 * 
-                 * 2 triangles form from face indices abcd like so: a, b, d,      c, d, b
-                 * **/
-                const touchingBoxGeometry = new THREE.BufferGeometry();
-                touchingBoxGeometry.setAttribute('position', new THREE.BufferAttribute(touchingBoxesCoordinates, 3));
-                const touchingBoxColors = new Float32Array([//6 faces per cube, 12 triangles=12 rows,  each row is R G B, R G B, R G B,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+
+        this.solderableLeads = solderableLeads;
+        const solderableLeadsIdx_touchingBoxesIdx__attachmentId = {}; const attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
+        const uuid__type = {};
+        for ( let i = 0; i<solderableLeads.length; i++) {
+            let touchingFaces = solderableLeads[i];
+            for(let j = 0; j<touchingFaces.length; j++) {
+                const touchingFaceCoordinates = new Float32Array(touchingFaces[j]['touchingFaceCoordinates']);
+                const touchingFaceGeometry = new THREE.BufferGeometry();
+                touchingFaceGeometry.setAttribute('position', new THREE.BufferAttribute(touchingFaceCoordinates, 3));
+                const touchingFaceColors = new Float32Array([//2 triangles per face,  each row is R G B, R G B, R G B,
                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                 ]);
-                touchingBoxGeometry.setAttribute('color', new THREE.BufferAttribute(touchingBoxColors, 3));
-                const touchingBoxIndices = new Uint16Array([
+                touchingFaceGeometry.setAttribute('color', new THREE.BufferAttribute(touchingFaceColors, 3));
+                const touchingFaceIndices = new Uint16Array([
                     0, 1, 3, 2, 3, 1, //top face
-                    0, 3, 4, 7, 4, 3, //left face
-                    1, 0, 5, 4, 5, 0, //back face
-                    2, 1, 6, 5, 6, 1, //right face
-                    3, 2, 7, 6, 7, 2, //front face
-                    7, 6, 4, 5, 4, 6, //bottom face
                 ]);
-                touchingBoxGeometry.setIndex(new THREE.BufferAttribute(touchingBoxIndices, 1));
-                const touchingBoxMaterial = new THREE.MeshBasicMaterial({
+                touchingFaceGeometry.setIndex(new THREE.BufferAttribute(touchingFaceIndices, 1));
+                const touchingFaceMaterial = new THREE.MeshBasicMaterial({
                     vertexColors: true,
                     // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
                     side: THREE.DoubleSide //ensure backface shows color too
                 });
-                const touchingBox = new THREE.Line(touchingBoxGeometry, touchingBoxMaterial);
-                this.attach(touchingBox);
-                solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = attachmentId;
-                attachmentId__solderableLeadsIdx_touchingBoxesIdx[attachmentId] = [i, j];
-                attachmentId ++;
-                //
-                const insertVectorCoordinates = touchingAttr['insertVectorCoordinates'];
-                //need to turn this into a THREE.Line so that if the position|rotation of this Component is changed by THE_USER, it's position|rotation is updated
-                const points =[ insertVectorCoordinates[0], insertVectorCoordinates[1]];
-                const line = new THREE.Line(
-                    new THREE.BufferGeometry().setFromPoints( points ),
-                    new THREE.LineBasicMaterial( { color: 0xf0f0f0 } ) //should be transparent... 
-                )
-                this.attach(line);
-                solderableLeadsIdx_insertVectorsIdx__attachmentId[[i, j]] = attachmentId;
-                attachmentId__solderableLeadsIdx_insertVectorsIdx[attachmentId] = [i, j];
-                attachmentId ++;
+                const touchingFace = new THREE.Line(touchingFaceGeometry, touchingFaceMaterial);
+                this.add(touchingFace);//this.attach(touchingFace);
+                uuid__type[touchingFace.uuid] = 'TOUCHING_BOX';
+                solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = touchingFace.uuid;
+                attachmentId__solderableLeadsIdx_touchingBoxesIdx[touchingFace.uuid] = [i, j];
             }
         }
         this.solderableLeadsIdx_touchingBoxesIdx__attachmentId = solderableLeadsIdx_touchingBoxesIdx__attachmentId;
         this.attachmentId__solderableLeadsIdx_touchingBoxesIdx = attachmentId__solderableLeadsIdx_touchingBoxesIdx;
-        this.solderableLeadsIdx_insertVectorsIdx__attachmentId = solderableLeadsIdx_insertVectorsIdx__attachmentId;
-        this.attachmentId__solderableLeadsIdx_insertVectorsIdx = attachmentId__solderableLeadsIdx_insertVectorsIdx;
-
+        this.uuid__type = uuid__type;
 
         //update world position
         this.position.set(position.x, position.y, position.z);
@@ -12276,17 +12137,15 @@ class ComponentResistor extends THREE.Object3D {
      * get all touchingBoxes
      * **/
     getAllTouchingBoxesAndInsertVectors() {
-        this.computeBoundingBox(); //update touchingBoxes and their insertVectors
         let updatedSolderableLeads = [];
         for ( let i = 0; i < this.solderableLeads.length; i ++ ) {
-            let touchingBoxesInsertVectors = solderableLeads[i];
+            let touchingBoxes = this.solderableLeads[i];
             let updatedSolderableLead = [];
-            for ( let j = 0; j < touchingBoxesInsertVectors.length; j ++ ) {
+            for ( let j = 0; j < touchingBoxes.length; j ++ ) {
                 let touchingBoxAttachmentId = this.solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]];
-                let insertVectorAttachmentId = this.solderableLeadsIdx_insertVectorsIdx__attachmentId[[i, j]];
+                let touchingBox = this.getObjectByProperty('uuid', touchingBoxAttachmentId);//is THREE.Line
                 updatedSolderableLead.push({
-                    'touchingBox':this.getObjectById(touchingBoxAttachmentId),//is THREE.Mesh
-                    'insertVector':this.getObjectById(insertVectorAttachmentId),//is THREE.Line
+                    'touchingBox':this.updateListOfCoordinates(touchingBox)
                 });
             }
             updatedSolderableLeads.push(updatedSolderableLead);
@@ -12295,17 +12154,65 @@ class ComponentResistor extends THREE.Object3D {
     }
 
     /**
-     * computeBoundingBox for each children of this Object3D
-     * and then 'combine' all the children's boundingBoxes into this.boundingBox
+     * Converts THREE.Object3D.geometry.position.array to a Javascript.Array of [x, y, z]; where x, y, z are Javascript floats
      * **/
-    computeBoundingBox() {
-        this.boundingBox = new THREE.Box3();
+    updateListOfCoordinates(threeObject3D) {
+        threeObject3D.geometry.computeBoundingBox(); threeObject3D.updateMatrixWorld(true);
+        const pointsList = this.threeFloatsToAPoint(threeObject3D.geometry.getAttribute('position').array);
+        const updatedPoints = [];
+        for(let i=0; i<pointsList.length; i++) {
+            const oldPoint = new THREE.Vector3(pointsList[i][0], pointsList[i][1],pointsList[i][2]);
+            const updatedPoint = oldPoint.clone().applyMatrix4(threeObject3D.matrixWorld);
+            updatedPoints.push([updatedPoint.x, updatedPoint.y, updatedPoint.z]);
+        }
+        return updatedPoints;
+    }
+
+    /**
+     * check if the casted ray will intersect with this component or its touchingBoxes
+     * **/
+    raycast(raycaster, intersects) {//TODO unfinished<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        const uuidInserted = [];
         for(let i=0; i<this.children.length; i++) {
             const child = this.children[i];
-            child.geometry.computeBoundingBox();
-            this.boundingBox.expandByPoint(child.geometry.boundingBox.min);
-            this.boundingBox.expandByPoint(child.geometry.boundingBox.max);
+            if (this.uuid__type[child.uuid] == 'TOUCHING_BOX') {
+                // console.log(child, 'child');
+                //check for intersection with face
+                const boxPointList = this.threeFloatsToAPoint(child.geometry.getAttribute('position').array);//first corner, vertices is a flat list
+                // const wBFacesThatIntersectWithiV = [];
+
+                function faceIntersectionCallback(faceIndices) {
+                    // wBFacesThatIntersectWithiV.push(faceIndices);
+                    if (uuidInserted.indexOf(child.uuid) >= 0) {
+                        intersects.push(child); uuidInserted.push(child.uuid);
+                    }
+                    
+                }
+                //TODO the ray.direction is a little weird, needs to check in three.core.js, might be perspective|orthographic difference setFromCamera, line 54312
+                const rayVecCoordinate = [raycaster.ray.direction.x, raycaster.ray.direction.y, raycaster.ray.direction.z];
+                
+                //convert raycaster.ray.origin to list of three floats
+                const origin = [raycaster.ray.origin.x, raycaster.ray.origin.y, raycaster.ray.origin.z];
+                // console.log('origin', origin); console.log('rayVecCoordinate', rayVecCoordinate);
+                (new RayIntersectBox()).facesOfIntersection(boxPointList, origin, rayVecCoordinate, faceIntersectionCallback);
+            }
         }
+    }
+
+
+
+    /**
+     * A list of floats, whose amount is divisible by 3. Rearrange every 3 floats into a coordinate point.
+     * **/
+    threeFloatsToAPoint(coordinates) {
+        const points = []; let point = [];
+        for (let i=0; i<coordinates.length; i++) {
+            point.push(coordinates[i]);
+            if (i%3 == 2) {
+                points.push(point); point = [];
+            }
+        }
+        return points;
     }
 }
 

@@ -236,18 +236,10 @@ solderableLeads = [
     [
         ([#left_touchingBox #left -> right
 ( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
 ( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
 ( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
 ( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre-(diameter*(1/2))-(diameter*(1/2)), yStart+(length*(1/2)), 0), #startPoint
-            (xzCentre-(diameter*(1/2)), yStart+(length*(1/2)), 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
@@ -256,48 +248,24 @@ solderableLeads = [
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, up, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, up, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart-(length*(1/4)), 0), #startPoint
-            (xzCentre, yStart, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
 ( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2))+(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2)))  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox # out -> in
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2))-(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2)))  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
     ],
@@ -346,7 +314,7 @@ xzCentre = middle_lead_xzCentre
 
 solderableLeads += [
 
-    #right_lead
+    #middle_lead
     [
 
         ([#down_touchingBox # down -> up
@@ -354,48 +322,24 @@ solderableLeads += [
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, up, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, up, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart-(length*(1/4)), 0), #startPoint
-            (xzCentre, yStart, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
 ( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2))+(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2)))  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox out -> in
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, inx)
 ( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
 ( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2))-(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2)))  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
@@ -456,69 +400,37 @@ solderableLeads += [
     #right_lead
     [
         ([#right_touchingBox # right -> left
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
 ( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
 ( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
 ( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
 ( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre+(diameter*(1/2))+(diameter*(1/2)), yStart+(length*(1/2)), 0), #startPoint
-            (xzCentre+(diameter*(1/2)), yStart+(length*(1/2)), 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
         ([#down_touchingBox # down -> up
-( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  (diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart-(length*(1/4)) ,  -(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart-(length*(1/4)), 0), #startPoint
-            (xzCentre, yStart, 0)  #endPoint
-        )),
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, inx)
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, out)
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, out)
+        ]),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2))+(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), (diameter*(1/2)))  #endPoint
-        )),
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, up, inx)<
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, up, inx)<
+( xzCentre-(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (left, down, inx)<
+( xzCentre+(diameter*(1/2)) ,  yStart ,  (diameter*(1/2))+(diameter*(1/2)) ), # (right, down, inx)<
+        ]),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox out -> in
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (left, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2)) ), # (right, down, inx)
-( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)
-( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)
-        ], 
-        (
-            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2))-(diameter*(1/2))), #startPoint
-            (xzCentre, yStart+(length*(1/2)), -(diameter*(1/2)))  #endPoint
-        )),
+( xzCentre+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, up, out)<
+( xzCentre-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, up, out)<
+( xzCentre+(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (right, down, out)<
+( xzCentre-(diameter*(1/2)) ,  yStart ,  -(diameter*(1/2))-(diameter*(1/2)) ), # (left, down, out)<
+        ]),
 #<<<<<<<<<<<<
 
 

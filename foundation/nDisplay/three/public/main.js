@@ -1,6 +1,6 @@
 // import * as THREE from './static/three/three.core.js';
 import * as THREE from './static/three/three.module.js';
-import {OrbitControls} from './static/three/OrbitControls.js';
+// import {OrbitControls} from './static/three/OrbitControls.js';
 // import {TextGeometry} from './static/three/TextGeometry.js';
 // import {FontLoader} from './static/three/FontLoader.js';
 import {GLTFLoader} from './static/three/GLTFLoader.js';
@@ -13,6 +13,7 @@ import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
 // import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
 // import {MeshResistor} from './static/meshes/MeshResistor.js';
 // import {MeshCapacitor} from './static/meshes/MeshCapacitor.js';
+
 import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 import {ComponentBattery} from './static/meshes/ComponentBattery.js';
 import {ComponentDiode} from './static/meshes/ComponentDiode.js';
@@ -21,6 +22,8 @@ import {ComponentInductor} from './static/meshes/ComponentInductor.js';
 import {ComponentOscillator} from './static/meshes/ComponentOscillator.js';
 import {ComponentTransistor} from './static/meshes/ComponentTransistor.js';
 import {ComponentACSignalGenerator} from './static/meshes/ComponentACSignalGenerator.js';
+import {GuiControls} from './static/custom/GuiControls.js';
+import {Wire} from './static/meshes/Wire.js';
 
 
 
@@ -88,8 +91,43 @@ function onWindowResize() {
 
 
 
-// const resistor0 = new ComponentResistor({x:0, y:0, z:10});
-// scene.add(resistor0); render();
+const resistor0 = new ComponentResistor({x:0, y:0, z:0});
+scene.add(resistor0); render();
+// console.log(resistor0.children)
+
+
+//print the touchingBoxes Coordinates of resistor0
+
+// for(let i=0; i<this.children.length; i++) {
+//     const child = this.children[i];
+//     if (this.uuid__type[child.uuid] == 'TOUCHING_BOX') {
+//         // console.log(child, 'child');
+//         //check for intersection with face<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//         const boxPointList = this.threeFloatsToAPoint(child.geometry.getAttribute('position').array);//first corner, vertices is a flat list
+//         // const wBFacesThatIntersectWithiV = [];
+
+//     }
+// }
+
+
+
+// resistor0.computeBoundingBox();
+// console.log('resistor0 boundingBox:');
+// console.log(resistor0.boundingBox);
+//use boundingBox to 
+// const resistor1 = new ComponentResistor({x:resistor0.boundingBox.max.x+10, y:0, z:0});
+const resistor1 = new ComponentResistor({x:15, y:0, z:0});
+scene.add(resistor1); render();
+//print the touchingBoxes Coordinates of resistor1
+
+
+// resistor1.computeBoundingBox();
+// console.log('resistor1 boundingBox:');
+// console.log(resistor1.boundingBox);
+
+
+const wireBetween01 = new Wire(resistor0, resistor1);
+scene.add(wireBetween01); render();
 
 // const battery0 = new ComponentBattery({x:0, y:0, z:10});
 // scene.add(battery0); render();
@@ -104,8 +142,8 @@ function onWindowResize() {
 // const inductor0 = new ComponentInductor({x:0, y:0, z:10});
 // scene.add(inductor0); render();
 
-const oscillator0 = new ComponentOscillator({x:0, y:0, z:10});
-scene.add(oscillator0); render();
+// const oscillator0 = new ComponentOscillator({x:0, y:0, z:10});
+// scene.add(oscillator0); render();
 
 // const transistor0 = new ComponentTransistor({x:0, y:0, z:10});
 // scene.add(transistor0); render();
@@ -114,13 +152,13 @@ scene.add(oscillator0); render();
 // scene.add(acSignalGenerator0); render();
 
 
-asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){
-    scene.add(textMesh); render();
-});
+// asyncCreateTextMesh("These are 11.6 kOhm -+2% Vishal Resistor", {x:0, y:4, z:0}, 0x006699, 'mesh', 1, function(textMesh){
+//     scene.add(textMesh); render();
+// });
 
 //after placing all the Object3D into the scene, then we can start trying to animate the scene
 function animate(){
-    let rotatingObject = inductor0;
+    // let rotatingObject = resistor0;
     // rotatingObject.rotation.x += (Math.PI/(360*6));
     // rotatingObject.rotation.y += (Math.PI/(360*6));
     // rotatingObject.rotation.z += (Math.PI/(360*6));
@@ -128,8 +166,8 @@ function animate(){
 }
 
 //controls
-
-const controls = new OrbitControls( camera, renderer.domElement );
+// const controls = new OrbitControls( camera, renderer.domElement );
+const controls = new GuiControls(camera, scene, renderer.domElement);
 controls.target.set( 0, 0, 0 );
 controls.update();
 

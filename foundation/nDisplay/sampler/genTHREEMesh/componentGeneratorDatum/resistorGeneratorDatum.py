@@ -245,19 +245,11 @@ solderableLeads = [
     #left_lead
     [
         ([#left_touchingBox #left -> right
-( -length*(3/4) - (length*(3/4))*(1/2) ,  diameter/2 ,  diameter/2 ), # (left, up, inx)
 ( -length*(3/4) ,  diameter/2 ,  diameter/2 ), # (right, up, inx)
 ( -length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (right, up, out)
-( -length*(3/4) - (length*(3/4))*(1/2) ,  diameter/2 ,  -diameter/2 ), # (left, up, out)
-( -length*(3/4) - (length*(3/4))*(1/2) ,  -diameter/2 ,  diameter/2 ), # (left, down, inx)
 ( -length*(3/4) ,  -diameter/2 ,  diameter/2 ), # (right, down, inx)
 ( -length*(3/4) ,  -diameter/2 ,  -diameter/2 ), # (right, down, out)
-( -length*(3/4) - (length*(3/4))*(1/2) ,  -diameter/2 ,  -diameter/2 ), # (left, down, out)
-        ], 
-        (
-            ( -length*(3/4) - (length*(3/4))*(1/2) ,  0,  0), #startPoint
-            ( -length*(3/4) ,  0,  0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#up_touchingBox #up -> down
@@ -265,64 +257,32 @@ solderableLeads = [
 ( -length/2 ,  diameter/2 + (diameter/2)*(1/2) ,  diameter/2 ), # (right, up, inx)
 ( -length/2 ,  diameter/2 + (diameter/2)*(1/2) ,  -diameter/2 ), # (right, up, out)
 ( -length*(3/4) ,  diameter/2 + (diameter/2)*(1/2) ,  -diameter/2 ), # (left, up, out)
-( -length*(3/4) ,  diameter/2 ,  diameter/2 ), # (left, down, inx)
-( -length/2 ,  diameter/2 ,  diameter/2 ), # (right, down, inx)
-( -length/2 ,  diameter/2 ,  -diameter/2 ), # (right, down, out)
-( -length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (-length*(5/8), diameter/2 + (diameter/2)*(1/2), 0), #startPoint
-            (-length*(5/8), diameter/2, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#down_touchingBox # down -> up
-( -length*(3/4) ,  -diameter/2 ,  diameter/2 ), # (left, up, inx)
-( -length/2 ,  -diameter/2 ,  diameter/2 ), # (right, up, inx)
-( -length/2 ,  -diameter/2 ,  -diameter/2 ), # (right, up, out)
-( -length*(3/4) ,  -diameter/2 ,  -diameter/2 ), # (left, up, out)
 ( -length*(3/4) ,  -diameter/2 - (diameter/2)*(1/2) ,  diameter/2 ), # (left, down, inx)
 ( -length/2 ,  -diameter/2 - (diameter/2)*(1/2) ,  diameter/2 ), # (right, down, inx)
 ( -length/2 ,  -diameter/2 - (diameter/2)*(1/2) ,  -diameter/2 ), # (right, down, out)
 ( -length*(3/4) ,  -diameter/2 - (diameter/2)*(1/2) ,  -diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (-length*(5/8), -diameter/2 - (diameter/2)*(1/2), 0), #startPoint
-            (-length*(5/8), -diameter/2, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
-( -length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (left, up, inx)
-( -length/2 ,  diameter/2 ,  -diameter/2 ), # (right, up, inx)
-( -length/2 ,  diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (right, up, out)
-( -length*(3/4) ,  diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (left, up, out)
-( -length*(3/4) ,  -diameter/2 ,  -diameter/2 ), # (left, down, inx)
-( -length/2 ,  -diameter/2 ,  -diameter/2 ), # (right, down, inx)
-( -length/2 ,  -diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (right, down, out)
-( -length*(3/4) ,  -diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (left, down, out)
-        ], 
-        (
-            (-length*(5/8), 0, -diameter/2), #startPoint
-            (-length*(5/8), 0, -diameter/2 - (diameter/2)*(1/2))  #endPoint
-        )),
+( -length*(3/4) ,  diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (left, up, inx)
+( -length/2 ,  diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (right, up, inx)
+( -length*(3/4) ,  -diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (left, down, inx)
+( -length/2 ,  -diameter/2 ,  -diameter/2 - (diameter/2)*(1/2) ), # (right, down, inx)
+        ]),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox # out -> in
-( -length*(3/4) ,  diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (left, up, inx)
-( -length/2 ,  diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (right, up, inx)
-( -length/2 ,  diameter/2 ,  diameter/2 ), # (right, up, out)
-( -length*(3/4) ,  diameter/2 ,  diameter/2 ), # (left, up, out)
-( -length*(3/4) ,  -diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (left, down, inx)
-( -length/2 ,  -diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (right, down, inx)
-( -length/2 ,  -diameter/2 ,  diameter/2 ), # (right, down, out)
-( -length*(3/4) ,  -diameter/2 ,  diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (-length*(5/8), 0, diameter/2), #startPoint
-            (-length*(5/8), 0, diameter/2 + (diameter/2)*(1/2))  #endPoint
-        )),
+( -length/2 ,  diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (right, up, out)
+( -length*(3/4) ,  diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (left, up, out)
+( -length/2 ,  -diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (right, down, out)
+( -length*(3/4) ,  -diameter/2 ,  diameter/2 + (diameter/2)*(1/2) ), # (left, down, out)
+        ]),
 #<<<<<<<<<<<<
 
     ],
@@ -336,18 +296,10 @@ solderableLeads = [
     [
         ([#right_touchingBox # right -> left
 ( length*(3/4) ,  diameter/2 ,  diameter/2 ), # (left, up, inx)
-( length*(3/4) + (length*(3/4))*(1/2) ,  diameter/2 ,  diameter/2 ), # (right, up, inx)
-( length*(3/4) + (length*(3/4))*(1/2) ,  diameter/2 ,  -diameter/2 ), # (right, up, out)
 ( length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (left, up, out)
 ( length*(3/4) ,  -diameter/2 ,  diameter/2 ), # (left, down, inx)
-( length*(3/4) + (length*(3/4))*(1/2) ,  -diameter/2 ,  diameter/2 ), # (right, down, inx)
-( length*(3/4) + (length*(3/4))*(1/2) ,  -diameter/2 ,  -diameter/2 ), # (right, down, out)
 ( length*(3/4) ,  -diameter/2 ,  -diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (length*(3/4) + (length*(3/4))*(1/2), 0, 0), #startPoint
-            (length*(3/4), 0, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#up_touchingBox # up -> down
@@ -355,64 +307,32 @@ solderableLeads = [
 ( length*(3/4) ,  diameter/2 +(diameter/2)*(1/2) ,  diameter/2 ), # (right, up, inx)
 ( length*(3/4) ,  diameter/2 +(diameter/2)*(1/2) ,  -diameter/2 ), # (right, up, out)
 ( length/2 ,  diameter/2 +(diameter/2)*(1/2) ,  -diameter/2 ), # (left, up, out)
-( length/2 ,  diameter/2 ,  diameter/2 ), # (left, down, inx)
-( length*(3/4) ,  diameter/2 ,  diameter/2 ), # (right, down, inx)
-( length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (right, down, out)
-( length/2 ,  diameter/2 ,  -diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (length*(5/8), diameter/2 +(diameter/2)*(1/2), 0), #startPoint
-            (length*(5/8), diameter/2, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#down_touchingBox # down -> up
-( length/2 ,  -diameter/2 ,  diameter/2 ), # (left, up, inx)
-( length*(3/4) ,  -diameter/2 ,  diameter/2 ), # (right, up, inx)
-( length*(3/4) ,  -diameter/2 ,  -diameter/2 ), # (right, up, out)
-( length/2 ,  -diameter/2 ,  -diameter/2 ), # (left, up, out)
 ( length/2 ,  -diameter/2 -(diameter/2)*(1/2) ,  diameter/2 ), # (left, down, inx)
 ( length*(3/4) ,  -diameter/2 -(diameter/2)*(1/2) ,  diameter/2 ), # (right, down, inx)
 ( length*(3/4) ,  -diameter/2 -(diameter/2)*(1/2) ,  -diameter/2 ), # (right, down, out)
 ( length/2 ,  -diameter/2 -(diameter/2)*(1/2) ,  -diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (length*(5/8), -diameter/2 -(diameter/2)*(1/2), 0), #startPoint
-            (length*(5/8), -diameter/2, 0)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 
         ([#in_touchingBox # in -> out
 ( length/2 ,  diameter/2 ,  diameter/2+(diameter/2)*(1/2) ), # (left, up, inx)
 ( length*(3/4) ,  diameter/2 ,  diameter/2+(diameter/2)*(1/2) ), # (right, up, inx)
-( length*(3/4) ,  diameter/2 ,  diameter/2 ), # (right, up, out)
-( length/2 ,  diameter/2 ,  diameter/2 ), # (left, up, out)
 ( length/2 ,  -diameter/2 ,  diameter/2+(diameter/2)*(1/2) ), # (left, down, inx)
 ( length*(3/4) ,  -diameter/2 ,  diameter/2+(diameter/2)*(1/2) ), # (right, down, inx)
-( length*(3/4) ,  -diameter/2 ,  diameter/2 ), # (right, down, out)
-( length/2 ,  -diameter/2 ,  diameter/2 ), # (left, down, out)
-        ], 
-        (
-            (length*(5/8), 0, diameter/2+(diameter/2)*(1/2)), #startPoint
-            (length*(5/8), 0, diameter/2)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
         ([#out_touchingBox out -> in
-( length/2 ,  diameter/2 ,  -diameter/2 ), # (left, up, inx)
-( length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (right, up, inx)
 ( length*(3/4) ,  diameter/2 ,  -diameter/2-(diameter/2)*(1/2) ), # (right, up, out)
 ( length/2 ,  diameter/2 ,  -diameter/2-(diameter/2)*(1/2) ), # (left, up, out)
-( length/2 ,  -diameter/2 ,  -diameter/2 ), # (left, down, inx)
-( length*(3/4) ,  -diameter/2 ,  -diameter/2 ), # (right, down, inx)
 ( length*(3/4) ,  -diameter/2 ,  -diameter/2-(diameter/2)*(1/2) ), # (right, down, out)
 ( length/2 ,  -diameter/2 ,  -diameter/2-(diameter/2)*(1/2) ), # (left, down, out)
-        ], 
-        (
-            (length*(5/8), 0, -diameter/2-(diameter/2)*(1/2)), #startPoint
-            (length*(5/8), 0, -diameter/2)  #endPoint
-        )),
+        ]),
 #<<<<<<<<<<<<
 
 

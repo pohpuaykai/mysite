@@ -1,6 +1,5 @@
-Test and Fix Wire.js
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
--Build this pipeline:
+-To build this pipeline:
 --Manual Draw components in 3D
 --Extract Graph (Network) information=Gi
 --Generate 2D Symbolic Circuit Diagram with SVG (OPTIONAL for now)
