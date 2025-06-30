@@ -1,3 +1,4 @@
+Extract Graph|Network information
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -To build this pipeline:
 --Manual Draw components in 3D
@@ -20,6 +21,10 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 
 
 TODO:
+Wire is also a component -> use TubeGeometry&Curve <<<<<<<<<<<<<<<<<not displaying properly not sure why yet....
+
+
+
 ###############################################################
 2. Component~.js ~=SignalGenerator[ACMicroGenerator]
 """TODO
