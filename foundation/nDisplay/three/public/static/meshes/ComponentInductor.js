@@ -9,6 +9,8 @@ class ComponentInductor extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "inductor";
+
         const listOfVertices = [
         new Float32Array([
         -1.4177332533505709e-06, 13.999999999999966, 3.798804803180335e-07, 

@@ -9,6 +9,8 @@ class ComponentResistor extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "resistor";
+
         const listOfVertices = [
         new Float32Array([
         3.244999999999974, 0.19999039917785263, -4.8983520442671735e-17, 

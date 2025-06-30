@@ -9,6 +9,8 @@ class ComponentOscillator extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "oscillator";
+
         const listOfVertices = [
         new Float32Array([
         -4.034950812239804, 3.900000000000002, 0.3823380436347263, 

@@ -9,6 +9,8 @@ class ComponentTransistor extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "transistor";
+
         const listOfVertices = [
         new Float32Array([
         -2.2299999999999924, 4.5, -0.12489795918368884, 

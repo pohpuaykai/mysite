@@ -9,6 +9,8 @@ class Component{{className}} extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "{{type}}";
+
         const listOfVertices = [
         {% for coordinates in listOfCoordinates %}new Float32Array([
         {% for coordinate in coordinates %}{% set remainder = loop.index % 3 %}{{coordinate}}, {% if remainder == 0 %}

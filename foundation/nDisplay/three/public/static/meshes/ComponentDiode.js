@@ -9,6 +9,8 @@ class ComponentDiode extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "diode";
+
         const listOfVertices = [
         new Float32Array([
         2.500000000000002, 1.35, -3.3065463576978537e-16, 

@@ -334,6 +334,7 @@ solderableLeads += [
 
 if __name__=='__main__':
     name = 'Oscillator'
+    type = 'oscillator'
     print(f'generating Component{name} from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile(name, listOfVertices, listOfIndices, listOfColors, solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, listOfVertices, listOfIndices, listOfColors, solderableLeads)

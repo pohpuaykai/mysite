@@ -91,6 +91,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
      * **/
     constructor(component0, component1, radius, solderableLeadIdx0=null, solderableLeadIdx1=null) {
         super();
+        this.type = 'wire';
         /**
          * HELPERS start
          * **/

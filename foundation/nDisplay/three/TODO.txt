@@ -1,4 +1,10 @@
-Extract Graph|Network information
+--Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with graph_algos and Gi
+---KVL: check with automat, MST;ASST;smallcyclefinder
+---KCL: Where wire connects with wire? ONLY?
+---hFE: find all diodes
+---Ohm_Law: after KVL and KCL, plug the types and electrical_specification
+
+
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -To build this pipeline:
 --Manual Draw components in 3D

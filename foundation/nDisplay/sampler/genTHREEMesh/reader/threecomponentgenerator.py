@@ -16,7 +16,7 @@ class THREEComponentGenerator:
         if not os.path.isdir(self.outputFolder):
             os.makedirs(self.outputFolder)
 
-    def generateMeshFile(self, meshName, listOfCoordinates, listOfIndices, listOfColors, solderableLeads):
+    def generateMeshFile(self, meshName, type, listOfCoordinates, listOfIndices, listOfColors, solderableLeads):
         templateName = "Component~.js.jinja2"
         environment = Environment(loader=FileSystemLoader(self.templateFolder))
         meshJSTemplate = environment.get_template(templateName)
@@ -36,6 +36,7 @@ class THREEComponentGenerator:
             listOfColors___new.append(Flattener.flatten(colors))#these are RGB_colors for each vertices|indices
         listOfColors = listOfColors___new
         meshJSContent = meshJSTemplate.render({
+            'type':type,
             'listOfCoordinates':listOfCoordinates,
             'listOfIndices':listOfIndices,
             'listOfColors':listOfColors,

@@ -150,6 +150,8 @@ solderableLeads = [
 
 
 if __name__=='__main__':
+    name = 'Diode'
+    type = 'diode'
     print('generating Component Mesh from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile('Diode', [vertices], [indices], [colors], solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads)

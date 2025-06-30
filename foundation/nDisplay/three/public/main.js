@@ -66,8 +66,9 @@ function onWindowResize() {
     render();
 }
 
-
-const rD = (new DCTwoResistorParallel(scene, camera, renderer, {})).act();
+// const circuit = new DCTwoResistorSeries(scene, camera, renderer, {});
+const circuit = new DCTwoResistorParallel(scene, camera, renderer, {});
+const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 
 const resistor0 = rD['meshes']['resistor0']; const battery0 = rD['meshes']['battery0']; const resistor1 = rD['meshes']['resistor1'];
@@ -75,6 +76,8 @@ const wireBetween01 = rD['meshes']['wireBetween01'];
 // const wireBetween10 = rD['meshes']['wireBetween10'];
 // const wireBetween11 = rD['meshes']['wireBetween11'];
 const animate = rD['animate'];
+console.log('circuit network:', circuit.getNetworkGraph());
+console.log('circuit uuid__type: ', circuit.uuid__type);
 
 //controls
 // const controls = new OrbitControls( camera, renderer.domElement );

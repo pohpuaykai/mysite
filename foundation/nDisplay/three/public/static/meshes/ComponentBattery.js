@@ -9,6 +9,8 @@ class ComponentBattery extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "battery";
+
         const listOfVertices = [
         new Float32Array([
         25.75, 3.5, -8.572527594031472e-16, 

@@ -9,6 +9,8 @@ class ComponentCapacitor extends THREE.Object3D {
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
 
+        this.type = "capacitor";
+
         const listOfVertices = [
         new Float32Array([
         -2.5719475642363263, 11.999999999999973, 0.6891512728123163, 
