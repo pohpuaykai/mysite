@@ -1,4 +1,4 @@
---Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with graph_algos and Gi
+--Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with automat.common spanningtree.py, allpairshortestpath smallcyclefinder
 ---KVL: check with automat, MST;ASST;smallcyclefinder
 ---KCL: Where wire connects with wire? ONLY?
 ---hFE: find all diodes
