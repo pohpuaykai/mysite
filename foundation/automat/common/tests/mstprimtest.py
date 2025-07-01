@@ -3,7 +3,7 @@ import pprint
 
 from foundation.automat.common.mstprim import MstPrim
 
-def mst__test1(verbose=True):
+def mst__test1(verbose=True):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move to spanningtreetest.py
     g = {
     0:[1,3],
     1:[0,2,4],

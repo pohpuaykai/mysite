@@ -55,25 +55,35 @@ class Piece {
     }
 
     getNetworkGraph() {
-        let networkGraph = {};
+        //simplify uuid 
+        this.uuid__id = {}; this.id__uuid = {}; this.id__type = {};
+        const uuid__typeEntries = Object.entries(this.uuid__type);let uuid; let type;
+        // console.log(uuid__typeEntries);
+        for (let i=0; i<uuid__typeEntries.length; i++) {
+            [uuid, type] = uuid__typeEntries[i];
+            // console.log(uuid, type)
+            this.uuid__id[uuid] = i; this.id__uuid[i] = uuid; this.id__type[i] = this.uuid__type[uuid];
+        }
+        // console.log(this.uuid__id); console.log(this.id__uuid);
+        let networkGraph = {}; let idNetworkGraph = {}; let id__type = {};
         let component0_uuid; let component1_uuid; let component0_solderableIdx;//component1 is the wire
         for (let i=0; i<this.wiring.length; i++) {
             [component0_uuid, component1_uuid, component0_solderableIdx] = this.wiring[i];
             //
-            let existingNeighbours = networkGraph[component0_uuid];
+            let existingNeighbours = networkGraph[this.uuid__id[component0_uuid].toString()];
             if (existingNeighbours===undefined) {
                 existingNeighbours = [];
             }
-            existingNeighbours.push(component1_uuid);
-            networkGraph[component0_uuid] = existingNeighbours;
+            existingNeighbours.push(this.uuid__id[component1_uuid].toString());
+            networkGraph[this.uuid__id[component0_uuid]] = existingNeighbours;
             //
             //
-            existingNeighbours = networkGraph[component1_uuid];
+            existingNeighbours = networkGraph[this.uuid__id[component1_uuid].toString()];
             if (existingNeighbours===undefined) {
                 existingNeighbours = [];
             }
-            existingNeighbours.push(component0_uuid);
-            networkGraph[component1_uuid] = existingNeighbours;
+            existingNeighbours.push(this.uuid__id[component0_uuid].toString());
+            networkGraph[this.uuid__id[component1_uuid].toString()] = existingNeighbours;
             //
         }
         return networkGraph;

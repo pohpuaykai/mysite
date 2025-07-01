@@ -77,16 +77,23 @@ const wireBetween01 = rD['meshes']['wireBetween01'];
 // const wireBetween11 = rD['meshes']['wireBetween11'];
 const animate = rD['animate'];
 console.log('circuit network:', circuit.getNetworkGraph());
-console.log('circuit uuid__type: ', circuit.uuid__type);
-console.log('sending data to: ', findEquationsAndSolve_url);
+console.log('circuit network stringify:', JSON.stringify(circuit.getNetworkGraph()));
+console.log('circuit id__type: ', circuit.id__type);
+// console.log('sending data to: ', findEquationsAndSolve_url);
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 const request = new Request(findEquationsAndSolve_url, {
     method:"POST", 
     headers: {'X-CSRFToken':csrftoken},
     mode:'same-origin',
-    body:JSON.stringify({'networkGraph':circuit.getNetworkGraph(), 'uuid__type':circuit.uuid__type})}
-);
-fetch(request).then(response => {console.log('response: ', response);}).catch(error => {console.log('error: ', error)});
+    body:JSON.stringify({'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
+        'id__type':circuit.id__type})
+});
+fetch(request).then(response => {
+    console.log('response: ', response);
+    console.log(response.body);
+}).catch(error => {
+    console.log('error: ', error);
+});
 
 
 //controls

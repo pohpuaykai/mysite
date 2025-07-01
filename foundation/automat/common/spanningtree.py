@@ -1,50 +1,77 @@
-class SpanningTree:
-    @classmethod
-    def minimumSpanningTree(cls, g, w):
-        """
-        g must be a connected graph
-        
-        spanning tree
-        1. contain all nodes from g
-        2. edges from g, so that g remains connected
-        
-        minimum spanning tree.
-        1.a spanning tree
-        2. the sum of all the edges in output is the lowest amongst all the possible spanning trees that can be derived from g
-        
-        Courtesy of Charissa Tan Weiyi and her pilates friends
+from foundation.automat.common.unionfindbyrankwithpathcompression import UnionFindByRankWithPathCompression
 
-        TODO cover it with testcases
+class SpanningTree:
+
+
+
+    @classmethod
+    def minimumSpanningTreeKruskal(cls, vertexIterable, edgeIterableSortable, edgeWeight):
+        """ TODO test
+        Courtesy of Chapter 21 of "Introduction to Algorithms (4Ed)" by Thomas Cormens
+
+        vertexIterable is a iterable of integers
+        edgeIterableSortable is a iterable of 2-tuples of integers in vertexIterable, must also be sortable
+        edgeWeight is a function, from an element in edgeIterableSortable to a number
         """
-        visited__edges = set()
-        node__minEdgeWeight = {}#todo init to inf?
-        node__edge = {}
-        stack = [0]
+        A = set()
+        uf = UnionFindByRankWithPathCompression(len(vertexIterable))
+        edgeIterableSortable__sorted = sorted(edgeIterableSortable, key=lambda edge: edgeWeight[edge])
+        for edge in edgeIterableSortable__sorted:#Add commentMore actions
+            if uf.find(edge[0]) != uf.find(edge[1]):
+                A.add(edge)
+                uf.union(edge[0], edge[1])
+
+        #not part of original algorithm, reconstruct the tree
+        stg = {} # node to list_of_neighbours
+        for node0, node1 in list(A):
+            oldChildren = stg.get(node0, [])
+            oldChildren.append(node1)
+            stg[node0] = oldChildren
+            #
+            oldChildren = stg.get(node1, [])
+            oldChildren.append(node0)
+            stg[node1] = oldChildren
+            #
+        #find subtracted edges
+        return stg, list(set(edgeIterableSortable) - A)
+
+
+    @classmethod
+    def undirectedSpanningTreeDBFSSearchUndirectedGraph(cls, g, breadthFirst=False):
+        """
+        g is undirected_connected_graph
+
+        if breadthFirst is false, then its depthFirst
+        """
+        if breadthFirst:
+            popOrder = 0 # first out -> queue
+        else: 
+            popOrder = -1 # last out -> stack
+
+        edgesSelected = set()
+        undirectedSpanningTree = {} # undirected
+        startNode = list(g.keys())[0];#any random one... is there a better way?
+        stack = [startNode]; visited = set([startNode])
         while len(stack) > 0:
-            p = stack.pop()
-            children = g[p]
-            stack += children
-            for c in children:
-                edge = set([p,c])#the direction does not matter
-                if edge not in visited__edges:
-                    visited__edges.add(edge)
-                    weight = w[edge]
-                    if p not in node_minEdgeWeight or node_minEdgeWeight[p] > weight:
-                        #update node p
-                        node__minEdgeWeight[p] = weight
-                        node__edge[p] = edge
-                    if c not in node_minEdgeWeight or node_minEdgeWeight[c] > weight:
-                        #update node c
-                        node__minEdgeWeight[c] = weight
-                        node__minEdgeWeight[c] = edge
-        #reconstruct spanningTree
-        stg = {}
-        for node, edge in node__edge.items():
-            edge = tuple(edge)
-            oldChildren = g.get(node, [])
-            if node == edge[0]:# then edge[1] is neighbour
-                oldChildren.append(edge[1])
-            else: # then edge[0] is neighbour
-                oldChildren.append(edge[0])
-            stg[node] = oldChildren
-        return stg
+            current = stack.pop(popOrder); 
+            for neighbour in g[current]:
+                if neighbour not in visited:
+                    visited.add(neighbour);
+                    stack.append(neighbour) # last in
+                    #add to undirected_spanning_tree
+                    existingNeighbours = undirectedSpanningTree.get(current, [])
+                    existingNeighbours.append(neighbour)
+                    undirectedSpanningTree[current] = existingNeighbours
+                    edgesSelected.add((current, neighbour))
+                    #if undirected then we only add one side
+                    existingNeighbours = undirectedSpanningTree.get(neighbour, [])
+                    existingNeighbours.append(current)
+                    undirectedSpanningTree[neighbour] = existingNeighbours
+                    edgesSelected.add((neighbour, current))
+        #
+        subtracted_edges = []
+        for parentNode, neighbours in g.items(): #since g is undirected_connected_graph, every edge is on g
+            for neighbour in neighbours:
+                if (parentNode, neighbour) not in edgesSelected:
+                    subtracted_edges.append((parentNode, neighbour))
+        return undirectedSpanningTree, subtracted_edges
