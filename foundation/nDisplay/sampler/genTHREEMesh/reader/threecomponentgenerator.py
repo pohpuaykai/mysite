@@ -16,7 +16,7 @@ class THREEComponentGenerator:
         if not os.path.isdir(self.outputFolder):
             os.makedirs(self.outputFolder)
 
-    def generateMeshFile(self, meshName, type, listOfCoordinates, listOfIndices, listOfColors, solderableLeads):
+    def generateMeshFile(self, meshName, type, listOfCoordinates, listOfIndices, listOfColors, solderableLeads, positiveLeadsDirections):
         templateName = "Component~.js.jinja2"
         environment = Environment(loader=FileSystemLoader(self.templateFolder))
         meshJSTemplate = environment.get_template(templateName)
@@ -42,6 +42,7 @@ class THREEComponentGenerator:
             'listOfColors':listOfColors,
             'className':meshName,
             'solderableLeads':solderableLeads,
+            'positiveLeadsDirections':positiveLeadsDirections
         })
         fileName = templateName.replace('~', meshName).replace('.jinja2', '')
         self.writeToFile(fileName, meshJSContent, verbose=self.verbose)

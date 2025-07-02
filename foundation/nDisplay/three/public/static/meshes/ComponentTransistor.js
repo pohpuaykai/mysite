@@ -11,6 +11,8 @@ class ComponentTransistor extends THREE.Object3D {
 
         this.type = "transistor";
 
+        this.positiveLeadsDirections = [[1, 0], [2, 0], [2, 1]];
+
         const listOfVertices = [
         new Float32Array([
         -2.2299999999999924, 4.5, -0.12489795918368884, 

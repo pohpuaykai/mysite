@@ -464,9 +464,19 @@ class Wire extends THREE.Object3D {//THREE.Line {
         this.wirePath = wirePath;
         console.log('wirePath');console.log(wirePath);
 
+        const positiveLeadsDirections = [];
+        for(let i=0; i<this.wirePath.length; i++) {
+            for(let j=i+1; j<this.wirePath.length; j++) {
+                positiveLeadsDirections.push([i, j]);
+                positiveLeadsDirections.push([j, i]);
+            }
+        }
+        this.positiveLeadsDirections = positiveLeadsDirections;
+
+
         //add touchingFaces to this wire.
         const solderableLeads = []; const offset = radius+0.001; console.log(offset);
-        for (let i=0; i<wirePath.length-1; i++) {
+        for (let i=0; i<wirePath.length-1; i++) {//number_of_solderableLeads == wirePath.length
             const startCoordinate = wirePath[i]; const endCoordinate = wirePath[i+1];
             console.log('s', startCoordinate); console.log('e', endCoordinate);
             //find boundingBoxOfThisLine with radius

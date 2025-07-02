@@ -26,7 +26,7 @@ vertices, indices, colors = RotateSampler.rotatePieceWiseSample([
         'dEnd':360,
         'dStep':30,
         'xRange__color':{
-            ((-length/2),(-length/2)+(0.2*body_length)):(192, 192, 192),#silver band is the component bias direction
+            ((-length/2),(-length/2)+(0.2*body_length)):(192, 192, 192),#silver band is the component bias direction on the leftSide, leftSide is -ve
         },
         'defaultColor':(0, 0, 0)
     },
@@ -50,7 +50,7 @@ diameter = body_diameter
 
 ##########################################################################################
 solderableLeads = [
-    #left_lead
+    #left_lead -ve
     [
         ([#left_touchingBox #left -> right
 ( -length*(3/4) ,  diameter/2 ,  diameter/2 ), # (right, up, inx)
@@ -100,7 +100,7 @@ solderableLeads = [
 
 
 
-    #right_lead
+    #right_lead +ve
     [
         ([#right_touchingBox # right -> left
 ( length*(3/4) ,  diameter/2 ,  diameter/2 ), # (left, up, inx)
@@ -148,10 +148,12 @@ solderableLeads = [
 ]
 
 
+positiveLeadsDirections = [(0, 1)] # if leftSolderableLead to rightSolderableLead, the positive, numbers are indices of solderableLeads
+
 
 if __name__=='__main__':
     name = 'Diode'
     type = 'diode'
     print('generating Component Mesh from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads, positiveLeadsDirections)

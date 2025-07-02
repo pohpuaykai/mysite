@@ -130,7 +130,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'zFormulaLambda':lambda v, y: eval('zFormulaLambda(v, y)', locals={'v':v, 'y':y, 'zFormulaLambda':zFormulaLambda, 'math':theMathModule}),
         'colorFunction':bodyColorFunction
     },
-    {# round body of the transistor
+    {# round body of the transistor #positiveZ IN
         'uStart':round_body_yStart,
         'uEnd':round_body_yStart+round_body_height,
         'uStep':0.1,
@@ -142,7 +142,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'zFormulaLambda':lambda v, y: eval('(round_body_length/2)*math.sin(math.pi*v)', locals={'v':v, 'y':y, 'round_body_length':round_body_length, 'math':theMathModule}),
         'colorFunction':bodyBaseColorFunction
     },
-    {#left lead
+    {#left lead #Emitter
         'uStart':left_lead_yStart,#'uStart':-left_lead_length,
         'uEnd':left_lead_yStart+left_lead_length,#'uEnd':0,
         'uStep':0.1,
@@ -154,7 +154,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'zFormulaLambda':lambda v, y: eval('0.5*left_lead_diameter*math.sin(math.pi*v)', locals={'v':v, 'y':y, 'left_lead_diameter':left_lead_diameter, 'left_lead_xzCentre':left_lead_xzCentre, 'math':theMathModule}),
         'colorFunction':leftLeadColorFunction
     },
-    {#middle lead
+    {#middle lead #Base
         'uStart':middle_lead_yStart,#'uStart':-left_lead_length,
         'uEnd':middle_lead_yStart+middle_lead_length,#'uEnd':0,
         'uStep':0.1,
@@ -166,7 +166,7 @@ listOfVertices, listOfIndices, listOfColors = BottomUpSampler.bottomUpPieceWiseS
         'zFormulaLambda':lambda v, y: eval('0.5*middle_lead_diameter*math.sin(math.pi*v)', locals={'v':v, 'y':y, 'middle_lead_diameter':middle_lead_diameter, 'middle_lead_xzCentre':middle_lead_xzCentre, 'math':theMathModule}),
         'colorFunction':middleLeadColorFunction
     },
-    {#right lead
+    {#right lead #Collector
         'uStart':right_lead_yStart,#'uStart':-17,
         'uEnd':right_lead_yStart+right_lead_length,#'uEnd':0,
         'uStep':0.1,
@@ -439,10 +439,14 @@ solderableLeads += [
 
 
 
+#0=Emitter;1=Base;2=Collector
+#NPN: B->E+, C->E+; C->B+ #PNP:E->B+;E->C+;B->C+
+positiveLeadsDirections = [(1, 0), (2, 0), (2, 1)]
+
 
 if __name__=='__main__':
     name = 'Transistor'
     type = 'transistor'
     print(f'generating Component{name} from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile(name, type, listOfVertices, listOfIndices, listOfColors, solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, listOfVertices, listOfIndices, listOfColors, solderableLeads, positiveLeadsDirections)

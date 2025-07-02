@@ -9,7 +9,7 @@ class Schemeparser(Parser):
     """
     FUNC_NAMES = Function.FUNC_NAMES()
 
-    def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None):
+    def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None, equalTuple=None):
         self.parserName = 'scheme'
         #this attribute is unique to schemeparsers for now
         self.nodeId__len = {} # TODO have a go on the equationStr, to remove all the excess spaces..., this will give problems to startPos__nodeId and nodeId__len
@@ -20,7 +20,7 @@ class Schemeparser(Parser):
             self.equalTuple = None
             # self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId = self._parse()
         else:
-            self.equalTuple = None
+            self.equalTuple = equalTuple
             self.ast = ast
             self.verbose = verbose
             self.veryVerbose = veryVerbose

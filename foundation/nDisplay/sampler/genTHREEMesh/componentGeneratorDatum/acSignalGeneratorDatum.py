@@ -291,6 +291,7 @@ solderableLeads += [
 ]
 
 
+positiveLeadsDirections = [(0, 1)] # if leftSolderableLead to rightSolderableLead, the positive, numbers are indices of solderableLeads
 
 
 if __name__=='__main__':
@@ -298,4 +299,4 @@ if __name__=='__main__':
     type = 'AC_signal_generator'
     print(f'generating Component{name} from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile(name, type, listOfVertices, listOfIndices, listOfColors, solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, listOfVertices, listOfIndices, listOfColors, solderableLeads, positiveLeadsDirections)

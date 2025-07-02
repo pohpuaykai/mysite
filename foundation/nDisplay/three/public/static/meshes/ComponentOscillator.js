@@ -11,6 +11,8 @@ class ComponentOscillator extends THREE.Object3D {
 
         this.type = "oscillator";
 
+        this.positiveLeadsDirections = [[0, 1], [1, 0]];
+
         const listOfVertices = [
         new Float32Array([
         -4.034950812239804, 3.900000000000002, 0.3823380436347263, 

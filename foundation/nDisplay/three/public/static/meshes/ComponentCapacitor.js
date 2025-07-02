@@ -11,6 +11,8 @@ class ComponentCapacitor extends THREE.Object3D {
 
         this.type = "capacitor";
 
+        this.positiveLeadsDirections = [[0, 1]];
+
         const listOfVertices = [
         new Float32Array([
         -2.5719475642363263, 11.999999999999973, 0.6891512728123163, 

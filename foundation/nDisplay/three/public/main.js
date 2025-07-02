@@ -85,8 +85,11 @@ const request = new Request(findEquationsAndSolve_url, {
     method:"POST", 
     headers: {'X-CSRFToken':csrftoken},
     mode:'same-origin',
-    body:JSON.stringify({'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
-        'id__type':circuit.id__type})
+    body:JSON.stringify({
+    'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
+        'id__type':circuit.id__type,
+        'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections
+    })
 });
 fetch(request).then(response => {
     console.log('response: ', response);

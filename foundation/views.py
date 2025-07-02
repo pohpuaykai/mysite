@@ -14,11 +14,6 @@ def index(request):
 
 def automat_findEquationsAndSolve(request):
 
-    from foundation.automat.common.spanningtree import SpanningTree # temporary-> for testing
-    from foundation.automat.common.flattener import Flattener
-
-    from foundation.automat.common.allpairshortestpath import AllPairShortestPath #temporary -> for testing
-    from foundation.automat.common.smallcyclefinder import SmallCycleFinder
     """
     #KVL (this is also voltage_divider) #MST, APSP on MST, find subtracted edges, putback subtracted edges with shortestpath to form faces
     # KCL (this is also current_divider) # each wire component's neighbour_components' current should sum up to zero, need the direction of the source also...? What is there are many sources?
@@ -47,25 +42,18 @@ def automat_findEquationsAndSolve(request):
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(circuit_details)
     #because json keys has to be str.
-    exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); id__type = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__type'].items()))
+    exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
+    id__type = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__type'].items()))
+    id__positiveLeadsDirections = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__positiveLeadsDirections'].items()))
     # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
     pp.pprint(networkGraph)
     pp.pprint(id__type)
+    pp.pprint(id__positiveLeadsDirections)
 
-    #weighted by number of neighbours
-    # nodew = {}
-    # for idx, type in id__type.items():
-    #     nodew[idx] = 0 if idx not in networkGraph else len(networkGraph[idx])
-    # w = {} # each edge is the sum of its parents
-    # for pNodeIdx, children in networkGraph.items():
-    #     for childIdx in children:
-    #         w[(pNodeIdx, childIdx)] = nodew[pNodeIdx]+nodew[childIdx]
-    #         w[(childIdx, pNodeIdx)] = nodew[pNodeIdx]+nodew[childIdx]
-    # print('w', w)
-    # nodeList = list((set(Flattener.flatten(list(w.keys()))))); edgeList = list(w.keys())
-    # stg, subtractedEdges = SpanningTree.minimumSpanningTreeKruskal(nodeList, edgeList, w) # actuall no need for this? just DFS tree will do?
-    # print('stg', stg); print(nodeList[0])
-    # shortestPaths = AllPairShortestPath.apsp(stg, nodeList[0])
-    # print(shortestPaths)
+    #TODO supposed to scan the whole equationFinder folder like equation.Equation.getFunctionClass<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    from foundation.ecircuit.equationFinders.kvlequationfinder import KVLEquationFinder#temporary -> for testing
+    equationFinder = KVLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
+    equationFinder.findEquations()
+    # equationFinder.list_equations
 
     return HttpResponse('', content_type="text/plain")

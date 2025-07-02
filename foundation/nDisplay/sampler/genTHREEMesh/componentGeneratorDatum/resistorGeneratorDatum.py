@@ -340,9 +340,11 @@ solderableLeads = [
 ]
 
 
+positiveLeadsDirections = [(0, 1), (1, 0)] # if leftSolderableLead to rightSolderableLead, the positive, numbers are indices of solderableLeads
+
 if __name__=='__main__':
     name = 'Resistor'
     type = 'resistor'
     print('generating Component Mesh from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads, positiveLeadsDirections)

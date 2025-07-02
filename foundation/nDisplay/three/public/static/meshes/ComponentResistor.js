@@ -11,6 +11,8 @@ class ComponentResistor extends THREE.Object3D {
 
         this.type = "resistor";
 
+        this.positiveLeadsDirections = [[0, 1], [1, 0]];
+
         const listOfVertices = [
         new Float32Array([
         3.244999999999974, 0.19999039917785263, -4.8983520442671735e-17, 

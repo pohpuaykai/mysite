@@ -2454,6 +2454,28 @@ EntityTypes to handle:
         raise Exception(f"unHandled entityType: {entityType}")
 
 
+    def latexToScheme(self):
+        pass#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO<<<<<<<<scheme has to take a startNode
+
+
+    @classmethod
+    def readListOfPlusAndMinusEqualsZero(cls, listOfPlusAndMinus):
+        """
+        used by ecircuit.equationFinders.equationfinder
+        kvl
+        kcl
+        """
+        latexStr = ''
+        for i, dict_var in enumerate(listOfPlusAndMinus):
+            if dict_var['positive']:
+                if i != 0:
+                    latexStr += f'+{dict_var["varStr"]}'
+                else:
+                    latexStr += dict_var["varStr"]
+            else:
+                latexStr += f'-{dict_var["varStr"]}'
+        return latexStr+'=0'
+
 
 class EntityStorage:
     """

@@ -14,6 +14,7 @@ class Piece {
         this.meshes = meshes;
         this.wiring = [];
         this.uuid__type = {};
+        this.uuid__positiveLeadsDirections = {};
     }
 
     /**
@@ -51,18 +52,22 @@ class Piece {
         this.uuid__type[component0.uuid] = component0.type;
         this.uuid__type[component1.uuid] = component1.type;
         this.uuid__type[wireBetween.uuid] = wireBetween.type;
+        this.uuid__positiveLeadsDirections[component0.uuid] = component0.positiveLeadsDirections;
+        this.uuid__positiveLeadsDirections[component1.uuid] = component1.positiveLeadsDirections;
+        this.uuid__positiveLeadsDirections[wireBetween.uuid] = wireBetween.positiveLeadsDirections;
         return wireBetween
     }
 
     getNetworkGraph() {
         //simplify uuid 
-        this.uuid__id = {}; this.id__uuid = {}; this.id__type = {};
+        this.uuid__id = {}; this.id__uuid = {}; this.id__type = {}; this.id__positiveLeadsDirections = {};
         const uuid__typeEntries = Object.entries(this.uuid__type);let uuid; let type;
         // console.log(uuid__typeEntries);
         for (let i=0; i<uuid__typeEntries.length; i++) {
             [uuid, type] = uuid__typeEntries[i];
             // console.log(uuid, type)
             this.uuid__id[uuid] = i; this.id__uuid[i] = uuid; this.id__type[i] = this.uuid__type[uuid];
+            this.id__positiveLeadsDirections[i] = this.uuid__positiveLeadsDirections[uuid];
         }
         // console.log(this.uuid__id); console.log(this.id__uuid);
         let networkGraph = {}; let idNetworkGraph = {}; let id__type = {};

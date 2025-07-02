@@ -11,6 +11,8 @@ class Component{{className}} extends THREE.Object3D {
 
         this.type = "{{type}}";
 
+        this.positiveLeadsDirections = {{positiveLeadsDirections|tojson}};
+
         const listOfVertices = [
         {% for coordinates in listOfCoordinates %}new Float32Array([
         {% for coordinate in coordinates %}{% set remainder = loop.index % 3 %}{{coordinate}}, {% if remainder == 0 %}

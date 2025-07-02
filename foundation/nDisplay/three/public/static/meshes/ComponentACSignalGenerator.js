@@ -11,6 +11,8 @@ class ComponentACSignalGenerator extends THREE.Object3D {
 
         this.type = "AC_signal_generator";
 
+        this.positiveLeadsDirections = [[0, 1]];
+
         const listOfVertices = [
         new Float32Array([
         -0.0, 50, 0.0, 

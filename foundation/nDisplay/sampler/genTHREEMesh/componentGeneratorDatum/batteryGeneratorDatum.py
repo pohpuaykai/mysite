@@ -19,13 +19,13 @@ button_diameter = 5.5
 bottom_length = 0.1
 bottom_diameter = 7.0
 
-length = bottom_length+body_length+bottom_length # total_length
+length = button_length+body_length+bottom_length # total_length
 
 
 import math; theMathModule = locals()['math'];
 
 vertices, indices, colors = RotateSampler.rotatePieceWiseSample([
-    {#button
+    {#button +ve
         'formulaLambda':lambda x: eval('h', locals={'h':button_diameter/2}),
         'xStart':(-length/2),
         'xEnd':(-length/2)+(button_length),
@@ -82,7 +82,7 @@ diameter = body_diameter
 
 ##########################################################################################
 solderableLeads = [
-    #left_lead
+    #left_lead #button +ve
     [
         ([#left_touchingBox #left -> right
 ( -length*(3/4) ,  diameter/2 ,  diameter/2 ), # (right, up, inx)
@@ -132,7 +132,7 @@ solderableLeads = [
 
 
 
-    #right_lead
+    #right_lead -ve
     [
         ([#right_touchingBox # right -> left
 ( length*(3/4) ,  diameter/2 ,  diameter/2 ), # (left, up, inx)
@@ -179,6 +179,7 @@ solderableLeads = [
     ],
 ]
 
+positiveLeadsDirections = [(1, 0)] # if leftSolderableLead to rightSolderableLead, the positive, numbers are indices of solderableLeads
 
 
 if __name__=='__main__':
@@ -186,4 +187,4 @@ if __name__=='__main__':
     type = 'battery'
     print('generating Component Mesh from UserPreset datum')
     from foundation.nDisplay.sampler.genTHREEMesh.reader.threecomponentgenerator import THREEComponentGenerator
-    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads)
+    THREEComponentGenerator().generateMeshFile(name, type, [vertices], [indices], [colors], solderableLeads, positiveLeadsDirections)

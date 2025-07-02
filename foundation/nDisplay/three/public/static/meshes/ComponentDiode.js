@@ -11,6 +11,8 @@ class ComponentDiode extends THREE.Object3D {
 
         this.type = "diode";
 
+        this.positiveLeadsDirections = [[0, 1]];
+
         const listOfVertices = [
         new Float32Array([
         2.500000000000002, 1.35, -3.3065463576978537e-16, 
