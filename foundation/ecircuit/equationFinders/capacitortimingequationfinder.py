@@ -7,4 +7,17 @@ class CapacitortimingEquationFinder(EquationFinder):
         self.id__positiveLeadsDirections = id__positiveLeadsDirections
 
     def findEquations(self):
-        pass
+        """every capacitor will have this first_order_seperable_differential_equation, where 
+        equivalent = current through capacitor
+        derivativeMultiplier = capacitance of capacitor
+        differentiand = voltage of capacitor
+        differentiator = time
+        """
+
+        for componentId, componentType in self.id__type.items():
+            if componentType in ['capacitor']:
+                currentVariable = self.getVariable('current', componentType, componentId)
+                capacitanceVariable = self.getVariable('capacitance', componentType, componentId)
+                voltageVariable = self.getVariable('voltage', componentType, componentId)
+                timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
+                self.firstOrderSeperableDifferentialEquation(currentVariable, capacitanceVariable, voltageVariable, timeVariable)

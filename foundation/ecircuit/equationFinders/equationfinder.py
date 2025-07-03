@@ -116,7 +116,8 @@ class EquationFinder(ABC):
 
 
     def addVariableToComponentIdx(self, componentIdx, variableStr):
-        self.componentId__list_variables[componentIdx].append(variableStr)
+        if variableStr not in self.componentId__list_variables[componentIdx]: # might be repeated because different equationFinder ask for the same variable
+            self.componentId__list_variables[componentIdx].append(variableStr)
 
     def getEdgeDirection(self, edge):
         """
@@ -179,11 +180,21 @@ class EquationFinder(ABC):
         return f'{main_symbol}_{{ {subscript}_{{ {subsubscript} }} }}'
 
     def sumOfPositiveNegativeToLatexAndScheme(self, list_vars):
-        latexStr = Latexparser.readListOfPlusAndMinusEqualsZero(list_vars)
+        latexStr = Latexparser.makePlusAndMinusEqualsZero(list_vars)
         print('latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
-    def addLatexStrAsEquation(self, latexStr):
+    def simpleRatioToLatexAndScheme(self, equivalentRatio, numerator, denominator):
+        latexStr = Latexparser.makeSimpleRatio(equivalentRatio, numerator, denominator)
+        print('latexStr: ', latexStr)
+        self.addLatexStrAsEquation(latexStr)
+
+    def firstOrderSeperableDifferentialEquation(self, equivalent, derivativeMultiplier, differentiand, differentiator):
+        latexStr = Latexparser.makeFirstOrderSeparableDifferentialEquation(equivalent, derivativeMultiplier, differentiand, differentiator)
+        print('latexStr: ', latexStr)
+        self.addLatexStrAsEquation(latexStr)
+
+    def addLatexStrAsEquation(self, latexStr):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         equation = Equation(equationStr=latexStr, parserName='latex')
         print('schemeStr: ', equation.schemeStr)
         self.list_equations.append(equation)

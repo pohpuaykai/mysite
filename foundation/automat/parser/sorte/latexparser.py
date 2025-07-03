@@ -2459,7 +2459,7 @@ EntityTypes to handle:
 
 
     @classmethod
-    def readListOfPlusAndMinusEqualsZero(cls, listOfPlusAndMinus):
+    def makePlusAndMinusEqualsZero(cls, listOfPlusAndMinus):
         """
         used by ecircuit.equationFinders.equationfinder
         kvl
@@ -2475,6 +2475,23 @@ EntityTypes to handle:
             else:
                 latexStr += f'-{dict_var["varStr"]}'
         return latexStr+'=0'
+
+    @classmethod
+    def makeSimpleRatio(self, equivalentRatio, numerator, denominator):
+        """
+        used by ecircuit.equationFinders.equationfinder
+        OhmsLaw
+        """
+        return f'\\frac{{{numerator}}}{{{denominator}}}={equivalentRatio}'
+
+    @classmethod
+    def makeFirstOrderSeparableDifferentialEquation(self, equivalent, derivativeMultiplier, differentiand, differentiator):
+        """
+        used by ecircuit.equationFinders.equationfinder
+        capacitortiming
+        inductortiming
+        """
+        return f'{equivalent} = {derivativeMultiplier} \\frac{{d {differentiand}}}{{d {differentiator}}}'
 
 
 class EntityStorage:

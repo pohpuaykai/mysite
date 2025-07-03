@@ -53,8 +53,10 @@ def automat_findEquationsAndSolve(request):
     #TODO supposed to scan the whole equationFinder folder like equation.Equation.getFunctionClass<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     # from foundation.ecircuit.equationFinders.kvlequationfinder import KVLEquationFinder#temporary -> for testing
     # equationFinder = KVLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
-    from foundation.ecircuit.equationFinders.kclequationfinder import KCLEquationFinder#temporary -> for testing
-    equationFinder = KCLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
+    # from foundation.ecircuit.equationFinders.kclequationfinder import KCLEquationFinder#temporary -> for testing
+    # equationFinder = KCLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
+    from foundation.ecircuit.equationFinders.ohmlawequationfinder import OhmlawEquationFinder#temporary -> for testing
+    equationFinder = OhmlawEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
     equationFinder.findEquations()
     # equationFinder.list_equations
 
