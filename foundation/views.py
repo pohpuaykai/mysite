@@ -26,11 +26,11 @@ def automat_findEquationsAndSolve(request):
     #parallel sum -> resistor #everything between 2 same superNodes, after series sum are in parallel.?
     #parallel sum -> capacitor #everything between 2 same superNodes, after series sum are in parallel.?
     #parallel sum -> inductor #everything between 2 same superNodes, after series sum are in parallel.?
+    #hFE transistor -> every transistor #https://en.wikipedia.org/wiki/Bipolar_junction_transistor
+    #Eber-molls -> every transistor
+    #Shockley diode model -> every diode
     #Thevenin
     #Norton
-    #hFE transistor
-    #Eber-molls
-    #Shockley diode model
     
 
     #solve with symgaussianelimination (? more well studied then bipartite_graph? not possible for differentiation&integration?), 
@@ -51,8 +51,10 @@ def automat_findEquationsAndSolve(request):
     pp.pprint(id__positiveLeadsDirections)
 
     #TODO supposed to scan the whole equationFinder folder like equation.Equation.getFunctionClass<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    from foundation.ecircuit.equationFinders.kvlequationfinder import KVLEquationFinder#temporary -> for testing
-    equationFinder = KVLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
+    # from foundation.ecircuit.equationFinders.kvlequationfinder import KVLEquationFinder#temporary -> for testing
+    # equationFinder = KVLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
+    from foundation.ecircuit.equationFinders.kclequationfinder import KCLEquationFinder#temporary -> for testing
+    equationFinder = KCLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
     equationFinder.findEquations()
     # equationFinder.list_equations
 

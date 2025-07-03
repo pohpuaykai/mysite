@@ -1,4 +1,3 @@
-
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class KVLEquationFinder(EquationFinder):
