@@ -20,14 +20,9 @@ def automat_findEquationsAndSolve(request):
     #OhmLaw # every non-wire|non-source component, has V=IR
     #capcitor derivative model (timing) #every capacitor has this
     #inductor derivative model (timing) # every inductor has this
-    #series sum -> resistor #wire|source components are superNodes, everything between superNodes, are in series.?
-    #series sum -> capacitor #wire|source components are superNodes, everything between superNodes, are in series.?
-    #series sum -> inductor #wire|source components are superNodes, everything between superNodes, are in series.?
-    #parallel sum -> resistor #everything between 2 same superNodes, after series sum are in parallel.?
-    #parallel sum -> capacitor #everything between 2 same superNodes, after series sum are in parallel.?
-    #parallel sum -> inductor #everything between 2 same superNodes, after series sum are in parallel.?
+    #complex_impedance_sum model # every path|ball that only has linear_components(resistor|capacitor|inductor), parallel<->harmonic_sum(complex_impedance), series<->normal_sum(complex_impedance)
     #hFE transistor -> every transistor #https://en.wikipedia.org/wiki/Bipolar_junction_transistor
-    #Eber-molls -> every transistor
+    #Eber-molls -> every transistor #https://en.wikipedia.org/wiki/Bipolar_junction_transistor
     #Shockley diode model -> every diode
     #Thevenin
     #Norton
@@ -50,14 +45,8 @@ def automat_findEquationsAndSolve(request):
     pp.pprint(id__type)
     pp.pprint(id__positiveLeadsDirections)
 
-    #TODO supposed to scan the whole equationFinder folder like equation.Equation.getFunctionClass<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    # from foundation.ecircuit.equationFinders.kvlequationfinder import KVLEquationFinder#temporary -> for testing
-    # equationFinder = KVLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
-    # from foundation.ecircuit.equationFinders.kclequationfinder import KCLEquationFinder#temporary -> for testing
-    # equationFinder = KCLEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
-    from foundation.ecircuit.equationFinders.ohmlawequationfinder import OhmlawEquationFinder#temporary -> for testing
-    equationFinder = OhmlawEquationFinder(networkGraph, id__type, id__positiveLeadsDirections)
-    equationFinder.findEquations()
-    # equationFinder.list_equations
-
+    from foundation.ecircuit.equationFinders.equationFinder import EquationFinder
+    for equationFinderClass in EquationFinder.getAllEquationFinders():
+        equationFinderClass().findEquations(networkGraph, id__type, id__positiveLeadsDirections)
+    #print the equations on THREE.scene<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     return HttpResponse('', content_type="text/plain")

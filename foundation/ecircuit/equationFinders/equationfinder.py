@@ -30,8 +30,29 @@ class EquationFinder(ABC):
     def findEquations(self):
         pass
 
-    def getAllEquationFinders(self):
-        pass#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<copy from foundation.automat.core.equation
+    @classmethod
+    def getAllEquationFinders(cls):#Automatically import all Python files in the package directory
+        equationFinders = []
+        import os; import importlib; import inspect
+        module_dir = os.path.dirname(__file__); #print(module_dir, '<<<<<module_dir')
+        for module in os.listdir(module_dir):
+            if module.endswith('.py') and module not in ['__init__.py', 'equationfinder.py']:
+                module_name = module[:-3] # remove .py
+                # print('module_name::', module_name)
+                # module_obj = importlib.import_module(f'.', package=__name__)
+                module_obj = importlib.import_module(f'..{module_name}', package=__name__)
+                for name, cls in inspect.getmembers(module_obj, predicate=inspect.isclass):
+                    if name in ['EquationFinder']:
+                        continue
+                    equationFinders.append(cls)
+                    # print(name, '<<<<<<<className')#this is an equationfinder, but need to run it <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    # globals()[name] = cls # export the class as well
+                    # for method_name, method in inspect.getmembers(cls, predicate=inspect.ismethod):
+                    #     if (isinstance(inspect.getattr_static(cls, method_name), staticmethod)) or \
+                    #        (isinstance(inspect.getattr_static(cls, method_name), classmethod)):
+                    #        #is a static or class method
+                    #        globals()[method_name] = method
+        return equationFinders
 
     def groupComponentsIntoPathsAndBalls(self):
         """
@@ -153,8 +174,14 @@ class EquationFinder(ABC):
             main_symbol = 'C'
         elif electricalType in ['inductance']:
             main_symbol = 'L'
-        elif electricalType in ['reactance']:
+        elif electricalType in ['impedance']:
             main_symbol = 'X'
+        elif electricalType in ['frequency']:
+            main_symbol = 'w'
+        elif electricalType in ['temperature']:
+            main_symbol = 'T'
+        elif electricalType in ['current_amplification']:
+            main_symbol = '\\alpha'
         else:
             raise Exception()
         subscript = ''
@@ -172,15 +199,36 @@ class EquationFinder(ABC):
             subscript = 'O'
         elif componentType in ['resistor']:
             subscript = 'R'
-        elif componentType in ['transistor']:
-            subscript = 'T'
+        elif componentType in ['transistor_emitter']:
+            subscript = 'TE'
+        elif componentType in ['transistor_common']:
+            subscript = 'TC'
+        elif componentType in ['transistor_base']:
+            subscript = 'TB'
+        elif componentType in ['transistor_emitter_common']:
+            subscript = 'TEC'
+        elif componentType in ['transistor_base_common']:
+            subscript = 'TBC'
+        elif componentType in ['transistor_emitter_base']:
+            subscript = 'TEB'
+        else:#undefined like totalsum
+            subscript = componentType
+
 
 
         subsubscript = str(nodeId)
         return f'{main_symbol}_{{ {subscript}_{{ {subsubscript} }} }}'
 
-    def sumOfPositiveNegativeToLatexAndScheme(self, list_vars):
-        latexStr = Latexparser.makePlusAndMinusEqualsZero(list_vars)
+    def sumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, addAsEquation=True):
+        latexStr = Latexparser.makePlusAndMinus(list_vars, equivalentVariableDict)
+        print('latexStr: ', latexStr)
+        if addAsEquation:
+            self.addLatexStrAsEquation(latexStr)
+        else:
+            return latexStr
+
+    def harmonicSumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict):
+        latexStr = Latexparser.makeHarmonicPlusAndMinusEqualsZero(list_vars)
         print('latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
@@ -194,7 +242,37 @@ class EquationFinder(ABC):
         print('latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
+    def makeLinearFirstOrderDifferentialEquation(self, equivalent, listOfTerms):
+        """#solving steps are here: https://en.wikipedia.org/wiki/Matrix_differential_equation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<automate when you reach many BJT
+        listOfTerms = [
+            {'coefficient':, 'differentiand': , 'differentiator': },
+        ]
+        """
+        latexStr = Latexparser.makeLinearFirstOrderDifferentialEquation(equivalent, listOfTerms)
+        print('latexStr: ', latexStr)
+        self.addLatexStrAsEquation(latexStr)
+
     def addLatexStrAsEquation(self, latexStr):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         equation = Equation(equationStr=latexStr, parserName='latex')
         print('schemeStr: ', equation.schemeStr)
         self.list_equations.append(equation)
+
+    def makeRatio(self, numerator, denominator):
+        latexStr = Latexparser.makeRatio(numerator, denominator)
+        return latexStr
+
+    def exponentialMinusOne(self, equivalent, multiplicative, exponent):
+        latexStr = Latexparser.exponentialMinusOne(equivalent, multiplicative, exponent)
+        print('latexStr: ', latexStr)
+        self.addLatexStrAsEquation(latexStr)
+
+    def getConstantVariable(self, name):
+        """
+        Things like boltzmann_constant, charge_of_electron, avogradro_constant, imaginery_number
+        """
+        if name == 'boltzmann_constant':
+            return 'k'
+        elif name == 'charge_of_an_electron':
+            return 'q'
+        elif name == 'imaginery_number':
+            return 'i'

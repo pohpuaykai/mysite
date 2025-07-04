@@ -73,7 +73,7 @@ class KCLEquationFinder(EquationFinder):
             list_equationVars.append(list_vars)
         #convert equationVars to list_equations and store in parent
         for list_vars in list_equationVars:
-            self.sumOfPositiveNegativeToLatexAndScheme(list_vars)
+            self.sumOfPositiveNegativeToLatexAndScheme(list_vars, {'varStr':'0', 'positive':True})
 
 
             #find path in this: tuple_startSuperNodeId_endSuperNodeId__list_path

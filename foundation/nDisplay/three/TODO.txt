@@ -1,9 +1,5 @@
---Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with automat.common spanningtree.py, allpairshortestpath smallcyclefinder
----KVL: check with automat, MST;ASST;smallcyclefinder
----KCL: Where wire connects with wire? ONLY?
----hFE: find all diodes
----Ohm_Law: after KVL and KCL, plug the types and electrical_specification
-
+-draw many many many electrical circuits to test equationfinders(will try to do the bipartitegraphsolver in tandem)<<<<<<<<<<<<<<
+-Generate 2D Symbolic Circuit Diagram with SVG
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -To build this pipeline:
@@ -11,7 +7,8 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 --Extract Graph (Network) information=Gi
 --Generate 2D Symbolic Circuit Diagram with SVG (OPTIONAL for now)
 --Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with graph_algos and Gi
---Use CAS to solve symbolic_equations, return solving_steps and solved_results to 3D, make pretty animation :D
+--Use CAS to solve symbolic_equations, return solving_steps and solved_results to 3D, 
+--make pretty animation :D
 
 
 

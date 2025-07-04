@@ -2459,7 +2459,7 @@ EntityTypes to handle:
 
 
     @classmethod
-    def makePlusAndMinusEqualsZero(cls, listOfPlusAndMinus):
+    def makePlusAndMinus(cls, listOfPlusAndMinus, equivalentVariableDict):
         """
         used by ecircuit.equationFinders.equationfinder
         kvl
@@ -2474,7 +2474,35 @@ EntityTypes to handle:
                     latexStr += dict_var["varStr"]
             else:
                 latexStr += f'-{dict_var["varStr"]}'
-        return latexStr+'=0'
+
+        if equivalentVariableDict['positive']:
+            return latexStr+f'={equivalentVariableDict["varStr"]}'
+        else:
+            return latexStr+f'=-{equivalentVariableDict["varStr"]}'
+        # return latexStr+'=0'
+
+    @classmethod
+    def makePlusAndMinusEqualsZero(cls, listOfPlusAndMinus, equivalentVariableDict):
+        """
+        used by ecircuit.equationFinders.equationfinder
+        resistorparallel
+        capacitorseries
+        inductorparallel
+        """
+        latexStr = ''
+        for i, dict_var in enumerate(listOfPlusAndMinus):
+            if dict_var['positive']:
+                if i != 0:
+                    latexStr += f'+\\frac{{1}}{{{dict_var["varStr"]}}}'
+                else:
+                    latexStr += f'\\frac{{1}}{{{dict_var["varStr"]}}}'
+            else:
+                latexStr += f'-\\frac{{1}}{{{dict_var["varStr"]}}}'
+        if equivalentVariableDict['positive']:
+            return latexStr+f'={equivalentVariableDict["varStr"]}'
+        else:
+            return latexStr+f'=-{equivalentVariableDict["varStr"]}'
+
 
     @classmethod
     def makeSimpleRatio(self, equivalentRatio, numerator, denominator):
@@ -2492,6 +2520,28 @@ EntityTypes to handle:
         inductortiming
         """
         return f'{equivalent} = {derivativeMultiplier} \\frac{{d {differentiand}}}{{d {differentiator}}}'
+
+    @classmethod
+    def makeLinearFirstOrderDifferentialEquation(self, equivalent, listOfTerms):
+        """#solving steps are here: https://en.wikipedia.org/wiki/Matrix_differential_equation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<automate when you reach many BJT
+        listOfTerms = [
+            {'coefficient':, 'differentiand': , 'differentiator': },
+        ]
+        """
+        firstTerm = listOfTerms
+        RHS = f'{firstTerm["coefficient"]} \\frac{{d {firstTerm["differentiand"]}}}{{d {firstTerm["differentiator"]}}}'
+        for term in listOfTerms[1:]:
+            RHS += f'+{term["coefficient"]} \\frac{{d {term["differentiand"]}}}{{d {term["differentiator"]}}}'
+        return f'{equivalent}={RHS}'
+
+
+    @classmethod
+    def makeRatio(self, numerator, denominator):
+        return f'\\frac{{{numerator}}}{{{denominator}}}'
+
+    @classmethod
+    def exponentialMinusOne(self, equivalent, multiplicative, exponent):
+        return f'{equivalent}={multiplicative} (e^{{{exponent}}} -1)'
 
 
 class EntityStorage:
