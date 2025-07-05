@@ -1,9 +1,7 @@
 // import * as THREE from './static/three/three.core.js';
 import * as THREE from './static/three/three.module.js';
-// import {OrbitControls} from './static/three/OrbitControls.js';
-// import {TextGeometry} from './static/three/TextGeometry.js';
-// import {FontLoader} from './static/three/FontLoader.js';
-import {GLTFLoader} from './static/three/GLTFLoader.js';
+// import {GLTFLoader} from './static/three/GLTFLoader.js';
+import {SVGLoader} from './static/three/SVGLoader.js';
 
 import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
 
@@ -91,12 +89,52 @@ const request = new Request(findEquationsAndSolve_url, {
         'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections
     })
 });
-fetch(request).then(response => {
-    console.log('response: ', response);
-    console.log(response.body);
-}).catch(error => {
-    console.log('error: ', error);
+// fetch(request).then(response => {//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<uncomment after you put Latex on THREE.scene
+//     console.log('response: ', response);
+//     console.log(response.body);
+// }).catch(error => {
+//     console.log('error: ', error);
+// });
+
+//test out SVG=>THREE.js setup Courtesy of ChatGPT
+function getCleanSVG(math) {
+  const svgNode = MathJax.tex2svg(math, {display: true});
+  const svg = svgNode.querySelector("svg");
+
+  // Clean style to avoid CSS inheritance issues
+  svg.removeAttribute("style");
+
+  // Serialize to string
+  return new XMLSerializer().serializeToString(svg);
+}
+const svgString = getCleanSVG("x^2 + y^2 = z^2");
+const blob = new Blob([svgString], {type: "image/svg+xml"});
+const url = URL.createObjectURL(blob);
+
+const loader = new SVGLoader();
+loader.load(url, (data) => {
+  const paths = data.paths;
+  const group = new THREE.Group();
+
+  for (const path of paths) {
+    const material = new THREE.MeshBasicMaterial({
+      color: path.color,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+
+    const shapes = path.toShapes(true);
+    for (const shape of shapes) {
+      const geometry = new THREE.ShapeGeometry(shape);
+      const mesh = new THREE.Mesh(geometry, material);
+      group.add(mesh);
+    }
+  }
+
+  scene.add(group);
 });
+//
+
 
 
 //controls
