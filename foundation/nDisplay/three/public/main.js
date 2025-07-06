@@ -4,6 +4,7 @@ import * as THREE from './static/three/three.module.js';
 import {SVGLoader} from './static/three/SVGLoader.js';
 
 import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
+import {asyncCreateLatexMesh} from './static/custom/LatexMeshCreater.js';
 
 // import {mesh as cylinder_mesh} from './static/meshes/mesh_cylinder.js';
 // import {mesh as wall_mesh} from './static/meshes/mesh_wall.js';
@@ -36,7 +37,7 @@ const near = 1;//Camera frustum near plane
 const far = 10000;//Camera frustum far plane
 
 camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, near, far );
-camera.position.set( 0, 0, -50 );
+camera.position.set( 0, 20, -80 );// camera.position.set( 0, 0, -50 );//OG camera.position, try moving the camera by animation.....?<<<<<<<<<<<<<<<<<<how to run one animation function after another....?
 renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -77,64 +78,34 @@ const animate = rD['animate'];
 console.log('circuit network:', circuit.getNetworkGraph());
 console.log('circuit network stringify:', JSON.stringify(circuit.getNetworkGraph()));
 console.log('circuit id__type: ', circuit.id__type);
+console.log('circuit edge__solderableIndices: ', circuit.edge__solderableIndices);
 // console.log('sending data to: ', findEquationsAndSolve_url);
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-const request = new Request(findEquationsAndSolve_url, {
-    method:"POST", 
-    headers: {'X-CSRFToken':csrftoken},
-    mode:'same-origin',
-    body:JSON.stringify({
+
+
+////////////////////////
+
+const xhr = new XMLHttpRequest();
+xhr.onreadystatechange  = function(){
+
+    if (this.readyState == 4 && this.status == 200) {
+      const listOfEquations_latexStrs = JSON.parse(this.responseText);
+      console.log(listOfEquations_latexStrs);
+
+      asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
+    }
+}
+// xhr.onerror = function(){}
+xhr.open('POST', findEquationsAndSolve_url);
+xhr.setRequestHeader('X-CSRFToken', csrftoken);
+// xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.send(JSON.stringify({
     'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
         'id__type':circuit.id__type,
-        'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections
-    })
-});
-// fetch(request).then(response => {//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<uncomment after you put Latex on THREE.scene
-//     console.log('response: ', response);
-//     console.log(response.body);
-// }).catch(error => {
-//     console.log('error: ', error);
-// });
-
-//test out SVG=>THREE.js setup Courtesy of ChatGPT
-function getCleanSVG(math) {
-  const svgNode = MathJax.tex2svg(math, {display: true});
-  const svg = svgNode.querySelector("svg");
-
-  // Clean style to avoid CSS inheritance issues
-  svg.removeAttribute("style");
-
-  // Serialize to string
-  return new XMLSerializer().serializeToString(svg);
-}
-const svgString = getCleanSVG("x^2 + y^2 = z^2");
-const blob = new Blob([svgString], {type: "image/svg+xml"});
-const url = URL.createObjectURL(blob);
-
-const loader = new SVGLoader();
-loader.load(url, (data) => {
-  const paths = data.paths;
-  const group = new THREE.Group();
-
-  for (const path of paths) {
-    const material = new THREE.MeshBasicMaterial({
-      color: path.color,
-      side: THREE.DoubleSide,
-      depthWrite: false
-    });
-
-    const shapes = path.toShapes(true);
-    for (const shape of shapes) {
-      const geometry = new THREE.ShapeGeometry(shape);
-      const mesh = new THREE.Mesh(geometry, material);
-      group.add(mesh);
-    }
-  }
-
-  scene.add(group);
-});
-//
-
+        'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections,
+        'edge__solderableIndices':circuit.edge__solderableIndices
+}));
+////////////////////////
 
 
 //controls

@@ -15,6 +15,8 @@ class Piece {
         this.wiring = [];
         this.uuid__type = {};
         this.uuid__positiveLeadsDirections = {};
+        this.edgeUUID__solderableIndices = {};
+        this.edge__solderableIndices = {};
     }
 
     /**
@@ -55,6 +57,15 @@ class Piece {
         this.uuid__positiveLeadsDirections[component0.uuid] = component0.positiveLeadsDirections;
         this.uuid__positiveLeadsDirections[component1.uuid] = component1.positiveLeadsDirections;
         this.uuid__positiveLeadsDirections[wireBetween.uuid] = wireBetween.positiveLeadsDirections;
+        //edgeUUID, is undirected, so need both sides, solderableLeadIdx is directed, so only one side
+        this.edgeUUID__solderableIndices[[component0.uuid, wireBetween.uuid]] = [solderableLeadIdx0, solderableLeadIdx1];
+        this.edgeUUID__solderableIndices[[wireBetween.uuid, component0.uuid]] = [solderableLeadIdx0, solderableLeadIdx1];
+        this.edgeUUID__solderableIndices[[component1.uuid, wireBetween.uuid]] = [solderableLeadIdx0, solderableLeadIdx1];
+        this.edgeUUID__solderableIndices[[wireBetween.uuid, component1.uuid]] = [solderableLeadIdx0, solderableLeadIdx1];
+        // also add the connection without wire for some equationFinders ignore wire.... TODO maybe a seperate dictionary to prevent confusion?
+        
+        this.edgeUUID__solderableIndices[[component0.uuid, component1.uuid]] = [solderableLeadIdx0, solderableLeadIdx1];
+        this.edgeUUID__solderableIndices[[component1.uuid, component0.uuid]] = [solderableLeadIdx0, solderableLeadIdx1];
         return wireBetween
     }
 
@@ -69,9 +80,21 @@ class Piece {
             this.uuid__id[uuid] = i; this.id__uuid[i] = uuid; this.id__type[i] = this.uuid__type[uuid];
             this.id__positiveLeadsDirections[i] = this.uuid__positiveLeadsDirections[uuid];
         }
+        console.log('this.edgeUUID__solderableIndices', this.edgeUUID__solderableIndices);
+        const edgeUUID__solderableIndicesEntries = Object.entries(this.edgeUUID__solderableIndices); let uuidDelimitedByComma; let component0_uuid; let component1_uuid; let solderableLeadIdx0; let solderableLeadIdx1;
+        console.log('edgeUUID__solderableIndicesEntries', edgeUUID__solderableIndicesEntries)
+        for (let i=0; i<edgeUUID__solderableIndicesEntries.length; i++) {
+            [uuidDelimitedByComma, [solderableLeadIdx0, solderableLeadIdx1]] = edgeUUID__solderableIndicesEntries[i];
+            [component0_uuid, component1_uuid] = uuidDelimitedByComma.split(',');
+            console.log('uuidDelimitedByComma', uuidDelimitedByComma, 'solderableLeadIdx0', solderableLeadIdx0, 'solderableLeadIdx1', solderableLeadIdx1);
+            this.edge__solderableIndices[this.uuid__id[component0_uuid]+","+this.uuid__id[component1_uuid]] = [solderableLeadIdx0, solderableLeadIdx1]
+        }
+        console.log('this.edge__solderableIndices', this.edge__solderableIndices);
+
         // console.log(this.uuid__id); console.log(this.id__uuid);
         let networkGraph = {}; let idNetworkGraph = {}; let id__type = {};
-        let component0_uuid; let component1_uuid; let component0_solderableIdx;//component1 is the wire
+        // let component0_uuid; let component1_uuid; 
+        let component0_solderableIdx;//component1 is the wire
         for (let i=0; i<this.wiring.length; i++) {
             [component0_uuid, component1_uuid, component0_solderableIdx] = this.wiring[i];
             //

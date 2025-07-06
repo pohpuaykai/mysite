@@ -1,9 +1,8 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class KCLEquationFinder(EquationFinder):
-    def __init__(self, networkGraph, id__type, id__positiveLeadsDirections):
-        super().__init__(networkGraph, id__type)
-        self.id__positiveLeadsDirections = id__positiveLeadsDirections
+    def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
+        super().__init__(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices)
 
     def findEquations(self):
         """
@@ -64,12 +63,14 @@ class KCLEquationFinder(EquationFinder):
                     if selectedComponentId is not None:
                         directedEdge = (prevSelectedComponentId, selectedComponentId)
                         variable = self.getVariable('current', selectedComponentType, selectedComponentId)
-                        if directedEdge in self.id__positiveLeadsDirections[prevSelectedComponentId]:
-                            list_vars.append({'varStr':variable, 'positive':True})#add positive Voltage variable
-                            self.addVariableToComponentIdx(selectedComponentId, variable)
-                        else:
-                            list_vars.append({'varStr':variable, 'positive':False})#add negative Voltage variable
-                            self.addVariableToComponentIdx(selectedComponentId, variable)
+                        list_vars.append({'varStr':variable, 'positive':self.directedEdgeIsPositive(directedEdge)})#add positive Voltage variable
+                        self.addVariableToComponentIdx(selectedComponentId, variable)
+                        # if directedEdge in self.id__positiveLeadsDirections[prevSelectedComponentId]:
+                        #     list_vars.append({'varStr':variable, 'positive':True})#add positive Voltage variable
+                        #     self.addVariableToComponentIdx(selectedComponentId, variable)
+                        # else:
+                        #     list_vars.append({'varStr':variable, 'positive':False})#add negative Voltage variable
+                        #     self.addVariableToComponentIdx(selectedComponentId, variable)
             list_equationVars.append(list_vars)
         #convert equationVars to list_equations and store in parent
         for list_vars in list_equationVars:

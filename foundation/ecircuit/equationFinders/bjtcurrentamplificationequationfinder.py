@@ -2,9 +2,8 @@ from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class BJTcurrentamplificationEquationFinder(EquationFinder):
 
-    def __init__(self, networkGraph, id__type, id__positiveLeadsDirections):
-        super().__init__(networkGraph, id__type)
-        self.id__positiveLeadsDirections = id__positiveLeadsDirections
+    def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
+        super().__init__(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices)
 
     def findEquations(self):
         """
@@ -25,18 +24,31 @@ class BJTcurrentamplificationEquationFinder(EquationFinder):
         for componentId, componentType in self.id__type.items():
             if componentType in ['transistor']:
                 commonCurrentVariable = self.getVariable("current", 'transistor_common', componentId)#<<<<<<<
+                self.addVariableToComponentIdx(componentId, commonCurrentVariable)
                 emitterCurrentVariable = self.getVariable("current", 'transistor_emitter', componentId)#<<<<<<<
+                self.addVariableToComponentIdx(componentId, emitterCurrentVariable)
                 baseCurrentVariable = self.getVariable("current", 'transistor_base', componentId)#<<<<<<<<<
+                self.addVariableToComponentIdx(componentId, baseCurrentVariable)
                 commonVoltageVariable = self.getVariable("voltage", 'transistor_common', componentId)#<<<<<<<
+                self.addVariableToComponentIdx(componentId, commonVoltageVariable)
                 emitterVoltageVariable = self.getVariable("voltage", 'transistor_emitter', componentId)#<<<<<<<
+                self.addVariableToComponentIdx(componentId, emitterVoltageVariable)
                 baseVoltageVariable = self.getVariable("voltage", 'transistor_base', componentId)#<<<<<<<<<
+                self.addVariableToComponentIdx(componentId, baseVoltageVariable)
                 commonResistanceVariable = self.getVariable("resistance", 'transistor_common', componentId)#<<<<<<<
+                self.addVariableToComponentIdx(componentId, commonResistanceVariable)
                 emitterVoltageVariable = self.getVariable("resistance", 'transistor_emitter', componentId)#<<<<<<<
+                self.addVariableToComponentIdx(componentId, emitterVoltageVariable)
                 baseVoltageVariable = self.getVariable("resistance", 'transistor_base', componentId)#<<<<<<<<<
+                self.addVariableToComponentIdx(componentId, baseVoltageVariable)
                 alphaVariable = self.getVariable("current_amplification", 'transistor_emitter_common', componentId) #<<<<<<<
+                self.addVariableToComponentIdx(componentId, alphaVariable)
                 betaVariable = self.getVariable("current_amplification", 'transistor_base_common', componentId) #<<<<<<<<
+                self.addVariableToComponentIdx(componentId, betaVariable)
                 baseCollectorCapacitanceVariable = self.getVariable("capacitance", 'transistor_base_common', componentId)#also capacitance_{\mu} # feeds back collector into base <-> causes Miller effect
+                self.addVariableToComponentIdx(componentId, baseCollectorCapacitanceVariable)
                 baseEmitterCapacitanceVariable = self.getVariable("capacitance", 'transistor_base_common', componentId)#also capacitance_{\pi} # stores charge <->sets delays in forward biasing
+                self.addVariableToComponentIdx(componentId, baseEmitterCapacitanceVariable)
                 #KCL
                 self.sumOfPositiveNegativeToLatexAndScheme(self, [{'varStr':baseCurrentVariable, 'positive':True}, {'varStr':commonCurrentVariable, 'positive':True}], {'varStr':emitterCurrentVariable, 'positive':True})
                 #amplication

@@ -1,5 +1,5 @@
 import os
-from json import loads
+from json import loads, dumps
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -40,13 +40,28 @@ def automat_findEquationsAndSolve(request):
     exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
     id__type = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__type'].items()))
     id__positiveLeadsDirections = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__positiveLeadsDirections'].items()))
+    edge__solderableIndices = {}
+    for edge, solderableLeads in circuit_details['edge__solderableIndices'].items():
+        print(edge)
+        edgeStart___str, edgeEnd___str = edge.split(',')
+        edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
     # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
     pp.pprint(networkGraph)
     pp.pprint(id__type)
     pp.pprint(id__positiveLeadsDirections)
+    print('edge__solderableIndices:')
+    pp.pprint(edge__solderableIndices)
 
-    from foundation.ecircuit.equationFinders.equationFinder import EquationFinder
+    from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
+    EquationFinder.list_equations = []
     for equationFinderClass in EquationFinder.getAllEquationFinders():
-        equationFinderClass().findEquations(networkGraph, id__type, id__positiveLeadsDirections)
-    #print the equations on THREE.scene<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    return HttpResponse('', content_type="text/plain")
+        equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations()
+    EquationFinder._has_run_common_code = False
+    #print the equations on THREE.scene
+    listOfCollectedEquations = []
+    for equation in EquationFinder.list_equations:
+        listOfCollectedEquations.append(equation._eqs)
+    print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    print(listOfCollectedEquations)
+    print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    return HttpResponse(dumps(listOfCollectedEquations), content_type="text/plain")

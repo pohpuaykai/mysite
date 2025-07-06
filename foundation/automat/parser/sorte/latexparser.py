@@ -2482,6 +2482,27 @@ EntityTypes to handle:
         # return latexStr+'=0'
 
     @classmethod
+    def makeHarmonicPlusAndMinusEqualsZero(cls, listOfPlusAndMinus, equivalentVariableDict):
+        """
+        used by ecircuit.equationFinder.equationfinder
+        compleximpedancesumequationfinder
+        """
+        latexStr = ''
+        for i, dict_var in enumerate(listOfPlusAndMinus):
+            if dict_var['positive']:
+                if i != 0:
+                    latexStr += f'+\\frac{{1}}{{{dict_var["varStr"]}}}'
+                else:
+                    latexStr += f'\\frac{{1}}{{{dict_var["varStr"]}}}'
+            else:
+                latexStr += f'-\\frac{{1}}{{{dict_var["varStr"]}}}'
+
+        if equivalentVariableDict['positive']:
+            return latexStr+f'=\\frac{{1}}{{{equivalentVariableDict["varStr"]}}}'
+        else:
+            return latexStr+f'=-\\frac{{1}}{{{equivalentVariableDict["varStr"]}}}'
+
+    @classmethod
     def makePlusAndMinusEqualsZero(cls, listOfPlusAndMinus, equivalentVariableDict):
         """
         used by ecircuit.equationFinders.equationfinder

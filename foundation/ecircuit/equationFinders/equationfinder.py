@@ -6,25 +6,50 @@ from foundation.automat.common.smallcyclefinder import SmallCycleFinder
 
 class EquationFinder(ABC):
 
-    def __init__(self, networkGraph, id__type):
+    cycles = []
+    directedCycles = []
+    list_equations = []
+    componentId__list_variables = {}
+    superNodeIds = []
+    list_nodeIds___deg2 = [] # for KCL
+    tuple_startSuperNodeId_endSuperNodeId__list_path = {} # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
+    superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
+    _has_run_common_code = False
+
+    def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
         """
         #assign a direction for each pair of leads of each component, by finding faces
-        #group components into paths (for series addition), group paths into balls (for parallel addition)<<<<<<<<<<<<<<<<<<<graph_pruning collect all degree_2(non-wire) nodes
+        #group components into paths (for series addition), group paths into balls (for parallel addition):graph_pruning collect all degree_2(non-wire) nodes
 
         #get the latex and scheme 
         """
         self.networkGraph = networkGraph
         self.id__type = id__type
-        self.cycles = SmallCycleFinder.findCycles(networkGraph)
-        self.directedCycles = []
-        self.list_equations = []
-        self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
-        self.assignDirectionToEdges()#produces self.directedCycles
-        self.superNodeIds = []
-        self.list_nodeIds___deg2 = [] # for KCL
-        self.tuple_startSuperNodeId_endSuperNodeId__list_path = {} # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
-        self.superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
-        self.groupComponentsIntoPathsAndBalls()
+        self.id__positiveLeadsDirections = id__positiveLeadsDirections
+        self.edge__solderableIndices = edge__solderableIndices
+        if not EquationFinder._has_run_common_code:#THIS CODES are repeated for everyChild class... 
+            self.cycles = SmallCycleFinder.findCycles(self.networkGraph)
+            self.directedCycles = EquationFinder.directedCycles
+            self.list_equations = EquationFinder.list_equations
+            self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
+            self.assignDirectionToEdges()#produces self.directedCycles
+            self.superNodeIds = EquationFinder.superNodeIds
+            self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
+            self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
+            self.superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
+            self.groupComponentsIntoPathsAndBalls()
+            print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            EquationFinder._has_run_common_code = True
+        else:
+            self.cycles = EquationFinder.cycles
+            self.directedCycles = EquationFinder.directedCycles
+            self.list_equations = EquationFinder.list_equations
+            self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
+            self.superNodeIds = EquationFinder.superNodeIds
+            self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
+            self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
+            self.superNodeUndirectedGraph = EquationFinder.superNodeUndirectedGraph# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
+        
 
     @abstractmethod
     def findEquations(self):
@@ -63,13 +88,13 @@ class EquationFinder(ABC):
         """
         for parentNode, children in self.networkGraph.items():
             if len(children) > 2:
-                self.superNodeIds.append(parentNode)
+                EquationFinder.superNodeIds.append(parentNode)
             elif len(children) == 2:
-                self.list_nodeIds___deg2.append(parentNode) # for KCL
+                EquationFinder.list_nodeIds___deg2.append(parentNode) # for KCL
         # find superNodes in directedCycles
-        for directedCycle in self.directedCycles:
+        for directedCycle in EquationFinder.directedCycles:
             indexOnDirectedCycle__superNodeId = {}
-            for superNodeId in self.superNodeIds:
+            for superNodeId in EquationFinder.superNodeIds:
                 try:#find the index of superNodeId on directedCycle, if index is 0 , it could be -1 also (first and last of directedCycle)
                     indexOnDirectedCycle__superNodeId[directedCycle.index(superNodeId)] = superNodeId
                 except: # throws ValueError if superNodeId is not found on directedCycle
@@ -87,22 +112,22 @@ class EquationFinder(ABC):
                     directedPath = tuple(directedCycle[startIdxOnCycle+1:endIdxOnCycle])#+1 on startIdxOnCycle to exclude the superNode
                     endSuperNodeId = indexOnDirectedCycle__superNodeId[endIdxOnCycle]
                 #check for repeats and store
-                existingPaths = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), [])#check both (startSuperNodeId, endSuperNodeId) & (endSuperNodeId, startSuperNodeId), but store only (startSuperNodeId, endSuperNodeId)
+                existingPaths = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), [])#check both (startSuperNodeId, endSuperNodeId) & (endSuperNodeId, startSuperNodeId), but store only (startSuperNodeId, endSuperNodeId)
                 if len(existingPaths) == 0: #check the other direction
-                    existingPaths = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId), [])
+                    existingPaths = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId), [])
                 if directedPath not in existingPaths:
                     existingPaths.append(directedPath)
-                self.tuple_startSuperNodeId_endSuperNodeId__list_path[(startSuperNodeId, endSuperNodeId)] = existingPaths
+                EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path[(startSuperNodeId, endSuperNodeId)] = existingPaths
                 #add to superNodeUndirectedGraph
-                existingNeighbours = self.superNodeUndirectedGraph.get(startSuperNodeId, [])
+                existingNeighbours = EquationFinder.superNodeUndirectedGraph.get(startSuperNodeId, [])
                 if endSuperNodeId not in existingNeighbours:
                     existingNeighbours.append(endSuperNodeId)
-                self.superNodeUndirectedGraph[startSuperNodeId] = existingNeighbours
+                EquationFinder.superNodeUndirectedGraph[startSuperNodeId] = existingNeighbours
                 #add the other direction edge
-                existingNeighbours = self.superNodeUndirectedGraph.get(endSuperNodeId, [])
+                existingNeighbours = EquationFinder.superNodeUndirectedGraph.get(endSuperNodeId, [])
                 if startSuperNodeId not in existingNeighbours:
                     existingNeighbours.append(startSuperNodeId)
-                self.superNodeUndirectedGraph[endSuperNodeId] = existingNeighbours
+                EquationFinder.superNodeUndirectedGraph[endSuperNodeId] = existingNeighbours
 
 
     def assignDirectionToEdges(self):
@@ -113,7 +138,7 @@ class EquationFinder(ABC):
             endNode = self.cycles[0][idx]
             self.directedEdges.append((startNode, endNode))
             startNode = endNode
-        self.directedCycles.append(self.cycles[0])
+        EquationFinder.directedCycles.append(self.cycles[0])
         #check if the cycle has any directedEdges, then we go according to that direction
         for cycleIdx in range(1, len(self.cycles)):
             cycle = self.cycles[cycleIdx]
@@ -127,8 +152,24 @@ class EquationFinder(ABC):
                     cycle = reversed(cycle)
                     break
                 startNode = endNode
+            #check if all the non-wire-components are connected in edge__solderableIndices
+            startNonWireComponent = None; solderableIdx = None;
+            for startNodeId in range(0, len(cycle)-1):
+                endNodeId = cycle[startNodeId+1]; edge = (startNodeId, endNodeId)
+                if startNonWireComponent is not None and self.id__type[endNodeId] not in ['wire']:
+                    solderableIdx = self.edge__solderableIndices[edge]
+                    if startNonWireComponent != endNodeId:
+                        self.edge__solderableIndices[(startNonWireComponent, endNodeId)] = solderableIdx
+                        self.edge__solderableIndices[(endNodeId, startNonWireComponent)] = solderableIdx
+                        # print('adding: ', (startNonWireComponent, endNodeId))
+                    startNonWireComponent = endNodeId; #reset
+                if startNonWireComponent is None and self.id__type[startNodeId] not in ['wire']:
+                    startNonWireComponent = startNodeId
+            # print('self.edge__solderableIndices', self.edge__solderableIndices)
+            #
+
             #add directedEdges
-            self.directedCycles.append(cycle)
+            EquationFinder.directedCycles.append(cycle)
             startNode = cycle[0]
             for idx in range(1, len(cycle)):
                 endNode = cycle[idx]
@@ -139,6 +180,11 @@ class EquationFinder(ABC):
     def addVariableToComponentIdx(self, componentIdx, variableStr):
         if variableStr not in self.componentId__list_variables[componentIdx]: # might be repeated because different equationFinder ask for the same variable
             self.componentId__list_variables[componentIdx].append(variableStr)
+
+    def directedEdgeIsPositive(self, directedEdge):
+        solderableIndices = self.edge__solderableIndices[directedEdge]
+        isPositive = solderableIndices in self.id__positiveLeadsDirections[directedEdge[0]] # take the start...., or should have taken the end? directedEdges[1]
+        return isPositive
 
     def getEdgeDirection(self, edge):
         """
@@ -221,25 +267,25 @@ class EquationFinder(ABC):
 
     def sumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, addAsEquation=True):
         latexStr = Latexparser.makePlusAndMinus(list_vars, equivalentVariableDict)
-        print('latexStr: ', latexStr)
+        print('sumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
         if addAsEquation:
             self.addLatexStrAsEquation(latexStr)
         else:
             return latexStr
 
     def harmonicSumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict):
-        latexStr = Latexparser.makeHarmonicPlusAndMinusEqualsZero(list_vars)
-        print('latexStr: ', latexStr)
+        latexStr = Latexparser.makeHarmonicPlusAndMinusEqualsZero(list_vars, equivalentVariableDict)
+        print('harmonicSumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
     def simpleRatioToLatexAndScheme(self, equivalentRatio, numerator, denominator):
         latexStr = Latexparser.makeSimpleRatio(equivalentRatio, numerator, denominator)
-        print('latexStr: ', latexStr)
+        print('simpleRatioToLatexAndScheme; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
     def firstOrderSeperableDifferentialEquation(self, equivalent, derivativeMultiplier, differentiand, differentiator):
         latexStr = Latexparser.makeFirstOrderSeparableDifferentialEquation(equivalent, derivativeMultiplier, differentiand, differentiator)
-        print('latexStr: ', latexStr)
+        print('firstOrderSeperableDifferentialEquation; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
     def makeLinearFirstOrderDifferentialEquation(self, equivalent, listOfTerms):
@@ -249,21 +295,22 @@ class EquationFinder(ABC):
         ]
         """
         latexStr = Latexparser.makeLinearFirstOrderDifferentialEquation(equivalent, listOfTerms)
-        print('latexStr: ', latexStr)
+        print('makeLinearFirstOrderDifferentialEquation; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
     def addLatexStrAsEquation(self, latexStr):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         equation = Equation(equationStr=latexStr, parserName='latex')
         print('schemeStr: ', equation.schemeStr)
-        self.list_equations.append(equation)
+        EquationFinder.list_equations.append(equation)
 
     def makeRatio(self, numerator, denominator):
         latexStr = Latexparser.makeRatio(numerator, denominator)
+        print('makeRatio; latexStr: ', latexStr)
         return latexStr
 
     def exponentialMinusOne(self, equivalent, multiplicative, exponent):
         latexStr = Latexparser.exponentialMinusOne(equivalent, multiplicative, exponent)
-        print('latexStr: ', latexStr)
+        print('exponentialMinusOne; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr)
 
     def getConstantVariable(self, name):
