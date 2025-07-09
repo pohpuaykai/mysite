@@ -19,7 +19,7 @@ async function asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_lat
     const YSize = 30;
     const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
     for (let i=0; i<listOfEquations_latexStrs.length; i++) {
-        let latexStr = listOfEquations_latexStrs[i]; console.log(latexStr);
+        let latexStr = listOfEquations_latexStrs[i]; //console.log(latexStr);
 
         const svgString = getCleanSVG(latexStr);
         const blob = new Blob([svgString], {type: "image/svg+xml"});

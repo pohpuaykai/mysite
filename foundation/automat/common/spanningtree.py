@@ -14,12 +14,15 @@ class SpanningTree:
         edgeWeight is a function, from an element in edgeIterableSortable to a number
         """
         A = set()
+
         uf = UnionFindByRankWithPathCompression(len(vertexIterable))
+        vertexIdx__ufIdx = dict(zip(vertexIterable, range(0, len(vertexIterable))))
+        ufIdx__vertexIdx = dict(zip(range(0, len(vertexIterable)), vertexIterable))
         edgeIterableSortable__sorted = sorted(edgeIterableSortable, key=lambda edge: edgeWeight[edge])
         for edge in edgeIterableSortable__sorted:#Add commentMore actions
-            if uf.find(edge[0]) != uf.find(edge[1]):
+            if uf.find(vertexIdx__ufIdx[edge[0]]) != uf.find(vertexIdx__ufIdx[edge[1]]):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<need to translate index(UF) to vertexIdx(graph)
                 A.add(edge)
-                uf.union(edge[0], edge[1])
+                uf.union(vertexIdx__ufIdx[edge[0]], vertexIdx__ufIdx[edge[1]])#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<eed to translate index(UF) to vertexIdx(graph)
 
         #not part of original algorithm, reconstruct the tree
         stg = {} # node to list_of_neighbours

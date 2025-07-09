@@ -37,16 +37,20 @@ def automat_findEquationsAndSolve(request):
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(circuit_details)
     #because json keys has to be str.
-    exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
+    # exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
+    networkGraph = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraph'].items()))
+    networkGraphNoWires = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraphNoWires'].items()))
     id__type = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__type'].items()))
     id__positiveLeadsDirections = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__positiveLeadsDirections'].items()))
     edge__solderableIndices = {}
     for edge, solderableLeads in circuit_details['edge__solderableIndices'].items():
-        print(edge)
         edgeStart___str, edgeEnd___str = edge.split(',')
         edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
     # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
+    print('networkGraph')
     pp.pprint(networkGraph)
+    print('networkGraphNoWires')
+    pp.pprint(networkGraphNoWires)
     pp.pprint(id__type)
     pp.pprint(id__positiveLeadsDirections)
     print('edge__solderableIndices:')
@@ -64,4 +68,11 @@ def automat_findEquationsAndSolve(request):
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     print(listOfCollectedEquations)
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+
+
+
+
+    # from foundation.ecircuit.orthogonalLayouts.rcclorthogonallayout import RCCLOrthogonalLayout
+
     return HttpResponse(dumps(listOfCollectedEquations), content_type="text/plain")

@@ -462,7 +462,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
         }
         
         this.wirePath = wirePath;
-        console.log('wirePath');console.log(wirePath);
+        // console.log('wirePath');console.log(wirePath);
 
         const positiveLeadsDirections = [];
         for(let i=0; i<this.wirePath.length; i++) {
@@ -478,22 +478,22 @@ class Wire extends THREE.Object3D {//THREE.Line {
         const solderableLeads = []; const offset = radius+0.001; console.log(offset);
         for (let i=0; i<wirePath.length-1; i++) {//number_of_solderableLeads == wirePath.length
             const startCoordinate = wirePath[i]; const endCoordinate = wirePath[i+1];
-            console.log('s', startCoordinate); console.log('e', endCoordinate);
+            // console.log('s', startCoordinate); console.log('e', endCoordinate);
             //find boundingBoxOfThisLine with radius
             let left = null; let right = null; let down = null; let up = null; let out = null; let inx = null;
             if (!aEquals(startCoordinate[0], endCoordinate[0])) {//radius is on 1(y), 2(z)
                 left = Math.min(startCoordinate[0], endCoordinate[0]); right = Math.max(startCoordinate[0], endCoordinate[0]); 
                 down = startCoordinate[1]-offset; up = endCoordinate[1]+offset; out = startCoordinate[2]-offset; inx = endCoordinate[2]+offset;
-                console.log('facing x-axis');
+                // console.log('facing x-axis');
             } else if (!aEquals(startCoordinate[1], endCoordinate[1])) {//radius is on 0(x), 2(z)
                 left = startCoordinate[0]-offset; right = endCoordinate[0]+offset; 
                 down = Math.min(startCoordinate[1], endCoordinate[1]); up = Math.max(startCoordinate[1], endCoordinate[1]); 
                 out = startCoordinate[2]-offset; inx = endCoordinate[2]+offset;
-                console.log('facing y-axis');console.log('left', left); console.log('right', right);
+                // console.log('facing y-axis');console.log('left', left); console.log('right', right);
             } else if (!aEquals(startCoordinate[2], endCoordinate[2])) {//radius is on 0(x), 1(y)
                 left = startCoordinate[0]-offset; right = endCoordinate[0]+offset; down = startCoordinate[1]-offset; up = endCoordinate[1]+offset; 
                 out = Math.min(startCoordinate[2], endCoordinate[2]); inx = Math.max(startCoordinate[2], endCoordinate[2]);
-                console.log('facing z-axis')
+                // console.log('facing z-axis')
             }
             const coordinates = [
                 [left, up, inx],
@@ -505,7 +505,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
                 [right, down, out],
                 [left, down, out]
             ]
-            console.log('coordinates', coordinates);
+            // console.log('coordinates', coordinates);
             solderableLeads.push([
                 {//topFace
                     'touchingFaceCoordinates':[
@@ -559,15 +559,15 @@ class Wire extends THREE.Object3D {//THREE.Line {
         }
 
         this.solderableLeads = solderableLeads;
-        console.log("solderableLeads", solderableLeads);
+        // console.log("solderableLeads", solderableLeads);
         const solderableLeadsIdx_touchingBoxesIdx__attachmentId = {}; const attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
         const uuid__type = {};
         for ( let i = 0; i<solderableLeads.length; i++) {
             let touchingFaces = solderableLeads[i];
-            console.log('touchingFaces', touchingFaces);
+            // console.log('touchingFaces', touchingFaces);
             for(let j = 0; j<touchingFaces.length; j++) {
                 const touchingFaceCoordinates = new Float32Array(touchingFaces[j]['touchingFaceCoordinates']);//this needs to be flat...
-                console.log('touchingFaceCoordinates', touchingFaceCoordinates)
+                // console.log('touchingFaceCoordinates', touchingFaceCoordinates)
                 const touchingFaceGeometry = new THREE.BufferGeometry();
                 touchingFaceGeometry.setAttribute('position', new THREE.BufferAttribute(touchingFaceCoordinates, 3));
                 const touchingFaceColors = new Float32Array([//2 triangles per face,  each row is R G B, R G B, R G B,

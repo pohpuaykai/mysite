@@ -1,0 +1,10 @@
+{
+    "AC_signal_generator":"svgSymbols/sources_connectors/dcSource___abstract.svg",
+    "battery":"svgSymbols/sources_connectors/dcSource___battery.svg",
+    "capacitor":"svgSymbols/linear_components/capacitor/capacitor___unsigned.svg",
+    "diode":"svgSymbols/diodes/diode___abstract.svg",
+    "inductor":"svgSymbols/linear_components/inductor/inductor___coreless.svg",
+    "oscillator":"svgSymbols/linear_components/oscillator/oscillator___abstract.svg",
+    "resistor":"svgSymbols/linear_components/resistor/resistor___zigzag.svg",
+    "transistor":"svgSymbols/transistors/bipolartransistor___pnp.svg"
+}

@@ -1,5 +1,6 @@
 -draw many many many electrical circuits to test equationfinders(will try to do the bipartitegraphsolver in tandem)<<<<<<<<<<<<<<
 -Generate 2D Symbolic Circuit Diagram with SVG
+--D:\p\mysite\foundation\nDisplay\svg
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -To build this pipeline:
@@ -24,7 +25,6 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 
 
 TODO:
-https://discourse.threejs.org/t/how-to-render-text-containing-math-equations-generated-from-latex/20716/9 <<<<<<<<<<<<<<for displaying the equations on the THREE.js stage
 
 
 
@@ -67,5 +67,3 @@ https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#concepts
 
 
 
-
-remove Django?
