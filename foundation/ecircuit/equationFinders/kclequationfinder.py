@@ -69,7 +69,8 @@ class KCLEquationFinder(EquationFinder):
                     if selectedComponentId is not None:# and prevSelectedComponentType not in ['wire'] and selectedComponentType not in ['wire']:
                         directedEdge = (prevSelectedComponentId, selectedComponentId)
                         variable = self.getVariable('current', selectedComponentType, selectedComponentId)
-                        print('@@@@@@@@@@@@@@@@@@@@variable', variable)
+                        # print('@@@@@@@@@@@@@@@@@@@@variable', variable)
+                        #componentDirectionPositive <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<independent of polarity of component?
                         list_vars.append({'varStr':variable, 'positive':self.directedEdgeIsPositive(directedEdge)})#add positive Voltage variable
                         self.addVariableToComponentIdx(selectedComponentId, variable)
                         # if directedEdge in self.id__positiveLeadsDirections[prevSelectedComponentId]:

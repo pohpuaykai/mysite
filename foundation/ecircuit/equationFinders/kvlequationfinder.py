@@ -8,7 +8,7 @@ class KVLEquationFinder(EquationFinder):
     def findEquations(self):
         #requires the polarity of each edge
         list_equationVars = []
-        print('KVL directedCycles:', EquationFinder.directedCycles)
+        # print('KVL directedCycles:', EquationFinder.directedCycles)
         for directedCycle in EquationFinder.directedCycles:
             # print(directedCycle)
             #skip wires by filtering them out
@@ -20,7 +20,7 @@ class KVLEquationFinder(EquationFinder):
                 endNode = directedCycle[idx]
                 directedEdge = (startNode, endNode); componentType = self.id__type[startNode]
                 variable = self.getVariable('voltage', componentType, startNode)
-                list_vars.append({'varStr':variable, 'positive':self.directedEdgeIsPositive(directedEdge)})#add positive Voltage variable
+                list_vars.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})#add positive Voltage variable
                 self.addVariableToComponentIdx(startNode, variable)
 
                 # if directedEdge in self.id__positiveLeadsDirections[startNode]:

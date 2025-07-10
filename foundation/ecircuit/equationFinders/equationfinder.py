@@ -27,10 +27,11 @@ class EquationFinder(ABC):
         self.id__type = id__type
         self.id__positiveLeadsDirections = id__positiveLeadsDirections
         self.edge__solderableIndices = edge__solderableIndices
-        print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+        # print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
         if not EquationFinder._has_run_common_code:#THIS CODES are repeated for everyChild class... 
             self.cycles = SmallCycleFinder.findCycles(self.networkGraph)
             self.directedCycles = []#We want it to persist across HTTP requests?
+            self.directedEdges = [] # a part of directedCycles, for convienence
             self.list_equations = []#EquationFinder.list_equations
             self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.assignDirectionToEdges()#produces self.directedCycles
@@ -40,11 +41,12 @@ class EquationFinder(ABC):
             self.superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
             self.edge__solderableIndices = EquationFinder.edge__solderableIndices
             self.groupComponentsIntoPathsAndBalls()
-            print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            # print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             EquationFinder._has_run_common_code = True
         else:
             self.cycles = EquationFinder.cycles
             self.directedCycles = EquationFinder.directedCycles
+            self.directedEdges = EquationFinder.directedEdges
             self.list_equations = []#EquationFinder.list_equations
             self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.superNodeIds = EquationFinder.superNodeIds
@@ -133,7 +135,7 @@ class EquationFinder(ABC):
 
 
     def assignDirectionToEdges(self):
-        self.directedEdges = []
+        # self.directedEdges = []
         #init, first cycle there are no directedEdges, so we assign according to the existing cycle's list direction
         startNode = self.cycles[0][0]
         for idx in range(1, len(self.cycles[0])):
@@ -179,25 +181,28 @@ class EquationFinder(ABC):
                 self.directedEdges.append((startNode, endNode))
                 startNode = endNode
         EquationFinder.directedCycles = self.directedCycles # we want it to persist across HTTP Requests
-        print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CREATED self.directedCycles', self.directedCycles)
+        EquationFinder.directedEdges = self.directedEdges  # we want it to persist across HTTP Requests
+        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CREATED self.directedCycles', self.directedCycles)
 
 
     def addVariableToComponentIdx(self, componentIdx, variableStr):
         if variableStr not in self.componentId__list_variables[componentIdx]: # might be repeated because different equationFinder ask for the same variable
             self.componentId__list_variables[componentIdx].append(variableStr)
 
-    def directedEdgeIsPositive(self, directedEdge):
+    def componentDirectionPositive(self, directedEdge):#TODO this should be renamed to componentDirectionPositive
         solderableIndices = self.edge__solderableIndices[directedEdge]
         isPositive = list(solderableIndices) in self.id__positiveLeadsDirections[directedEdge[0]] # take the start...., or should have taken the end? directedEdges[1]
-        print('>>>>>', list(solderableIndices), self.id__positiveLeadsDirections[directedEdge[0]], isPositive)
+        # print('>>>>>', list(solderableIndices), self.id__positiveLeadsDirections[directedEdge[0]], isPositive)
         return isPositive
 
-    def getEdgeDirection(self, edge):
+    def directedEdgeIsPositive(self, directedEdge):#TODO this should be renamed to directedEdgeIsPositive
         """
         
         :param edge: edge is a 2-tuple
         """
-        return edge if edge in self.directedEdges else (edge[1], edge[0])
+        # return edge if edge in self.directedEdges else (edge[1], edge[0])
+        # print(directedEdge, self.directedEdges, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<directedEdgeIsPositive<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')#
+        return directedEdge in self.directedEdges
 
     def getVariable(self, electricalType, componentType, nodeId):
         """

@@ -376,26 +376,6 @@ class Recommend:
             #for now we return None #self.combingSearch() # then we comb :)
 
 
-    def bipartiteSearch(self):
-        """This was the original planned search. Implement this first for ecircuit<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        equations are nodes on 1 side of the bipartite, the other side are variables. variables connect to equations, if they appear in the equation. The connection is undirected
-
-        There are 
-        0. controllable_variables(manufacturers, variable_resistance, variable_capacitance, variable_inductance, amplification_of_transistor),
-        1. fixed_variables(more like constants coming from specifications|after_choosing_manufacturers, like V_{cc}, load_max_current, transistor_threshold_voltage, collector_emitter_breakdown_voltage)
-        2. intermediate_variables(not 0|1), we want to substitute these away...
-
-        form a path P, going through all the intermediate_variables, path will alternate between equation & variable.
-        In P, between 2 equations E0, E1 there is a variable V.
-        Make V the subject of E0, and substitute V away in E1.
-        Repeat for the whole P. We will get an equation without all the intermediate_variables.
-
-        Then either plop in the values(simple calculation), or plot a graph with the equation(understand effects of circuit), or use equation for optimization(what to buy)
-
-        """
-        pass
-
 
 
     def reduceVariablesCount(self, variable):
@@ -418,6 +398,30 @@ class Recommend:
         :type variable:
         """
         self.eq._cutSubASTAtRoot(rootNode)
+
+
+    @classmethod
+    def bipartiteSearch(self, list_equations, list_variables, equationVariables_bg, dependentVariable, list_independentVariables):
+        """THIS method seem ill suited to be in this class............. change file? ><
+
+        This was the original planned search. Implement this first for ecircuit<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+        equations are nodes on 1 side of the bipartite, the other side are variables. variables connect to equations, if they appear in the equation. The connection is undirected
+
+        There are 
+        0. controllable_variables(manufacturers, variable_resistance, variable_capacitance, variable_inductance, amplification_of_transistor),
+        1. fixed_variables(more like constants coming from specifications|after_choosing_manufacturers, like V_{cc}, load_max_current, transistor_threshold_voltage, collector_emitter_breakdown_voltage)
+        2. intermediate_variables(not 0|1), we want to substitute these away...
+
+        form a path P, going through all the intermediate_variables, path will alternate between equation & variable.
+        In P, between 2 equations E0, E1 there is a variable V.
+        Make V the subject of E0, and substitute V away in E1.
+        Repeat for the whole P. We will get an equation without all the intermediate_variables.
+
+        Then either plop in the values(simple calculation), or plot a graph with the equation(understand effects of circuit), or use equation for optimization(what to buy)
+
+        """
+        pass
 
 
     def combingSearch(self):
