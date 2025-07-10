@@ -14,7 +14,11 @@ class CompleximpedancesumEquationFinder(EquationFinder):
         imaginery_number = self.getConstantVariable('imaginery_number')
         totalVariableIdx = max(list(self.id__type.keys()))
         
+        visitedUndirected = set()
         for (startSuperNodeId, endSuperNodeId), list_path in self.tuple_startSuperNodeId_endSuperNodeId__list_path.items():
+            if (startSuperNodeId, endSuperNodeId) in visitedUndirected:
+                continue
+            visitedUndirected.add((startSuperNodeId, endSuperNodeId));visitedUndirected.add((endSuperNodeId, startSuperNodeId))
             nonlinearBall=False;list_equationVars = []#check if every component between startSuperNodeId and endSuperNodeId are only (resistor|capacitor|inductor)
             for directedPath in list_path:
                 nonlinearPath=False; list_var=[]#check if every component in directedPath are only (resistor|capacitor|inductor)
@@ -51,17 +55,20 @@ class CompleximpedancesumEquationFinder(EquationFinder):
                         variable = f'{imaginery_number} {frequencyVariable} {inductanceVariable}'
                         list_var.append({'varStr':variable, 'positive':self.directedEdgeIsPositive(directedEdge)})
                 if not nonlinearPath and len(list_var) > 0: # add_normal
-                    totalImpedanceVariable = self.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
-                    self.addVariableToComponentIdx(componentId, totalImpedanceVariable)
-                    totalVariableIdx += 1
-                    print('list_var:', list_var)
-                    self.sumOfPositiveNegativeToLatexAndScheme(list_var, {'varStr':totalImpedanceVariable, 'positive':True})#<<not associated with any
                     latexStrWithEqual = self.sumOfPositiveNegativeToLatexAndScheme(list_var, {'varStr':'', 'positive':True}, addAsEquation=False) # just to get the imcomplete equation for harmonic_add later
                     latexStr = latexStrWithEqual.replace('=', '')
                     list_equationVars.append({'varStr':latexStr, 'positive':True})#for harmonic_sum
+                    if len(list_var) > 1:
+                        totalImpedanceVariable = self.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
+                        self.addVariableToComponentIdx(componentId, totalImpedanceVariable)
+                        totalVariableIdx += 1
+                        print('list_var:', list_var)
+                        self.sumOfPositiveNegativeToLatexAndScheme(list_var, {'varStr':totalImpedanceVariable, 'positive':True})#<<not associated with any
+
             if not nonlinearBall: #add_harmonic
                 totalImpedanceVariable = self.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
                 self.addVariableToComponentIdx(componentId, totalImpedanceVariable)
                 totalVariableIdx += 1
                 print('list_equationVars', list_equationVars)
                 self.harmonicSumOfPositiveNegativeToLatexAndScheme(list_equationVars, {'varStr':totalImpedanceVariable, 'positive':True})
+        return self.list_equations

@@ -7,8 +7,8 @@ from foundation.automat.common.smallcyclefinder import SmallCycleFinder
 class EquationFinder(ABC):
 
     cycles = []
-    directedCycles = []
-    list_equations = []
+    # directedCycles = []
+    # list_equations = [] # persist across HTTP Request (not what we want)
     componentId__list_variables = {}
     superNodeIds = []
     list_nodeIds___deg2 = [] # for KCL
@@ -27,29 +27,31 @@ class EquationFinder(ABC):
         self.id__type = id__type
         self.id__positiveLeadsDirections = id__positiveLeadsDirections
         self.edge__solderableIndices = edge__solderableIndices
+        print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
         if not EquationFinder._has_run_common_code:#THIS CODES are repeated for everyChild class... 
             self.cycles = SmallCycleFinder.findCycles(self.networkGraph)
-            self.directedCycles = EquationFinder.directedCycles
-            self.list_equations = EquationFinder.list_equations
+            self.directedCycles = []#We want it to persist across HTTP requests?
+            self.list_equations = []#EquationFinder.list_equations
             self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.assignDirectionToEdges()#produces self.directedCycles
             self.superNodeIds = EquationFinder.superNodeIds
             self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
             self.superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
+            self.edge__solderableIndices = EquationFinder.edge__solderableIndices
             self.groupComponentsIntoPathsAndBalls()
             print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             EquationFinder._has_run_common_code = True
         else:
             self.cycles = EquationFinder.cycles
             self.directedCycles = EquationFinder.directedCycles
-            self.list_equations = EquationFinder.list_equations
+            self.list_equations = []#EquationFinder.list_equations
             self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.superNodeIds = EquationFinder.superNodeIds
             self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
             self.superNodeUndirectedGraph = EquationFinder.superNodeUndirectedGraph# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
-        
+            self.edge__solderableIndices = EquationFinder.edge__solderableIndices
 
     @abstractmethod
     def findEquations(self):
@@ -92,7 +94,7 @@ class EquationFinder(ABC):
             elif len(children) == 2:
                 EquationFinder.list_nodeIds___deg2.append(parentNode) # for KCL
         # find superNodes in directedCycles
-        for directedCycle in EquationFinder.directedCycles:
+        for directedCycle in self.directedCycles:#EquationFinder.directedCycles:
             indexOnDirectedCycle__superNodeId = {}
             for superNodeId in EquationFinder.superNodeIds:
                 try:#find the index of superNodeId on directedCycle, if index is 0 , it could be -1 also (first and last of directedCycle)
@@ -138,7 +140,7 @@ class EquationFinder(ABC):
             endNode = self.cycles[0][idx]
             self.directedEdges.append((startNode, endNode))
             startNode = endNode
-        EquationFinder.directedCycles.append(self.cycles[0])
+        self.directedCycles.append(self.cycles[0])#EquationFinder.directedCycles.append(self.cycles[0])
         #check if the cycle has any directedEdges, then we go according to that direction
         for cycleIdx in range(1, len(self.cycles)):
             cycle = self.cycles[cycleIdx]
@@ -167,14 +169,17 @@ class EquationFinder(ABC):
                     startNonWireComponent = startNodeId
             # print('self.edge__solderableIndices', self.edge__solderableIndices)
             #
+            EquationFinder.edge__solderableIndices = self.edge__solderableIndices
 
             #add directedEdges
-            EquationFinder.directedCycles.append(cycle)
+            self.directedCycles.append(cycle)#EquationFinder.directedCycles.append(cycle)
             startNode = cycle[0]
             for idx in range(1, len(cycle)):
                 endNode = cycle[idx]
                 self.directedEdges.append((startNode, endNode))
                 startNode = endNode
+        EquationFinder.directedCycles = self.directedCycles # we want it to persist across HTTP Requests
+        print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CREATED self.directedCycles', self.directedCycles)
 
 
     def addVariableToComponentIdx(self, componentIdx, variableStr):
@@ -183,7 +188,8 @@ class EquationFinder(ABC):
 
     def directedEdgeIsPositive(self, directedEdge):
         solderableIndices = self.edge__solderableIndices[directedEdge]
-        isPositive = solderableIndices in self.id__positiveLeadsDirections[directedEdge[0]] # take the start...., or should have taken the end? directedEdges[1]
+        isPositive = list(solderableIndices) in self.id__positiveLeadsDirections[directedEdge[0]] # take the start...., or should have taken the end? directedEdges[1]
+        print('>>>>>', list(solderableIndices), self.id__positiveLeadsDirections[directedEdge[0]], isPositive)
         return isPositive
 
     def getEdgeDirection(self, edge):
@@ -300,8 +306,8 @@ class EquationFinder(ABC):
 
     def addLatexStrAsEquation(self, latexStr):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         equation = Equation(equationStr=latexStr, parserName='latex')
-        print('schemeStr: ', equation.schemeStr)
-        EquationFinder.list_equations.append(equation)
+        # print('schemeStr: ', equation.schemeStr)
+        self.list_equations.append(equation)
 
     def makeRatio(self, numerator, denominator):
         latexStr = Latexparser.makeRatio(numerator, denominator)

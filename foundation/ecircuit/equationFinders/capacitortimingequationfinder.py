@@ -23,3 +23,4 @@ class CapacitortimingEquationFinder(EquationFinder):
                 self.addVariableToComponentIdx(componentId, voltageVariable)
                 timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
                 self.firstOrderSeperableDifferentialEquation(currentVariable, capacitanceVariable, voltageVariable, timeVariable)
+        return self.list_equations

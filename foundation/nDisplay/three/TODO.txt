@@ -1,9 +1,7 @@
 -bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
---debug reload give same equations
---debug polarity in equationFinders
---wire nodes should not have equation variables
+--debug polarity in equationFinders : KCL still have polarity issues
 --minimunspanningtree? then DFS?
--draw many many many electrical circuits to test|improve equationfinders, 2D|3D display
+-draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS

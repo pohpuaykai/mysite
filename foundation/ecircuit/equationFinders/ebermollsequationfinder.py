@@ -29,3 +29,4 @@ class EbermollsEquationFinder(EquationFinder):
                 temperatureVoltage = self.makeRatio(f'{boltzmann_constantVariable} {temperatureVariable}', charge_of_an_electronVariable)
                 exponent = self.makeRatio(baseEmitterVoltageVariable, temperatureVoltage)
                 self.exponentialMinusOne(emitterCurrentVariable, emitter_saturationCurrentVariable, exponent)
+        return self.list_equations

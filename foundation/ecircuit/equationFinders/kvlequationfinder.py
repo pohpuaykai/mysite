@@ -8,7 +8,8 @@ class KVLEquationFinder(EquationFinder):
     def findEquations(self):
         #requires the polarity of each edge
         list_equationVars = []
-        for directedCycle in self.directedCycles:
+        print('KVL directedCycles:', EquationFinder.directedCycles)
+        for directedCycle in EquationFinder.directedCycles:
             # print(directedCycle)
             #skip wires by filtering them out
             directedCycle = list(filter(lambda nodeId: self.id__type[nodeId] != 'wire', directedCycle))
@@ -33,3 +34,4 @@ class KVLEquationFinder(EquationFinder):
         #convert equationVars to list_equations and store in parent
         for list_vars in list_equationVars:
             self.sumOfPositiveNegativeToLatexAndScheme(list_vars, {'varStr':'0', 'positive':True})
+        return self.list_equations

@@ -24,3 +24,4 @@ class InductortimingEquationFinder(EquationFinder):
                 timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
                 self.addVariableToComponentIdx(componentId, timeVariable)
                 self.firstOrderSeperableDifferentialEquation(voltageVariable, inductanceVariable, currentVariable, timeVariable)
+        return self.list_equations

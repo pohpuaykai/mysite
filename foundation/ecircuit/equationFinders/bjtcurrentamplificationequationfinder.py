@@ -68,3 +68,4 @@ class BJTcurrentamplificationEquationFinder(EquationFinder):
                     {'coefficient':baseCollectorCapacitanceVariable, 'differentiand':baseVoltageVariable+'-'+commonVoltageVariable , 'differentiator':timeVariable }
                 ])
                 self.firstOrderSeperableDifferentialEquation(currentVariable, baseCollectorCapacitanceVariable, voltageVariable, timeVariable)
+        return self.list_equations

@@ -18,3 +18,4 @@ class OhmlawEquationFinder(EquationFinder):
                 currentVariable = self.getVariable('current', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, currentVariable)
                 self.simpleRatioToLatexAndScheme(resistanceVariable, voltageVariable, currentVariable)
+        return self.list_equations

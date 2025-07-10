@@ -31,3 +31,4 @@ class ShockleydiodeEquationFinder(EquationFinder):
                 temperatureVoltage = self.makeRatio(f'{ideality_factorVariable} {boltzmann_constantVariable} {temperatureVariable}', charge_of_an_electronVariable)
                 exponent = self.makeRatio(diodeVoltageVariable, temperatureVoltage)
                 self.exponentialMinusOne(diodeCurrentVariable, diode_saturationCurrentVariable, exponent)
+        return self.list_equations

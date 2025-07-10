@@ -35,7 +35,7 @@ def automat_findEquationsAndSolve(request):
     circuit_details = loads(request.body)
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(circuit_details)
+    # pp.pprint(circuit_details)
     #because json keys has to be str.
     # exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
     networkGraph = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraph'].items()))
@@ -47,26 +47,33 @@ def automat_findEquationsAndSolve(request):
         edgeStart___str, edgeEnd___str = edge.split(',')
         edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
     # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
-    print('networkGraph')
-    pp.pprint(networkGraph)
-    # print('networkGraphNoWires')
-    # pp.pprint(networkGraphNoWires)
-    pp.pprint(id__type)
-    pp.pprint(id__positiveLeadsDirections)
-    print('edge__solderableIndices:')
-    pp.pprint(edge__solderableIndices)
+    # print('networkGraph')
+    # pp.pprint(networkGraph)
+    # # print('networkGraphNoWires')
+    # # pp.pprint(networkGraphNoWires)
+    # pp.pprint(id__type)
+    # pp.pprint(id__positiveLeadsDirections)
+    # print('edge__solderableIndices:')
+    # pp.pprint(edge__solderableIndices)
+
 
     from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
-    EquationFinder.list_equations = []
-    for equationFinderClass in EquationFinder.getAllEquationFinders():
-        equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations()
-    EquationFinder._has_run_common_code = False
-    #print the equations on THREE.scene
+    # print('existing EquationFinder has ', len(EquationFinder.list_equations), ' equations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    # EquationFinder.list_equations = []
     listOfCollectedEquations = []
-    for equation in EquationFinder.list_equations:
-        listOfCollectedEquations.append(equation._eqs)
+    for equationFinderClass in EquationFinder.getAllEquationFinders():
+        # equationFinderClass.list_equations = []
+        print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        print('len(listOfCollectedEquations)', len(listOfCollectedEquations))
+        for equation in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
+            listOfCollectedEquations.append(equation._eqs)
+    # EquationFinder._has_run_common_code = False
+    #print the equations on THREE.scene
+    # listOfCollectedEquations = []
+    # for equation in EquationFinder.list_equations:
+    #     listOfCollectedEquations.append(equation._eqs)
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print(listOfCollectedEquations)
+    print(listOfCollectedEquations); print(len(listOfCollectedEquations))
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
 
