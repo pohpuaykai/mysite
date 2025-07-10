@@ -12,7 +12,7 @@ class Piece {
         this.renderer = renderer;
         this.meshes = meshes;
         this.wiring = [];
-        this.wiringSansWires = [];
+        // this.wiringSansWires = [];//originally for rcclorthogonallayout, but to differentiate parallel_circuit from series_circuit, we need wire nodes. so... this is defunked for now
         this.uuid__type = {};
         this.uuid__positiveLeadsDirections = {};
         this.edgeUUID__solderableIndices = {};
@@ -108,77 +108,77 @@ class Piece {
         this.scene.add(wireBetween); this.render();
         // this.wiring.push([component0.uuid, wireBetween.uuid, solderableLeadIdx0]);
         // this.wiring.push([component1.uuid, wireBetween.uuid, solderableLeadIdx1]);
-        let networkGraph = {};
-        if ((component0.type == 'wire') || (component1.type == 'wire')) {
-            //construct dictionary_list of this.wiring
-            let component0_uuid; let component1_uuid;
-            for (let i=0; i<this.wiring.length; i++) {
-                // [component0_uuid, component1_uuid, component0_solderableIdx] = this.wiring[i];
-                [component0_uuid, component1_uuid] = this.wiring[i];
-                //
-                let existingNeighbours = networkGraph[component0_uuid];
-                if (existingNeighbours===undefined) {
-                    existingNeighbours = [];
-                }
-                existingNeighbours.push(component1_uuid);
-                networkGraph[component0_uuid] = existingNeighbours;
-                //
-                //
-                existingNeighbours = networkGraph[component1_uuid];
-                if (existingNeighbours===undefined) {
-                    existingNeighbours = [];
-                }
-                existingNeighbours.push(component0_uuid);
-                networkGraph[component1_uuid] = existingNeighbours;
-                //
-            }
-            //BFS this.wiring(list_of_edges) from component0, if child is non-wire add to this.wiringSansWires, and do not add to queue
-            if (component0.type == 'wire') {
-                const queue = [component0.uuid]; const visited = [component0.uuid]; const noWireNeighbours = [];
-                while (queue.length > 0) {
-                    const current = queue.shift(); const neighbours = networkGraph[current];
-                    for (let i=0; i<neighbours.length; i++) {
-                        const neighbour = neighbours[i];
-                        if (this.uuid__type[neighbour] == 'wire') {
-                            if (visited.indexOf(neighbour) == -1) {
-                                queue.push(neighbour); visited.push(neighbour);
-                            }
-                        } else {
-                            noWireNeighbours.push(neighbour); visited.push(neighbour);
-                        }
-                    }
-                }
-                for (let i=0; i<noWireNeighbours.length; i++) {//component1 is not wire, since cannot be both wires.... <<<<<<<<need to check and throw ?
-                    const noWireNeighbour = noWireNeighbours[i];
-                    this.wiringSansWires.push([noWireNeighbour, component1.uuid]);
-                    this.wiringSansWires.push([component1.uuid, noWireNeighbour]);
-                }
-            }
+        // let networkGraph = {};
+        // if ((component0.type == 'wire') || (component1.type == 'wire')) {
+        //     //construct dictionary_list of this.wiring
+        //     let component0_uuid; let component1_uuid;
+        //     for (let i=0; i<this.wiring.length; i++) {
+        //         // [component0_uuid, component1_uuid, component0_solderableIdx] = this.wiring[i];
+        //         [component0_uuid, component1_uuid] = this.wiring[i];
+        //         //
+        //         let existingNeighbours = networkGraph[component0_uuid];
+        //         if (existingNeighbours===undefined) {
+        //             existingNeighbours = [];
+        //         }
+        //         existingNeighbours.push(component1_uuid);
+        //         networkGraph[component0_uuid] = existingNeighbours;
+        //         //
+        //         //
+        //         existingNeighbours = networkGraph[component1_uuid];
+        //         if (existingNeighbours===undefined) {
+        //             existingNeighbours = [];
+        //         }
+        //         existingNeighbours.push(component0_uuid);
+        //         networkGraph[component1_uuid] = existingNeighbours;
+        //         //
+        //     }
+        //     //BFS this.wiring(list_of_edges) from component0, if child is non-wire add to this.wiringSansWires, and do not add to queue
+        //     if (component0.type == 'wire') {
+        //         const queue = [component0.uuid]; const visited = [component0.uuid]; const noWireNeighbours = [];
+        //         while (queue.length > 0) {
+        //             const current = queue.shift(); const neighbours = networkGraph[current];
+        //             for (let i=0; i<neighbours.length; i++) {
+        //                 const neighbour = neighbours[i];
+        //                 if (this.uuid__type[neighbour] == 'wire') {
+        //                     if (visited.indexOf(neighbour) == -1) {
+        //                         queue.push(neighbour); visited.push(neighbour);
+        //                     }
+        //                 } else {
+        //                     noWireNeighbours.push(neighbour); visited.push(neighbour);
+        //                 }
+        //             }
+        //         }
+        //         for (let i=0; i<noWireNeighbours.length; i++) {//component1 is not wire, since cannot be both wires.... <<<<<<<<need to check and throw ?
+        //             const noWireNeighbour = noWireNeighbours[i];
+        //             this.wiringSansWires.push([noWireNeighbour, component1.uuid]);
+        //             this.wiringSansWires.push([component1.uuid, noWireNeighbour]);
+        //         }
+        //     }
 
-            if (component1.type == 'wire') {
-                const queue = [component1.uuid]; const visited = [component0.uuid]; const noWireNeighbours = [];
-                while(queue.length > 0) {
-                    const current = queue.shift(); const neighbours = networkGraph[current];
-                    for (let i=0; i<neighbours.length; i++) {
-                        const neighbour = neighbours[i];
-                        if (this.uuid__type[neighbour] == 'wire') {
-                            if (visited.indexOf(neighbour) == -1) {
-                                queue.push(neighbour); visited.push(neighbour);
-                            }
-                        } else {
-                            noWireNeighbours.push(neighbour); visited.push(neighbour);
-                        }
-                    }
-                }
-                for (let i=0; i<noWireNeighbours.length; i++) {//component0 is not wire, since cannot be both wires.... <<<<<<<<need to check and throw ?
-                    const noWireNeighbour = noWireNeighbours[i];
-                    this.wiringSansWires.push([noWireNeighbour, component0.uuid]);
-                    this.wiringSansWires.push([component0.uuid, noWireNeighbour]);
-                }
-            }
-        } else {
-            this.wiringSansWires.push([component0.uuid, component1.uuid]);
-        }
+        //     if (component1.type == 'wire') {
+        //         const queue = [component1.uuid]; const visited = [component0.uuid]; const noWireNeighbours = [];
+        //         while(queue.length > 0) {
+        //             const current = queue.shift(); const neighbours = networkGraph[current];
+        //             for (let i=0; i<neighbours.length; i++) {
+        //                 const neighbour = neighbours[i];
+        //                 if (this.uuid__type[neighbour] == 'wire') {
+        //                     if (visited.indexOf(neighbour) == -1) {
+        //                         queue.push(neighbour); visited.push(neighbour);
+        //                     }
+        //                 } else {
+        //                     noWireNeighbours.push(neighbour); visited.push(neighbour);
+        //                 }
+        //             }
+        //         }
+        //         for (let i=0; i<noWireNeighbours.length; i++) {//component0 is not wire, since cannot be both wires.... <<<<<<<<need to check and throw ?
+        //             const noWireNeighbour = noWireNeighbours[i];
+        //             this.wiringSansWires.push([noWireNeighbour, component0.uuid]);
+        //             this.wiringSansWires.push([component0.uuid, noWireNeighbour]);
+        //         }
+        //     }
+        // } else {
+        //     this.wiringSansWires.push([component0.uuid, component1.uuid]);
+        // }
 
 
         this.wiring.push([component0.uuid, wireBetween.uuid]);
@@ -224,35 +224,35 @@ class Piece {
         // console.log('this.edge__solderableIndices', this.edge__solderableIndices);
 
         //find networkGraphNoWires
-        console.log('wiringSansWires:', this.wiringSansWires);
-        this.networkGraphNoWires = {};
-        for (let i=0; i<this.wiringSansWires.length; i++) {
-            [component0_uuid, component1_uuid] = this.wiringSansWires[i];
-            console.log(this.uuid__id[component0_uuid], this.uuid__id[component1_uuid]);
-            //
-            let existingNeighbours = this.networkGraphNoWires[this.uuid__id[component0_uuid]];
-            if (existingNeighbours===undefined) {
-                existingNeighbours = [];
-            }
-            if (existingNeighbours.indexOf(this.uuid__id[component1_uuid]) == -1) {
-                console.log('parent:', this.uuid__id[component0_uuid], 'existingNeighbours', existingNeighbours, 'adding:', this.uuid__id[component1_uuid]);
-                existingNeighbours.push(this.uuid__id[component1_uuid]);
-            }
-            this.networkGraphNoWires[this.uuid__id[component0_uuid]] = existingNeighbours;
-            //
-            //
-            existingNeighbours = this.networkGraphNoWires[this.uuid__id[component1_uuid]];
-            if (existingNeighbours===undefined) {
-                existingNeighbours = [];
-            }
-            if (existingNeighbours.indexOf(this.uuid__id[component0_uuid]) == -1) {
-                console.log('parent:', this.uuid__id[component1_uuid], 'existingNeighbours', existingNeighbours, 'adding:', this.uuid__id[component0_uuid]);
-                existingNeighbours.push(this.uuid__id[component0_uuid]);
-            }
-            this.networkGraphNoWires[this.uuid__id[component1_uuid]] = existingNeighbours;
-            //
-        }
-        console.log('this.networkGraphNoWires', this.networkGraphNoWires); console.log('*************************************************')
+        // console.log('wiringSansWires:', this.wiringSansWires);
+        // this.networkGraphNoWires = {};
+        // for (let i=0; i<this.wiringSansWires.length; i++) {
+        //     [component0_uuid, component1_uuid] = this.wiringSansWires[i];
+        //     console.log(this.uuid__id[component0_uuid], this.uuid__id[component1_uuid]);
+        //     //
+        //     let existingNeighbours = this.networkGraphNoWires[this.uuid__id[component0_uuid]];
+        //     if (existingNeighbours===undefined) {
+        //         existingNeighbours = [];
+        //     }
+        //     if (existingNeighbours.indexOf(this.uuid__id[component1_uuid]) == -1) {
+        //         console.log('parent:', this.uuid__id[component0_uuid], 'existingNeighbours', existingNeighbours, 'adding:', this.uuid__id[component1_uuid]);
+        //         existingNeighbours.push(this.uuid__id[component1_uuid]);
+        //     }
+        //     this.networkGraphNoWires[this.uuid__id[component0_uuid]] = existingNeighbours;
+        //     //
+        //     //
+        //     existingNeighbours = this.networkGraphNoWires[this.uuid__id[component1_uuid]];
+        //     if (existingNeighbours===undefined) {
+        //         existingNeighbours = [];
+        //     }
+        //     if (existingNeighbours.indexOf(this.uuid__id[component0_uuid]) == -1) {
+        //         console.log('parent:', this.uuid__id[component1_uuid], 'existingNeighbours', existingNeighbours, 'adding:', this.uuid__id[component0_uuid]);
+        //         existingNeighbours.push(this.uuid__id[component0_uuid]);
+        //     }
+        //     this.networkGraphNoWires[this.uuid__id[component1_uuid]] = existingNeighbours;
+        //     //
+        // }
+        // console.log('this.networkGraphNoWires', this.networkGraphNoWires); console.log('*************************************************')
 
         // console.log(this.uuid__id); console.log(this.id__uuid);
         let networkGraph = {}; let idNetworkGraph = {}; let id__type = {};

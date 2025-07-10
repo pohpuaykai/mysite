@@ -39,7 +39,7 @@ def automat_findEquationsAndSolve(request):
     #because json keys has to be str.
     # exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
     networkGraph = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraph'].items()))
-    networkGraphNoWires = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraphNoWires'].items()))
+    # networkGraphNoWires = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraphNoWires'].items()))
     id__type = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__type'].items()))
     id__positiveLeadsDirections = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__positiveLeadsDirections'].items()))
     edge__solderableIndices = {}
@@ -49,8 +49,8 @@ def automat_findEquationsAndSolve(request):
     # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
     print('networkGraph')
     pp.pprint(networkGraph)
-    print('networkGraphNoWires')
-    pp.pprint(networkGraphNoWires)
+    # print('networkGraphNoWires')
+    # pp.pprint(networkGraphNoWires)
     pp.pprint(id__type)
     pp.pprint(id__positiveLeadsDirections)
     print('edge__solderableIndices:')

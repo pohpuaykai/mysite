@@ -6,7 +6,7 @@ class SpanningTree:
 
     @classmethod
     def minimumSpanningTreeKruskal(cls, vertexIterable, edgeIterableSortable, edgeWeight):
-        """ TODO test
+        """
         Courtesy of Chapter 21 of "Introduction to Algorithms (4Ed)" by Thomas Cormens
 
         vertexIterable is a iterable of integers
@@ -19,10 +19,10 @@ class SpanningTree:
         vertexIdx__ufIdx = dict(zip(vertexIterable, range(0, len(vertexIterable))))
         ufIdx__vertexIdx = dict(zip(range(0, len(vertexIterable)), vertexIterable))
         edgeIterableSortable__sorted = sorted(edgeIterableSortable, key=lambda edge: edgeWeight[edge])
-        for edge in edgeIterableSortable__sorted:#Add commentMore actions
-            if uf.find(vertexIdx__ufIdx[edge[0]]) != uf.find(vertexIdx__ufIdx[edge[1]]):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<need to translate index(UF) to vertexIdx(graph)
+        for edge in edgeIterableSortable__sorted:
+            if uf.find(vertexIdx__ufIdx[edge[0]]) != uf.find(vertexIdx__ufIdx[edge[1]]):#need to translate index(UF) to vertexIdx(graph)
                 A.add(edge)
-                uf.union(vertexIdx__ufIdx[edge[0]], vertexIdx__ufIdx[edge[1]])#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<eed to translate index(UF) to vertexIdx(graph)
+                uf.union(vertexIdx__ufIdx[edge[0]], vertexIdx__ufIdx[edge[1]])#need to translate index(UF) to vertexIdx(graph)
 
         #not part of original algorithm, reconstruct the tree
         stg = {} # node to list_of_neighbours
@@ -53,7 +53,7 @@ class SpanningTree:
 
         edgesSelected = set()
         undirectedSpanningTree = {} # undirected
-        startNode = list(g.keys())[0];#any random one... is there a better way?
+        startNode = list(g.keys())[0];#any random one... is there a better way? Ou est vers origin, ja?
         stack = [startNode]; visited = set([startNode])
         while len(stack) > 0:
             current = stack.pop(popOrder); 

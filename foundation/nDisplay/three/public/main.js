@@ -103,7 +103,7 @@ circuit.getNetworkGraph();
 xhr.send(JSON.stringify({
     // 'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
     'networkGraph':circuit.networkGraph,
-    'networkGraphNoWires': circuit.networkGraphNoWires,
+    // 'networkGraphNoWires': circuit.networkGraphNoWires,
     'id__type':circuit.id__type,
     'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections,
     'edge__solderableIndices':circuit.edge__solderableIndices

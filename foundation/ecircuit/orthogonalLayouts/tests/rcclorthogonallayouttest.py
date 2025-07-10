@@ -7,7 +7,15 @@ from foundation.ecircuit.orthogonalLayouts.rcclorthogonallayout import RCCLOrtho
 def test__genSVG__dc_twoResistor_parallel(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
 
-    g = {0: [1, 4], 1: [0, 4], 4: [0, 1]}
+    # g = {0: [1, 4], 1: [0, 4], 4: [0, 1]}
+    g = {
+    0: [2, 3],
+    1: [2, 3],
+    2: [0, 1, 6],
+    3: [0, 1, 5],
+    4: [5, 6],
+    5: [4, 3],
+    6: [4, 2]}
     id__type = {
         0: 'resistor',
         1: 'resistor',
@@ -50,10 +58,16 @@ def test__genSVG__dc_twoResistor_parallel(verbose=False):
             "height":14
         }
     }
-    artificialNodeHeight = 1
-    artificialNodeWidth = 1
-    xSpacingBetweenComponent = 10
-    ySpacingBetweenComponent = 10
+    artificialNodeHeight = 3.5
+    artificialNodeWidth = 3.5
+    #spacing should be the max of the components that appear g?
+    xSpacingBetweenComponent = 0 # spacing should be the max of the components that appear g?
+    ySpacingBetweenComponent = 0
+    for nodeId in g.keys():
+        boundingBox = type__boundingBox.get(id__type[nodeId], {'height':artificialNodeHeight, 'width':artificialNodeWidth})
+        xSpacingBetweenComponent = max(xSpacingBetweenComponent, boundingBox['width'])
+        ySpacingBetweenComponent = max(ySpacingBetweenComponent, boundingBox['height'])
+    #
     layouter = RCCLOrthogonalLayout(g, id__type, type__boundingBox, artificialNodeHeight, artificialNodeWidth, xSpacingBetweenComponent, ySpacingBetweenComponent)
     layouter.makeSchematics(svg=True)
     nodeId__inflatedNumericStartCoordinateTuple = layouter.nodeId__inflatedNumericStartCoordinateTuple
@@ -70,8 +84,11 @@ def test__genSVG__dc_twoResistor_parallel(verbose=False):
         expected__svgStr == svgStr
     )
     if verbose:
+        print('nodeId__inflatedNumericStartCoordinateTuple***')
         pp.pprint(nodeId__inflatedNumericStartCoordinateTuple)
+        print('list_wireStartCoordinateEndCoordinateTuple***')
         pp.pprint(list_wireStartCoordinateEndCoordinateTuple)
+        print('svgStr***')
         print(svgStr)
 
 

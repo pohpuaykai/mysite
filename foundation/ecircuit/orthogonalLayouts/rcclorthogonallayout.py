@@ -4,10 +4,16 @@ from foundation.automat.common.spanningtree import SpanningTree
 
 class RCCLOrthogonalLayout:
     """
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+wire should connect to centre of SVGComponent's x or y
+SVGComponent should be rotated to the correct orientation
+last SVGComponent of either x or y, should use end of x or y instead of start
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 Overview 
 we take a undirectedGraph G which comes from an electrical circuit, and try to draw an SVG (a xy-coordinate for each node) on a xy-farplane with G.
-0. Use a graph whose nodes are not wires. (capture that in JS)
-1. Make a MinimumSpanningTree mst of G, T (and R are the removed_edges from G), where the weights are smaller for nodes with more neighbours
+0. Use a graph with wires, wire nodes are artificialNodes? WIRE MUST HAVE BOUNDINGBOX<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+1. Make a MinimumSpanningTree mst of G, T (and R are the removed_edges from G), where the weights are smaller for nodes with more neighbours #[TODO MANY optimisations can be made to the assignment to make schematics look pretty, reduce crossing_number]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2. We try to fit T into a square_grid, that only has unit_xy-coordinates, and by assigning a string of U=(+1 in y-axis); R=(+1 in x-axis); D=(-1 in y-axis); L=(-1 in x-axis) [we call this unit_xy-coordinates]
   0. Take the node with most neighbours in T, r
   1. Split up r, if r has more than 4 neighbours, try to make the split even. let number of neighbours of r be m
@@ -90,14 +96,20 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
 
         type__boundingBox, dictionary from componentType to its SVG boundingBox, which contains actual height and actual width when placed on SVG
         """
+        print('g******************************************')
+        print(g)
+        print('id__type***********************************')
+        print(id__type)
         self.g = g; self.id__type=id__type; self.type__boundingBox = type__boundingBox; 
+        if 'wire' not in self.type__boundingBox:
+            self.type__boundingBox['wire'] = {'width':artificialNodeWidth, 'height':artificialNodeHeight}
         self.artificialNodeHeight = artificialNodeHeight; self.artificialNodeWidth = artificialNodeWidth;
         self.xSpacingBetweenComponent = xSpacingBetweenComponent; self.ySpacingBetweenComponent = ySpacingBetweenComponent
 
     def makeSchematics(self, svg=False):
         self.svg = svg
         #get maxIdx of all nodes
-        self.maxNodeIdx = max(self.g.keys())
+        self.maxNodeIdx = max(self.g.keys()) + 1
         self.nodeId__unitXYCoordinateString = {}
         self.XX_X = []
         self.nodeId__numericXYCoordinateTuple = {}
@@ -123,7 +135,7 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
               edgeIterableSortable.append((parent, neighbour))
         nodeId__noOfNeighbours = dict(map(lambda t: (t[0], len(t[1])), self.g.items()))
         maxNoOfNeigbours = max(map(lambda t: t[1], nodeId__noOfNeighbours.items()))
-        edgeWeight = {}
+        edgeWeight = {}#[TODO MANY optimisations can be made to the assignment to make schematics look pretty, reduce crossing_number]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         for edge in edgeIterableSortable:
             eW = 2*maxNoOfNeigbours - (nodeId__noOfNeighbours[edge[0]]+nodeId__noOfNeighbours[edge[1]])
             edgeWeight[edge] = eW
@@ -166,7 +178,7 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
                     queue.append(neighbour); visited.append(neighbour)
         #3. Assign U, R, D, L to the neighbours of r [TODO MANY optimisations can be made to the assignment to make schematics look pretty, reduce crossing_number]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         self.nodeId__unitXYCoordinateString.update(dict(zip(self.T[self.r], ['U', 'R', 'D', 'L'])))#just a simple assignment, TODO could be better optimised
-        print('nodeId__unitXYCoordinateString', self.nodeId__unitXYCoordinateString)
+        print('nodeId__unitXYCoordinateString', self.nodeId__unitXYCoordinateString); print('self.r', self.r)
         #4. Look for nodes that lead to paths that end in deg1 nodes
         leafIds = []
         for nodeId, neighbours in self.T.items():
@@ -189,14 +201,15 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
         # queue = [r]; visited = [r]
         queue = list(self.T[self.r]); visited = [self.r] + list(self.T[self.r])
         while len(queue) > 0:
+            # print('queue: ', queue)
             current = queue.pop(0)#BFS
             #
             current___unitXYCoordinateString = self.nodeId__unitXYCoordinateString[current]#ignore r
             #
             for neighbour in self.T[current]:
                 if neighbour not in visited:
+                    # print('current: ', current, ' neighbour: ', neighbour); import pdb;pdb.set_trace()
                     #assign
-                    self.nodeId__unitXYCoordinateString[neighbour];
                     if len(current___unitXYCoordinateString) >= 2 and current___unitXYCoordinateString[-1] == current___unitXYCoordinateString[-2]:
                         #0 . if XX, assign neighbour to X
                         self.nodeId__unitXYCoordinateString[neighbour] = (current___unitXYCoordinateString+current___unitXYCoordinateString[-1])
@@ -275,6 +288,8 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
                             self.nodeId__unitXYCoordinateString[neighbour] = current___unitXYCoordinateString + 'U'
                     #
                     queue.append(neighbour); visited.append(neighbour)
+        print('self.nodeId__unitXYCoordinateString****************************************************************')
+        print(self.nodeId__unitXYCoordinateString)
 
     def _convertUnitToNumericCoordinate(self):
         # 0. every U becomes +1 in y
@@ -286,17 +301,26 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
             U = unitXYCoordinateString.count('U'); R = unitXYCoordinateString.count('R');
             D = unitXYCoordinateString.count('D'); L = unitXYCoordinateString.count('L');
             self.nodeId__numericXYCoordinateTuple[nodeId] = (R-L, U-D)
+        print('self.nodeId__numericXYCoordinateTuple***************************_convertUnitToNumericCoordinate***********************************')
+        print(self.nodeId__numericXYCoordinateTuple)
 
     def _addRemovedEdgesBack(self):
-        for (A, B) in self.R:#A, B are nodeIds
-            if A != self.r and B != self.r:
+        alreadyAdded = set()#R may contain both direction of the edge, we only need one
+        for (A, B) in self.R:#A, B are nodeIds, 
+            print('adding back: ', (A, B))
+            if (A, B) not in alreadyAdded and A != self.r and B != self.r:
                 A___nc = self.nodeId__numericXYCoordinateTuple[A]; B___nc = self.nodeId__numericXYCoordinateTuple[B]
+                print('A___nc', A___nc); print('B___nc', B___nc)
                 if A___nc[0] != B___nc[0] and A___nc[1] != B___nc[1]:
                     artificialNode = self.getArtificialNodeIdx()
+                    print('got artificialNode: ', artificialNode)
                     self.T[artificialNode] = [A, B]
                     self.nodeId__numericXYCoordinateTuple[artificialNode] = (A___nc[0], B___nc[1])
                 else:
                     self.T[A].append(B); self.T[B].append(A)#its inplace... right?
+                alreadyAdded.add((A, B)); alreadyAdded.add((B, A))
+        print('self.nodeId__numericXYCoordinateTuple******************************_addRemovedEdgesBack********************************')
+        print(self.nodeId__numericXYCoordinateTuple)
 
     def _convertToActualSVGDistance(self):
         """
@@ -313,7 +337,6 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
       0. Store the new_end_coordinates (get associated x) of node, and new_start_coordiantes (get associated x) of node (for adding wire positions)
   4. Collate all the x_coordinate & y_coordinate back to xy_coordinate, key is nodeId
         """
-        print(self.nodeId__numericXYCoordinateTuple)
         minX = min(map(lambda t: t[1][0], self.nodeId__numericXYCoordinateTuple.items())) 
         minY = min(map(lambda t: t[1][1], self.nodeId__numericXYCoordinateTuple.items()))
         xCoordinate__list_nodeId = {}; nodeId__xCoordinate = {}; yCoordinate__list_nodeId = {}; nodeId__yCoordinate = {};
@@ -329,27 +352,36 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
             yCoordinate__list_nodeId[yCoordinate] = existing
 
             nodeId__yCoordinate[nodeId] = yCoordinate
+
+        print('xCoordinate__list_nodeId', xCoordinate__list_nodeId)
+        print('yCoordinate__list_nodeId', yCoordinate__list_nodeId)
         #2
         nodeId__startEndXCoordinateTuple = {}; 
         previousAddedAmount = 0;
         for idx, xCoordinate in enumerate(sorted(list(xCoordinate__list_nodeId.keys()))):
+            maxXSize = 0
             for nodeId in xCoordinate__list_nodeId[xCoordinate]:
                 type = self.id__type.get(nodeId, 'artificial')
                 boundingBox = self.type__boundingBox.get(type, {'height':self.artificialNodeHeight, 'width':self.artificialNodeWidth})
                 startXCoordinate = previousAddedAmount + xCoordinate; endXCoordinate = previousAddedAmount + xCoordinate + boundingBox['width']
                 nodeId__startEndXCoordinateTuple[nodeId] = (startXCoordinate, endXCoordinate)
-                previousAddedAmount += boundingBox['width'] + self.xSpacingBetweenComponent
+                maxXSize = max(maxXSize, boundingBox['width'])
+            previousAddedAmount += maxXSize + self.xSpacingBetweenComponent
+        print('nodeId__startEndXCoordinateTuple', nodeId__startEndXCoordinateTuple)
 
         #3
         nodeId__startEndYCoordinateTuple = {}
         previousAddedAmount = 0;
         for idx, yCoordinate in enumerate(sorted(list(yCoordinate__list_nodeId.keys()))):
+            maxYSize = 0
             for nodeId in yCoordinate__list_nodeId[yCoordinate]:
                 type = self.id__type.get(nodeId, 'artificial')
                 boundingBox = self.type__boundingBox.get(type, {'height':self.artificialNodeHeight, 'width':self.artificialNodeWidth})
                 startYCoordinate = previousAddedAmount + yCoordinate; endYCoordinate = previousAddedAmount + yCoordinate + boundingBox['height']
                 nodeId__startEndYCoordinateTuple[nodeId] = (startYCoordinate, endYCoordinate)
-                previousAddedAmount += boundingBox['height'] + self.ySpacingBetweenComponent
+                maxYSize = max(maxYSize, boundingBox['height'])
+            previousAddedAmount += maxYSize + self.ySpacingBetweenComponent
+        print('nodeId__startEndYCoordinateTuple', nodeId__startEndYCoordinateTuple)
 
         #4
         for nodeId in self.nodeId__numericXYCoordinateTuple.keys():
@@ -357,15 +389,44 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
             (startYCoordinate, endYCoordinate) = nodeId__startEndYCoordinateTuple[nodeId]
             self.nodeId__inflatedNumericStartCoordinateTuple[nodeId] = (startXCoordinate, startYCoordinate)
 
+        print('JUST before adding SVGWire****************************************************')
+        print('self.T', self.T)
+        print('nodeId__startEndXCoordinateTuple', nodeId__startEndXCoordinateTuple)
+        print('nodeId__startEndYCoordinateTuple', nodeId__startEndYCoordinateTuple)
+        print('self.nodeId__numericXYCoordinateTuple', self.nodeId__numericXYCoordinateTuple) # for determining UDLR
+
+        addedEdges = set() # check for both directions, we only need to add once
         for nodeId, neighbours in self.T.items():
             (startXCoordinate, endXCoordinate) = nodeId__startEndXCoordinateTuple[nodeId]
             (startYCoordinate, endYCoordinate) = nodeId__startEndYCoordinateTuple[nodeId]
-            startXYCoordinate = (endXCoordinate, endYCoordinate)
-            for neighbour in neighbours:
-                (startXCoordinate, endXCoordinate) = nodeId__startEndXCoordinateTuple[neighbour]
-                (startYCoordinate, endYCoordinate) = nodeId__startEndYCoordinateTuple[neighbour]
-                endXYCoordinate = (startXCoordinate, startYCoordinate)
-                self.list_wireStartCoordinateEndCoordinateTuple.append((startXYCoordinate, endXYCoordinate))
+            (startXUnit, startYUnit) = self.nodeId__numericXYCoordinateTuple[nodeId]
+            print('nId:', nodeId, 'X: ', (startXCoordinate, endXCoordinate), ' Y: ', (startYCoordinate, endYCoordinate))
+            # startXYCoordinate = (endXCoordinate, endYCoordinate)
+            for neighbour in neighbours: # only take the leftToRight downToUp direction<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                if (nodeId, neighbour) not in addedEdges:
+                    (nstartXCoordinate, nendXCoordinate) = nodeId__startEndXCoordinateTuple[neighbour]
+                    (nstartYCoordinate, nendYCoordinate) = nodeId__startEndYCoordinateTuple[neighbour]
+                    (endXUnit, endYUnit) = self.nodeId__numericXYCoordinateTuple[neighbour]
+                    if startXUnit != endXUnit and startYUnit != endYUnit:
+                        raise Exception(f'nodes {nodeId} and {neighbour} are not orthogonal!')
+                    elif startXUnit == endXUnit:#downToUp
+                        if startYUnit > endYUnit: # nodeId is up, neighbour is down
+                            startXYCoordinate = (min(nendXCoordinate, startXCoordinate),nendYCoordinate); endXYCoordinate = (min(nendXCoordinate, startXCoordinate),startYCoordinate);
+                        else: # nodeId is down, neighbour is up
+                            startXYCoordinate = (min(endXCoordinate, nstartXCoordinate),endYCoordinate); endXYCoordinate = (min(endXCoordinate, nstartXCoordinate),nstartYCoordinate);
+
+                    elif startYUnit == endYUnit:#leftToRight
+                        if startXUnit > endXUnit: # nodeId is right, neighbour is left
+                            startXYCoordinate = (nendXCoordinate,min(nendYCoordinate, startYCoordinate)); endXYCoordinate = (startXCoordinate,min(nendYCoordinate, startYCoordinate));
+                        else: # nodeId is left, neighbour is right
+                            startXYCoordinate = (endXCoordinate,min(endYCoordinate, nstartYCoordinate)); endXYCoordinate = (nstartXCoordinate,min(endYCoordinate, nstartYCoordinate));
+
+                    print('start: ', (startXUnit, startYUnit), ' end: ', (endXUnit, endYUnit))
+                    # endXYCoordinate = (startXCoordinate, startYCoordinate)
+                    print('neighbour:', neighbour, 'X: ', (startXCoordinate, endXCoordinate), ' Y: ', (startYCoordinate, endYCoordinate))
+                    # print('connect: ', nodeId, '', startXYCoordinate, ';', neighbour, ':', endXYCoordinate)
+                    self.list_wireStartCoordinateEndCoordinateTuple.append((startXYCoordinate, endXYCoordinate))
+                    addedEdges.add((nodeId, neighbour)); addedEdges.add((neighbour, nodeId))
 
         #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<make SVG for testing?
         if self.svg:
@@ -391,7 +452,7 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
             def svg(width, height, viewBox, content, fontStr="italic 40px serif;", fillStr="#ffffff", style=""):
                 #xmlns="http://wwww.w3.org/2000/svg"
                 #xmlns:xlink="http://www.w3.org/1999/xlink"
-                return f"""<svg width="{width}" height="{height}" viewBox="{viewBox[0]} {viewBox[1]} {viewBox[2]} {viewBox[3]}" style="{style}">{textStyle(fontStr, fillStr)}
+                return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="{viewBox[0]} {viewBox[1]} {viewBox[2]} {viewBox[3]}" style="{style}">{textStyle(fontStr, fillStr)}
                 {content}</svg>"""
 
 
@@ -405,7 +466,6 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
             for componentType, svgFilepath___stub in json.loads(mapping_file.read()).items():
                 svg_file = open(os.path.join(NDISPLAY_MODULE_DIR, 'three', 'public', 'static', svgFilepath___stub), 'r')
                 svg_content = svg_file.read()
-                print(svg_content)
                 svgRoot = ET.fromstring(svg_content)
                 g = list(svgRoot)[0]#strip the top svg tag, and then add translate
                 g.set('transform', f'translate({XCOORDINATEPLACEHOLDER}, {YCOORDINATEPLACEHOLDER})')
@@ -424,7 +484,7 @@ we take a undirectedGraph G which comes from an electrical circuit, and try to d
                 svgStr = svgStrEmptyPosition.replace(XCOORDINATEPLACEHOLDER, str(inflatedNumericStartCoordinateTuple[0])).replace(YCOORDINATEPLACEHOLDER, str(inflatedNumericStartCoordinateTuple[1]))
                 svgContent += svgStr
 
-            stroke = '#ffffff'; stroke_width = 2; fill = '#ffffff';
+            stroke = '#000000'; stroke_width = 3.5; fill = '#000000';
             for wireStartCoordinateEndCoordinateTuple in self.list_wireStartCoordinateEndCoordinateTuple:
                 svgStr = polyline(wireStartCoordinateEndCoordinateTuple , stroke, stroke_width, fill)
                 svgContent += svgStr

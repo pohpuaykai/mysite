@@ -1,6 +1,10 @@
--draw many many many electrical circuits to test equationfinders(will try to do the bipartitegraphsolver in tandem)<<<<<<<<<<<<<<
--Generate 2D Symbolic Circuit Diagram with SVG
---D:\p\mysite\foundation\nDisplay\svg
+-bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
+--debug reload give same equations
+--debug polarity in equationFinders
+--wire nodes should not have equation variables
+--minimunspanningtree? then DFS?
+-draw many many many electrical circuits to test|improve equationfinders, 2D|3D display
+
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -To build this pipeline:
@@ -10,6 +14,7 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 --Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with graph_algos and Gi
 --Use CAS to solve symbolic_equations, return solving_steps and solved_results to 3D, 
 --make pretty animation :D
+--scrap electronic store data & feed to optimiser like simplexTableau for which to buy?
 
 
 
@@ -29,12 +34,17 @@ TODO:
 
 
 
+2DSVGCircuit beautifying tasks on rcclorthogonallayout.py
+
+
+
+
 Wire is also a component -> use TubeGeometry&Curve <<<<<<<<<<<<<<<<<not displaying properly not sure why yet....
 
 
 
 ###############################################################
-2. Component~.js ~=SignalGenerator[ACMicroGenerator]
+2. Component~.js ~=[ACMicroGenerator]
 """TODO
 (Overall size): 30mm×30mm×13.2mm (height)
 (Formed body): 28.5mm×10mm
