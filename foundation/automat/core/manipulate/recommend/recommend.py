@@ -401,10 +401,22 @@ class Recommend:
 
 
     @classmethod
-    def bipartiteSearch(self, list_equations, list_variables, equationVariables_bg, dependentVariable, list_independentVariables):
-        """THIS method seem ill suited to be in this class............. change file? ><
+    def bipartiteSearch(
+        self, 
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds
+        ):
+        """THIS method seem ill suited to be in this class............. change file? >< Maybe create a new class called Eliminator take always takes a system of equations, also contains symbolicGaussian
 
-        This was the original planned search. Implement this first for ecircuit<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        This was the original planned search. Implemented for ecircuit
 
         equations are nodes on 1 side of the bipartite, the other side are variables. variables connect to equations, if they appear in the equation. The connection is undirected
 
@@ -420,8 +432,57 @@ class Recommend:
 
         Then either plop in the values(simple calculation), or plot a graph with the equation(understand effects of circuit), or use equation for optimization(what to buy)
 
+        :param dependentVariableId: is a vertexId, (not from list_equations nor list_variables)
+        :param list_independentVariableIds: are vertexIds (not from list_equations nor list_variables)
+        :param type__list_vertexIds: type is either (0)equationKey or (1)variableKey (the partite of each vertexId), values are a list of vertexIds of its key's partite
         """
-        pass
+        #[TODO optimization possible, if the bipartite graph equationVariables_bg is disconnected, only take the connected part that is related to dependent|indepedentVariables]
+        from foundation.automat.common.spanningtree import SpanningTree
+        vertexIterable = sorted(list(equationVariables_bg))
+        def isEquation(parentId):
+            return parentId < len(list_equations)
+        edgeIterableSortable = []; edgeWeight = {}#assign edges incident to variables that we want to get rid of, lower weights
+        HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; #[TODO many optimizations possible here]
+        for parentId, neighbours in equationVariables_bg.items():
+            parentKeep = isEquation(parentId) or (parentId in [dependentVariableId]+list_independentVariableIds) # equation=KEEP, dependent|independentVariable=KEEP
+            for neighbourId in neighbours:
+                neighbourKeep = isEquation(neighbourId) or (neighbourId in [dependentVariableId]+list_independentVariableIds)
+                directedEdge = (parentId, neighbourId)
+                edgeIterableSortable.append(directedEdge)
+                if parentKeep and neighbourKeep:# both nodes of directedEdge are either (0)Equation OR (1)dependent|independentVariables, assign HIGH_WEIGHTS to keep
+                    edgeWeight[directedEdge] = HIGH_WEIGHTS
+                else: # either nodes of directedEdge is NOT Equation NOR dependent|independentVariables, assign LOW_WEIGHTS to form subsitutionPath to be eliminated
+                    edgeWeight[directedEdge] = LOW_WEIGHTS
+        T, R = SpanningTree.minimumSpanningTreeKruskal(vertexIterable, edgeIterableSortable, edgeWeight)
+        #find equationNode in T, that has dependentVariableId as start of DFS#[TODO many optimizations possible here, to get a Path that substitutes away all the unwanted variables]
+        #since T is spanning, we can just look in list_equations, for ANY equation that has_most_number_of_dependentVariableId_and_list_independentVariableIds[heuristic][TODO many optimizations possible here, on which starting point to pick] Ou est vers origin, ja?
+        wantedVariables = []
+        for wantedVariableId in [dependentVariableId]+list_independentVariableIds:
+            wantedVariables.append(list_variables[wantedVariableId])
+        maxTotalCount = -1; maxEquationVertexId = None;
+        for equationId, equation in enumerate(list_equations):
+            variables__count = equation.variablesScheme; totalWantedVariableCount = 0
+            for wantedVariable in set(variables__count.keys()).intersection(set(wantedVariables)):
+                totalWantedVariableCount += variables__count[wantedVariable]
+            if totalWantedVariableCount > maxTotalCount:
+                maxTotalCount = totalWantedVariableCount; maxEquationVertexId = equationId__vertexId[equationId]
+        #check if all the variables to be substituted away are in our path
+        #or we can start from a variable, then add the appropriate equation to the beginning of the resulting path
+        unwantedVariableIds = list(set(type__list_vertexIds[variableKey])-set([dependentVariableId]+list_independentVariableIds)) # any variable that is not dependent|independentVariable
+        # dependentVariable = list_variables[dependentVariableId]
+        # stack = [{'current':dependentVariableId, 'path':[dependentVariableId]}]; visited = [dependentVariableId]; 
+        stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; visited = [maxEquationVertexId];
+        maxLength=0; maxLengthChildDict = None
+        while len(stack)>0:
+            current___dict = stack.pop()#lastOut
+            for neighbour in equationVariables_bg[current___dict['current']]:
+                if neighbour not in visited:
+                    visited.append(neighbour)
+                    childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour]}
+                    if len(childDict['path']) > maxLength:
+                        maxLength = len(childDict['path']); maxLengthChildDict = childDict
+                    stack.append(childDict)
+        return maxLengthChildDict['path']
 
 
     def combingSearch(self):
@@ -431,6 +492,8 @@ class Recommend:
         use Dijkstra : (courtesy of ChatGPT)
 
         TODO implement Dijkstra with heurestic in common
+        nodes are equations, nodes are connected if we can apply a manipulation from a node to another node.
+        there are some end nodes, where if our search hits, then it terminates (Take me Ohm)
 
 
 

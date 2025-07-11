@@ -1,7 +1,7 @@
 -bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
---debug polarity in equationFinders : KCL still have polarity issues
---minimunspanningtree? then DFS?
--draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display
+--translate subsitutionPath into solving_steps (debugger_format???)
+---make lineareliminationbysubstitution inplace for the equation that is self. See foundation.automat.core.tests.lineareliminationbysubstitution.py
+-draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display, bipartiteSolver?
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS

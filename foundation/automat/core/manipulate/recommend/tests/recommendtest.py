@@ -27,43 +27,96 @@ def test__deriveMetaInformation__basic(verbose=False):#TODO does not work
 def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     from foundation.automat.core.equation import Equation
     listOfCollectedEquationStrs = [
-    '\\frac{1}{-R_{ R_{ 0 } }}+\\frac{1}{-R_{ R_{ 1 } }}=\\frac{1}{X_{ total_{ 6 } }}', 
-    'I_{ R_{ 0 } }-I_{ R_{ 1 } }-I_{ DC_{ 4 } }=0', '-V_{ R_{ 1 } }-V_{ R_{ 0 } }=0', 
-    'V_{ DC_{ 4 } }+V_{ R_{ 0 } }=0', 
-    '\\frac{V_{ R_{ 0 } }}{I_{ R_{ 0 } }}=R_{ R_{ 0 } }', 
-    '\\frac{V_{ R_{ 1 } }}{I_{ R_{ 1 } }}=R_{ R_{ 1 } }'
+    '\\frac{1}{-R_{ R_{ 0 } }}+\\frac{1}{-R_{ R_{ 1 } }}=\\frac{1}{X_{ total_{ 6 } }}', #0
+    'I_{ R_{ 0 } }-I_{ R_{ 1 } }-I_{ DC_{ 4 } }=0', #1
+    '-V_{ R_{ 1 } }-V_{ R_{ 0 } }=0', #2
+    'V_{ DC_{ 4 } }+V_{ R_{ 0 } }=0', #3
+    '\\frac{V_{ R_{ 0 } }}{I_{ R_{ 0 } }}=R_{ R_{ 0 } }', #4
+    '\\frac{V_{ R_{ 1 } }}{I_{ R_{ 1 } }}=R_{ R_{ 1 } }' #5
     ] # convert to equations
 
     listOfCollectedEquations = []; listOfVariables = []; #take the index in list as the id of these
-    equationVariables_g = {}
+    equationVariables_g = {}; 
+    type__list_vertexIds = {}; equationKey = 'equation'; variableKey = 'variable';
+    equationId__vertexId = {}
+    variableId__vertexId = {};#only for this script
+    class VertexIdIssuer:
+        def __init__(self):
+            self.vertexId = -1
+            self.vertexId__equationVariableId = {}
+        def getVertexId(self, equationVariableId):
+            self.vertexId += 1
+            self.vertexId__equationVariableId[self.vertexId] = equationVariableId
+            return self.vertexId
+
+    vertexIdIssuer = VertexIdIssuer()
     for equationId, equationStr in enumerate(listOfCollectedEquationStrs):
         equation = Equation(equationStr=equationStr, parserName='latex')
+        equationVertexId = vertexIdIssuer.getVertexId(equationId)
+        equationId__vertexId[equationId] = equationVertexId
+        #
+        existingNeighbours = type__list_vertexIds.get(equationKey, [])
+        existingNeighbours.append(equationVertexId)
+        type__list_vertexIds[equationKey] = existingNeighbours
+        #
         variables = equation.variablesScheme
         for variable in variables.keys():
             try:
                 variableId = listOfVariables.index(variable)
+                variableVertexId = variableId__vertexId[variableId]
             except:
                 variableId = len(listOfVariables)
                 listOfVariables.append(variable)
-            existingNeighbours = equationVariables_g.get(variableId, [])
-            existingNeighbours.append(equationId)
-            equationVariables_g[variableId] = existingNeighbours
+                variableVertexId = vertexIdIssuer.getVertexId(variableId)
+                variableId__vertexId[variableId] = variableVertexId
+            # print(variable, variableId, variableVertexId); import pdb;pdb.set_trace()
             #
-            existingNeighbours = equationVariables_g.get(equationId, [])
-            existingNeighbours.append(variableId)
-            equationVariables_g[equationId] = existingNeighbours
+            existingNeighbours = type__list_vertexIds.get(variableKey, [])
+            if variableVertexId not in existingNeighbours:
+                existingNeighbours.append(variableVertexId)
+            type__list_vertexIds[variableKey] = existingNeighbours
+            #
+            existingNeighbours = equationVariables_g.get(variableVertexId, [])
+            existingNeighbours.append(equationVertexId)
+            equationVariables_g[variableVertexId] = existingNeighbours
+            #
+            existingNeighbours = equationVariables_g.get(equationVertexId, [])
+            existingNeighbours.append(variableVertexId)
+            equationVariables_g[equationVertexId] = existingNeighbours
         # print(variables, '<<<<<,variables')
         listOfCollectedEquations.append(equation)
 
-    dependentVariable = None#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    list_independentVariables = None#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    vertexId__equationVariableId = vertexIdIssuer.vertexId__equationVariableId
+    dependentVariableId = 2#'X_{ total_{ 6 } }'
+    list_independentVariablesIds = [6, 7, 8]#['V_{ R_{ 1 } }', 'V_{ R_{ 0 } }', 'V_{ DC_{ 4 } }']
 
-    Recommend.bipartiteSearch(listOfCollectedEquations, listOfVariables, equationVariables_g, dependentVariable, list_independentVariables)
+    # #this is also the solving steps? Just the rough steps... not detailed enough<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<should include the actual manipulation steps :)
+    substitutionPath = Recommend.bipartiteSearch(listOfCollectedEquations, listOfVariables, equationVariables_g, vertexId__equationVariableId, equationId__vertexId, type__list_vertexIds, equationKey, variableKey, dependentVariableId, list_independentVariablesIds)
+
+    # vorEquation = list_equations[vertexId__equationVariableId[substitutionPath[0]]]
+    # entVariable = list_variables[vertexId__equationVariableId[substitutionPath[1]]]
+    # for idx, vertexId in enumerate(substitutionPath[2:]):
+    #     if idx % 2 == 0: # vertexId==equationVertexId
+    #         hinEquation = list_equations[vertexId__equationVariableId[vertexId]]
+    #         #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
+    #         hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)#This method is not inplace (please see foundation.automat.core.tests.lineareliminationbysubstitution.py)
+    #         vorEquation = hinEquation
+    #     else: # vertexId==variableVertexId
+    #         eliminateVariableId = list_variables[vertexId__equationVariableId[vertexIdx]]
 
     if verbose:
-        print(listOfCollectedEquations)
-        print(listOfVariables)
+        print('listOfCollectedEquations')
+        pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        print('listOfVariables')
+        pp.pprint(listOfVariables)
+        print('vertexId__equationVariableId')
+        pp.pprint(vertexId__equationVariableId)
+        print('equationVariables_g')
         pp.pprint(equationVariables_g)
+        print('type__list_vertexIds')
+        pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
 
 
 if __name__=='__main__':
