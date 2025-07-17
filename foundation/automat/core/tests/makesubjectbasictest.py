@@ -13,7 +13,7 @@ def test__makeSubject2Input__addition0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a-c=b' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -57,7 +57,7 @@ def test__makeSubject2Input__addition1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a-b=c' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -99,7 +99,7 @@ def test__makeSubject2Input__subtraction0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a+c=b' # to be filled in 
     expectedFunctions = {'+': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -141,7 +141,7 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b-a=c' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -183,7 +183,7 @@ def test__makeSubject2Input__multiply0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{a}{c}=b' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -225,7 +225,7 @@ def test__makeSubject2Input__multiply1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{a}{b}=c' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -267,7 +267,7 @@ def test__makeSubject2Input__divide0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'ac=b' # to be filled in 
     expectedFunctions = {'*': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -309,7 +309,7 @@ def test__makeSubject2Input__divide1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{b}{a}=c' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -351,7 +351,7 @@ def test__makeSubject2Input__exponent0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sqrt[c]{a}=b' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -393,7 +393,7 @@ def test__makeSubject2Input__exponent1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\log_b(a)=c' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -435,7 +435,7 @@ def test__makeSubject2Input__nroot0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\log_a(c)=b' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -477,7 +477,7 @@ def test__makeSubject2Input__nroot1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a^b=c' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -519,7 +519,7 @@ def test__makeSubject2Input__log0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sqrt[a]{c}=b' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -561,7 +561,7 @@ def test__makeSubject2Input__log1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('c')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b^a=c' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'a': 1, 'b': 1, 'c': 1} # count
@@ -603,7 +603,7 @@ def test__makeSubject1Input__arccosec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\cosec(a)=b' # to be filled in 
     expectedFunctions = {'cosec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -645,7 +645,7 @@ def test__makeSubject1Input__arccosech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\cosech(a)=b' # to be filled in 
     expectedFunctions = {'cosech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -687,7 +687,7 @@ def test__makeSubject1Input__arccos(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\cos(a)=b' # to be filled in 
     expectedFunctions = {'cos': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -729,7 +729,7 @@ def test__makeSubject1Input__arccosh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\cosh(a)=b' # to be filled in 
     expectedFunctions = {'cosh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -771,7 +771,7 @@ def test__makeSubject1Input__arccot(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\cot(a)=b' # to be filled in 
     expectedFunctions = {'cot': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -813,7 +813,7 @@ def test__makeSubject1Input__arccoth(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\coth(a)=b' # to be filled in 
     expectedFunctions = {'coth': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -855,7 +855,7 @@ def test__makeSubject1Input__arcsec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sec(a)=b' # to be filled in 
     expectedFunctions = {'sec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -897,7 +897,7 @@ def test__makeSubject1Input__arcsech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sech(a)=b' # to be filled in 
     expectedFunctions = {'sech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -939,7 +939,7 @@ def test__makeSubject1Input__arcsin(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sin(a)=b' # to be filled in 
     expectedFunctions = {'sin': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -981,7 +981,7 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sinh(a)=b' # to be filled in 
     expectedFunctions = {'sinh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1023,7 +1023,7 @@ def test__makeSubject1Input__arctan(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\tan(a)=b' # to be filled in 
     expectedFunctions = {'tan': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1065,7 +1065,7 @@ def test__makeSubject1Input__arctanh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\tanh(a)=b' # to be filled in 
     expectedFunctions = {'tanh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1107,7 +1107,7 @@ def test__makeSubject1Input__cosec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccosec(a)=b' # to be filled in 
     expectedFunctions = {'arccosec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1149,7 +1149,7 @@ def test__makeSubject1Input__cosech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccosech(a)=b' # to be filled in 
     expectedFunctions = {'arccosech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1191,7 +1191,7 @@ def test__makeSubject1Input__cos(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccos(a)=b' # to be filled in 
     expectedFunctions = {'arccos': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1233,7 +1233,7 @@ def test__makeSubject1Input__cosh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccosh(a)=b' # to be filled in 
     expectedFunctions = {'arccosh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1275,7 +1275,7 @@ def test__makeSubject1Input__cot(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccot(a)=b' # to be filled in 
     expectedFunctions = {'arccot': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1317,7 +1317,7 @@ def test__makeSubject1Input__coth(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccoth(a)=b' # to be filled in 
     expectedFunctions = {'arccoth': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1359,7 +1359,7 @@ def test__makeSubject1Input__sec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arcsec(a)=b' # to be filled in 
     expectedFunctions = {'arcsec': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1401,7 +1401,7 @@ def test__makeSubject1Input__sech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arcsech(a)=b' # to be filled in 
     expectedFunctions = {'arcsech': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1443,7 +1443,7 @@ def test__makeSubject1Input__sin(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arcsin(a)=b' # to be filled in 
     expectedFunctions = {'arcsin': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1485,7 +1485,7 @@ def test__makeSubject1Input__sinh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arcsinh(a)=b' # to be filled in 
     expectedFunctions = {'arcsinh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1527,7 +1527,7 @@ def test__makeSubject1Input__tan(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arctan(a)=b' # to be filled in 
     expectedFunctions = {'arctan': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1569,7 +1569,7 @@ def test__makeSubject1Input__tanh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arctanh(a)=b' # to be filled in 
     expectedFunctions = {'arctanh': 1} # count
     expectedVariables = {'a': 1, 'b': 1} # count
@@ -1614,7 +1614,7 @@ def test__leftSide__addition0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=c-b' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1656,7 +1656,7 @@ def test__leftSide__addition1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=c-a' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1698,7 +1698,7 @@ def test__leftSide__subtraction0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=c+b' # to be filled in 
     expectedFunctions = {'+': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1740,7 +1740,7 @@ def test__leftSide__subtraction1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=a-c' # to be filled in 
     expectedFunctions = {'-': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1782,7 +1782,7 @@ def test__leftSide__multiply0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\frac{c}{b}' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1824,7 +1824,7 @@ def test__leftSide__multiply1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=\\frac{c}{a}' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1866,7 +1866,7 @@ def test__leftSide__divide0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=cb' # to be filled in 
     expectedFunctions = {'*': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1908,7 +1908,7 @@ def test__leftSide__divide1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=\\frac{a}{c}' # to be filled in 
     expectedFunctions = {'/': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1950,7 +1950,7 @@ def test__leftSide__exponent0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\sqrt[b]{c}' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -1992,7 +1992,7 @@ def test__leftSide__exponent1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=\\log_a(c)' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -2034,7 +2034,7 @@ def test__leftSide__nroot0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\log_c(b)' # to be filled in 
     expectedFunctions = {'log': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -2076,7 +2076,7 @@ def test__leftSide__nroot1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=c^a' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -2118,7 +2118,7 @@ def test__leftSide__log0(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\sqrt[c]{b}' # to be filled in 
     expectedFunctions = {'nroot': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -2160,7 +2160,7 @@ def test__leftSide__log1(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('b')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'b=a^c' # to be filled in 
     expectedFunctions = {'^': 1} # count
     expectedVariables = {'c': 1, 'a': 1, 'b': 1} # count
@@ -2202,7 +2202,7 @@ def test__leftSide__arccosec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\cosec(b)' # to be filled in 
     expectedFunctions = {'cosec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2244,7 +2244,7 @@ def test__leftSide__arccosech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\cosech(b)' # to be filled in 
     expectedFunctions = {'cosech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2286,7 +2286,7 @@ def test__leftSide__arccos(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\cos(b)' # to be filled in 
     expectedFunctions = {'cos': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2328,7 +2328,7 @@ def test__leftSide__arccosh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\cosh(b)' # to be filled in 
     expectedFunctions = {'cosh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2370,7 +2370,7 @@ def test__leftSide__arccot(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\cot(b)' # to be filled in 
     expectedFunctions = {'cot': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2412,7 +2412,7 @@ def test__leftSide__arccoth(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\coth(b)' # to be filled in 
     expectedFunctions = {'coth': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2454,7 +2454,7 @@ def test__leftSide__arcsec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\sec(b)' # to be filled in 
     expectedFunctions = {'sec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2496,7 +2496,7 @@ def test__leftSide__arcsech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\sech(b)' # to be filled in 
     expectedFunctions = {'sech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2538,7 +2538,7 @@ def test__leftSide__arcsin(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\sin(b)' # to be filled in 
     expectedFunctions = {'sin': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2580,7 +2580,7 @@ def test__leftSide__arcsinh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\sinh(b)' # to be filled in 
     expectedFunctions = {'sinh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2622,7 +2622,7 @@ def test__leftSide__arctan(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\tan(b)' # to be filled in 
     expectedFunctions = {'tan': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2664,7 +2664,7 @@ def test__leftSide__arctanh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\tanh(b)' # to be filled in 
     expectedFunctions = {'tanh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2706,7 +2706,7 @@ def test__leftSide__cosec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arccosec(b)' # to be filled in 
     expectedFunctions = {'arccosec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2748,7 +2748,7 @@ def test__leftSide__cosech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arccosech(b)' # to be filled in 
     expectedFunctions = {'arccosech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2790,7 +2790,7 @@ def test__leftSide__cos(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arccos(b)' # to be filled in 
     expectedFunctions = {'arccos': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2832,7 +2832,7 @@ def test__leftSide__cosh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arccosh(b)' # to be filled in 
     expectedFunctions = {'arccosh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2874,7 +2874,7 @@ def test__leftSide__cot(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arccot(b)' # to be filled in 
     expectedFunctions = {'arccot': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2916,7 +2916,7 @@ def test__leftSide__coth(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arccoth(b)' # to be filled in 
     expectedFunctions = {'arccoth': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -2958,7 +2958,7 @@ def test__leftSide__sec(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arcsec(b)' # to be filled in 
     expectedFunctions = {'arcsec': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -3000,7 +3000,7 @@ def test__leftSide__sech(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arcsech(b)' # to be filled in 
     expectedFunctions = {'arcsech': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -3042,7 +3042,7 @@ def test__leftSide__sin(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arcsin(b)' # to be filled in 
     expectedFunctions = {'arcsin': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -3084,7 +3084,7 @@ def test__leftSide__sinh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arcsinh(b)' # to be filled in 
     expectedFunctions = {'arcsinh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -3126,7 +3126,7 @@ def test__leftSide__tan(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arctan(b)' # to be filled in 
     expectedFunctions = {'arctan': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count
@@ -3168,7 +3168,7 @@ def test__leftSide__tanh(verbose=False):
     before__startPos__nodeId = eq0.startPos__nodeId
     modifiedAST = eq0.makeSubject('a')
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a=\\arctanh(b)' # to be filled in 
     expectedFunctions = {'arctanh': 1} # count
     expectedVariables = {'b': 1, 'a': 1} # count

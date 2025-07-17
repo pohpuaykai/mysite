@@ -48,6 +48,7 @@ class Equation:
             self.astScheme = ast
             self.schemeparser = Schemeparser(ast=self.ast)
             self.schemeStr = self.schemeparser._unparse()
+            self.rootOfTree = self.schemeparser.rootOfTree
             self.functionsScheme = self.schemeparser.functions
             self.variablesScheme = self.schemeparser.variables
             self.primitivesScheme = self.schemeparser.primitives
@@ -57,7 +58,7 @@ class Equation:
             self._parserName = 'scheme'
             self._parser = self.schemeparser
 
-        else:
+        else: # from str to ast???
             self._eqs = equationStr
             self._parserName = parserName
             self._parser = Parser(parserName)
@@ -69,17 +70,19 @@ class Equation:
                 self.nodeId__len = self._parser.nodeId__len
                 self.schemeparser = self._parser
                 self.astScheme = self.ast
+                self.rootOfTree = self._parser.rootOfTree
                 self.functionsScheme = self.functions
                 self.variablesScheme = self.variables
                 self.primitivesScheme = self.primitives
                 self.totalNodeCountScheme = self.totalNodeCount
                 self.startPos__nodeIdScheme = self._parser.startPos__nodeId
                 self.nodeId__lenScheme = self._parser.nodeId__len
-            else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now.
+            else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now, used by Manipulate.py
                 from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
                 self.schemeparser = Schemeparser(ast=self.ast)
                 self.schemeStr = self.schemeparser._unparse()
                 self.astScheme = self.ast
+                self.rootOfTree = self.schemeparser.rootOfTree
                 #TODO test, untested please future-me
                 self.functionsScheme = self.schemeparser.functions
                 self.variablesScheme = self.schemeparser.variables
@@ -148,12 +151,13 @@ class Equation:
             print('working on AST:', self.astScheme)
 
         #find path from subRoot to variable
+        rootLabel = self.rootOfTree[0]; rootId = self.rootOfTree[1]
         stack = [Backtracker(
-            '=', #label
+            rootLabel, #label
             None, #neighbours
             None, # argumentIdx
             None, #prev
-            0, #id
+            rootId, #id
         )]
         found = None
         while len(stack) != 0:
@@ -191,7 +195,7 @@ class Equation:
                 }] # chain of inverses to apply,
         while found.prev is not None:
             found = found.prev
-            if found.label != '=':#cannot apply reverse(=)
+            if found.label != rootLabel:#cannot apply reverse(=)
                 ops.append({
                     'functionName':found.label,
                     'argumentIdx':found.argumentIdx, # this is the argumentIdx of self in its parent
@@ -203,11 +207,11 @@ class Equation:
         #
         found = foundBackUp #reset found
         while found.prev is not None:
-            if found.prev.label == '=':
+            if found.prev.label == rootLabel:
                 firstAncestorOfFound = (found.label, found.id)
                 if self.verbose:
                     print(firstAncestorOfFound)
-                childrenOfEquals = self.astScheme[('=', 0)]
+                childrenOfEquals = self.astScheme[self.rootOfTree]
                 firstAncestorOfFoundChildIdx = childrenOfEquals.index(firstAncestorOfFound)
                 if firstAncestorOfFoundChildIdx == 0:#left side
                     equationSide = 'L'
@@ -227,9 +231,9 @@ class Equation:
                 'functionName':vorOp['functionName'],
                 'argumentIdx':hinOp['argumentIdx'], # take the child's argumentIdx
                 'id':vorOp['id'], #this is the function nodeId
-                'lastId':0 # always going to be equals, after then prevOp....
+                'lastId':rootId # always going to be equals, after then prevOp....
             })
-        ops = operationOrderWithIdx
+        ops = operationOrderWithIdx#part of solving steps, excluding simplify
         if self.verbose:
             print('ops', ops)
         if simplify:
@@ -265,7 +269,7 @@ class Equation:
                 print('AFTER astScheme:', self.astScheme)
                 print('AFTER startPos__nodeIdScheme', self.startPos__nodeIdScheme)
             if simplify:
-                returnTup = recommend.simplify(hint={'invertedResults':invertedResults})#, 'lastOp':op})
+                returnTup = recommend.simplify(hint={'invertedResults':invertedResults})#, 'lastOp':op}) # part of solving steps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 if returnTup is not None:
                     simplifiedAst, nodeIdOfPrimitivesRemoved, nodeIdOfVariablesRemoved, nodeIdOfFuncsRemoved = returnTup
                     ######

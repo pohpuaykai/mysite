@@ -56,6 +56,7 @@ class Parser(ABC):
         globals()[className] = parserClass
         parser = parserClass(equationStr=equationStr, verbose=verbose)
         self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId = parser._parse()
+        self.rootOfTree = parser.rootOfTree
         #child class specific TODO
         if self.parserName == 'scheme':
             self.nodeId__len = parser.nodeId__len

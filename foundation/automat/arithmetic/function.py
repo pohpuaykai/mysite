@@ -242,7 +242,7 @@ class Function:#(metaclass=FunctionHook):
             nodeId__nodeId[iNodeId] = oNodeId
         #DFS to get the order, TODO technically its ALWAYS going to be 2 rows and 2 items in each row
         #i.e. a SMALL CONSTANT, do we need to invoke DFS? TODO
-        stack = [('=', 0)]
+        stack = [self.eq.rootOfTree]#stack = [('=', 0)]#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         orderList__after = []
         #
         # print('nodeId__nodeId')

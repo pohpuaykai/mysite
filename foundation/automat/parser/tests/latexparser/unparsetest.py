@@ -287,7 +287,7 @@ def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=Fa
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\widehat{H}\\Psi=\\widehat{E}\\Psi'
+    expected_eqsStr = '\\widehat{H}\\Psi =\\widehat{E}\\Psi'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -531,7 +531,7 @@ def test__manyFracCaretEnclosingBrac__partialFrac(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\frac{x^2}{(x-2)(x-3)^2}=(\\frac{9}{(x-3)^2}+\\frac{4}{x-2})+\\frac{-3}{x-3}'#'\\frac{x^2}{(x-2)(x-3)^2}=\\frac{4}{x-2}+\\frac{-3}{x-3}+\\frac{9}{(x-3)^2}'
+    expected_eqsStr = '\\frac{x^2}{(x-2)(x-3)^2}=(\\frac{4}{x-2}+\\frac{-3}{x-3})+\\frac{9}{(x-3)^2}'#'\\frac{x^2}{(x-2)(x-3)^2}=\\frac{4}{x-2}+\\frac{-3}{x-3}+\\frac{9}{(x-3)^2}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -596,7 +596,7 @@ def test__backslashInfixInBackslash__trigInTrig(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\sin^{20-\\cos^{43}(1-\\frac{\\pi }{5})}(9-\\tan^4(\\theta))+5=F'
+    expected_eqsStr = '\\sin^{20-\\cos^{43}(1-\\frac{\\pi}{5})}(9-\\tan^4(\\theta))+5=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -685,7 +685,7 @@ def test__hassliche__highPowersAndRandomCoefficientsPITEST(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = 'Px=7x^{13}-3x^9+5x^8-\\sqrt{2}x^4+\\pi x^2-42'
+    expected_eqsStr = 'P=((7x^{13}-3x^9)+(5x^8-\\sqrt{2}x^4))+(\\pi x^2-42)'#'Px=7x^{13}-3x^9+5x^8-\\sqrt{2}x^4+\\pi x^2-42'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1126,6 +1126,31 @@ def test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(verbose=Fa
         print(eqsStr)
 
 
+def test__makesubjecttest0__impedanceOfParallelRLCCircuit1(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+        ('/', 6): [('1', 14), ('*', 20)], 
+        ('/', 4): [('1', 10), ('R', 11)], 
+        ('-', 2): [('0', 17), ('1', 16)], 
+        ('*', 20): [('omega', 7), ('L', 15)], 
+        ('nroot', 0): [('-', 2), ('Z', 9)], 
+        ('-', 3): [('nroot', 0), ('/', 4)], 
+        ('/', 18): [('-', 3), ('j', 12)], 
+        ('+', 1): [('/', 18), ('/', 6)], 
+        ('=', 8): [('/', 19), ('C', 13)], 
+        ('/', 19): [('+', 1), ('omega', 5)]
+    }
+    rootOfTree = ('=', 8)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    expected_eqsStr = '\\frac{\\frac{\\sqrt[-1]{Z}-\\frac{1}{R}}{j}+\\frac{1}{\\omega L}}{\\omega}=C'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
 
 def test__newSymbolsLimitTheorem__sumRule(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -1150,7 +1175,7 @@ def test__newSymbolsLimitTheorem__sumRule(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\lim_{x\\to\\bar{x}}{(f+g)x}=\\lim_{x\\to\\bar{x}}{fx}+\\lim_{x\to\bar{x}}{gx}'#fx->f(x) & gx->g(x) TODO<<<<<<
+    expected_eqsStr = '\\lim_{x \\to \\bar{x}}{(f+g)x}=\\lim_{x \\to \\bar{x}}{fx}+\\lim_{x \\to \\bar{x}}{gx}'#fx->f(x) & gx->g(x) TODO<<<<<<
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1180,7 +1205,7 @@ def test__newSymbolsLimitTheorem__productRule(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\lim_{x\\to\\bar{x}}{fgx}=\\lim_{x\\to\\bar{x}}{fx}\\lim_{x\\to\\bar{x}}{gx}'#fx->f(x) & gx->g(x) TODO<<<<<<
+    expected_eqsStr = '\\lim_{x \\to \\bar{x}}{fgx}=\\lim_{x \\to \\bar{x}}{fx}\\lim_{x \\to \\bar{x}}{gx}'#fx->f(x) & gx->g(x) TODO<<<<<<
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1206,7 +1231,7 @@ def test__newSymbolsLimitTheorem__constantTimesRule(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\lim_{x\\to\\bar{x}}{cfx}=c\\lim_{x\\to\\bar{x}}{fx}'#fx->f(x) & gx->g(x) TODO<<<<<<
+    expected_eqsStr = '\\lim_{x \\to \\bar{x}}{cfx}=c\\lim_{x \\to \\bar{x}}{fx}'#fx->f(x) & gx->g(x) TODO<<<<<<
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1236,7 +1261,7 @@ def test__newSymbolsLimitTheorem__quotientRule(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\lim_{x\\to\\bar{x}}{\\frac{f}{g}x}=\\frac{\\lim_{x\\to\\bar{x}}{fx}}{\\lim_{x\\to\\bar{x}}{gx}}'
+    expected_eqsStr = '\\lim_{x \\to \\bar{x}}{\\frac{f}{g}x}=\\frac{\\lim_{x \\to \\bar{x}}{fx}}{\\lim_{x \\to \\bar{x}}{gx}}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1279,7 +1304,7 @@ def test__newSymbols__fourierSeries(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\lim_{\\theta\\to \\infty}{\\sum_{n=-\\theta }^{\\theta }{\\frac{1}{P}\\int_{\\frac{P}{2}}^{-\\frac{P}{2}}{fxe^-i2\\pi \\frac{n}{P}x\\dx }e^i2\\pi \\frac{n}{P}x}}'
+    expected_eqsStr = '\\lim_{\\theta\\to \\infty}{\\sum_{n=-\\theta }^{\\theta}{\\frac{1}{P}\\int_{\\frac{P}{2}}^{-\\frac{P}{2}}{fxe^-i2\\pi \\frac{n}{P}x\\dx }e^i2\\pi \\frac{n}{P}x}}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1287,6 +1312,13 @@ def test__newSymbols__fourierSeries(verbose=False):
 
 
 def test__newSymbols__parallelSumOfCapacitance(verbose=False):
+    """
+(= C^{parallelTotal}_{k} (/ (prod (= k_0 1) k C_{k_0}) (sum (= k_1 1) k (/ (prod (= k_0 1) k C_{k_0}) C_{k_1}))))
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+01234567891111111111222222222233333333334444444444555555555566666666667777777777888888888899999999991111111111111
+          0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890000000000111
+                                                                                                    0123456789012
+    """
     pp = pprint.PrettyPrinter(indent=4)
 
     ast = {
@@ -1529,60 +1561,61 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus(True)
-    test__contiguousLeftOvers__decimalPlaces(True)
-    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply(True)
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets(True)
-    test__schemeToLatex__variablesWithCurlyBrackets(True)
-    test__findingBackSlashAndInfixOperations__Trig0(True)
-    # test__findingBackSlashAndInfixOperations__Trig1(True)
-    # test__findingBackSlashAndInfixOperations__Trig2(True)
-    # test__findingBackSlashAndInfixOperations__Sqrt0(True)
-    # test__findingBackSlashAndInfixOperations__Sqrt1(True)
-    # test__findingBackSlashAndInfixOperations__Ln(True)
-    # test__findingBackSlashAndInfixOperations__Frac(True)
-    # test__findingBackSlashAndInfixOperations__Log0(True)
-    # test__findingBackSlashAndInfixOperations__Log1(True)
-    # test__findingBackSlashAndInfixOperations__tildeVariable(True)
+    # test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
+    # test__contiguousLeftOvers__decimalPlaces()
+    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    # test__schemeToLatex__variablesWithCurlyBrackets()
+    # test__findingBackSlashAndInfixOperations__Trig0()
+    # test__findingBackSlashAndInfixOperations__Trig1()
+    # test__findingBackSlashAndInfixOperations__Trig2()
+    # test__findingBackSlashAndInfixOperations__Sqrt0()
+    # test__findingBackSlashAndInfixOperations__Sqrt1()
+    # test__findingBackSlashAndInfixOperations__Ln()
+    # test__findingBackSlashAndInfixOperations__Frac()
+    # test__findingBackSlashAndInfixOperations__Log0()
+    # test__findingBackSlashAndInfixOperations__Log1()
+    # test__findingBackSlashAndInfixOperations__tildeVariable()
     # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    # test__infixInBackslash__paraboloid(True)
-    # test__sqrtWithPowerCaretRightOtherInfix__hill(True)
-    # test__nonInfixBrackets__addImplicitMultiply(True)
-    # test__nonInfixBrackets__addImplicitMultiply0(True)
-    # test__nonInfixBrackets__addImplicitMultiply1(True)
-    # test__BODMAS__priorityBetweenInfixForBrackets(True)
-    # test__BODMAS__enclosingBracketInBackslashArg(True)
-    # test__BODMAS__enclosingBracketInBackslashArgWithExponent(True)
-    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero(True)
-    # test__BODMAS__enclosingBracket(True)
-    # test__manyFracCaretEnclosingBrac__partialFrac(True)
-    # test__fracWithLogNoBase__changeLogBaseFormula(True)
+    # test__infixInBackslash__paraboloid()
+    # test__sqrtWithPowerCaretRightOtherInfix__hill()
+    # test__nonInfixBrackets__addImplicitMultiply()
+    # test__nonInfixBrackets__addImplicitMultiply0()
+    # test__nonInfixBrackets__addImplicitMultiply1()
+    # test__BODMAS__priorityBetweenInfixForBrackets()
+    # test__BODMAS__enclosingBracketInBackslashArg()
+    # test__BODMAS__enclosingBracketInBackslashArgWithExponent()
+    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
+    # test__BODMAS__enclosingBracket()
+    # test__manyFracCaretEnclosingBrac__partialFrac()
+    # test__fracWithLogNoBase__changeLogBaseFormula()
     # test__backslashInfixInBackslash__sqrtInSqrt(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    # test__backslashInfixInBackslash__trigInTrig(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    # test__backslashInfixInBackslash__logInLog(True)
-    # test__backslashInfixInBackslash__fracInFrac(True)
-    # test__hassliche__highPowersAndRandomCoefficientsPITEST(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
-    # test__hassliche__nestedPolynomial(True)
-    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST(True)
-    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST(True)
-    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH(True)
-    # test__hassliche__degree5(True)
-    # test__hassliche__degree6(True)
-    # test__hassliche__degree7(True)
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm(True)
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0(True)
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1(True)
-    # test__newSymbolsLimitTheorem__sumRule(True)
-    # test__newSymbolsLimitTheorem__productRule(True)
-    # test__newSymbolsLimitTheorem__constantTimesRule(True)
-    # test__newSymbolsLimitTheorem__quotientRule(True)
-    # test__newSymbols__fourierSeries(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
-    # test__newSymbols__parallelSumOfCapacitance(True)
-    # test__newSymbols__faradayIntegralForm(True)
-    # test__newSymbols__faradayDifferentialForm(True)
-    # test__newSymbols__gaussIntegralForm(True)
-    test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< missing nabla<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    # test__paveWayForDifferentiation__productRule(True) 
-    # test__paveWayForDifferentiation__sumRule(True)  
-    # test__paveWayForIntegration__enclosingBracketNonBackslash(True) # functions u and v... (same problem as S(x, y))
-    # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(True) #  TODO refactor brackslash args into a list, ... and the rest of the code...
+    # test__backslashInfixInBackslash__trigInTrig()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    # test__backslashInfixInBackslash__logInLog()
+    # test__backslashInfixInBackslash__fracInFrac()
+    # test__hassliche__highPowersAndRandomCoefficientsPITEST()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
+    # test__hassliche__nestedPolynomial()
+    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
+    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
+    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
+    # test__hassliche__degree5()
+    # test__hassliche__degree6()
+    # test__hassliche__degree7()
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
+    test__makesubjecttest0__impedanceOfParallelRLCCircuit1(True)
+    # test__newSymbolsLimitTheorem__sumRule()
+    # test__newSymbolsLimitTheorem__productRule()
+    # test__newSymbolsLimitTheorem__constantTimesRule()
+    # test__newSymbolsLimitTheorem__quotientRule()
+    # test__newSymbols__fourierSeries()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
+    # test__newSymbols__parallelSumOfCapacitance()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<missing a sum
+    # test__newSymbols__faradayIntegralForm()
+    # test__newSymbols__faradayDifferentialForm()
+    # test__newSymbols__gaussIntegralForm()
+    # test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< nabla missing curlybrace<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    # test__paveWayForDifferentiation__productRule() 
+    # test__paveWayForDifferentiation__sumRule()  
+    # test__paveWayForIntegration__enclosingBracketNonBackslash() # functions u and v... (same problem as S(x, y))
+    # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash() #  TODO refactor brackslash args into a list, ... and the rest of the code...

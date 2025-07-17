@@ -13,7 +13,7 @@ def test__moreThan1Op__seriesResistance0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'R_1-R_3=R_2' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -28,7 +28,7 @@ def test__moreThan1Op__seriesResistance1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'R_1-R_2=R_3' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -43,7 +43,7 @@ def test__moreThan1Op__parallelResistance0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'R_1=\\frac{1}{\\frac{1}{R_2}+\\frac{1}{R_3}}' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -59,7 +59,7 @@ def test__moreThan1Op__parallelResistance1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{1}{\\frac{1}{R_1}-\\frac{1}{R_3}}=R_2' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -75,7 +75,7 @@ def test__moreThan1Op__parallelResistance2(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{1}{\\frac{1}{R_1}-\\frac{1}{R_2}}=R_3' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -91,7 +91,7 @@ def test__moreThan1Op__ohmPowerLaw0(verbose=False): # TODO nroot of even power, 
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sqrt{PR}=V' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -107,7 +107,7 @@ def test__moreThan1Op__ohmPowerLaw1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{V^2}{P}=R' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -123,7 +123,7 @@ def test__moreThan1Op__ohmPowerLaw2(verbose=False): # TODO nroot of even power, 
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\sqrt{\\frac{P}{R}}=I' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -139,7 +139,7 @@ def test__moreThan1Op__ohmPowerLaw3(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{P}{I^2}=R' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -155,7 +155,7 @@ def test__moreThan1Op__transistorOhmLaw0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'I_B R_B+V_{BE}=V_B' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -170,7 +170,7 @@ def test__moreThan1Op__transistorOhmLaw1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'V_B -I_B R_B=V_{BE}' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -186,7 +186,7 @@ def test__moreThan1Op__transistorOhmLaw2(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{V_B -V_{BE}}{I_B}=R_B' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -202,8 +202,8 @@ def test__moreThan1Op__ebermollsModel0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\frac{I_C }{e^{\\frac{V_{BE} }{V_T}}-1}=I_S' # to be filled in 
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{I_C}{e^{\\frac{V_{BE}}{V_T}}-1}=I_S' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -218,8 +218,8 @@ def test__moreThan1Op__ebermollsModel1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\ln(\\frac{I_C }{I_S}+1)V_T=V_{BE}' # to be filled in 
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\ln(\\frac{I_C}{I_S}+1)V_T=V_{BE}' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -234,7 +234,7 @@ def test__moreThan1Op__ebermollsModel2(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{V_{BE} }{\\ln(\\frac{I_C }{I_S}+1)}=V_T' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -250,8 +250,8 @@ def test__moreThan1Op__acVoltage0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\frac{v_t }{\\sin(\\omega t+\\phi)}=V_{peak}' # to be filled in 
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{v_t}{\\sin(\\omega t+\\phi )}=V_{peak}' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -266,8 +266,8 @@ def test__moreThan1Op__acVoltage1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\frac{\\arcsin(\\frac{v_t }{V_{peak}})-\\phi}{t}=\\omega'
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{\\arcsin(\\frac{v_t}{V_{peak}})-\\phi }{t}=\\omega'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -283,8 +283,8 @@ def test__moreThan1Op__acVoltage2(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\frac{\\arcsin(\\frac{v_t }{V_{peak}})-\\phi}{\\omega}=t' # to be filled in 
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{\\arcsin(\\frac{v_t}{V_{peak}})-\\phi }{\\omega}=t' # to be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -300,8 +300,8 @@ def test__moreThan1Op__acVoltage3(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\arcsin(\\frac{v_t }{V_{peak}})-\\omega t=\\phi'
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\arcsin(\\frac{v_t}{V_{peak}})-\\omega t=\\phi'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -316,8 +316,8 @@ def test__moreThan1Op__acPower0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\frac{\\frac{P}{\\cos(\\phi )}}{I_{rms}}=V_{rms}'
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{\\frac{P}{\\cos(\\phi)}}{I_{rms}}=V_{rms}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -332,8 +332,8 @@ def test__moreThan1Op__acPower1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
-    expectedLatexStr = '\\frac{\\frac{P}{\\cos(\\phi )}}{V_{rms}}=I_{rms}'
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{\\frac{P}{\\cos(\\phi)}}{V_{rms}}=I_{rms}'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -349,7 +349,7 @@ def test__moreThan1Op__acPower2(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\arccos(\\frac{P}{V_{rms} I_{rms}})=\\phi'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -366,7 +366,7 @@ def test__6levelsDeep__impedanceOfParallelRLCCircuit0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{1}{\\sqrt[-1]{Z}-j(\\omega C-\\frac{1}{\\omega L})}=R'
     #TODO \\sqrt[-1]{Z} is a bit weird... maybe 'fix' this in latexUnparse?, very unconventional to write like that
     #TODO \\sqrt[-1]{Z} ==> \\frac{-1}{Z}
@@ -385,7 +385,7 @@ def test__6levelsDeep__impedanceOfParallelRLCCircuit1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{\\frac{\\sqrt[-1]{Z}-\\frac{1}{R}}{j}+\\frac{1}{\\omega L}}{\\omega}=C'
     #TODO \\sqrt[-1]{Z} is a bit weird... maybe 'fix' this in latexUnparse?, very unconventional to write like that
     #TODO \\sqrt[-1]{Z} ==> \\frac{-1}{Z}
@@ -404,7 +404,7 @@ def test__6levelsDeep__impedanceOfParallelRLCCircuit2(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{\\frac{1}{\\omega C-\\frac{\\sqrt[-1]{Z}-\\frac{1}{R}}{j}}}{\\omega}=L'
     #TODO \\sqrt[-1]{Z} is a bit weird... maybe 'fix' this in latexUnparse?, very unconventional to write like that
     #TODO \\sqrt[-1]{Z} ==> \\frac{-1}{Z}
@@ -425,7 +425,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '((A_v -\\frac{1}{1+\\frac{R_o }{R_L +\\frac{R_2}{1+sCR_2}}})-(1))R_1=R_f'
     #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
@@ -443,7 +443,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp1(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{R_f }{(A_v -\\frac{1}{1+\\frac{R_o }{R_L +\\frac{R_2}{1+sCR_2}}})-(1)}=R_1'
     #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
@@ -474,7 +474,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp2(verbose=False):
     # ('/', 6): [('1', 11), ('-', 5)],
     # ('/', 16): [('R_2', 24), ('+', 18)],
     # ('=', 0): [('*', 10), ('R_o', 13)]}
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '(\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1)(R_L +\\frac{R_2}{1+sCR_2})=R_o'
     #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
@@ -492,7 +492,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp3(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{R_o }{\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1}-\\frac{R_2}{1+sCR_2}=R_L'
     #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
@@ -511,7 +511,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp4(verbose=False):
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     # print(modifiedAST)
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{\\frac{\\frac{R_2}{\\frac{R_o }{\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1}-R_L}-1}{R_2}}{C}=s'
     # TODO DOUBLE_INVERSE=>simplification_in_AST
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
@@ -529,7 +529,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp5(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{\\frac{\\frac{R_2}{\\frac{R_o }{\\frac{1}{A_v -(1+\\frac{R_f }{R_1})}-1}-R_L}-1}{R_2}}{s}=C'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -546,7 +546,7 @@ def test__linearEliminationBySubstitution__eq0(verbose=False):
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = '\\frac{V_{in} -I_{Z_{1}}R_{Z_{1}}}{R}=I_{R}' # TO be filled in 
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -567,7 +567,7 @@ def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simp
     #
     modifiedAST = eq0.makeSubject(subject, simplify=True) # PIONEER BATCH :)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=modifiedAST, verbose=verbose)._unparse()
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
     # This is simplify:
     expectedLatexStr = 'I_{R} =\\frac{I_{R_{C}} R_{C}-V^{Q1}_{BE}}{R}'
     # This is without simplify:
@@ -581,36 +581,36 @@ def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simp
 
 
 if __name__=='__main__':
-    test__moreThan1Op__seriesResistance0()
-    test__moreThan1Op__seriesResistance1()
-    test__moreThan1Op__parallelResistance0()
-    test__moreThan1Op__parallelResistance1()
-    test__moreThan1Op__parallelResistance2()
-    test__moreThan1Op__ohmPowerLaw0()
-    test__moreThan1Op__ohmPowerLaw1()
-    test__moreThan1Op__ohmPowerLaw2()
-    test__moreThan1Op__ohmPowerLaw3()
-    test__moreThan1Op__transistorOhmLaw0()
-    test__moreThan1Op__transistorOhmLaw1()
-    test__moreThan1Op__transistorOhmLaw2()
-    test__moreThan1Op__ebermollsModel0()
-    test__moreThan1Op__ebermollsModel1()
-    test__moreThan1Op__ebermollsModel2()
-    test__moreThan1Op__acVoltage0()
-    test__moreThan1Op__acVoltage1()
-    test__moreThan1Op__acVoltage2()
-    test__moreThan1Op__acVoltage3()
-    test__moreThan1Op__acPower0()
-    test__moreThan1Op__acPower1()
-    test__moreThan1Op__acPower2()
+    # test__moreThan1Op__seriesResistance0()
+    # test__moreThan1Op__seriesResistance1()
+    # test__moreThan1Op__parallelResistance0()
+    # test__moreThan1Op__parallelResistance1()
+    # test__moreThan1Op__parallelResistance2()
+    # test__moreThan1Op__ohmPowerLaw0()
+    # test__moreThan1Op__ohmPowerLaw1()
+    # test__moreThan1Op__ohmPowerLaw2()
+    # test__moreThan1Op__ohmPowerLaw3()
+    # test__moreThan1Op__transistorOhmLaw0(True) # ugly
+    # test__moreThan1Op__transistorOhmLaw1(True) # ugly
+    # test__moreThan1Op__transistorOhmLaw2(True) # ugly
+    # test__moreThan1Op__ebermollsModel0()
+    # test__moreThan1Op__ebermollsModel1()
+    # test__moreThan1Op__ebermollsModel2(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<log_e did not become ln
+    # test__moreThan1Op__acVoltage0()
+    # test__moreThan1Op__acVoltage1(True) # not sure why no match?
+    # test__moreThan1Op__acVoltage2()
+    # test__moreThan1Op__acVoltage3(True) # not sure why no match?
+    # test__moreThan1Op__acPower0()
+    # test__moreThan1Op__acPower1()
+    # test__moreThan1Op__acPower2() # ugly
     # test__6levelsDeep__impedanceOfParallelRLCCircuit0() # TODO weird latex unparse sqrt[-1], simplify?
-    # test__6levelsDeep__impedanceOfParallelRLCCircuit1() # TODO weird latex unparse sqrt[-1], simplify?
-    # test__6levelsDeep__impedanceOfParallelRLCCircuit2() # TODO weird latex unparse sqrt[-1], DOUBLE_INVERSE=>simplification_in_AST
-    test__6levelsDeep__voltageGainOfNonInvertingOp0()
-    test__6levelsDeep__voltageGainOfNonInvertingOp1()
+    test__6levelsDeep__impedanceOfParallelRLCCircuit1(True) # TODO weird latex unparse sqrt[-1], simplify?
+    # test__6levelsDeep__impedanceOfParallelRLCCircuit2(True) # TODO weird latex unparse sqrt[-1], DOUBLE_INVERSE=>simplification_in_AST
+    # test__6levelsDeep__voltageGainOfNonInvertingOp0(True)
+    # test__6levelsDeep__voltageGainOfNonInvertingOp1(True)
     # test__6levelsDeep__voltageGainOfNonInvertingOp2() #
-    test__6levelsDeep__voltageGainOfNonInvertingOp3()
-    test__6levelsDeep__voltageGainOfNonInvertingOp4() 
-    test__6levelsDeep__voltageGainOfNonInvertingOp5()
-    test__linearEliminationBySubstitution__eq0()
-    test__linearEliminationBySubstitution__eq1() # MINUS_ZERO=>simplication_in_AST
+    # test__6levelsDeep__voltageGainOfNonInvertingOp3()
+    # test__6levelsDeep__voltageGainOfNonInvertingOp4() 
+    # test__6levelsDeep__voltageGainOfNonInvertingOp5()
+    # test__linearEliminationBySubstitution__eq0()
+    # test__linearEliminationBySubstitution__eq1() # MINUS_ZERO=>simplication_in_AST

@@ -93,16 +93,21 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     # #this is also the solving steps? Just the rough steps... not detailed enough<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<should include the actual manipulation steps :)
     substitutionPath = Recommend.bipartiteSearch(listOfCollectedEquations, listOfVariables, equationVariables_g, vertexId__equationVariableId, equationId__vertexId, type__list_vertexIds, equationKey, variableKey, dependentVariableId, list_independentVariablesIds)
 
-    # vorEquation = list_equations[vertexId__equationVariableId[substitutionPath[0]]]
-    # entVariable = list_variables[vertexId__equationVariableId[substitutionPath[1]]]
-    # for idx, vertexId in enumerate(substitutionPath[2:]):
-    #     if idx % 2 == 0: # vertexId==equationVertexId
-    #         hinEquation = list_equations[vertexId__equationVariableId[vertexId]]
-    #         #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
-    #         hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)#This method is not inplace (please see foundation.automat.core.tests.lineareliminationbysubstitution.py)
-    #         vorEquation = hinEquation
-    #     else: # vertexId==variableVertexId
-    #         eliminateVariableId = list_variables[vertexId__equationVariableId[vertexIdx]]
+    #incorporate for displaying_of_latex
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    #
+    vorEquation = list_equations[vertexId__equationVariableId[substitutionPath[0]]]
+    entVariable = list_variables[vertexId__equationVariableId[substitutionPath[1]]]
+    print('start: ', Latexparser(ast=vorEquation.astScheme, rootOfTree=)._unparse()
+    for idx, vertexId in enumerate(substitutionPath[2:]):
+        if idx % 2 == 0: # vertexId==equationVertexId
+            hinEquation = list_equations[vertexId__equationVariableId[vertexId]]
+            #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
+            hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)#This method is not inplace (please see foundation.automat.core.tests.lineareliminationbysubstitution.py)
+            print('substitutionStep ', (idx/2), ': ', hinEquation.astScheme, ' subVar: ', entVariable)
+            vorEquation = hinEquation
+        else: # vertexId==variableVertexId
+            entVariable = list_variables[vertexId__equationVariableId[vertexIdx]]
 
     if verbose:
         print('listOfCollectedEquations')

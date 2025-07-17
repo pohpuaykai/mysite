@@ -25,8 +25,8 @@ class FindTreeInTree:
                 if _nodeMatch(gesuchteTreeRoot, child):
                     list_of_matches.append(child)
         #
-        print('list_of_matches<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-        print(list_of_matches)
+        # print('list_of_matches<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        # print(list_of_matches)
 
 
         if len(list_of_matches) > 0:#some found => list_of_matches (different nodeId)
@@ -35,13 +35,13 @@ class FindTreeInTree:
                 gesuchteTreeStack, targetTreeStack = [gesuchteTreeRoot], [targetTreeRoot]
                 matchedTargetTree, lastLeafMatched = None, None # for getting nodeId
                 callbackForTreeTreeMatchingStart(targetTreeRoot)
-                print('rooting at ', targetTreeRoot)
-                print('___________________________________________________________________')
+                # print('rooting at ', targetTreeRoot)
+                # print('___________________________________________________________________')
                 while len(gesuchteTreeStack) > 0 and len(targetTreeStack) > 0:
                     gesuchteCurrent, targetCurrent = gesuchteTreeStack.pop(0), targetTreeStack.pop(0) # BFS
                     gesuchteCurrentChildren = gesuchteTree.get(gesuchteCurrent, [])
                     gesuchteTreeStack+=gesuchteCurrentChildren
-                    print('popped:', gesuchteCurrent, targetCurrent); import pdb;pdb.set_trace()
+                    # print('popped:', gesuchteCurrent, targetCurrent); import pdb;pdb.set_trace()
                     # print('gesuchteTreeStack', gesuchteTreeStack)
                     # print('targetTreeStack', targetTreeStack)
                     # if gesuchteCurrent[0] != targetCurrent[0]: #no_match #<<<<<<<<<<<<<<<<<<<<<<<<<<<funcmatching

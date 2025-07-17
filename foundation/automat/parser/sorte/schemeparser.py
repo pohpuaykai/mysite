@@ -9,7 +9,7 @@ class Schemeparser(Parser):
     """
     FUNC_NAMES = Function.FUNC_NAMES()
 
-    def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None, equalTuple=None):
+    def __init__(self, equationStr=None, verbose=False, veryVerbose=False, ast=None, rootOfTree=None):
         self.parserName = 'scheme'
         #this attribute is unique to schemeparsers for now
         self.nodeId__len = {} # TODO have a go on the equationStr, to remove all the excess spaces..., this will give problems to startPos__nodeId and nodeId__len
@@ -17,10 +17,10 @@ class Schemeparser(Parser):
             self._eqs = equationStr
             self.verbose = verbose
             self.veryVerbose = veryVerbose
-            self.equalTuple = None
+            self.rootOfTree = None
             # self.ast, self.functions, self.variables, self.primitives, self.totalNodeCount, self.startPos__nodeId = self._parse()
         else:
-            self.equalTuple = equalTuple
+            self.rootOfTree = rootOfTree
             self.ast = ast
             self.verbose = verbose
             self.veryVerbose = veryVerbose
@@ -60,6 +60,7 @@ class Schemeparser(Parser):
             print(f'return from _recursiveParse************* initialised ast: {ast}')
         currentId = 0
         stack = [{'bt':backtrackerRoot, 'tid':currentId}]
+        self.rootOfTree = (backtrackerRoot.label, currentId)
         startPos__nodeId[backtrackerRoot.prev] = currentId
         while len(stack) != 0:
             currentBt = stack.pop(0)
@@ -195,7 +196,7 @@ class Schemeparser(Parser):
     def _findEqualTuple(self):
         for keyTuple in self.ast.keys():
             if keyTuple[0] == '=':
-                self.equalTuple = keyTuple
+                self.rootOfTree = keyTuple
 
 
     def _unparse(self):
@@ -209,12 +210,13 @@ class Schemeparser(Parser):
         self.variables = {}
         self.primitives = {}
         #find the (=, id)
-        if self.equalTuple is None:
+        if self.rootOfTree is None:
             self._findEqualTuple()
-        if self.equalTuple is None:#noch equalTuple kann nicht finden
+        if self.rootOfTree is None:#noch rootOfTree kann nicht finden
             raise Exception('No equal, Invalid Equation String')
-        returnTup = self._recursiveUnparse(self.ast, self.equalTuple, 0)
-        del self.functions['=']
+        returnTup = self._recursiveUnparse(self.ast, self.rootOfTree, 0)
+        if '=' in self.functions:
+            del self.functions['=']
         return returnTup
 
     def _recursiveUnparse(self, subAST, keyTuple, startPos):

@@ -385,6 +385,7 @@ class Latexparser(Parser):
             self.all_preSym_pos = None
 
             self.latexAST = None #VAR:OUTPUTS
+            self.rootOfTree = None
             self.functions, self.variables, self.primitives, self.totalNodeCount, = None, None, None, None #VAR:OUTPUTS
             self.list_of_ast_roots = []
         else: # unparse Mode
@@ -949,7 +950,7 @@ class Latexparser(Parser):
 
             if isOverallEqual:# this is a overall bracket
                 self.overallEqual_startPos.append(start)
-        print('self.overallEqual_startPos', self.overallEqual_startPos)
+        # print('self.overallEqual_startPos', self.overallEqual_startPos)
         #overallEquals SPLIT the equationStr into equal parts
         self.overallEqual_startPos = sorted(self.overallEqual_startPos)
         self.overallEqual_startPos.insert(0, 0)
@@ -973,7 +974,7 @@ class Latexparser(Parser):
             nodeIdx = self.entitystorage.insert(group, start, end, EntityType.PURE_INFIX, widthStart=widthStart, widthEnd=widthEnd)
             if start in self.overallEqual_startPos:
                 self.overallEqual_nodes.append(('=', nodeIdx))
-        print('self.overallEqual_nodes', self.overallEqual_nodes)
+        # print('self.overallEqual_nodes', self.overallEqual_nodes)
 
 
         # print(str(self.entitystorage))
@@ -1677,6 +1678,9 @@ class Latexparser(Parser):
             # print('this should not happen if there is an overallEquals')
             self.list_of_ast_roots.append((infixEle[1], infixEle[0]))
 
+        #bad but quick fix for now
+        self.rootOfTree = self.list_of_ast_roots[0]
+
 
 
         
@@ -1850,9 +1854,9 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
             if not instructions:
                 self.ast[pNode] = replaceChildWithNewParent(current__replaced, existingChildrenList, pNode)
 
-        # #SPECIAL CASE FOR DIFFERENTIAL OPERATORS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<better to use SchemeGrammarParser for this?
+        # #SPECIAL CASE FOR DIFFERENTIAL OPERATORS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<better to use SchemeGrammarParser for this?
         """
-        Is it better to use SchemeGrammarParser?
+        Is it better to use SchemeGrammarParser? YES, we are using SGP for _unparse, here not using is ok, because we are only matching one node, but _unparse needs to match tree(template) to tree(ast)
         
         FindTreeInTree misses 
         (d/dx)(uv), because a misses a tree, by popping u instead of d
@@ -2065,185 +2069,386 @@ count by EntityType:
 
     def _convertASTToLatexStyleAST(self):
         """
+        DFS, at each current, collect all symbols non duplicated
+
+        for each symbol run list_instructions = self.getLatexSpecialCases(symbol, reverse=True), in order of 'reversePriority'
+            convert(ast->scheme) the BFS_queue to schemeBFS, use schemegrammarparser, 
+                schemeword=schemeBFS, 
+                rawInputPattern=(ast->scheme)(list_instructions['outputTemplate']),  #if var__defaults is not empty, replace var with defaults in list_instructions['outputTemplate']
+                rawOutputPattern=(ast->scheme)(list_instructions['inputTemplate'])   #if var__defaults is not empty, remove the tuple with var as the first entry in list_instructions['inputTemplate']
+            convert the manipulatedSchemeWord back to AST
+
+
+
+
+
+        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        remove FindTreeInTree, does lesser than schemegrammarparser, could do this for _convert_to_schemeStyledAST, so that our configuration will be more flexible (not restricted to 1_node_matching)
+        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
         find all outputTemplate(subtree) in input
         - find root in input
         - DFS together
         """
+
+        def stripOutArgsFromTemplate(templateWithArgs, templateRoot):
+            # need to strip the outputTemplate of all the unnecessary arguments
+            stripStack, outputTemplate = [templateRoot], {}# stripStack, outputTemplate = [outputTemplateRoot], {}
+            while len(stripStack) > 0:
+                tup = stripStack.pop()
+                strippedChildren = []
+                # print(dict(instructions['outputTemplate']));import pdb;pdb.set_trace()
+                # for child in dict(instructions['outputTemplate']).get(tup, []):
+                for child in templateWithArgs.get(tup, []):
+                    strippedChildren.append(child[0])
+                    stripStack.append(child)
+                if len(strippedChildren)>0:
+                    outputTemplate[tup[0]] = strippedChildren
+            outputTemplateRoot = templateRoot[0]
+            # import pdb;pdb.set_trace()
+            return outputTemplate, outputTemplateRoot
+
+
+        def findOutputTemplateRoot(instructions):
+            outputTemplateRoot = None
+            for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
+                # import pdb;pdb.set_trace()
+                if outputTemplateParent[2] == instructions['rootOfResultTemplate']: #only the id
+                    outputTemplateRoot=outputTemplateParent
+                    break
+            return outputTemplateRoot
+
+        from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser
+
+
+        nodeId__symbol___withInstructions = {}
+        stack = [self.rootOfTree]
+        while len(stack) > 0:
+            current = stack.pop()
+            if len(self.getLatexSpecialCases(current[0], reverse=True)) > 0:
+                nodeId__symbol___withInstructions[current[1]] = current[0]
+            kinder = self.ast.get(current, [])
+            stack += kinder
+        #found all symbols of self.ast
+        # print('self.ast', self.ast)
+        theAst = self.ast; theRootOfTree = self.rootOfTree; idxOf_nodeId__symbol___withInstructions = 0; astSchemeStr = None
+        while len(nodeId__symbol___withInstructions) > 0:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< after trying 2 cycles then stop?
+            # print('nodeId__symbol___withInstructions: ', nodeId__symbol___withInstructions)
+            # for symbol in list(all_symbols):
+            print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            if idxOf_nodeId__symbol___withInstructions >= len(nodeId__symbol___withInstructions):
+                break
+            nodeId, symbol = list(nodeId__symbol___withInstructions.items())[idxOf_nodeId__symbol___withInstructions];idxOf_nodeId__symbol___withInstructions+=1
+            list_instructions = self.getLatexSpecialCases(symbol, reverse=True)
+            # print('list_instructions: ', list_instructions)
+            # print('len(list_instructions): ', len(list_instructions))
+            # if len(list_instructions) > 0:
+            for instructionsIdx, instructions in enumerate(sorted(list_instructions, key=lambda dic: dic['reversePriority'], reverse=False)): # sort instructions by 'reversePriority'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                
+                og_schemeparser = Schemeparser(ast=theAst, rootOfTree=theRootOfTree)
+                astSchemeStr = og_schemeparser._unparse()
+                # nodeId__startPos = dict(map(lambda t: (t[1], t[0]), og_schemeparser.startPos__nodeId.items()))
+                print('beginning: ', astSchemeStr, 'startPos__nodeId:', og_schemeparser.startPos__nodeId)#, 'nodeId__startPos: ', nodeId__startPos)
+                
+                # print('outputTemplate:')
+                # print(instructions['outputTemplate'])
+                # print('inputTemplate:')
+                # print(instructions['inputTemplate'])
+                #instructions['outputTemplate']
+                outputTemplate, outputTemplateRoot = stripOutArgsFromTemplate(dict(instructions['outputTemplate']), findOutputTemplateRoot(instructions))
+                OG_outputTemplate, OG_outputTemplateRoot = outputTemplate, outputTemplateRoot
+                # print('outputTemplate: ', outputTemplate, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                # print('outputTemplateRoot: ', outputTemplateRoot)
+                # print(rawInputPattern)
+                #instructions['inputTemplate']
+                inputTemplate, inputTemplateRoot = stripOutArgsFromTemplate(dict([instructions['inputTemplate']]), instructions['inputTemplate'][0])
+                OG_inputTemplate, OG_inputTemplateRoot = inputTemplate, inputTemplateRoot
+                # print('inputTemplate: ', inputTemplate, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                # print('inputTemplateRoot: ', inputTemplateRoot); 
+                # import pdb;pdb.set_trace()
+                if 'var__defaults' in instructions and len(instructions['var__defaults']) > 0:
+                    newOutputTemplate = {}
+                    for parent, children in outputTemplate.items():
+                        # we assume var__defaults are never in parents
+                        newChildren = []
+                        for child in children:
+                            if child[0] in instructions['var__defaults']:
+                                newChildren.append((instructions['var__defaults'][child[0]], child[1]))
+                            else:
+                                newChildren.append(child)
+                        newOutputTemplate[parent] = newChildren
+                    outputTemplate = newOutputTemplate
+                    #take out all tuples from inputTemplate that has first item in var__defaults.keys()
+                    newInputTemplate = {}
+                    for parent, children in inputTemplate.items():
+                        # we assume var__defaults are never in parents
+                        newChildren = []
+                        for child in children:
+                            if child[0] not in instructions['var__defaults']:
+                                newChildren.append(child)
+                        newInputTemplate[parent] = newChildren
+                    inputTemplate = newInputTemplate
+                    # print('var__defaults sub**************************************************')
+                    # print('outputTemplate:', outputTemplate)
+                    # print('inputTemplate:', inputTemplate)
+                rawInputPattern = Schemeparser(ast=outputTemplate, rootOfTree=outputTemplateRoot)._unparse()
+                rawOutputPattern = Schemeparser(ast=inputTemplate, rootOfTree=inputTemplateRoot)._unparse()
+                print("rawInputPattern", rawInputPattern)
+                print("rawOutputPattern", rawOutputPattern)
+                sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=self.verbose, recordMaking=True) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
+                manipulatedAstSchemeStr = sgparser.parse(astSchemeStr)
+                # print('matchedWtihDefaults? ', rawInputPattern, not sgparser.noMatches, rawOutputPattern)
+                if sgparser.noMatches and instructionsIdx==len(list_instructions)-1:#  # should try all the defaults first, then try all the non-defaults, we do that by only trying non-defaults on the last instruction (we assume that all the defaults are the same across list_instructions)
+                    rawInputPattern = Schemeparser(ast=OG_outputTemplate, rootOfTree=OG_outputTemplateRoot)._unparse()
+                    rawOutputPattern = Schemeparser(ast=OG_inputTemplate, rootOfTree=OG_inputTemplateRoot)._unparse()
+                    sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=True, recordMaking=True) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
+                    # print('OG: ', rawInputPattern, rawOutputPattern, 'astSchemeStr:', astSchemeStr)
+                    manipulatedAstSchemeStr = sgparser.parse(astSchemeStr)
+                    # print('@@@@@tried OG', rawInputPattern, 'matchedOG?:', not sgparser.noMatches, rawOutputPattern)
+                if not sgparser.noMatches:
+                    astSchemeStr = manipulatedAstSchemeStr
+                    # import pprint; pp = pprint.PrettyPrinter(indent=4)
+                    # pp.pprint(sgparser.verPosWord)
+                    # matches = list(filter(lambda row: row['d']=='r' and row['v'] is not None, sgparser.verPosWord))
+                    # print('matches: ')
+                    # pp.pprint(matches)
+                    ############
+                    # pp.pprint(sgparser.matches)
+                    ############
+                    nodeIdToRemove = []
+                    for match in sgparser.matches: # could contain argument matches also.
+                        try:
+                            nodeIdToRemove.append(og_schemeparser.startPos__nodeId[match['s']+len('(')])#len('(') assumes that we always replace only schemeFunctions and never schemePrimitives
+                        except:
+                            pass # skip argument matches
+                    beforeLeftOverLen = len(nodeId__symbol___withInstructions)
+                    nodeId__symbol___withInstructions = dict(filter(lambda t: t[0] not in nodeIdToRemove, nodeId__symbol___withInstructions.items()))
+                    afterLeftOverLen = len(nodeId__symbol___withInstructions)
+                    schemeparser = Schemeparser(equationStr=astSchemeStr)
+                    theAst, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse() 
+                    theRootOfTree = schemeparser.rootOfTree
+                    if afterLeftOverLen < beforeLeftOverLen: # there could be matches but no decrease
+                        idxOf_nodeId__symbol___withInstructions = 0; #reset 
+                    # print('matches: ', matches);
+                    # import pprint; pp = pprint.PrettyPrinter(indent=4)
+                    # pp.pprint(sgparser.verPosWord)
+                    # import pdb;pdb.set_trace()
+                    #nodeId will change?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                    # import pdb;pdb.set_trace()
+                print('newSchemeStr: ', astSchemeStr)
+                print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                print('LEFTOVERs: ')
+                import pprint; pp = pprint.PrettyPrinter(indent=4)
+                pp.pprint(nodeId__symbol___withInstructions)
+                print('idxOf_nodeId__symbol___withInstructions: ', idxOf_nodeId__symbol___withInstructions)
+                # if len(nodeId__symbol___withInstructions) <=0:
+                #     break
+                # if not sgparser.noMatches:##### cannot just try one, there might be other matches of other types somewhere else in the string. But if try all, then 
+                #     break # we just want one match for each list_instructions, according to the reversePriority
+                # HANDLE var__defaults
+        #convert astSchemeStr back to ast
+        if astSchemeStr is not None:
+            schemeparser = Schemeparser(equationStr=astSchemeStr)
+            ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
+            self.latexAST = ast; self.rootOfTree = schemeparser.rootOfTree
+        else:
+            self.latexAST = theAst
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # import pprint;pp = pprint.PrettyPrinter(indent=4)
 
-        def nodeMatch(gesuchteNode, targetNode):
-            if gesuchteNode[0].startswith('$'): #its a variable
-                return True# variables match anything in targetTree, ignores Optional|Compulsory
-            return gesuchteNode[0] == targetNode[0]
+        # def nodeMatch(gesuchteNode, targetNode):
+        #     if gesuchteNode[0].startswith('$'): #its a variable
+        #         return True# variables match anything in targetTree, ignores Optional|Compulsory
+        #     return gesuchteNode[0] == targetNode[0]
 
-        def differenceBetweenOutputAndInput(instructions):
-            # print('output versus input')
-            # print(set(dict(instructions['outputTemplate']).keys()));
-            # print(set([instructions['inputTemplate'][0]]));
-            # print(list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]])))
+        # def differenceBetweenOutputAndInput(instructions):
+        #     # print('output versus input')
+        #     # print(set(dict(instructions['outputTemplate']).keys()));
+        #     # print(set([instructions['inputTemplate'][0]]));
+        #     # print(list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]])))
 
-            # import pdb;pdb.set_trace()
+        #     # import pdb;pdb.set_trace()
 
-            #if set_difference compares by nodeId ONLY, then it will be right
-            nodeDifferences, inNodeIds = [], set([instructions['inputTemplate'][0][0][1]])
-            for inputTemplateParentNode in dict(instructions['outputTemplate']).keys():
-                if inputTemplateParentNode[0][1] not in inNodeIds:
-                    nodeDifferences.append(inputTemplateParentNode)
-            # import pdb;pdb.set_trace()
-            return nodeDifferences
-            # return list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]]))
+        #     #if set_difference compares by nodeId ONLY, then it will be right
+        #     nodeDifferences, inNodeIds = [], set([instructions['inputTemplate'][0][0][1]])
+        #     for inputTemplateParentNode in dict(instructions['outputTemplate']).keys():
+        #         if inputTemplateParentNode[0][1] not in inNodeIds:
+        #             nodeDifferences.append(inputTemplateParentNode)
+        #     # import pdb;pdb.set_trace()
+        #     return nodeDifferences
+        #     # return list(set(dict(instructions['outputTemplate']).keys())-set([instructions['inputTemplate'][0]]))
         
-        #current__replaced-> for replacing child in parent's children
-        self.latexAST, current__replaced, badNodes, parentIdDifferenceToRemove = {}, {}, [], []
-        usedMatchedTrees = []
+        # #current__replaced-> for replacing child in parent's children
+        # self.latexAST, current__replaced, badNodes, parentIdDifferenceToRemove = {}, {}, [], []
+        # usedMatchedTrees = []
 
-        #topological_sort_BFS(top->bottom;left->bottom) for self.ast.items(), also to match the findTreeInTree
-        items = []
-        queue = [self.rootOfTree]
-        while len(queue) > 0:
-            jetzt = queue.pop(0) # BFS
-            kinder = self.ast.get(jetzt, [])
-            queue += kinder
-            if len(kinder) > 0:
-                items.append((jetzt, kinder))
+        # #topological_sort_BFS(top->bottom;left->bottom) for self.ast.items(), also to match the findTreeInTree
+        # items = []
+        # queue = [self.rootOfTree]
+        # while len(queue) > 0:
+        #     jetzt = queue.pop(0) # BFS
+        #     kinder = self.ast.get(jetzt, [])
+        #     queue += kinder
+        #     if len(kinder) > 0:
+        #         items.append((jetzt, kinder))
 
 
 
-        # for pNode, children in self.ast.items():#if this was processed from bottoms-up(topological_sort), then current__replaced will not have a problem| just do one more pass to replace parent's children
-        for pNode, children in items:
-            list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
-            # print(pNode, children);import pdb;pdb.set_trace()
-            candidateReplacements, candidateIndex__defaultsMatchedCount = [], dict(map(lambda t: (t[0], t[1]['reversePriority']), enumerate(list_instructions)))
-            for candidateIndex, instructions in enumerate(list_instructions):####gives a list of candidate replacement......
-                ######
-                # print('instructions')
-                # pp.pprint(instructions)
-                ######
-                templateNodeDifferenceToRemove = differenceBetweenOutputAndInput(instructions)
-                candidate___current__replaced = {}
-                outputTemplateRoot = None
-                for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
-                    # import pdb;pdb.set_trace()
-                    if outputTemplateParent[2] == instructions['rootOfResultTemplate']: #only the id
-                        outputTemplateRoot=outputTemplateParent
-                        break
-                # need to strip the outputTemplate of all the unnecessary arguments
-                stripStack, outputTemplate = [outputTemplateRoot], {}
-                while len(stripStack) > 0:
-                    tup = stripStack.pop()
-                    strippedChildren = []
-                    # print(dict(instructions['outputTemplate']));import pdb;pdb.set_trace()
-                    for child in dict(instructions['outputTemplate']).get(tup, []):
-                        strippedChildren.append(child[0])
-                        stripStack.append(child)
-                    if len(strippedChildren)>0:
-                        outputTemplate[tup[0]] = strippedChildren
-                outputTemplateRoot = outputTemplateRoot[0]
-                #
-                # print('matching pNode: ', pNode)
-                # print('usedMatchedTrees', usedMatchedTrees)
-                var__val = {}
-                #for same funcName (outputTemplateRoot), outputTemplateRoot:[matchedOutputTree] is CACHABLE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                #matchedTrees should be order in which self.ast is processed, top->bottom;left->right
-                #if here is top->bottom;left->right, then the above (self.ast.items) should also be top->bottom;left->right
-                rootOfMatched = None
-                for rootOfMatched, matchedOutputTree in FindTreeInTree.findAllTreeInTree(outputTemplate, outputTemplateRoot, self.ast, self.rootOfTree, nodeMatch):
-                    if (rootOfMatched, matchedOutputTree) in usedMatchedTrees:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        continue
-                    # print('~~~matchedOutputTree:', matchedOutputTree);import pdb;pdb.set_trace()
-                    #if tree has been matched, DO NOT USE IT AGAIN<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    #match the variables
-                    #callbackForMatchCompletion(targetTreeRoot):#<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the _unparse with this NEW_FUNCTION
-                    templateStack, matchedStack = [outputTemplateRoot], [rootOfMatched]
-                    while len(templateStack) > 0 and len(matchedStack) > 0:
-                        (templateName, templateId), (matchedName, matchedId) = templateStack.pop(), matchedStack.pop()
-                        if templateName.startswith('$'):
-                            var__val[templateName] = matchedName
-                            # print('$$$$$$$matchedName', matchedName, instructions.get('var__defaults', {}).values()) # the default is 1, so we add 2 to choose this
-                            if matchedName in instructions.get('var__defaults', {}).values():
-                                candidateIndex__defaultsMatchedCount[candidateIndex] += 2
-                        if templateId.startswith('$'):
-                            var__val[templateId] = matchedId
-                        # print(var__val);import pdb;pdb.set_trace()
-                        templateStack += outputTemplate.get((templateName, templateId), [])
-                        matchedStack += matchedOutputTree.get((matchedName, matchedId), [])
-                    break # just need one matched tree, this means last_used rootOfMatched will be put into usedMatchedTrees
-                # print('var__val', var__val);import pdb;pdb.set_trace()
-                #
+        # # for pNode, children in self.ast.items():#if this was processed from bottoms-up(topological_sort), then current__replaced will not have a problem| just do one more pass to replace parent's children
+        # for pNode, children in items:
+        #     list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
+        #     # print(pNode, children);import pdb;pdb.set_trace()
+        #     candidateReplacements, candidateIndex__defaultsMatchedCount = [], dict(map(lambda t: (t[0], t[1]['reversePriority']), enumerate(list_instructions)))
+        #     for candidateIndex, instructions in enumerate(list_instructions):####gives a list of candidate replacement......
+        #         ######
+        #         # print('instructions')
+        #         # pp.pprint(instructions)
+        #         ######
+        #         templateNodeDifferenceToRemove = differenceBetweenOutputAndInput(instructions)
+        #         candidate___current__replaced = {}
+        #         outputTemplateRoot = None
+        #         for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
+        #             # import pdb;pdb.set_trace()
+        #             if outputTemplateParent[2] == instructions['rootOfResultTemplate']: #only the id
+        #                 outputTemplateRoot=outputTemplateParent
+        #                 break
+        #         # need to strip the outputTemplate of all the unnecessary arguments
+        #         stripStack, outputTemplate = [outputTemplateRoot], {}
+        #         while len(stripStack) > 0:
+        #             tup = stripStack.pop()
+        #             strippedChildren = []
+        #             # print(dict(instructions['outputTemplate']));import pdb;pdb.set_trace()
+        #             for child in dict(instructions['outputTemplate']).get(tup, []):
+        #                 strippedChildren.append(child[0])
+        #                 stripStack.append(child)
+        #             if len(strippedChildren)>0:
+        #                 outputTemplate[tup[0]] = strippedChildren
+        #         outputTemplateRoot = outputTemplateRoot[0]
+        #         #
+        #         print('*******************************************************************************************************')
+        #         print('matching pNode: ', pNode)
+        #         print('usedMatchedTrees', usedMatchedTrees)
+        #         print('outputTemplate: ', outputTemplate)
+        #         print('outputTemplateRoot: ', outputTemplateRoot)
+        #         var__val = {}
+        #         #for same funcName (outputTemplateRoot), outputTemplateRoot:[matchedOutputTree] is CACHABLE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #         #matchedTrees should be order in which self.ast is processed, top->bottom;left->right
+        #         #if here is top->bottom;left->right, then the above (self.ast.items) should also be top->bottom;left->right
+        #         rootOfMatched = None
+        #         for rootOfMatched, matchedOutputTree in FindTreeInTree.findAllTreeInTree(outputTemplate, outputTemplateRoot, self.ast, self.rootOfTree, nodeMatch):
+        #             if (rootOfMatched, matchedOutputTree) in usedMatchedTrees:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #                 continue
+        #             print('~~~matchedOutputTree:', matchedOutputTree);import pdb;pdb.set_trace()
+        #             #if tree has been matched, DO NOT USE IT AGAIN<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #             #match the variables
+        #             #callbackForMatchCompletion(targetTreeRoot):#<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the _unparse with this NEW_FUNCTION
+        #             templateStack, matchedStack = [outputTemplateRoot], [rootOfMatched]
+        #             while len(templateStack) > 0 and len(matchedStack) > 0:
+        #                 (templateName, templateId), (matchedName, matchedId) = templateStack.pop(), matchedStack.pop()
+        #                 if templateName.startswith('$'):
+        #                     var__val[templateName] = matchedName
+        #                     # print('$$$$$$$matchedName', matchedName, instructions.get('var__defaults', {}).values()) # the default is 1, so we add 2 to choose this
+        #                     if matchedName in instructions.get('var__defaults', {}).values():
+        #                         candidateIndex__defaultsMatchedCount[candidateIndex] += 2
+        #                 if templateId.startswith('$'):
+        #                     var__val[templateId] = matchedId
+        #                 # print(var__val);import pdb;pdb.set_trace()
+        #                 templateStack += outputTemplate.get((templateName, templateId), [])
+        #                 matchedStack += matchedOutputTree.get((matchedName, matchedId), [])
+        #             break # just need one matched tree, this means last_used rootOfMatched will be put into usedMatchedTrees
+        #         # print('var__val', var__val);import pdb;pdb.set_trace()
+        #         #
 
-                #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
-                templateParent, templateChildren = instructions['inputTemplate'] # we expecting only 1 line for instructions['inputTemplate']
-                filledParentName = var__val.get(templateParent[0][0], templateParent[0][0])
-                filledParentId = var__val.get(templateParent[0][1], templateParent[0][1])
-                # print('filledParent:', (filledParentName, filledParentId));import pdb;pdb.set_trace()
-                filledChildren = []
-                for templateChild in templateChildren:
-                    filledChildName = var__val.get(templateChild[0][0], templateChild[0][0])#
-                    # print('filledChildName', filledChildName, 'defaults: ', instructions.get('var__defaults', {}).values())
-                    if filledChildName in instructions.get('var__defaults', {}).values(): #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<the more defaults it fits, the higher the priority of this candidateReplacement
-                        candidateIndex__defaultsMatchedCount[candidateIndex] += 1
-                        # print('matchedDefault, optional::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::', );import pdb;pdb.set_trace()
-                        if templateChild[1]:#skip if optional
-                            # print('skipping child$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-                            continue
-                    filledChildId = var__val.get(templateChild[0][1], templateChild[0][1])#
-                    # print(templateChild);import pdb;pdb.set_trace()
-                    #
-                    if filledChildName.startswith('$') or str(filledChildId).startswith('$'):
-                        continue#don't add this child
-                    # parentIdDifferenceToRemove using templateNodeDifferenceToRemove
-                    #fill up the nodes to ignore
-                    for templateNodeToRemove in templateNodeDifferenceToRemove:
-                        templateNodeName, templateNodeId = templateNodeToRemove[0]
-                        nodeToRemove = (var__val.get(templateNodeName, templateNodeName), var__val.get(templateNodeId, templateNodeId))
-                        parentIdDifferenceToRemove.append(nodeToRemove)
-                        candidate___current__replaced[nodeToRemove] = (filledParentName, filledParentId)
-                    #
-                    # print('parentIdDifferenceToRemove', parentIdDifferenceToRemove);import pdb;pdb.set_trace()
-                    filledChildren.append((filledChildName, filledChildId))
-                    # print(filledChildren, 'filedChildren<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                if len(filledChildren) == 0:#<<<< this is not accurate, if we cannot find child in var__val, should do optional|compulsory_matching with children (of pNode) TODO
-                    filledChildren = children
-                    filledParentName, filledParentId = pNode
-                # print('latexAST',self.latexAST);import pdb;pdb.set_trace()
-                # print('current__replaced', current__replaced)
-                candidate___current__replaced[pNode] = (filledParentName, filledParentId)
-                # print('candidate: ', {'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced})
-                candidateReplacements.append({'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced}) 
-            #
-            if len(candidateIndex__defaultsMatchedCount) > 0: 
-                # print('candidateReplacements:', candidateReplacements)
-                # print('candidateIndex__defaultsMatchedCount', candidateIndex__defaultsMatchedCount);import pdb;pdb.set_trace()
+        #         #match matched_variables into inputTemplate, entitystorage.insert missing variables->matched_inputTemplate
+        #         templateParent, templateChildren = instructions['inputTemplate'] # we expecting only 1 line for instructions['inputTemplate']
+        #         filledParentName = var__val.get(templateParent[0][0], templateParent[0][0])
+        #         filledParentId = var__val.get(templateParent[0][1], templateParent[0][1])
+        #         # print('filledParent:', (filledParentName, filledParentId));import pdb;pdb.set_trace()
+        #         filledChildren = []
+        #         for templateChild in templateChildren:
+        #             filledChildName = var__val.get(templateChild[0][0], templateChild[0][0])#
+        #             # print('filledChildName', filledChildName, 'defaults: ', instructions.get('var__defaults', {}).values())
+        #             if filledChildName in instructions.get('var__defaults', {}).values(): #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<the more defaults it fits, the higher the priority of this candidateReplacement
+        #                 candidateIndex__defaultsMatchedCount[candidateIndex] += 1
+        #                 # print('matchedDefault, optional::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::', );import pdb;pdb.set_trace()
+        #                 if templateChild[1]:#skip if optional
+        #                     # print('skipping child$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+        #                     continue
+        #             filledChildId = var__val.get(templateChild[0][1], templateChild[0][1])#
+        #             # print(templateChild);import pdb;pdb.set_trace()
+        #             #
+        #             if filledChildName.startswith('$') or str(filledChildId).startswith('$'):
+        #                 continue#don't add this child
+        #             # parentIdDifferenceToRemove using templateNodeDifferenceToRemove
+        #             #fill up the nodes to ignore
+        #             for templateNodeToRemove in templateNodeDifferenceToRemove:
+        #                 templateNodeName, templateNodeId = templateNodeToRemove[0]
+        #                 nodeToRemove = (var__val.get(templateNodeName, templateNodeName), var__val.get(templateNodeId, templateNodeId))
+        #                 parentIdDifferenceToRemove.append(nodeToRemove)
+        #                 candidate___current__replaced[nodeToRemove] = (filledParentName, filledParentId)
+        #             #
+        #             # print('parentIdDifferenceToRemove', parentIdDifferenceToRemove);import pdb;pdb.set_trace()
+        #             filledChildren.append((filledChildName, filledChildId))
+        #             # print(filledChildren, 'filedChildren<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        #         if len(filledChildren) == 0:#<<<< this is not accurate, if we cannot find child in var__val, should do optional|compulsory_matching with children (of pNode) TODO
+        #             filledChildren = children
+        #             filledParentName, filledParentId = pNode
+        #         # print('latexAST',self.latexAST);import pdb;pdb.set_trace()
+        #         # print('current__replaced', current__replaced)
+        #         candidate___current__replaced[pNode] = (filledParentName, filledParentId)
+        #         # print('candidate: ', {'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced})
+        #         candidateReplacements.append({'candidate':{(filledParentName, filledParentId):filledChildren}, 'current__replaced':candidate___current__replaced}) 
+        #     #
+        #     if len(candidateIndex__defaultsMatchedCount) > 0: 
+        #         # print('candidateReplacements:', candidateReplacements)
+        #         # print('candidateIndex__defaultsMatchedCount', candidateIndex__defaultsMatchedCount);import pdb;pdb.set_trace()
                 
-                candidateReplacement = candidateReplacements[max(candidateIndex__defaultsMatchedCount.items(), key=lambda t:t[1])[0]]#IF DRAW?????????<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                filledParent, filledChildren = list(candidateReplacement['candidate'].items())[0]
-                current__replaced.update(candidateReplacement['current__replaced'])
-                self.latexAST[filledParent] = filledChildren#
-                if rootOfMatched is not None:
-                    usedMatchedTrees.append((rootOfMatched, matchedOutputTree))
+        #         candidateReplacement = candidateReplacements[max(candidateIndex__defaultsMatchedCount.items(), key=lambda t:t[1])[0]]#IF DRAW?????????<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #         filledParent, filledChildren = list(candidateReplacement['candidate'].items())[0]
+        #         current__replaced.update(candidateReplacement['current__replaced'])
+        #         self.latexAST[filledParent] = filledChildren#
+        #         if rootOfMatched is not None:
+        #             usedMatchedTrees.append((rootOfMatched, matchedOutputTree))
 
-                # print('latexAST:', self.latexAST)
-                # print('current__replaced:', current__replaced)
-                #take out the difference between the instructions['outputTemplate'] and the instructions['inputTemplate']
+        #         print('latexAST:', self.latexAST)
+        #         # print('current__replaced:', current__replaced)
+        #         #take out the difference between the instructions['outputTemplate'] and the instructions['inputTemplate']
 
-            # if len(list_instructions) == 0:
-            #     self.latexAST[pNode] = children
+        #     # if len(list_instructions) == 0:
+        #     #     self.latexAST[pNode] = children
 
-        # print('badNodes', badNodes);import pdb;pdb.set_trace()
-        for pNode, children in self.ast.items():
-            list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
-            if len(list_instructions) == 0 and pNode not in parentIdDifferenceToRemove:
-                newChildren = []
-                for child in children:
-                    newChildren.append(current__replaced.get(child, child))
-                self.latexAST[pNode] = newChildren
+        # # print('badNodes', badNodes);import pdb;pdb.set_trace()
+        # for pNode, children in self.ast.items():
+        #     list_instructions = self.getLatexSpecialCases(pNode[0], reverse=True)
+        #     if len(list_instructions) == 0 and pNode not in parentIdDifferenceToRemove:
+        #         newChildren = []
+        #         for child in children:
+        #             newChildren.append(current__replaced.get(child, child))
+        #         self.latexAST[pNode] = newChildren
 
-            # #secondpass to replace parent's children, because we don't want to do topological_sort at the start
-            # if len(list_instructions) > 0:
-            #     newParent, newChildren = current__replaced.get(pNode, pNode), []
-            #     for child in self.latexAST[newParent]:
-            #         newChildren.append(current__replaced.get(child, child))
-            #     self.latexAST[newParent] = newChildren
+        # print('replaced in parents children: ', self.latexAST)
+        #     # #secondpass to replace parent's children, because we don't want to do topological_sort at the start
+        #     # if len(list_instructions) > 0:
+        #     #     newParent, newChildren = current__replaced.get(pNode, pNode), []
+        #     #     for child in self.latexAST[newParent]:
+        #     #         newChildren.append(current__replaced.get(child, child))
+        #     #     self.latexAST[newParent] = newChildren
 
 
         #<<<<<<<<<<<<<<<<<<<<<<<<< for polynomials, like test__nonInfixBrackets__addImplicitMultiply; example: 1+(1+(1+1))=4, should be 1+1+1+1=4
@@ -2340,7 +2545,7 @@ count by EntityType:
         self._convertASTToLatexStyleAST()
         ###
         # import pprint;pp = pprint.PrettyPrinter(indent=4)
-        # print('latexAST:', pp.pformat(self.latexAST));import pdb;pdb.set_trace()
+        # print('latexAST:', pp.pformat(self.latexAST));#import pdb;pdb.set_trace()
         ###
         self._classifyEntityType()
         return self._recursiveUnparse(self.rootOfTree, None)#we have OVERALLEquals self.overallEqual_startPos
