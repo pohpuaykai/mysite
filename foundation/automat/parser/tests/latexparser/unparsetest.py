@@ -287,7 +287,7 @@ def test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(verbose=Fa
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\widehat{H}\\Psi =\\widehat{E}\\Psi'
+    expected_eqsStr = '\\widehat{H}\\Psi =\\widehat{E}\\Psi '
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -570,7 +570,7 @@ def test__backslashInfixInBackslash__sqrtInSqrt(verbose=False):
 
     parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
     eqsStr = parser._unparse()
-    expected_eqsStr = '\\sqrt[\\sqrt{\\frac{\\pi}{22}}]{\\sqrt[\\sin(\\pi )]{\\pi}}=F'
+    expected_eqsStr = '\\sqrt[\\sqrt{\\frac{\\pi}{22}}]{\\sqrt[\\sin(\\pi)]{\\pi}}=F'
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
     if verbose:
         print(eqsStr)
@@ -1561,61 +1561,61 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    # test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
-    # test__contiguousLeftOvers__decimalPlaces()
-    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
-    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
-    # test__schemeToLatex__variablesWithCurlyBrackets()
-    # test__findingBackSlashAndInfixOperations__Trig0()
-    # test__findingBackSlashAndInfixOperations__Trig1()
-    # test__findingBackSlashAndInfixOperations__Trig2()
-    # test__findingBackSlashAndInfixOperations__Sqrt0()
-    # test__findingBackSlashAndInfixOperations__Sqrt1()
-    # test__findingBackSlashAndInfixOperations__Ln()
-    # test__findingBackSlashAndInfixOperations__Frac()
-    # test__findingBackSlashAndInfixOperations__Log0()
-    # test__findingBackSlashAndInfixOperations__Log1()
-    # test__findingBackSlashAndInfixOperations__tildeVariable()
-    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    # test__infixInBackslash__paraboloid()
-    # test__sqrtWithPowerCaretRightOtherInfix__hill()
-    # test__nonInfixBrackets__addImplicitMultiply()
-    # test__nonInfixBrackets__addImplicitMultiply0()
-    # test__nonInfixBrackets__addImplicitMultiply1()
-    # test__BODMAS__priorityBetweenInfixForBrackets()
-    # test__BODMAS__enclosingBracketInBackslashArg()
-    # test__BODMAS__enclosingBracketInBackslashArgWithExponent()
-    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
-    # test__BODMAS__enclosingBracket()
-    # test__manyFracCaretEnclosingBrac__partialFrac()
-    # test__fracWithLogNoBase__changeLogBaseFormula()
-    # test__backslashInfixInBackslash__sqrtInSqrt(True)#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    # test__backslashInfixInBackslash__trigInTrig()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    # test__backslashInfixInBackslash__logInLog()
-    # test__backslashInfixInBackslash__fracInFrac()
-    # test__hassliche__highPowersAndRandomCoefficientsPITEST()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
-    # test__hassliche__nestedPolynomial()
-    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
-    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
-    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
-    # test__hassliche__degree5()
-    # test__hassliche__degree6()
-    # test__hassliche__degree7()
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
-    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
-    test__makesubjecttest0__impedanceOfParallelRLCCircuit1(True)
-    # test__newSymbolsLimitTheorem__sumRule()
-    # test__newSymbolsLimitTheorem__productRule()
-    # test__newSymbolsLimitTheorem__constantTimesRule()
-    # test__newSymbolsLimitTheorem__quotientRule()
-    # test__newSymbols__fourierSeries()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
-    # test__newSymbols__parallelSumOfCapacitance()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<missing a sum
-    # test__newSymbols__faradayIntegralForm()
-    # test__newSymbols__faradayDifferentialForm()
-    # test__newSymbols__gaussIntegralForm()
+    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
+    test__contiguousLeftOvers__decimalPlaces()
+    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    test__schemeToLatex__variablesWithCurlyBrackets()
+    test__findingBackSlashAndInfixOperations__Trig0()
+    test__findingBackSlashAndInfixOperations__Trig1()
+    test__findingBackSlashAndInfixOperations__Trig2()
+    test__findingBackSlashAndInfixOperations__Sqrt0()
+    test__findingBackSlashAndInfixOperations__Sqrt1()
+    test__findingBackSlashAndInfixOperations__Ln()
+    test__findingBackSlashAndInfixOperations__Frac()
+    test__findingBackSlashAndInfixOperations__Log0()
+    test__findingBackSlashAndInfixOperations__Log1()
+    test__findingBackSlashAndInfixOperations__tildeVariable()
+    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    test__infixInBackslash__paraboloid()
+    test__sqrtWithPowerCaretRightOtherInfix__hill()
+    test__nonInfixBrackets__addImplicitMultiply()
+    test__nonInfixBrackets__addImplicitMultiply0()
+    test__nonInfixBrackets__addImplicitMultiply1()
+    test__BODMAS__priorityBetweenInfixForBrackets()
+    test__BODMAS__enclosingBracketInBackslashArg()
+    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
+    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
+    test__BODMAS__enclosingBracket()
+    test__manyFracCaretEnclosingBrac__partialFrac()
+    test__fracWithLogNoBase__changeLogBaseFormula()
+    test__backslashInfixInBackslash__sqrtInSqrt()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    test__backslashInfixInBackslash__trigInTrig()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    test__backslashInfixInBackslash__logInLog()
+    test__backslashInfixInBackslash__fracInFrac()
+    test__hassliche__highPowersAndRandomCoefficientsPITEST()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
+    test__hassliche__nestedPolynomial()
+    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
+    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
+    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
+    test__hassliche__degree5()
+    test__hassliche__degree6()
+    test__hassliche__degree7()
+    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
+    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
+    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
+    test__makesubjecttest0__impedanceOfParallelRLCCircuit1()
+    test__newSymbolsLimitTheorem__sumRule()
+    test__newSymbolsLimitTheorem__productRule()
+    test__newSymbolsLimitTheorem__constantTimesRule()
+    test__newSymbolsLimitTheorem__quotientRule()
+    test__newSymbols__fourierSeries()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
+    test__newSymbols__parallelSumOfCapacitance()
+    test__newSymbols__faradayIntegralForm()
+    test__newSymbols__faradayDifferentialForm()
+    test__newSymbols__gaussIntegralForm()
     # test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< nabla missing curlybrace<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    # test__paveWayForDifferentiation__productRule() 
-    # test__paveWayForDifferentiation__sumRule()  
-    # test__paveWayForIntegration__enclosingBracketNonBackslash() # functions u and v... (same problem as S(x, y))
-    # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash() #  TODO refactor brackslash args into a list, ... and the rest of the code...
+    test__paveWayForDifferentiation__productRule() 
+    test__paveWayForDifferentiation__sumRule()  
+    test__paveWayForIntegration__enclosingBracketNonBackslash() # functions u and v... (same problem as S(x, y))
+    test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash() #  TODO refactor brackslash args into a list, ... and the rest of the code...

@@ -2136,7 +2136,7 @@ count by EntityType:
         while len(nodeId__symbol___withInstructions) > 0:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< after trying 2 cycles then stop?
             # print('nodeId__symbol___withInstructions: ', nodeId__symbol___withInstructions)
             # for symbol in list(all_symbols):
-            print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             if idxOf_nodeId__symbol___withInstructions >= len(nodeId__symbol___withInstructions):
                 break
             nodeId, symbol = list(nodeId__symbol___withInstructions.items())[idxOf_nodeId__symbol___withInstructions];idxOf_nodeId__symbol___withInstructions+=1
@@ -2149,7 +2149,7 @@ count by EntityType:
                 og_schemeparser = Schemeparser(ast=theAst, rootOfTree=theRootOfTree)
                 astSchemeStr = og_schemeparser._unparse()
                 # nodeId__startPos = dict(map(lambda t: (t[1], t[0]), og_schemeparser.startPos__nodeId.items()))
-                print('beginning: ', astSchemeStr, 'startPos__nodeId:', og_schemeparser.startPos__nodeId)#, 'nodeId__startPos: ', nodeId__startPos)
+                # print('beginning: ', astSchemeStr, 'startPos__nodeId:', og_schemeparser.startPos__nodeId)#, 'nodeId__startPos: ', nodeId__startPos)
                 
                 # print('outputTemplate:')
                 # print(instructions['outputTemplate'])
@@ -2194,8 +2194,8 @@ count by EntityType:
                     # print('inputTemplate:', inputTemplate)
                 rawInputPattern = Schemeparser(ast=outputTemplate, rootOfTree=outputTemplateRoot)._unparse()
                 rawOutputPattern = Schemeparser(ast=inputTemplate, rootOfTree=inputTemplateRoot)._unparse()
-                print("rawInputPattern", rawInputPattern)
-                print("rawOutputPattern", rawOutputPattern)
+                # print("rawInputPattern", rawInputPattern)
+                # print("rawOutputPattern", rawOutputPattern)
                 sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=self.verbose, recordMaking=True) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
                 manipulatedAstSchemeStr = sgparser.parse(astSchemeStr)
                 # print('matchedWtihDefaults? ', rawInputPattern, not sgparser.noMatches, rawOutputPattern)
@@ -2235,14 +2235,14 @@ count by EntityType:
                     # pp.pprint(sgparser.verPosWord)
                     # import pdb;pdb.set_trace()
                     #nodeId will change?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                    # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                     # import pdb;pdb.set_trace()
-                print('newSchemeStr: ', astSchemeStr)
-                print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                print('LEFTOVERs: ')
-                import pprint; pp = pprint.PrettyPrinter(indent=4)
-                pp.pprint(nodeId__symbol___withInstructions)
-                print('idxOf_nodeId__symbol___withInstructions: ', idxOf_nodeId__symbol___withInstructions)
+                # print('newSchemeStr: ', astSchemeStr)
+                # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                # print('LEFTOVERs: ')
+                # import pprint; pp = pprint.PrettyPrinter(indent=4)
+                # pp.pprint(nodeId__symbol___withInstructions)
+                # print('idxOf_nodeId__symbol___withInstructions: ', idxOf_nodeId__symbol___withInstructions)
                 # if len(nodeId__symbol___withInstructions) <=0:
                 #     break
                 # if not sgparser.noMatches:##### cannot just try one, there might be other matches of other types somewhere else in the string. But if try all, then 

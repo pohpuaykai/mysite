@@ -301,7 +301,7 @@ def test__moreThan1Op__acVoltage3(verbose=False):
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
-    expectedLatexStr = '\\arcsin(\\frac{v_t}{V_{peak}})-\\omega t=\\phi'
+    expectedLatexStr = '\\arcsin(\\frac{v_t}{V_{peak}})-\\omega t=\\phi '
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
         print('OG: ', latexEq)
@@ -426,7 +426,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp0(verbose=False):
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
-    expectedLatexStr = '((A_v -\\frac{1}{1+\\frac{R_o }{R_L +\\frac{R_2}{1+sCR_2}}})-(1))R_1=R_f'
+    expectedLatexStr = '((A_v-\\frac{1}{1+\\frac{R_o}{R_L+\\frac{R_2}{1+sCR_2}}})-1)R_1=R_f'
     #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -444,7 +444,7 @@ def test__6levelsDeep__voltageGainOfNonInvertingOp1(verbose=False):
     modifiedAST = eq0.makeSubject(subject, simplify=False)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
-    expectedLatexStr = '\\frac{R_f }{(A_v -\\frac{1}{1+\\frac{R_o }{R_L +\\frac{R_2}{1+sCR_2}}})-(1)}=R_1'
+    expectedLatexStr = '\\frac{R_f}{(A_v-\\frac{1}{1+\\frac{R_o}{R_L+\\frac{R_2}{1+sCR_2}}})-1}=R_1'
     #TODO latexparser._unparse must leave space between implicitMultiplies of single_variables, else, parsing will fail.
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', expectedLatexStr == latexStr)
     if verbose:
@@ -581,36 +581,36 @@ def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simp
 
 
 if __name__=='__main__':
-    # test__moreThan1Op__seriesResistance0()
-    # test__moreThan1Op__seriesResistance1()
-    # test__moreThan1Op__parallelResistance0()
-    # test__moreThan1Op__parallelResistance1()
-    # test__moreThan1Op__parallelResistance2()
-    # test__moreThan1Op__ohmPowerLaw0()
-    # test__moreThan1Op__ohmPowerLaw1()
-    # test__moreThan1Op__ohmPowerLaw2()
-    # test__moreThan1Op__ohmPowerLaw3()
+    test__moreThan1Op__seriesResistance0()
+    test__moreThan1Op__seriesResistance1()
+    test__moreThan1Op__parallelResistance0()
+    test__moreThan1Op__parallelResistance1()
+    test__moreThan1Op__parallelResistance2()
+    test__moreThan1Op__ohmPowerLaw0()
+    test__moreThan1Op__ohmPowerLaw1()
+    test__moreThan1Op__ohmPowerLaw2()
+    test__moreThan1Op__ohmPowerLaw3()
     # test__moreThan1Op__transistorOhmLaw0(True) # ugly
     # test__moreThan1Op__transistorOhmLaw1(True) # ugly
     # test__moreThan1Op__transistorOhmLaw2(True) # ugly
-    # test__moreThan1Op__ebermollsModel0()
-    # test__moreThan1Op__ebermollsModel1()
+    test__moreThan1Op__ebermollsModel0()
+    test__moreThan1Op__ebermollsModel1()
     # test__moreThan1Op__ebermollsModel2(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<log_e did not become ln
-    # test__moreThan1Op__acVoltage0()
-    # test__moreThan1Op__acVoltage1(True) # not sure why no match?
-    # test__moreThan1Op__acVoltage2()
-    # test__moreThan1Op__acVoltage3(True) # not sure why no match?
-    # test__moreThan1Op__acPower0()
-    # test__moreThan1Op__acPower1()
-    # test__moreThan1Op__acPower2() # ugly
-    # test__6levelsDeep__impedanceOfParallelRLCCircuit0() # TODO weird latex unparse sqrt[-1], simplify?
-    test__6levelsDeep__impedanceOfParallelRLCCircuit1(True) # TODO weird latex unparse sqrt[-1], simplify?
-    # test__6levelsDeep__impedanceOfParallelRLCCircuit2(True) # TODO weird latex unparse sqrt[-1], DOUBLE_INVERSE=>simplification_in_AST
-    # test__6levelsDeep__voltageGainOfNonInvertingOp0(True)
-    # test__6levelsDeep__voltageGainOfNonInvertingOp1(True)
-    # test__6levelsDeep__voltageGainOfNonInvertingOp2() #
-    # test__6levelsDeep__voltageGainOfNonInvertingOp3()
-    # test__6levelsDeep__voltageGainOfNonInvertingOp4() 
-    # test__6levelsDeep__voltageGainOfNonInvertingOp5()
-    # test__linearEliminationBySubstitution__eq0()
-    # test__linearEliminationBySubstitution__eq1() # MINUS_ZERO=>simplication_in_AST
+    test__moreThan1Op__acVoltage0()
+    test__moreThan1Op__acVoltage1()
+    test__moreThan1Op__acVoltage2()
+    test__moreThan1Op__acVoltage3()
+    test__moreThan1Op__acPower0()
+    test__moreThan1Op__acPower1()
+    # test__moreThan1Op__acPower2(True) # ugly
+    test__6levelsDeep__impedanceOfParallelRLCCircuit0() # TODO weird latex unparse sqrt[-1], simplify?
+    test__6levelsDeep__impedanceOfParallelRLCCircuit1() # TODO weird latex unparse sqrt[-1], simplify?
+    test__6levelsDeep__impedanceOfParallelRLCCircuit2() # TODO weird latex unparse sqrt[-1], DOUBLE_INVERSE=>simplification_in_AST
+    test__6levelsDeep__voltageGainOfNonInvertingOp0() 
+    test__6levelsDeep__voltageGainOfNonInvertingOp1()
+    # test__6levelsDeep__voltageGainOfNonInvertingOp2(True) #ugly
+    # test__6levelsDeep__voltageGainOfNonInvertingOp3(True) #ugly
+    # test__6levelsDeep__voltageGainOfNonInvertingOp4(True) #ugly
+    # test__6levelsDeep__voltageGainOfNonInvertingOp5(True) #ugly
+    # test__linearEliminationBySubstitution__eq0(True) #ugly
+    # test__linearEliminationBySubstitution__eq1(True) # MINUS_ZERO=>simplication_in_AST#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<something went wrong please check
