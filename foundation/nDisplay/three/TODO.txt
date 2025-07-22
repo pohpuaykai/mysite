@@ -1,8 +1,5 @@
 -bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
---fix foundation\automat\core\manipulate\recommend\tests\recommendtest.py, need to calculate:
-nodeId__len
-in
-foundation\automat\core\equation.py:linearEliminationBySubstitution
+--check if its sematically correct, (fingers_crossed)
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display, bipartiteSolver?
 
 

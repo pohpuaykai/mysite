@@ -78,18 +78,7 @@ class Equation:
                 self.startPos__nodeIdScheme = self._parser.startPos__nodeId
                 self.nodeId__lenScheme = self._parser.nodeId__len
             else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now, used by Manipulate.py
-                from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
-                self.schemeparser = Schemeparser(ast=self.ast)
-                self.schemeStr = self.schemeparser._unparse()
-                self.astScheme = self.ast
-                self.rootOfTree = self.schemeparser.rootOfTree
-                #TODO test, untested please future-me
-                self.functionsScheme = self.schemeparser.functions
-                self.variablesScheme = self.schemeparser.variables
-                self.primitivesScheme = self.schemeparser.primitives
-                self.totalNodeCountScheme = self.totalNodeCount
-                self.nodeId__lenScheme = self.schemeparser.nodeId__len
-                self.startPos__nodeIdScheme = self.schemeparser.startPos__nodeId
+                self.loadASTWithSchemeParser(self.ast)
 
             #TODO this can be removed, once we calculate self.functionsScheme, self.variablesScheme, self.primitivesScheme, self.totalNodeCountScheme, self.startPos__nodeIdScheme
             #in _unparse :)
@@ -115,6 +104,21 @@ class Equation:
             print('self.startPos__nodeIdScheme', self.startPos__nodeIdScheme)
             print('self.nodeId__lenScheme', self.nodeId__lenScheme)
         #############
+
+    def loadASTWithSchemeParser(self, ast):#TODO test with schemeParserTest<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
+        self.schemeparser = Schemeparser(ast=ast)
+        self.schemeStr = self.schemeparser._unparse()
+        self.astScheme = ast
+        self.rootOfTree = self.schemeparser.rootOfTree
+        #TODO test, untested please future-me
+        self.functionsScheme = self.schemeparser.functions
+        self.variablesScheme = self.schemeparser.variables
+        self.primitivesScheme = self.schemeparser.primitives
+        self.totalNodeCountScheme = self.totalNodeCount
+        self.nodeId__lenScheme = self.schemeparser.nodeId__len
+        self.startPos__nodeIdScheme = self.schemeparser.startPos__nodeId
+
 
 
     def getFunctionClass(self, funcName):
@@ -625,7 +629,7 @@ class Equation:
 
         #TODO recalculate for startPos__nodeIdScheme
         #TODO recalculate for nodeId__lenScheme
-        #TODO update rootOfTree(DONE)
+        self.loadASTWithSchemeParser(self.astScheme)
 
 
         return self.astScheme, self.functionsScheme, self.variablesScheme, \
