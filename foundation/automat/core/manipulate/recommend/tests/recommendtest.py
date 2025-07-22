@@ -96,18 +96,18 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     #incorporate for displaying_of_latex
     from foundation.automat.parser.sorte.latexparser import Latexparser
     #
-    vorEquation = list_equations[vertexId__equationVariableId[substitutionPath[0]]]
-    entVariable = list_variables[vertexId__equationVariableId[substitutionPath[1]]]
-    print('start: ', Latexparser(ast=vorEquation.astScheme, rootOfTree=)._unparse()
+    vorEquation = listOfCollectedEquations[vertexId__equationVariableId[substitutionPath[0]]]
+    entVariable = listOfVariables[vertexId__equationVariableId[substitutionPath[1]]]
+    print('start: ', Latexparser(ast=vorEquation.astScheme, rootOfTree=vorEquation.rootOfTree)._unparse())
     for idx, vertexId in enumerate(substitutionPath[2:]):
         if idx % 2 == 0: # vertexId==equationVertexId
-            hinEquation = list_equations[vertexId__equationVariableId[vertexId]]
+            hinEquation = listOfCollectedEquations[vertexId__equationVariableId[vertexId]]
             #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
             hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)#This method is not inplace (please see foundation.automat.core.tests.lineareliminationbysubstitution.py)
             print('substitutionStep ', (idx/2), ': ', hinEquation.astScheme, ' subVar: ', entVariable)
             vorEquation = hinEquation
         else: # vertexId==variableVertexId
-            entVariable = list_variables[vertexId__equationVariableId[vertexIdx]]
+            entVariable = listOfVariables[vertexId__equationVariableId[vertexId]]
 
     if verbose:
         print('listOfCollectedEquations')

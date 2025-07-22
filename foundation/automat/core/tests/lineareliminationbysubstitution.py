@@ -13,9 +13,9 @@ def test__basic__moveAdditionAndEquate(verbose=False):
     eq0 = Equation(eqs0, 'latex', verbose=verbose)
     eq1 = Equation(eqs1, 'latex', verbose=verbose)
     variableToEliminate = 'b'
-    ast, functions, variables, primitives, totalNodeCount = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
+    ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=ast)._unparse()
+    latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a-c=d-e' # to be filled in 
     expectedFunctions = {'-': 2} # count
     expectedVariables = {'a': 1, 'c': 1, 'd': 1, 'e': 1} # count
@@ -41,6 +41,10 @@ def test__basic__moveAdditionAndEquate(verbose=False):
         pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
         pp.pprint(eq0.totalNodeCountScheme)
+        print('stepsWithoutSimplify___self')
+        pp.pprint(stepsWithoutSimplify___self)
+        print('stepsWithoutSimplify___eq')
+        pp.pprint(stepsWithoutSimplify___eq)
 
 
 
@@ -50,9 +54,9 @@ def test__hatsukoi__step0(verbose=False):
     eq0 = Equation(eqs0, 'latex', verbose=verbose)
     eq1 = Equation(eqs1, 'latex', verbose=verbose)
     variableToEliminate = 'V_{Z_{1}}'
-    ast, functions, variables, primitives, totalNodeCount = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
+    ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=ast)._unparse()
+    latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'V_{in} -RI_R=I_{Z_{1}}R_{Z_{1}}' # to be filled in 
     expectedFunctions = {'*': 2, '-': 1} # count
     expectedVariables = {'I_R': 1, 'I_{Z_{1}}': 1, 'R': 1, 'R_{Z_{1}}': 1, 'V_{in}': 1} # count
@@ -78,6 +82,10 @@ def test__hatsukoi__step0(verbose=False):
         pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
         pp.pprint(eq0.totalNodeCountScheme)
+        print('stepsWithoutSimplify___self')
+        pp.pprint(stepsWithoutSimplify___self)
+        print('stepsWithoutSimplify___eq')
+        pp.pprint(stepsWithoutSimplify___eq)
 
 
 
@@ -87,10 +95,10 @@ def test__hatsukoi__step1(verbose=False): # TODO SAME_DIVISOR=> simplication_in_
     eq0 = Equation(eqs0, 'latex', verbose=verbose)
     eq1 = Equation(eqs1, 'latex', verbose=verbose)
     variableToEliminate = 'I_{R}'
-    ast, functions, variables, primitives, totalNodeCount = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
+    ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=ast)._unparse()
-    expectedLatexStr = '\\frac{V_{in} -I_{Z_{1}}R_{Z_{1}}}{R}=\\frac{(I_{R_{C}} R_{C}-V^{Q1}_{BE})-(0)}{R}' # to be filled in 
+    latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{V_{in}-I_{Z_{1}}R_{Z_{1}}}{R}=\\frac{(I_{R_{C}}R_{C}-V^{Q1}_{BE})-0}{R}' # to be filled in 
     expectedFunctions = {'*': 2, '-': 3, '/': 2} # count
     expectedVariables = {   
     'I_{R_{C}}': 1,
@@ -122,6 +130,10 @@ def test__hatsukoi__step1(verbose=False): # TODO SAME_DIVISOR=> simplication_in_
         pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
         pp.pprint(eq0.totalNodeCountScheme)
+        print('stepsWithoutSimplify___self')
+        pp.pprint(stepsWithoutSimplify___self)
+        print('stepsWithoutSimplify___eq')
+        pp.pprint(stepsWithoutSimplify___eq)
 
 
 
@@ -131,10 +143,10 @@ def test__hatsukoi__step2(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => s
     eq0 = Equation(eqs0, 'latex', verbose=verbose)
     eq1 = Equation(eqs1, 'latex', verbose=verbose)
     variableToEliminate = 'I_{RC}'
-    ast, functions, variables, primitives, totalNodeCount = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
+    ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
     from foundation.automat.parser.sorte.latexparser import Latexparser
-    latexStr = Latexparser(ast=ast)._unparse()
-    expectedLatexStr = '\\frac{\\frac{V_{in} -I_{Z1}R_{Z1}}{R}R+V_{BE}}{R_{C}}=I_{E} -I_{B}' # to be filled in 
+    latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = '\\frac{\\frac{V_{in}-I_{Z1}R_{Z1}}{R}R+V_{BE}}{R_{C}}=I_{E}-I_{B}' # to be filled in 
     expectedFunctions = {'*': 2, '+': 1, '-': 2, '/': 2} # count
     expectedVariables = {   'I_{B}': 1,
     'I_{E}': 1,
@@ -166,6 +178,10 @@ def test__hatsukoi__step2(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => s
         pp.pprint(eq0.primitivesScheme)
         print('results totalNodeCount')
         pp.pprint(eq0.totalNodeCountScheme)
+        print('stepsWithoutSimplify___self')
+        pp.pprint(stepsWithoutSimplify___self)
+        print('stepsWithoutSimplify___eq')
+        pp.pprint(stepsWithoutSimplify___eq)
 
 
 
@@ -174,3 +190,4 @@ if __name__=='__main__':
     test__hatsukoi__step0()
     test__hatsukoi__step1() # TODO SAME_DIVISOR=> simplication_in_AST
     test__hatsukoi__step2() # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => simplication_in_AST
+    #after testing this, 

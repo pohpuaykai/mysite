@@ -233,7 +233,7 @@ class Equation:
                 'id':vorOp['id'], #this is the function nodeId
                 'lastId':rootId # always going to be equals, after then prevOp....
             })
-        ops = operationOrderWithIdx#part of solving steps, excluding simplify
+        ops = deepcopy(operationOrderWithIdx)#part of solving steps, excluding simplify
         if self.verbose:
             print('ops', ops)
         if simplify:
@@ -351,7 +351,7 @@ class Equation:
 
         #need to put the scheme string back
         self.schemeStr = self.schemeparser.unparse(ast=self.astScheme)
-        return self.astScheme
+        return self.astScheme, operationOrderWithIdx
 
 
 
@@ -513,8 +513,8 @@ class Equation:
             print('before makeSubject eq.astScheme variablesScheme: ', eq.variablesScheme)
             print('before makeSubject eq.astScheme primitivesScheme', eq.primitivesScheme)
 
-        self.makeSubject(variable)
-        eq.makeSubject(variable)
+        _, stepsWithoutSimplify___self = self.makeSubject(variable)
+        _, stepsWithoutSimplify___eq = eq.makeSubject(variable)
         if self.verbose:
             print('after makeSubject self.astScheme: ', self.astScheme)
             print('after makeSubject self.astScheme totalNodeCountScheme: ', self.totalNodeCountScheme)
@@ -529,73 +529,56 @@ class Equation:
 
         #find which side of the = does variable be on
         sideOfVariableOfSelf = None
-        if self.astScheme[('=', 0)][0][0] == variable:
+        # if self.astScheme[('=', 0)][0][0] == variable:
+        if self.astScheme[self.rootOfTree][0][0] == variable:
             sideOfVariableOfSelf = 0
-            variableIdInSelf = self.astScheme[('=', 0)][0][1]
-        elif self.astScheme[('=', 0)][1][0] == variable:
+            # variableIdInSelf = self.astScheme[('=', 0)][0][1]
+            variableIdInSelf = self.astScheme[self.rootOfTree][0][1]
+        # elif self.astScheme[('=', 0)][1][0] == variable:
+        elif self.astScheme[self.rootOfTree][1][0] == variable:
             sideOfVariableOfSelf = 1
-            variableIdInSelf = self.astScheme[('=', 0)][1][1]
+            # variableIdInSelf = self.astScheme[('=', 0)][1][1]
+            variableIdInSelf = self.astScheme[self.rootOfTree][1][1]
         else:
             raise Exception(f'{variable} not the subject of self') # something wrong with makeSubject
         sideOfNonVariableOfEq = None
-        if eq.astScheme[('=', 0)][0][0] == variable:
+        # if eq.astScheme[('=', 0)][0][0] == variable:
+        if eq.astScheme[eq.rootOfTree][0][0] == variable:
             sideOfNonVariableOfEq = 1
-            variableIdInEq = eq.astScheme[('=', 0)][0][1]
-        elif eq.astScheme[('=', 0)][1][0] == variable:
+            # variableIdInEq = eq.astScheme[('=', 0)][0][1]
+            variableIdInEq = eq.astScheme[eq.rootOfTree][0][1]
+        # elif eq.astScheme[('=', 0)][1][0] == variable:
+        elif eq.astScheme[eq.rootOfTree][1][0] == variable:
             sideOfNonVariableOfEq = 0
-            variableIdInEq = eq.astScheme[('=', 0)][1][1]
+            # variableIdInEq = eq.astScheme[('=', 0)][1][1]
+            variableIdInEq = eq.astScheme[eq.rootOfTree][1][1]
         else:
             raise Exception(f'{variable} not the subject of eq') # something wrong with makeSubject
 
-        #move nodeId in self.ast that are > variableIdInEq, for consecutiveness
-        newAst = {}
-        stack = [('=', 0)]
-        while len(stack) > 0:
-            nodeName, nodeId = stack.pop()
-            children = self.astScheme.get((nodeName, nodeId), [])
-            stack += children
-            if len(children) > 0: # only keeping those with children
-                newChildren = []
-                for child in children:
-                    childName, childId = child
-                    if childId > variableIdInSelf:
-                        childId -= 1 # removing 1 variable
-                    newChildren.append((childName, childId))
-                if nodeId > variableIdInSelf:
-                    nodeId -= 1 # removing 1 variable
-                newAst[(nodeName, nodeId)] = newChildren
-        self.astScheme = newAst
+        #get the largest nodeId in self.astScheme = maxNodeId,  #<<<<<<<<<<<<<<<<<<<<this should be done by the Parser class
+        import sys
+        # print(self.astScheme); import pdb;pdb.set_trace()
+        maxNodeId = -sys.maxsize-1
+        for (_, parentId), childrenIds in self.astScheme.items():
+            maxNodeId = max(maxNodeId, parentId)
+            for (_, childId) in childrenIds:
+                maxNodeId = max(maxNodeId, childId)
+        # print('maxNodeId', maxNodeId); import pdb;pdb.set_trace()
+        #add (maxNodeId+1) to all the nodeIds in eq.astScheme
+        # from copy import deepcopy
+        newEqAst = {}; newEqRoot = None
+        for (parentName, parentId), childrenIds in eq.astScheme.items():
+            if parentName == '=':
+                newEqRoot = (parentName, parentId+(maxNodeId+1))
+            newChildren = []
+            for (childName, childId) in childrenIds:
+                newChildren.append((childName, childId+(maxNodeId+1)))
+            newEqAst[(parentName, parentId+(maxNodeId+1))] = newChildren
+        print(newEqAst, 'newEqAst')
 
-        from copy import deepcopy
-        eqAst = deepcopy(eq.astScheme)
-        #rename the ids of eqAst by adding self.totalNodeCount - 1 to all of eqAst
-        amountToIncreaseId = self.totalNodeCount - 2 # we will be removing 2 id from eq.ast, = and variable
-        newEqAst = {}
-        stack = [('=', 0)]
-        while len(stack) > 0:
-            nodeName, nodeId = stack.pop()
-            children = eqAst.get((nodeName, nodeId), [])
-            stack += children
-            if len(children) > 0: # we only put in nonLeaves
-                newChildren = []
-                for child in children:
-                    childName, childId = child
-                    if childId > variableIdInEq:
-                        childId -= 1 # removing 1 variable
-                    # import pdb;pdb.set_trace()
-                    newChildren.append((childName, childId+amountToIncreaseId))
-                if nodeId > variableIdInEq:
-                    nodeId -= 1
-                # import pdb;pdb.set_trace()
-                newEqAst[(nodeName, nodeId+amountToIncreaseId)] = newChildren
-        if self.verbose:
-            print('new self.astScheme:')
-            pp.pprint(self.astScheme)
-            print(f'after increasing nodeId by amountToIncreaseId ({amountToIncreaseId}) :')
-            pp.pprint(newEqAst)
-
-        self.astScheme[('=', 0)][sideOfVariableOfSelf] = newEqAst[('=', amountToIncreaseId)][sideOfNonVariableOfEq]
-        del newEqAst[('=', amountToIncreaseId)]
+        self.astScheme[self.rootOfTree][sideOfVariableOfSelf] = newEqAst[newEqRoot][sideOfNonVariableOfEq]
+        # del newEqAst[('=', self.rootOfTree[1]+amountToIncreaseId)]
+        del newEqAst[newEqRoot]
         if self.verbose:
             print('updating self.astScheme: ')
             pp.pprint(self.astScheme)
@@ -605,6 +588,8 @@ class Equation:
         if self.verbose:
             print('updated astScheme: ')
             pp.pprint(self.astScheme)
+            print('updated rootOfTree: ')
+            print(self.rootOfTree)
         #substitution complete
 
         #update functionCountChange, should have no functionCountChange
@@ -640,9 +625,11 @@ class Equation:
 
         #TODO recalculate for startPos__nodeIdScheme
         #TODO recalculate for nodeId__lenScheme
+        #TODO update rootOfTree(DONE)
 
 
-        return self.astScheme, self.functionsScheme, self.variablesScheme, self.primitivesScheme, self.totalNodeCountScheme
+        return self.astScheme, self.functionsScheme, self.variablesScheme, \
+        self.primitivesScheme, self.totalNodeCountScheme, stepsWithoutSimplify___self, stepsWithoutSimplify___eq
 
 
 

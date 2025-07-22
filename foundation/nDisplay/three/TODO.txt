@@ -1,10 +1,8 @@
 -bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
---translate subsitutionPath into solving_steps (debugger_format???)
----make lineareliminationbysubstitution return rootOfTree for translating to latex
-----Equation.py should have a rootOfTree attribute
----Equation.py need to store rootOfTree
----lineareliminationbysubstitution should return makeSubject steps
-----makeSubject should return steps
+--fix foundation\automat\core\manipulate\recommend\tests\recommendtest.py, need to calculate:
+nodeId__len
+in
+foundation\automat\core\equation.py:linearEliminationBySubstitution
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display, bipartiteSolver?
 
 
