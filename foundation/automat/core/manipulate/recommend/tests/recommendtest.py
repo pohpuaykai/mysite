@@ -27,12 +27,12 @@ def test__deriveMetaInformation__basic(verbose=False):#TODO does not work
 def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     from foundation.automat.core.equation import Equation
     listOfCollectedEquationStrs = [
-    '\\frac{1}{-R_{ R_{ 0 } }}+\\frac{1}{-R_{ R_{ 1 } }}=\\frac{1}{X_{ total_{ 6 } }}', #0
-    'I_{ R_{ 0 } }-I_{ R_{ 1 } }-I_{ DC_{ 4 } }=0', #1
-    '-V_{ R_{ 1 } }-V_{ R_{ 0 } }=0', #2
-    'V_{ DC_{ 4 } }+V_{ R_{ 0 } }=0', #3
-    '\\frac{V_{ R_{ 0 } }}{I_{ R_{ 0 } }}=R_{ R_{ 0 } }', #4
-    '\\frac{V_{ R_{ 1 } }}{I_{ R_{ 1 } }}=R_{ R_{ 1 } }' #5
+    '\\frac{1}{-R_{R_{0}}}+\\frac{1}{-R_{R_{1}}}=\\frac{1}{X_{total_{6}}}', #0
+    'I_{R_{0}}-I_{R_{1}}-I_{DC_{4}}=0', #1
+    '-V_{R_{1}}-V_{R_{0}}=0', #2
+    'V_{DC_{4}}+V_{R_{0}}=0', #3
+    '\\frac{V_{R_{0}}}{I_{R_{0}}}=R_{R_{0}}', #4
+    '\\frac{V_{R_{1}}}{I_{R_{1}}}=R_{R_{1}}' #5
     ] # convert to equations
 
     listOfCollectedEquations = []; listOfVariables = []; #take the index in list as the id of these
@@ -53,6 +53,7 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     for equationId, equationStr in enumerate(listOfCollectedEquationStrs):
         equation = Equation(equationStr=equationStr, parserName='latex')
         equationVertexId = vertexIdIssuer.getVertexId(equationId)
+        print('equation*****', equationId, equationVertexId)
         equationId__vertexId[equationId] = equationVertexId
         #
         existingNeighbours = type__list_vertexIds.get(equationKey, [])
@@ -69,6 +70,7 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
                 listOfVariables.append(variable)
                 variableVertexId = vertexIdIssuer.getVertexId(variableId)
                 variableId__vertexId[variableId] = variableVertexId
+            print('variable*****', variableId, variableVertexId)
             # print(variable, variableId, variableVertexId); import pdb;pdb.set_trace()
             #
             existingNeighbours = type__list_vertexIds.get(variableKey, [])
@@ -90,7 +92,6 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     dependentVariableId = 2#'X_{ total_{ 6 } }'
     list_independentVariablesIds = [6, 7, 8]#['V_{ R_{ 1 } }', 'V_{ R_{ 0 } }', 'V_{ DC_{ 4 } }']
 
-    # #this is also the solving steps? Just the rough steps... not detailed enough<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<should include the actual manipulation steps :)
     substitutionPath = Recommend.bipartiteSearch(listOfCollectedEquations, listOfVariables, equationVariables_g, vertexId__equationVariableId, equationId__vertexId, type__list_vertexIds, equationKey, variableKey, dependentVariableId, list_independentVariablesIds)
 
     #incorporate for displaying_of_latex
@@ -103,8 +104,12 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
         if idx % 2 == 0: # vertexId==equationVertexId
             hinEquation = listOfCollectedEquations[vertexId__equationVariableId[vertexId]]
             #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
-            hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)#This method is not inplace (please see foundation.automat.core.tests.lineareliminationbysubstitution.py)
-            print('substitutionStep ', (idx/2), ': ', hinEquation.astScheme, ' subVar: ', entVariable)
+            _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___self, _stepsWithoutSimplify___eq = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)
+            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+            # print('substitutionStepAst ', (idx/2), ': ', hinEquation.astScheme, ' subVar: ', entVariable)
+            pp.pprint(hinEquation.astScheme)
+            print('substitutionStepLatex ', (idx/2), ': ', Latexparser(ast=hinEquation.astScheme, rootOfTree=hinEquation.rootOfTree)._unparse(), ' subVar: ', entVariable)
+            print('substitutionStep ', (idx/2), ': ', hinEquation.schemeStr, ' subVar: ', entVariable)
             vorEquation = hinEquation
         else: # vertexId==variableVertexId
             entVariable = listOfVariables[vertexId__equationVariableId[vertexId]]

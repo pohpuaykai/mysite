@@ -119,8 +119,16 @@ class Schemeparser(Parser):
             procedureLabel = ''
             realProcedureStartPos = parentStartPosOffset + 1 # because we stripped the (
             procedureEndPosition = None
-            for idx, c in enumerate(strippedEqs):
-                if c == ' ': # is a space...
+            openBra__count___others = {'{':0, '[':0}; closeBra__openBra = {'}':'{', ']':'['} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
+            for idx, c in enumerate(strippedEqs):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<do bracket_accounting here
+                #
+                if c in openBra__count___others.keys():
+                    openBra__count___others[c] += 1
+                elif c in closeBra__openBra.keys():
+                    openBra__count___others[closeBra__openBra[c]] -= 1
+                #
+                if not any(map(lambda count: count!=0, openBra__count___others.values())) and \
+                (c == ' '): #first part is to allow anything within {} and [] to be counted as 1 entity is a space...
                     procedureEndPosition = idx
                     break
                 procedureLabel += c
@@ -138,6 +146,8 @@ class Schemeparser(Parser):
             arguments = []
             argStartPos = argStrStartPos # absolute beginning of each individual argstr
             argAmountStrippedOnLeft = 0
+            openBra__count___others = {'{':0, '[':0}; closeBra__openBra = {'}':'{', ']':'['} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
+            
             for jc, c in enumerate(argumentsStr):
                 if self.veryVerbose:
                     print(c, currentArgumentStr, c == ' ', bracketCounter == 0, '<<<<<<<<<<<<<<12<<<<<<<<<', jc)  
@@ -148,7 +158,14 @@ class Schemeparser(Parser):
                     bracketCounter += 1
                 elif c == ')':
                     bracketCounter -= 1
-                if c == ' ' and bracketCounter == 0: # (brackets are balanced) and this character c is a space
+                #bracket_accounting here:
+                if c in openBra__count___others.keys():
+                    openBra__count___others[c] += 1
+                elif c in closeBra__openBra.keys():
+                    openBra__count___others[closeBra__openBra[c]] -= 1
+                #
+                if not any(map(lambda count: count!=0, openBra__count___others.values())) and \
+                 (c == ' ' and bracketCounter == 0): # (brackets are balanced) and this character c is a space
                     if self.veryVerbose:
                         print(c, currentArgumentStr, c == ' ', bracketCounter == 0, '<<<<<<<<<<<<<<<<<<<<<<<', jc)
                     #for original_string position calculation

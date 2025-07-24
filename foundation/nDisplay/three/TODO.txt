@@ -1,5 +1,6 @@
 -bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
---check if its sematically correct, (fingers_crossed)
+--bipartiteSolver might not eliminate all the unwanted_variables after the substitutionPath, because it started in the wrong vertex
+---need to write a followUp to check what unwanted_variables are remaining, and selected the 'right' equation to remove it... ( abit like undoing a mistake)????? i am actually quite sure this will not work...
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display, bipartiteSolver?
 
 

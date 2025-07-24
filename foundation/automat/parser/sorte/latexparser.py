@@ -2142,6 +2142,7 @@ count by EntityType:
             nodeId, symbol = list(nodeId__symbol___withInstructions.items())[idxOf_nodeId__symbol___withInstructions];idxOf_nodeId__symbol___withInstructions+=1
             list_instructions = self.getLatexSpecialCases(symbol, reverse=True)
             # print('list_instructions: ', list_instructions)
+            # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             # print('len(list_instructions): ', len(list_instructions))
             # if len(list_instructions) > 0:
             for instructionsIdx, instructions in enumerate(sorted(list_instructions, key=lambda dic: dic['reversePriority'], reverse=False)): # sort instructions by 'reversePriority'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2238,6 +2239,7 @@ count by EntityType:
                     # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                     # import pdb;pdb.set_trace()
                 # print('newSchemeStr: ', astSchemeStr)
+                # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                 # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                 # print('LEFTOVERs: ')
                 # import pprint; pp = pprint.PrettyPrinter(indent=4)
@@ -2253,6 +2255,10 @@ count by EntityType:
             schemeparser = Schemeparser(equationStr=astSchemeStr)
             ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
             self.latexAST = ast; self.rootOfTree = schemeparser.rootOfTree
+            # print('latexAST:')
+            # print(self.latexAST);
+            # print('self.rootOfTree:');
+            # print(self.rootOfTree)
         else:
             self.latexAST = theAst
 

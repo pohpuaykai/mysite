@@ -931,6 +931,28 @@ def test__latexParserUnparser__impedanceOfParallelRLCCircuit1(verbose=False):
         )
 
 
+def test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1(verbose=False):
+    """"""
+    inputPattern = '(/ $0 $1)'
+    outputPattern = '(\\frac $0 $1)'
+    schemeword = '(= (/ (- (- 0 V_{ R_{ 1 } }) 0) I_{ R_{ 0 } }) (- 0 (/ 1 (- (/ 1 X_{ total_{ 6 } }) (/ 1 (- 0 R_{ R_{ 1 } }))))))'
+    nodeIdsToSkip = []
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
+    expected = None
+    expected_verPosWord = None
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('verPosWord(positional changes):')
+        pp.pprint(parser.verPosWord) # positional changes
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword and \
+        expected_verPosWord == parser.verPosWord 
+        )
+
 # def test__latexParserUnparse__(verbose=False):
 #     """"""
 #     inputPattern = None
@@ -955,23 +977,24 @@ def test__latexParserUnparser__impedanceOfParallelRLCCircuit1(verbose=False):
 
 
 if __name__=='__main__':
-    test__ideal__addition()
-    test__idealNested__addition()
-    test__simpleLeft__addition()
-    test__simpleRight__addition()
-    test__sameLevel__addition()
-    test__nested__addition()
-    test__nestedSameLevel__addition()
-    test__2deep2wide__addition()
-    test__2deep2wideSkip__addition()
-    test__notApplicable__addition()
-    test__functionCountChanges__subtractZero()
-    test__functionCountChanges__distributivity()
+    # test__ideal__addition(True)
+    # test__idealNested__addition(True)
+    # test__simpleLeft__addition(True)
+    # test__simpleRight__addition(True)
+    # test__sameLevel__addition(True)
+    # test__nested__addition(True)
+    # test__nestedSameLevel__addition(True)
+    # test__2deep2wide__addition(True)
+    # test__2deep2wideSkip__addition(True)
+    # test__notApplicable__addition(True)
+    # test__functionCountChanges__subtractZero(True)
+    # test__functionCountChanges__distributivity(True)
 
-    test__moreVariableOutputThanInput__exponential1IsAnythingToThe0()
+    # test__moreVariableOutputThanInput__exponential1IsAnythingToThe0(True)
     # # test__onlyVariable__multiplyDivideCancal(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typing REQUIRED postponed until pipeline
 
-    test__latexParserUnparse__sqrtInSqrt()
-    test__latexParserUnparse__parallelSumOfCapacitance()
-    test__latexParserUnparser__impedanceOfParallelRLCCircuit1()
+    # test__latexParserUnparse__sqrtInSqrt(True)
+    # test__latexParserUnparse__parallelSumOfCapacitance(True)
+    # test__latexParserUnparser__impedanceOfParallelRLCCircuit1(True)
+    test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1(True)
     #after this test latexparser again

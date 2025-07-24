@@ -274,7 +274,7 @@ class EquationFinder(ABC):
 
 
         subsubscript = str(nodeId)
-        return f'{main_symbol}_{{ {subscript}_{{ {subsubscript} }} }}'
+        return f'{main_symbol}_{{{subscript}_{{{subsubscript}}}}}'
 
     def sumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, addAsEquation=True):
         latexStr = Latexparser.makePlusAndMinus(list_vars, equivalentVariableDict)

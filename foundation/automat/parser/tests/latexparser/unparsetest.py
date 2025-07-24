@@ -1151,6 +1151,88 @@ def test__makesubjecttest0__impedanceOfParallelRLCCircuit1(verbose=False):
         print(eqsStr)
 
 
+def test__bipartiteSearch__dc_twoResistor_parallel_STEP1(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+        ('-', 0): [('0', 19), ('/', 3)],
+        ('-', 1): [('0', 20), ('R_{R_{1}}', 12)],
+        ('-', 2): [('/', 5), ('/', 4)],
+        ('-', 30): [('0', 40), ('V_{R_{1}}', 33)],
+        ('-', 31): [('-', 30), ('0', 39)],
+        ('/', 3): [('1', 7), ('-', 2)],
+        ('/', 4): [('1', 11), ('-', 1)],
+        ('/', 5): [('1', 15), ('X_{total_{6}}', 16)],
+        ('/', 21): [('-', 31), ('I_{R_{0}}', 26)],
+        ('=', 6): [('/', 21), ('-', 0)]
+    }
+    rootOfTree = ('=', 6)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    # expected_eqsStr = '\\frac{-V_{ R_{ 1 } } }{I_{ R_{ 0 } }}=-\\frac{1}{\\frac{1}{X_{ total_{ 6 } }}-\\frac{1}{-R_{ R_{ 1 } }}}'
+    expected_eqsStr = '\\frac{-V_{R_{1}}-0}{I_{R_{0}}}=-\\frac{1}{\\frac{1}{X_{total_{6}}}-\\frac{1}{-R_{R_{1}}}}'
+    
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+def test__bipartiteSearch__dc_twoResistor_parallel_STEP2(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    ast = {
+        ('-', 9): [('0', 28), ('/', 30)],
+        ('-', 10): [('0', 29), ('/', 13)],
+        ('-', 11): [('/', 14), ('/', 12)],
+        ('-', 39): [('0', 49), ('V_{R_{1}}', 42)],
+        ('-', 40): [('-', 39), ('0', 48)],
+        ('/', 0): [('V_{R_{1}}', 2), ('I_{R_{1}}', 5)],
+        ('/', 12): [('1', 16), ('-', 9)],
+        ('/', 13): [('1', 20), ('-', 11)],
+        ('/', 14): [('1', 24), ('X_{total_{6}}', 25)],
+        ('/', 30): [('-', 40), ('I_{R_{0}}', 35)],
+        ('=', 1): [('/', 0), ('-', 10)]
+    }
+    rootOfTree = ('=', 1)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    # expected_eqsStr = '\\frac{V_{ R_{ 1 } }}{I_{ R_{ 1 } }}=-\\frac{1}{\\frac{1}{X_{ total_{ 6 } }}-\\frac{1}{-\\frac{-V_{ R_{ 1 } }}{I_{ R_{ 0 } }}}}'
+    expected_eqsStr = '\\frac{V_{R_{1}}}{I_{R_{1}}}=-\\frac{1}{\\frac{1}{X_{total_{6}}}-\\frac{1}{-\\frac{-V_{R_{1}}-0}{I_{R_{0}}}}}'
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
+
+def test__bipartiteSearch__dc_twoResistor_parallel_STEP3(verbose=False):
+    pp = pprint.PrettyPrinter(indent=4)
+    ast = {   
+        ('+', 1): [('0', 12), ('I_{ DC_{ 4 } }', 9)],
+        ('-', 0): [('I_{R_{0}}', 3), ('+', 1)],
+        ('-', 22): [('0', 41), ('/', 43)],
+        ('-', 23): [('0', 42), ('/', 26)],
+        ('-', 24): [('/', 27), ('/', 25)],
+        ('-', 52): [('0', 62), ('V_{R_{1}}', 55)],
+        ('-', 53): [('-', 52), ('0', 61)],
+        ('/', 13): [('V_{R_{1}}', 15), ('-', 23)],
+        ('/', 25): [('1', 29), ('-', 22)],
+        ('/', 26): [('1', 33), ('-', 24)],
+        ('/', 27): [('1', 37), ('X_{total_{6}}', 38)],
+        ('/', 43): [('-', 53), ('I_{R_{0}}', 48)],
+        ('=', 2): [('/', 13), ('-', 0)]
+    }
+    rootOfTree = ('=', 2)
+
+    parser = Latexparser(ast=ast, rootOfTree=rootOfTree, verbose=verbose)
+    eqsStr = parser._unparse()
+    # expected_eqsStr = '\\frac{V_{ R_{ 1 } }}{-\\frac{1}{\\frac{1}{X_{ total_{ 6 } }}-\\frac{1}{-\\frac{-V_{ R_{ 1 } }}{I_{ R_{ 0 } }}}}}=I_{ R_{ 0 } }-I_{ DC_{ 4 } }'
+    expected_eqsStr = '\\frac{V_{R_{1}}}{-\\frac{1}{\\frac{1}{X_{total_{6}}}-\\frac{1}{-\\frac{-V_{R_{1}}-0}{I_{R_{0}}}}}}=I_{R_{0}}-(0+I_{DC_{4}})'
+    
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', expected_eqsStr == eqsStr)
+    if verbose:
+        print(eqsStr)
+
 
 def test__newSymbolsLimitTheorem__sumRule(verbose=False):
     pp = pprint.PrettyPrinter(indent=4)
@@ -1561,61 +1643,64 @@ def test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash(verbose=False):
 
 
 if __name__=='__main__':
-    test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
-    test__contiguousLeftOvers__decimalPlaces()
-    test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
-    test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
-    test__schemeToLatex__variablesWithCurlyBrackets()
-    test__findingBackSlashAndInfixOperations__Trig0()
-    test__findingBackSlashAndInfixOperations__Trig1()
-    test__findingBackSlashAndInfixOperations__Trig2()
-    test__findingBackSlashAndInfixOperations__Sqrt0()
-    test__findingBackSlashAndInfixOperations__Sqrt1()
-    test__findingBackSlashAndInfixOperations__Ln()
-    test__findingBackSlashAndInfixOperations__Frac()
-    test__findingBackSlashAndInfixOperations__Log0()
-    test__findingBackSlashAndInfixOperations__Log1()
-    test__findingBackSlashAndInfixOperations__tildeVariable()
-    test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    test__infixInBackslash__paraboloid()
-    test__sqrtWithPowerCaretRightOtherInfix__hill()
-    test__nonInfixBrackets__addImplicitMultiply()
-    test__nonInfixBrackets__addImplicitMultiply0()
-    test__nonInfixBrackets__addImplicitMultiply1()
-    test__BODMAS__priorityBetweenInfixForBrackets()
-    test__BODMAS__enclosingBracketInBackslashArg()
-    test__BODMAS__enclosingBracketInBackslashArgWithExponent()
-    test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
-    test__BODMAS__enclosingBracket()
-    test__manyFracCaretEnclosingBrac__partialFrac()
-    test__fracWithLogNoBase__changeLogBaseFormula()
-    test__backslashInfixInBackslash__sqrtInSqrt()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    test__backslashInfixInBackslash__trigInTrig()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
-    test__backslashInfixInBackslash__logInLog()
-    test__backslashInfixInBackslash__fracInFrac()
-    test__hassliche__highPowersAndRandomCoefficientsPITEST()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
-    test__hassliche__nestedPolynomial()
-    test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
-    test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
-    test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
-    test__hassliche__degree5()
-    test__hassliche__degree6()
-    test__hassliche__degree7()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
-    test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
-    test__makesubjecttest0__impedanceOfParallelRLCCircuit1()
-    test__newSymbolsLimitTheorem__sumRule()
-    test__newSymbolsLimitTheorem__productRule()
-    test__newSymbolsLimitTheorem__constantTimesRule()
-    test__newSymbolsLimitTheorem__quotientRule()
-    test__newSymbols__fourierSeries()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
-    test__newSymbols__parallelSumOfCapacitance()
-    test__newSymbols__faradayIntegralForm()
-    test__newSymbols__faradayDifferentialForm()
-    test__newSymbols__gaussIntegralForm()
-    # test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< nabla missing curlybrace<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    test__paveWayForDifferentiation__productRule() 
-    test__paveWayForDifferentiation__sumRule()  
-    test__paveWayForIntegration__enclosingBracketNonBackslash() # functions u and v... (same problem as S(x, y))
-    test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash() #  TODO refactor brackslash args into a list, ... and the rest of the code...
+    # test__bracketsOfMinus__rightBracketsOfMinusKeepIfRightIsPlus()
+    # test__contiguousLeftOvers__decimalPlaces()
+    # test__collateBackslashInfixLeftOversToContiguous__exponentialOverMultiply()
+    # test__interLevelSubTreeGrafting__exponentialOverEnclosingBrackets()
+    # test__schemeToLatex__variablesWithCurlyBrackets()
+    # test__findingBackSlashAndInfixOperations__Trig0()
+    # test__findingBackSlashAndInfixOperations__Trig1()
+    # test__findingBackSlashAndInfixOperations__Trig2()
+    # test__findingBackSlashAndInfixOperations__Sqrt0()
+    # test__findingBackSlashAndInfixOperations__Sqrt1()
+    # test__findingBackSlashAndInfixOperations__Ln()
+    # test__findingBackSlashAndInfixOperations__Frac()
+    # test__findingBackSlashAndInfixOperations__Log0()
+    # test__findingBackSlashAndInfixOperations__Log1()
+    # test__findingBackSlashAndInfixOperations__tildeVariable()
+    # test__findingBackSlashAndInfixOperations__SchrodingerWaveEquation()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    # test__infixInBackslash__paraboloid()
+    # test__sqrtWithPowerCaretRightOtherInfix__hill()
+    # test__nonInfixBrackets__addImplicitMultiply()
+    # test__nonInfixBrackets__addImplicitMultiply0()
+    # test__nonInfixBrackets__addImplicitMultiply1()
+    # test__BODMAS__priorityBetweenInfixForBrackets()
+    # test__BODMAS__enclosingBracketInBackslashArg()
+    # test__BODMAS__enclosingBracketInBackslashArgWithExponent()
+    # test__BODMAS__enclosingBracketInBackslashArgImplicitZero()
+    # test__BODMAS__enclosingBracket()
+    # test__manyFracCaretEnclosingBrac__partialFrac()
+    # test__fracWithLogNoBase__changeLogBaseFormula()
+    # test__backslashInfixInBackslash__sqrtInSqrt()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    # test__backslashInfixInBackslash__trigInTrig()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...
+    # test__backslashInfixInBackslash__logInLog()
+    # test__backslashInfixInBackslash__fracInFrac()
+    # test__hassliche__highPowersAndRandomCoefficientsPITEST()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
+    # test__hassliche__nestedPolynomial()
+    # test__hassliche__nonIntegerAndNegativeCoefficientsDECIMALPOINTTEST()
+    # test__hassliche__mixedVariablesAndPowersPOWERCOTEVARIABLEDOUBLEVARIABLETEST()
+    # test__hassliche__irrationalAndTranscendentalNumbersPOWERCOTEBACKSLASH()
+    # test__hassliche__degree5()
+    # test__hassliche__degree6()
+    # test__hassliche__degree7()
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm()
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm0()
+    # test__hassliche__moreThanOneAdditiveTermInEachMultiplicativeTerm1()
+    # test__makesubjecttest0__impedanceOfParallelRLCCircuit1()
+    # test__bipartiteSearch__dc_twoResistor_parallel_STEP1()
+    # test__bipartiteSearch__dc_twoResistor_parallel_STEP2()
+    test__bipartiteSearch__dc_twoResistor_parallel_STEP3(True)
+    # test__newSymbolsLimitTheorem__sumRule()
+    # test__newSymbolsLimitTheorem__productRule()
+    # test__newSymbolsLimitTheorem__constantTimesRule()
+    # test__newSymbolsLimitTheorem__quotientRule()
+    # test__newSymbols__fourierSeries()#<<<<<<BACKSLASH_NUMBER, but we cannot differentiate it between variables...; also need a space between BACKSLASH_NUMBER and anything in front of it
+    # test__newSymbols__parallelSumOfCapacitance()
+    # test__newSymbols__faradayIntegralForm()
+    # test__newSymbols__faradayDifferentialForm()
+    # test__newSymbols__gaussIntegralForm()
+    # # test__newSymbols__greenSecondVectorIdentityDifferentialForm(True)#<<< nabla missing curlybrace<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    # test__paveWayForDifferentiation__productRule() 
+    # test__paveWayForDifferentiation__sumRule()  
+    # test__paveWayForIntegration__enclosingBracketNonBackslash() # functions u and v... (same problem as S(x, y))
+    # test__paveWayForIntegrtion__exponentOnEnclosingNonBackslash() #  TODO refactor brackslash args into a list, ... and the rest of the code...

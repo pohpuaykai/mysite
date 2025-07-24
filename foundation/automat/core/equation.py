@@ -578,7 +578,7 @@ class Equation:
             for (childName, childId) in childrenIds:
                 newChildren.append((childName, childId+(maxNodeId+1)))
             newEqAst[(parentName, parentId+(maxNodeId+1))] = newChildren
-        print(newEqAst, 'newEqAst')
+        # print(newEqAst, 'newEqAst')
 
         self.astScheme[self.rootOfTree][sideOfVariableOfSelf] = newEqAst[newEqRoot][sideOfNonVariableOfEq]
         # del newEqAst[('=', self.rootOfTree[1]+amountToIncreaseId)]
@@ -626,9 +626,6 @@ class Equation:
         # import pdb;pdb.set_trace()
         self.totalNodeCountScheme += eq.totalNodeCountScheme - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
 
-
-        #TODO recalculate for startPos__nodeIdScheme
-        #TODO recalculate for nodeId__lenScheme
         self.loadASTWithSchemeParser(self.astScheme)
 
 

@@ -112,6 +112,12 @@ class SchemeGrammarParser:
         return self.manipulatedSchemeWord
 
 
+
+
+
+
+
+
     def findFirstSameLevel(self, pattern, schemeword, chopped=0):
         """
         
@@ -143,6 +149,7 @@ class SchemeGrammarParser:
         """
         matchingBrackets = {}
         def getNextBalancedPos(beginPos): # innerClass, for memoisation of matchingBrackets
+            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<change this after findAllEntity
             #beginPos = (   ALWAYS
             if beginPos in matchingBrackets:
                 return matchingBrackets[beginPos]
@@ -157,14 +164,14 @@ class SchemeGrammarParser:
                     elif c == ')':
                         openPos = stack.pop()
                         matchingBrackets[openPos] = beginPos + i # memoize
-                return matchingBrackets[beginPos]
+                return matchingBrackets[beginPos]#returns the next balanced_close_brackets after beginPos
         patternSegmentedByDollar = pattern.split('$')
         # if len(patternSegmentedByDollar) == 1: # there are no $ in pattern <==> no variables in pattern
         # is this pattern possible: '$0 $1'?
         # if so, then it can only match scheme strings with 2-variables?
         firstPre = patternSegmentedByDollar[0]
         ###########
-        # info('schemeword', schemeword)
+        # print(schemeword, 'schemeword<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< chopped: ', chopped)
         # info('pattern', pattern)
         # info('firstPre', firstPre)
         ###########
@@ -176,10 +183,10 @@ class SchemeGrammarParser:
                 pre = patternSegmentedByDollar[i]
                 suf = patternSegmentedByDollar[i+1]
                 #########
-                # info('pre|', pre, '|suf|', suf, '|start+len(pre)|', start+len(pre), '|schemeword[start+len(pre)]|', schemeword[start+len(pre)])
-                # info('len(schemeword) < (start+len(pre))', len(schemeword) < (start+len(pre)))
+                # print('pre|', pre, '|suf|', suf, '|start+len(pre)|', start+len(pre), '|schemeword[start+len(pre)]|', schemeword[start+len(pre)])
+                # print('(start+len(pre)) < len(schemeword)', (start+len(pre)) < len(schemeword))
+                # print("schemeword[start+len(pre)] == '('", schemeword[start+len(pre)] == '(')
                 # import pdb;pdb.set_trace()
-                # info("schemeword[start+len(pre)] == '('", schemeword[start+len(pre)] == '(')
                 #########
                 if (start+len(pre)) < len(schemeword) and schemeword[start+len(pre)] == '(':
                     ##########
@@ -188,26 +195,36 @@ class SchemeGrammarParser:
                     #
                     nextPos = getNextBalancedPos(start+len(pre)) + 1 # return None if cannot find
                     ##########
-                    # info('0!nextPos', nextPos, i, start, pre)
+                    # print('0!nextPos', nextPos, i, start, pre)
                     ##########
                     # if 
-                else:#variable, find next place that starts with suf
+                else:#variable, find next place(ENTITY) that starts with suf<<<<<<<<<<<<<<<<<<find nexy Entity instead of place(position)
+                    #if suf==' ', do you get all the space, and then next?
                     ##########
                     # info('1!', i, start, pre)
 
                     ##########
                     try:
                         subStart = start+len(pre)
-                        subEnd = schemeword[start+len(pre):].index(suf) + (start+len(pre))
+                        # subEnd = schemeword[start+len(pre):].index(suf) + (start+len(pre))
+                        subEnd = len(schemeword)
+                        openBra__count___others = {'{':0, '[':0}; closeBra__openBra = {'}':'{', ']':'['} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
                         for j in range(subStart, subEnd+1):
-                            if (schemeword[j].isspace()) or (schemeword[j] in ['(', ')']):
+                            if schemeword[j] in openBra__count___others:
+                                openBra__count___others[schemeword[j]] += 1
+                            elif schemeword[j] in closeBra__openBra:
+                                openBra__count___others[closeBra__openBra[schemeword[j]]] -= 1
+                            # print(j);import pdb; pdb.set_trace()
+                            if not any(map(lambda count: count!=0, openBra__count___others.values())) and ((schemeword[j].isspace()) or (schemeword[j] in ['(', ')'])): # do bracket accounting here for {} and []
+                            # if (schemeword[j].isspace()) or (schemeword[j] in ['(', ')']): # do bracket accounting here for {} and []
+                            
                                 nextPos = j
                                 break
                         if nextPos == subStart:
                             nextPos = None # empty string
 
                     ##########
-                        # info('1!nextPos', nextPos, i, start, pre)
+                        # print('1!nextPos', nextPos, i, start, pre)
 
                     ##########
                     except:
@@ -217,6 +234,7 @@ class SchemeGrammarParser:
                 else:
                     dollarPoss.append((start+len(pre)+chopped, nextPos+chopped))
                     start = nextPos
+                # print('********************************************************************')
             #here we need to match the suf, the last thing
             if len(dollarPoss) > 0:
                 schemewordSufStart = dollarPoss[-1][1]-chopped # -chopped because we don't have the complete schemeword

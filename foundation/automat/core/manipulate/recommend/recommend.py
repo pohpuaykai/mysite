@@ -454,6 +454,7 @@ class Recommend:
                 else: # either nodes of directedEdge is NOT Equation NOR dependent|independentVariables, assign LOW_WEIGHTS to form subsitutionPath to be eliminated
                     edgeWeight[directedEdge] = LOW_WEIGHTS
         T, R = SpanningTree.minimumSpanningTreeKruskal(vertexIterable, edgeIterableSortable, edgeWeight)
+        print('T:', T); print('R: ', R, '<<<<<<<<<<')
         #find equationNode in T, that has dependentVariableId as start of DFS#[TODO many optimizations possible here, to get a Path that substitutes away all the unwanted variables]
         #since T is spanning, we can just look in list_equations, for ANY equation that has_most_number_of_dependentVariableId_and_list_independentVariableIds[heuristic][TODO many optimizations possible here, on which starting point to pick] Ou est vers origin, ja?
         wantedVariables = []
@@ -475,13 +476,17 @@ class Recommend:
         maxLength=0; maxLengthChildDict = None
         while len(stack)>0:
             current___dict = stack.pop()#lastOut
-            for neighbour in equationVariables_bg[current___dict['current']]:
+            # for neighbour in equationVariables_bg[current___dict['current']]:
+            for neighbour in T[current___dict['current']]:
                 if neighbour not in visited:
                     visited.append(neighbour)
                     childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour]}
                     if len(childDict['path']) > maxLength:
                         maxLength = len(childDict['path']); maxLengthChildDict = childDict
                     stack.append(childDict)
+                    print('******')
+                    print('current: ', current___dict['current'], ' child: ', childDict['current'], ' path: ', childDict['path'])
+                    print('******')
         return maxLengthChildDict['path']
 
 
