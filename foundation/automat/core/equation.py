@@ -237,7 +237,7 @@ class Equation:
                 'id':vorOp['id'], #this is the function nodeId
                 'lastId':rootId # always going to be equals, after then prevOp....
             })
-        ops = deepcopy(operationOrderWithIdx)#part of solving steps, excluding simplify
+        ops = deepcopy(operationOrderWithIdx); solvingResultingSchemeStrs = []; solvingResultingAsts = []#part of solving steps, excluding simplify
         if self.verbose:
             print('ops', ops)
         if simplify:
@@ -268,6 +268,7 @@ class Equation:
             self.startPos__nodeIdScheme = startPos__nodeId
             self.astScheme = invertedAst
             self.schemeStr = Schemeparser(ast=self.astScheme)._unparse()
+            solvingResultingSchemeStrs.insert(0, self.schemeStr); solvingResultingAsts.insert(0, invertedAst)
             if self.verbose:
                 print('AFTER nodeId__lenScheme', self.nodeId__lenScheme)
                 print('AFTER astScheme:', self.astScheme)
@@ -355,6 +356,10 @@ class Equation:
 
         #need to put the scheme string back
         self.schemeStr = self.schemeparser.unparse(ast=self.astScheme)
+        #link the results of each step (solvingResultingSchemeStrs) with description of each step (operationOrderWithIdx)
+        for i, op in enumerate(operationOrderWithIdx):
+            op['resultSchemeStr'] = solvingResultingSchemeStrs[i];
+            op['resultAST'] = solvingResultingAsts[i];
         return self.astScheme, operationOrderWithIdx
 
 

@@ -75,6 +75,10 @@ def automat_findEquationsAndSolve(request):
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     print(listOfCollectedEquations); print(len(listOfCollectedEquations))
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    from foundation.ecircuit.equationSolvers.bipartitesolver import BipartiteSolver
+    dependentVariableStr = 'X_{total_{6}}'#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
+    independentVariableStrs = ['V_{R_{1}}', 'V_{R_{0}}', 'V_{DC_{4}}']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
+    steps = BipartiteSolver(listOfCollectedEquations, dependentVariableStr, independentVariableStrs)._solve()
 
 
 
@@ -82,4 +86,4 @@ def automat_findEquationsAndSolve(request):
 
     # from foundation.ecircuit.orthogonalLayouts.rcclorthogonallayout import RCCLOrthogonalLayout
 
-    return HttpResponse(dumps(listOfCollectedEquations), content_type="text/plain")
+    return HttpResponse(dumps({'equations':listOfCollectedEquations, 'solvingSteps':steps}), content_type="text/plain")

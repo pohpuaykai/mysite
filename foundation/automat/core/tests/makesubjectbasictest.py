@@ -22,6 +22,16 @@ def test__makeSubject2Input__addition0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('-', 2), ('b', 3)], ('-', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 4, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '+',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('-', 2): [('a', 1), ('c', 4)],
+                         ('=', 0): [('-', 2), ('b', 3)]},
+        'resultSchemeStr': '(= (- a c) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -30,7 +40,8 @@ def test__makeSubject2Input__addition0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -47,6 +58,8 @@ def test__makeSubject2Input__addition0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 
@@ -66,6 +79,16 @@ def test__makeSubject2Input__addition1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('-', 2), ('c', 4)], ('-', 2): [('a', 1), ('b', 3)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 3, 11: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '+',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('-', 2): [('a', 1), ('b', 3)],
+                         ('=', 0): [('-', 2), ('c', 4)]},
+        'resultSchemeStr': '(= (- a b) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -74,7 +97,8 @@ def test__makeSubject2Input__addition1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -91,6 +115,8 @@ def test__makeSubject2Input__addition1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__subtraction0(verbose=False):
@@ -108,6 +134,16 @@ def test__makeSubject2Input__subtraction0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('+', 2), ('b', 3)], ('+', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 4, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '-',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('+', 2): [('a', 1), ('c', 4)],
+                         ('=', 0): [('+', 2), ('b', 3)]},
+        'resultSchemeStr': '(= (+ a c) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -116,7 +152,8 @@ def test__makeSubject2Input__subtraction0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -133,6 +170,8 @@ def test__makeSubject2Input__subtraction0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__subtraction1(verbose=False):
@@ -150,6 +189,16 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('-', 2), ('c', 4)], ('-', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 3, 8: 1, 11: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '-',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('-', 2): [('b', 3), ('a', 1)],
+                         ('=', 0): [('-', 2), ('c', 4)]},
+        'resultSchemeStr': '(= (- b a) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -158,7 +207,8 @@ def test__makeSubject2Input__subtraction1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -175,6 +225,8 @@ def test__makeSubject2Input__subtraction1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__multiply0(verbose=False):
@@ -192,6 +244,16 @@ def test__makeSubject2Input__multiply0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('/', 2), ('b', 3)], ('/', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 4, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '*',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('/', 2): [('a', 1), ('c', 4)],
+                         ('=', 0): [('/', 2), ('b', 3)]},
+        'resultSchemeStr': '(= (/ a c) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -200,7 +262,8 @@ def test__makeSubject2Input__multiply0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -217,6 +280,8 @@ def test__makeSubject2Input__multiply0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__multiply1(verbose=False):
@@ -234,6 +299,16 @@ def test__makeSubject2Input__multiply1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('/', 2), ('c', 4)], ('/', 2): [('a', 1), ('b', 3)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 3, 11: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '*',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('/', 2): [('a', 1), ('b', 3)],
+                         ('=', 0): [('/', 2), ('c', 4)]},
+        'resultSchemeStr': '(= (/ a b) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -242,7 +317,8 @@ def test__makeSubject2Input__multiply1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -259,6 +335,8 @@ def test__makeSubject2Input__multiply1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__divide0(verbose=False):
@@ -276,6 +354,16 @@ def test__makeSubject2Input__divide0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('*', 2), ('b', 3)], ('*', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 4, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '/',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('*', 2): [('a', 1), ('c', 4)],
+                         ('=', 0): [('*', 2), ('b', 3)]},
+        'resultSchemeStr': '(= (* a c) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -284,7 +372,8 @@ def test__makeSubject2Input__divide0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -301,6 +390,8 @@ def test__makeSubject2Input__divide0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__divide1(verbose=False):
@@ -318,6 +409,16 @@ def test__makeSubject2Input__divide1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('/', 2), ('c', 4)], ('/', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 3, 8: 1, 11: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '/',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('/', 2): [('b', 3), ('a', 1)],
+                         ('=', 0): [('/', 2), ('c', 4)]},
+        'resultSchemeStr': '(= (/ b a) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -326,7 +427,8 @@ def test__makeSubject2Input__divide1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -343,6 +445,8 @@ def test__makeSubject2Input__divide1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__exponent0(verbose=False):
@@ -360,6 +464,16 @@ def test__makeSubject2Input__exponent0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('nroot', 2), ('b', 3)], ('nroot', 2): [('c', 4), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 10: 4, 12: 1, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '^',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('nroot', 2), ('b', 3)],
+                         ('nroot', 2): [('c', 4), ('a', 1)]},
+        'resultSchemeStr': '(= (nroot c a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -368,7 +482,8 @@ def test__makeSubject2Input__exponent0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -385,6 +500,8 @@ def test__makeSubject2Input__exponent0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__exponent1(verbose=False):
@@ -402,6 +519,16 @@ def test__makeSubject2Input__exponent1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('log', 2), ('c', 4)], ('log', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 3, 10: 1, 13: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '^',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('log', 2), ('c', 4)],
+                         ('log', 2): [('b', 3), ('a', 1)]},
+        'resultSchemeStr': '(= (log b a) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -410,7 +537,8 @@ def test__makeSubject2Input__exponent1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -427,6 +555,8 @@ def test__makeSubject2Input__exponent1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__nroot0(verbose=False):
@@ -444,6 +574,16 @@ def test__makeSubject2Input__nroot0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('log', 2), ('b', 3)], ('log', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 10: 4, 13: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'nroot',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('log', 2), ('b', 3)],
+                         ('log', 2): [('a', 1), ('c', 4)]},
+        'resultSchemeStr': '(= (log a c) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -452,7 +592,8 @@ def test__makeSubject2Input__nroot0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -469,6 +610,8 @@ def test__makeSubject2Input__nroot0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__nroot1(verbose=False):
@@ -486,6 +629,16 @@ def test__makeSubject2Input__nroot1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('^', 2), ('c', 4)], ('^', 2): [('a', 1), ('b', 3)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 3, 11: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': 'nroot',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('^', 2), ('c', 4)],
+                         ('^', 2): [('a', 1), ('b', 3)]},
+        'resultSchemeStr': '(= (^ a b) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -494,7 +647,8 @@ def test__makeSubject2Input__nroot1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -511,6 +665,8 @@ def test__makeSubject2Input__nroot1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__log0(verbose=False):
@@ -528,6 +684,16 @@ def test__makeSubject2Input__log0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('nroot', 2), ('b', 3)], ('nroot', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 10: 1, 12: 4, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'log',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('nroot', 2), ('b', 3)],
+                         ('nroot', 2): [('a', 1), ('c', 4)]},
+        'resultSchemeStr': '(= (nroot a c) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -536,7 +702,8 @@ def test__makeSubject2Input__log0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -553,6 +720,8 @@ def test__makeSubject2Input__log0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject2Input__log1(verbose=False):
@@ -570,6 +739,16 @@ def test__makeSubject2Input__log1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('^', 2), ('c', 4)], ('^', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 3, 8: 1, 11: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': 'log',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('^', 2), ('c', 4)],
+                         ('^', 2): [('b', 3), ('a', 1)]},
+        'resultSchemeStr': '(= (^ b a) c)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -578,7 +757,8 @@ def test__makeSubject2Input__log1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -595,6 +775,8 @@ def test__makeSubject2Input__log1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arccosec(verbose=False):
@@ -612,6 +794,16 @@ def test__makeSubject1Input__arccosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cosec', 2), ('b', 3)], ('cosec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 10: 1, 13: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccosec',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('cosec', 2), ('b', 3)],
+                         ('cosec', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (cosec a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -620,7 +812,8 @@ def test__makeSubject1Input__arccosec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -637,6 +830,8 @@ def test__makeSubject1Input__arccosec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arccosech(verbose=False):
@@ -654,6 +849,16 @@ def test__makeSubject1Input__arccosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cosech', 2), ('b', 3)], ('cosech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccosech',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('cosech', 2), ('b', 3)],
+                         ('cosech', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (cosech a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -662,7 +867,8 @@ def test__makeSubject1Input__arccosech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -679,6 +885,8 @@ def test__makeSubject1Input__arccosech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arccos(verbose=False):
@@ -696,6 +904,15 @@ def test__makeSubject1Input__arccos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cos', 2), ('b', 3)], ('cos', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccos',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('cos', 2), ('b', 3)], ('cos', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (cos a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -704,7 +921,8 @@ def test__makeSubject1Input__arccos(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -721,6 +939,8 @@ def test__makeSubject1Input__arccos(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arccosh(verbose=False):
@@ -738,6 +958,16 @@ def test__makeSubject1Input__arccosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cosh', 2), ('b', 3)], ('cosh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccosh',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('cosh', 2), ('b', 3)],
+                         ('cosh', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (cosh a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -746,7 +976,8 @@ def test__makeSubject1Input__arccosh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -763,6 +994,8 @@ def test__makeSubject1Input__arccosh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arccot(verbose=False):
@@ -780,6 +1013,15 @@ def test__makeSubject1Input__arccot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cot', 2), ('b', 3)], ('cot', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccot',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('cot', 2), ('b', 3)], ('cot', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (cot a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -788,7 +1030,8 @@ def test__makeSubject1Input__arccot(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -805,6 +1048,8 @@ def test__makeSubject1Input__arccot(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arccoth(verbose=False):
@@ -822,6 +1067,16 @@ def test__makeSubject1Input__arccoth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('coth', 2), ('b', 3)], ('coth', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccoth',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('coth', 2), ('b', 3)],
+                         ('coth', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (coth a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -830,7 +1085,8 @@ def test__makeSubject1Input__arccoth(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -847,6 +1103,8 @@ def test__makeSubject1Input__arccoth(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arcsec(verbose=False):
@@ -864,6 +1122,15 @@ def test__makeSubject1Input__arcsec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sec', 2), ('b', 3)], ('sec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsec',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('sec', 2), ('b', 3)], ('sec', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (sec a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -872,7 +1139,8 @@ def test__makeSubject1Input__arcsec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -889,6 +1157,8 @@ def test__makeSubject1Input__arcsec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arcsech(verbose=False):
@@ -906,6 +1176,16 @@ def test__makeSubject1Input__arcsech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sech', 2), ('b', 3)], ('sech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsech',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('sech', 2), ('b', 3)],
+                         ('sech', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (sech a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -914,7 +1194,8 @@ def test__makeSubject1Input__arcsech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -931,6 +1212,8 @@ def test__makeSubject1Input__arcsech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arcsin(verbose=False):
@@ -948,6 +1231,15 @@ def test__makeSubject1Input__arcsin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sin', 2), ('b', 3)], ('sin', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsin',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('sin', 2), ('b', 3)], ('sin', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (sin a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -956,7 +1248,8 @@ def test__makeSubject1Input__arcsin(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -973,6 +1266,8 @@ def test__makeSubject1Input__arcsin(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arcsinh(verbose=False):
@@ -990,6 +1285,16 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sinh', 2), ('b', 3)], ('sinh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsinh',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('sinh', 2), ('b', 3)],
+                         ('sinh', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (sinh a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -998,7 +1303,8 @@ def test__makeSubject1Input__arcsinh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1015,6 +1321,8 @@ def test__makeSubject1Input__arcsinh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arctan(verbose=False):
@@ -1032,6 +1340,15 @@ def test__makeSubject1Input__arctan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('tan', 2), ('b', 3)], ('tan', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arctan',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('tan', 2), ('b', 3)], ('tan', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (tan a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1040,7 +1357,8 @@ def test__makeSubject1Input__arctan(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1057,6 +1375,8 @@ def test__makeSubject1Input__arctan(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__arctanh(verbose=False):
@@ -1074,6 +1394,16 @@ def test__makeSubject1Input__arctanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('tanh', 2), ('b', 3)], ('tanh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arctanh',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('tanh', 2), ('b', 3)],
+                         ('tanh', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (tanh a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1082,7 +1412,8 @@ def test__makeSubject1Input__arctanh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1099,6 +1430,8 @@ def test__makeSubject1Input__arctanh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__cosec(verbose=False):
@@ -1116,6 +1449,16 @@ def test__makeSubject1Input__cosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccosec', 2), ('b', 3)], ('arccosec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 13: 1, 16: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cosec',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arccosec', 2), ('b', 3)],
+                         ('arccosec', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arccosec a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1124,7 +1467,8 @@ def test__makeSubject1Input__cosec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1141,6 +1485,8 @@ def test__makeSubject1Input__cosec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__cosech(verbose=False):
@@ -1158,6 +1504,16 @@ def test__makeSubject1Input__cosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccosech', 2), ('b', 3)], ('arccosech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 14: 1, 17: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cosech',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arccosech', 2), ('b', 3)],
+                         ('arccosech', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arccosech a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1166,7 +1522,8 @@ def test__makeSubject1Input__cosech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1183,6 +1540,8 @@ def test__makeSubject1Input__cosech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__cos(verbose=False):
@@ -1200,6 +1559,16 @@ def test__makeSubject1Input__cos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccos', 2), ('b', 3)], ('arccos', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cos',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arccos', 2), ('b', 3)],
+                         ('arccos', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arccos a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1208,7 +1577,8 @@ def test__makeSubject1Input__cos(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1225,6 +1595,8 @@ def test__makeSubject1Input__cos(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__cosh(verbose=False):
@@ -1242,6 +1614,16 @@ def test__makeSubject1Input__cosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccosh', 2), ('b', 3)], ('arccosh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cosh',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arccosh', 2), ('b', 3)],
+                         ('arccosh', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arccosh a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1250,7 +1632,8 @@ def test__makeSubject1Input__cosh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1267,6 +1650,8 @@ def test__makeSubject1Input__cosh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__cot(verbose=False):
@@ -1284,6 +1669,16 @@ def test__makeSubject1Input__cot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccot', 2), ('b', 3)], ('arccot', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cot',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arccot', 2), ('b', 3)],
+                         ('arccot', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arccot a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1292,7 +1687,8 @@ def test__makeSubject1Input__cot(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1309,6 +1705,8 @@ def test__makeSubject1Input__cot(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__coth(verbose=False):
@@ -1326,6 +1724,16 @@ def test__makeSubject1Input__coth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccoth', 2), ('b', 3)], ('arccoth', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'coth',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arccoth', 2), ('b', 3)],
+                         ('arccoth', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arccoth a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1334,7 +1742,8 @@ def test__makeSubject1Input__coth(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1351,6 +1760,8 @@ def test__makeSubject1Input__coth(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__sec(verbose=False):
@@ -1368,6 +1779,16 @@ def test__makeSubject1Input__sec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsec', 2), ('b', 3)], ('arcsec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sec',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arcsec', 2), ('b', 3)],
+                         ('arcsec', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arcsec a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1376,7 +1797,8 @@ def test__makeSubject1Input__sec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1393,6 +1815,8 @@ def test__makeSubject1Input__sec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__sech(verbose=False):
@@ -1410,6 +1834,16 @@ def test__makeSubject1Input__sech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsech', 2), ('b', 3)], ('arcsech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sech',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arcsech', 2), ('b', 3)],
+                         ('arcsech', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arcsech a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1418,7 +1852,8 @@ def test__makeSubject1Input__sech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1435,6 +1870,8 @@ def test__makeSubject1Input__sech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__sin(verbose=False):
@@ -1452,6 +1889,16 @@ def test__makeSubject1Input__sin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsin', 2), ('b', 3)], ('arcsin', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sin',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arcsin', 2), ('b', 3)],
+                         ('arcsin', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arcsin a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1460,7 +1907,8 @@ def test__makeSubject1Input__sin(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1477,6 +1925,8 @@ def test__makeSubject1Input__sin(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__sinh(verbose=False):
@@ -1494,6 +1944,16 @@ def test__makeSubject1Input__sinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsinh', 2), ('b', 3)], ('arcsinh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sinh',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arcsinh', 2), ('b', 3)],
+                         ('arcsinh', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arcsinh a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1502,7 +1962,8 @@ def test__makeSubject1Input__sinh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1519,6 +1980,8 @@ def test__makeSubject1Input__sinh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__tan(verbose=False):
@@ -1536,6 +1999,16 @@ def test__makeSubject1Input__tan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arctan', 2), ('b', 3)], ('arctan', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'tan',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arctan', 2), ('b', 3)],
+                         ('arctan', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arctan a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1544,7 +2017,8 @@ def test__makeSubject1Input__tan(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1561,6 +2035,8 @@ def test__makeSubject1Input__tan(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__makeSubject1Input__tanh(verbose=False):
@@ -1578,6 +2054,16 @@ def test__makeSubject1Input__tanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arctanh', 2), ('b', 3)], ('arctanh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'tanh',
+        'id': 2,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('arctanh', 2), ('b', 3)],
+                         ('arctanh', 2): [('a', 1)]},
+        'resultSchemeStr': '(= (arctanh a) b)'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1586,7 +2072,8 @@ def test__makeSubject1Input__tanh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1603,6 +2090,8 @@ def test__makeSubject1Input__tanh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 
@@ -1623,6 +2112,16 @@ def test__leftSide__addition0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('-', 1)], ('-', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '+',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('-', 1): [('c', 2), ('b', 4)],
+                         ('=', 0): [('a', 3), ('-', 1)]},
+        'resultSchemeStr': '(= a (- c b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1631,7 +2130,8 @@ def test__leftSide__addition0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1648,6 +2148,8 @@ def test__leftSide__addition0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__addition1(verbose=False):
@@ -1665,6 +2167,16 @@ def test__leftSide__addition1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('-', 1)], ('-', 1): [('c', 2), ('a', 3)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 2, 10: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '+',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('-', 1): [('c', 2), ('a', 3)],
+                         ('=', 0): [('b', 4), ('-', 1)]},
+        'resultSchemeStr': '(= b (- c a))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1673,7 +2185,8 @@ def test__leftSide__addition1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1690,6 +2203,8 @@ def test__leftSide__addition1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__subtraction0(verbose=False):
@@ -1707,6 +2222,16 @@ def test__leftSide__subtraction0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('+', 1)], ('+', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '-',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('+', 1): [('c', 2), ('b', 4)],
+                         ('=', 0): [('a', 3), ('+', 1)]},
+        'resultSchemeStr': '(= a (+ c b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1715,7 +2240,8 @@ def test__leftSide__subtraction0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1732,6 +2258,8 @@ def test__leftSide__subtraction0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__subtraction1(verbose=False):
@@ -1749,6 +2277,16 @@ def test__leftSide__subtraction1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('-', 1)], ('-', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 3, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '-',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('-', 1): [('a', 3), ('c', 2)],
+                         ('=', 0): [('b', 4), ('-', 1)]},
+        'resultSchemeStr': '(= b (- a c))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1757,7 +2295,8 @@ def test__leftSide__subtraction1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1774,6 +2313,8 @@ def test__leftSide__subtraction1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__multiply0(verbose=False):
@@ -1791,6 +2332,16 @@ def test__leftSide__multiply0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('/', 1)], ('/', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '*',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('/', 1): [('c', 2), ('b', 4)],
+                         ('=', 0): [('a', 3), ('/', 1)]},
+        'resultSchemeStr': '(= a (/ c b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1799,7 +2350,8 @@ def test__leftSide__multiply0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1816,6 +2368,8 @@ def test__leftSide__multiply0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__multiply1(verbose=False):
@@ -1833,6 +2387,16 @@ def test__leftSide__multiply1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('/', 1)], ('/', 1): [('c', 2), ('a', 3)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 2, 10: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '*',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('/', 1): [('c', 2), ('a', 3)],
+                         ('=', 0): [('b', 4), ('/', 1)]},
+        'resultSchemeStr': '(= b (/ c a))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1841,7 +2405,8 @@ def test__leftSide__multiply1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1858,6 +2423,8 @@ def test__leftSide__multiply1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__divide0(verbose=False):
@@ -1875,6 +2442,16 @@ def test__leftSide__divide0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('*', 1)], ('*', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '/',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('*', 1): [('c', 2), ('b', 4)],
+                         ('=', 0): [('a', 3), ('*', 1)]},
+        'resultSchemeStr': '(= a (* c b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1883,7 +2460,8 @@ def test__leftSide__divide0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1900,6 +2478,8 @@ def test__leftSide__divide0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__divide1(verbose=False):
@@ -1917,6 +2497,16 @@ def test__leftSide__divide1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('/', 1)], ('/', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 3, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '/',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('/', 1): [('a', 3), ('c', 2)],
+                         ('=', 0): [('b', 4), ('/', 1)]},
+        'resultSchemeStr': '(= b (/ a c))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1925,7 +2515,8 @@ def test__leftSide__divide1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1942,6 +2533,8 @@ def test__leftSide__divide1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__exponent0(verbose=False):
@@ -1959,6 +2552,16 @@ def test__leftSide__exponent0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('nroot', 1)], ('nroot', 1): [('b', 4), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 12: 4, 14: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '^',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('nroot', 1)],
+                         ('nroot', 1): [('b', 4), ('c', 2)]},
+        'resultSchemeStr': '(= a (nroot b c))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1967,7 +2570,8 @@ def test__leftSide__exponent0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -1984,6 +2588,8 @@ def test__leftSide__exponent0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__exponent1(verbose=False):
@@ -2001,6 +2607,16 @@ def test__leftSide__exponent1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('log', 1)], ('log', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 10: 3, 12: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': '^',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('b', 4), ('log', 1)],
+                         ('log', 1): [('a', 3), ('c', 2)]},
+        'resultSchemeStr': '(= b (log a c))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2009,7 +2625,8 @@ def test__leftSide__exponent1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2026,6 +2643,8 @@ def test__leftSide__exponent1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__nroot0(verbose=False):
@@ -2043,6 +2662,16 @@ def test__leftSide__nroot0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('log', 1)], ('log', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2, 12: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'nroot',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('log', 1)],
+                         ('log', 1): [('c', 2), ('b', 4)]},
+        'resultSchemeStr': '(= a (log c b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2051,7 +2680,8 @@ def test__leftSide__nroot0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2068,6 +2698,8 @@ def test__leftSide__nroot0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__nroot1(verbose=False):
@@ -2085,6 +2717,16 @@ def test__leftSide__nroot1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('^', 1)], ('^', 1): [('c', 2), ('a', 3)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 2, 10: 3}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': 'nroot',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('b', 4), ('^', 1)],
+                         ('^', 1): [('c', 2), ('a', 3)]},
+        'resultSchemeStr': '(= b (^ c a))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2093,7 +2735,8 @@ def test__leftSide__nroot1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2110,6 +2753,8 @@ def test__leftSide__nroot1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__log0(verbose=False):
@@ -2127,6 +2772,16 @@ def test__leftSide__log0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('nroot', 1)], ('nroot', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 12: 2, 14: 4}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'log',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('nroot', 1)],
+                         ('nroot', 1): [('c', 2), ('b', 4)]},
+        'resultSchemeStr': '(= a (nroot c b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2135,7 +2790,8 @@ def test__leftSide__log0(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2152,6 +2808,8 @@ def test__leftSide__log0(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__log1(verbose=False):
@@ -2169,6 +2827,16 @@ def test__leftSide__log1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('^', 1)], ('^', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 3, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 1,
+        'functionName': 'log',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('b', 4), ('^', 1)],
+                         ('^', 1): [('a', 3), ('c', 2)]},
+        'resultSchemeStr': '(= b (^ a c))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2177,7 +2845,8 @@ def test__leftSide__log1(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2194,6 +2863,8 @@ def test__leftSide__log1(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arccosec(verbose=False):
@@ -2211,6 +2882,16 @@ def test__leftSide__arccosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cosec', 1)], ('cosec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 12: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccosec',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('cosec', 1)],
+                         ('cosec', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (cosec b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2219,7 +2900,8 @@ def test__leftSide__arccosec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2236,6 +2918,8 @@ def test__leftSide__arccosec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arccosech(verbose=False):
@@ -2253,6 +2937,16 @@ def test__leftSide__arccosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cosech', 1)], ('cosech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccosech',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('cosech', 1)],
+                         ('cosech', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (cosech b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2261,7 +2955,8 @@ def test__leftSide__arccosech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2278,6 +2973,8 @@ def test__leftSide__arccosech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arccos(verbose=False):
@@ -2295,6 +2992,15 @@ def test__leftSide__arccos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cos', 1)], ('cos', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccos',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('a', 3), ('cos', 1)], ('cos', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (cos b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2303,7 +3009,8 @@ def test__leftSide__arccos(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2320,6 +3027,8 @@ def test__leftSide__arccos(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arccosh(verbose=False):
@@ -2337,6 +3046,16 @@ def test__leftSide__arccosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cosh', 1)], ('cosh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccosh',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('cosh', 1)],
+                         ('cosh', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (cosh b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2345,7 +3064,8 @@ def test__leftSide__arccosh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2362,6 +3082,8 @@ def test__leftSide__arccosh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arccot(verbose=False):
@@ -2379,6 +3101,15 @@ def test__leftSide__arccot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cot', 1)], ('cot', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccot',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('a', 3), ('cot', 1)], ('cot', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (cot b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2387,7 +3118,8 @@ def test__leftSide__arccot(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2404,6 +3136,8 @@ def test__leftSide__arccot(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arccoth(verbose=False):
@@ -2421,6 +3155,16 @@ def test__leftSide__arccoth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('coth', 1)], ('coth', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arccoth',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('coth', 1)],
+                         ('coth', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (coth b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2429,7 +3173,8 @@ def test__leftSide__arccoth(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2446,6 +3191,8 @@ def test__leftSide__arccoth(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arcsec(verbose=False):
@@ -2463,6 +3210,15 @@ def test__leftSide__arcsec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sec', 1)], ('sec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsec',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('a', 3), ('sec', 1)], ('sec', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (sec b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2471,7 +3227,8 @@ def test__leftSide__arcsec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2488,6 +3245,8 @@ def test__leftSide__arcsec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arcsech(verbose=False):
@@ -2505,6 +3264,16 @@ def test__leftSide__arcsech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sech', 1)], ('sech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsech',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('sech', 1)],
+                         ('sech', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (sech b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2513,7 +3282,8 @@ def test__leftSide__arcsech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2530,6 +3300,8 @@ def test__leftSide__arcsech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arcsin(verbose=False):
@@ -2547,6 +3319,15 @@ def test__leftSide__arcsin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sin', 1)], ('sin', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsin',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('a', 3), ('sin', 1)], ('sin', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (sin b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2555,7 +3336,8 @@ def test__leftSide__arcsin(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2572,6 +3354,8 @@ def test__leftSide__arcsin(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arcsinh(verbose=False):
@@ -2589,6 +3373,16 @@ def test__leftSide__arcsinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sinh', 1)], ('sinh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arcsinh',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('sinh', 1)],
+                         ('sinh', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (sinh b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2597,7 +3391,8 @@ def test__leftSide__arcsinh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2614,6 +3409,8 @@ def test__leftSide__arcsinh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arctan(verbose=False):
@@ -2631,6 +3428,15 @@ def test__leftSide__arctan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('tan', 1)], ('tan', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arctan',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {('=', 0): [('a', 3), ('tan', 1)], ('tan', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (tan b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2639,7 +3445,8 @@ def test__leftSide__arctan(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2656,6 +3463,8 @@ def test__leftSide__arctan(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__arctanh(verbose=False):
@@ -2673,6 +3482,16 @@ def test__leftSide__arctanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('tanh', 1)], ('tanh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'arctanh',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('tanh', 1)],
+                         ('tanh', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (tanh b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2681,7 +3500,8 @@ def test__leftSide__arctanh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2698,6 +3518,8 @@ def test__leftSide__arctanh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__cosec(verbose=False):
@@ -2715,6 +3537,16 @@ def test__leftSide__cosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccosec', 1)], ('arccosec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 15: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cosec',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arccosec', 1)],
+                         ('arccosec', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arccosec b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2723,7 +3555,8 @@ def test__leftSide__cosec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2740,6 +3573,8 @@ def test__leftSide__cosec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__cosech(verbose=False):
@@ -2757,6 +3592,16 @@ def test__leftSide__cosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccosech', 1)], ('arccosech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 16: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cosech',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arccosech', 1)],
+                         ('arccosech', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arccosech b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2765,7 +3610,8 @@ def test__leftSide__cosech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2782,6 +3628,8 @@ def test__leftSide__cosech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__cos(verbose=False):
@@ -2799,6 +3647,16 @@ def test__leftSide__cos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccos', 1)], ('arccos', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cos',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arccos', 1)],
+                         ('arccos', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arccos b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2807,7 +3665,8 @@ def test__leftSide__cos(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2824,6 +3683,8 @@ def test__leftSide__cos(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__cosh(verbose=False):
@@ -2841,6 +3702,16 @@ def test__leftSide__cosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccosh', 1)], ('arccosh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cosh',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arccosh', 1)],
+                         ('arccosh', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arccosh b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2849,7 +3720,8 @@ def test__leftSide__cosh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2866,6 +3738,8 @@ def test__leftSide__cosh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__cot(verbose=False):
@@ -2883,6 +3757,16 @@ def test__leftSide__cot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccot', 1)], ('arccot', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'cot',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arccot', 1)],
+                         ('arccot', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arccot b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2891,7 +3775,8 @@ def test__leftSide__cot(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2908,6 +3793,8 @@ def test__leftSide__cot(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__coth(verbose=False):
@@ -2925,6 +3812,16 @@ def test__leftSide__coth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccoth', 1)], ('arccoth', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'coth',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arccoth', 1)],
+                         ('arccoth', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arccoth b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2933,7 +3830,8 @@ def test__leftSide__coth(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2950,6 +3848,8 @@ def test__leftSide__coth(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__sec(verbose=False):
@@ -2967,6 +3867,16 @@ def test__leftSide__sec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsec', 1)], ('arcsec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sec',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arcsec', 1)],
+                         ('arcsec', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arcsec b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2975,7 +3885,8 @@ def test__leftSide__sec(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -2992,6 +3903,8 @@ def test__leftSide__sec(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__sech(verbose=False):
@@ -3009,6 +3922,16 @@ def test__leftSide__sech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsech', 1)], ('arcsech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sech',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arcsech', 1)],
+                         ('arcsech', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arcsech b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3017,7 +3940,8 @@ def test__leftSide__sech(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -3034,6 +3958,8 @@ def test__leftSide__sech(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__sin(verbose=False):
@@ -3051,6 +3977,16 @@ def test__leftSide__sin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsin', 1)], ('arcsin', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sin',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arcsin', 1)],
+                         ('arcsin', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arcsin b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3059,7 +3995,8 @@ def test__leftSide__sin(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -3076,6 +4013,8 @@ def test__leftSide__sin(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__sinh(verbose=False):
@@ -3093,6 +4032,16 @@ def test__leftSide__sinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsinh', 1)], ('arcsinh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'sinh',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arcsinh', 1)],
+                         ('arcsinh', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arcsinh b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3101,7 +4050,8 @@ def test__leftSide__sinh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -3118,6 +4068,8 @@ def test__leftSide__sinh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__tan(verbose=False):
@@ -3135,6 +4087,16 @@ def test__leftSide__tan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arctan', 1)], ('arctan', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'tan',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arctan', 1)],
+                         ('arctan', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arctan b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3143,7 +4105,8 @@ def test__leftSide__tan(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -3160,6 +4123,8 @@ def test__leftSide__tan(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 def test__leftSide__tanh(verbose=False):
@@ -3177,6 +4142,16 @@ def test__leftSide__tanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arctanh', 1)], ('arctanh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
+    expected__stepsWithoutSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': 'tanh',
+        'id': 1,
+        'lastId': 0,
+        'resultAST': {   ('=', 0): [('a', 3), ('arctanh', 1)],
+                         ('arctanh', 1): [('b', 2)]},
+        'resultSchemeStr': '(= a (arctanh b))'
+    }
+    ]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3185,7 +4160,8 @@ def test__leftSide__tanh(verbose=False):
         expectedPrimitives == eq0.primitivesScheme and
         expectedTotalNodeCount == eq0.totalNodeCountScheme and
         expectedModifiedAST == modifiedAST and
-        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme
+        expected__startPos__nodeId ==eq0.startPos__nodeIdScheme and
+        expected__stepsWithoutSimplify == stepsWithoutSimplify
         )
     if verbose:
         print(latexStr)
@@ -3202,6 +4178,8 @@ def test__leftSide__tanh(verbose=False):
         pp.pprint(before__startPos__nodeId)
         print('after startPos__nodeId')
         pp.pprint(eq0.startPos__nodeIdScheme)
+        print('stepsWithoutSimplify')
+        pp.pprint(stepsWithoutSimplify)
 
 
 

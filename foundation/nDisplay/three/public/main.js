@@ -89,8 +89,12 @@ const xhr = new XMLHttpRequest();
 xhr.onreadystatechange  = function(){
 
     if (this.readyState == 4 && this.status == 200) {
-      const listOfEquations_latexStrs = JSON.parse(this.responseText);
+      const responseDict = JSON.parse(this.responseText);
+      const listOfEquations_latexStrs = responseDict['equations'];
+      const solvingSteps = responseDict['solvingSteps'];
       console.log(listOfEquations_latexStrs);
+      console.log('solvingSteps');
+      console.log(solvingSteps);
 
       asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
     }

@@ -104,8 +104,12 @@ def test__bipartiteSearch__dc_twoResistor_parallel(verbose=False):
         if idx % 2 == 0: # vertexId==equationVertexId
             hinEquation = listOfCollectedEquations[vertexId__equationVariableId[vertexId]]
             #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
-            _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___self, _stepsWithoutSimplify___eq = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)
+            _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+            print('hinEq steps:')
+            pp.pprint(_stepsWithoutSimplify___hin)
+            print('vorEq steps:')
+            pp.pprint(_stepsWithoutSimplify___vor)
             # print('substitutionStepAst ', (idx/2), ': ', hinEquation.astScheme, ' subVar: ', entVariable)
             pp.pprint(hinEquation.astScheme)
             print('substitutionStepLatex ', (idx/2), ': ', Latexparser(ast=hinEquation.astScheme, rootOfTree=hinEquation.rootOfTree)._unparse(), ' subVar: ', entVariable)

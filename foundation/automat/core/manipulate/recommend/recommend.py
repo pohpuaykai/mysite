@@ -476,8 +476,8 @@ class Recommend:
         maxLength=0; maxLengthChildDict = None
         while len(stack)>0:
             current___dict = stack.pop()#lastOut
-            # for neighbour in equationVariables_bg[current___dict['current']]:
-            for neighbour in T[current___dict['current']]:
+            for neighbour in equationVariables_bg[current___dict['current']]:
+            # for neighbour in T[current___dict['current']]: # this is the correct one, but does not perform as well
                 if neighbour not in visited:
                     visited.append(neighbour)
                     childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour]}
