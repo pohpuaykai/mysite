@@ -1,14 +1,14 @@
--bipartitegraphsolver, find a variable in term of other variables, returns impossible if cannot find a substitutionPath in bipartitegraph?
---bipartiteSolver might not eliminate all the unwanted_variables after the substitutionPath, because it started in the wrong vertex
----need to write a followUp to check what unwanted_variables are remaining, and selected the 'right' equation to remove it... ( abit like undoing a mistake)????? i am actually quite sure this will not work...
--draw many many many many many many electrical circuits to test|improve equationfinders, 2D|3D display, bipartiteSolver?
+-draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
+--test simple series
+--<<Schaum's 3000 Solved Problems In Electric Circuits>>
+-make pretty animations :D
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
 -To build this pipeline:
 --Manual Draw components in 3D
 --Extract Graph (Network) information=Gi
---Generate 2D Symbolic Circuit Diagram with SVG (OPTIONAL for now)
+--Generate 2D Symbolic Circuit Diagram (schematics) with SVG (OPTIONAL for now)
 --Find symbolic_equations like KVL, KCL, hFE, Ohm_Law, multiple_ICR_addition, with graph_algos and Gi
 --Use CAS to solve symbolic_equations, return solving_steps and solved_results to 3D, 
 --make pretty animation :D
@@ -29,10 +29,6 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 
 TODO:
 
-
-
-
-2DSVGCircuit beautifying tasks on rcclorthogonallayout.py
 
 
 

@@ -40,7 +40,7 @@ class SpanningTree:
 
 
     @classmethod
-    def undirectedSpanningTreeDBFSSearchUndirectedGraph(cls, g, breadthFirst=False):
+    def undirectedSpanningTreeDBFSSearchUndirectedGraph(cls, g, startNode=None, breadthFirst=False):
         """
         g is undirected_connected_graph
 
@@ -53,7 +53,8 @@ class SpanningTree:
 
         edgesSelected = set()
         undirectedSpanningTree = {} # undirected
-        startNode = list(g.keys())[0];#any random one... is there a better way? Ou est vers origin, ja?
+        if startNode is None:
+            startNode = list(g.keys())[0];#any random one... is there a better way? Ou est vers origin, ja?
         stack = [startNode]; visited = set([startNode])
         while len(stack) > 0:
             current = stack.pop(popOrder); 

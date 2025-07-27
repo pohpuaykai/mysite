@@ -1,6 +1,9 @@
+from datetime import datetime
 import inspect
+import os
 import pprint
 
+from foundation.ecircuit import ECIRCUIT_MODULE_DIR
 from foundation.ecircuit.orthogonalLayouts.rcclorthogonallayout import RCCLOrthogonalLayout
 
 
@@ -58,8 +61,8 @@ def test__genSVG__dc_twoResistor_parallel(verbose=False):
             "height":14
         }
     }
-    artificialNodeHeight = 3.5
-    artificialNodeWidth = 3.5
+    artificialNodeHeight = 1# artificialNodeHeight = 3.5
+    artificialNodeWidth = 1# artificialNodeWidth = 3.5
     #spacing should be the max of the components that appear g?
     xSpacingBetweenComponent = 0 # spacing should be the max of the components that appear g?
     ySpacingBetweenComponent = 0
@@ -73,6 +76,12 @@ def test__genSVG__dc_twoResistor_parallel(verbose=False):
     nodeId__inflatedNumericStartCoordinateTuple = layouter.nodeId__inflatedNumericStartCoordinateTuple
     list_wireStartCoordinateEndCoordinateTuple = layouter.list_wireStartCoordinateEndCoordinateTuple
     svgStr = layouter.svgStr
+
+    outputDir = os.path.join(ECIRCUIT_MODULE_DIR, 'orthogonalLayouts', 'tests', 'rccl_SVGOuts')
+    outputFilepath = os.path.join(outputDir, datetime.strftime(datetime.utcnow(), '%Y%m%d%H%M%S.svg'))
+    outputFile = open(outputFilepath, 'w')
+    outputFile.write(svgStr)
+    outputFile.close()
 
 
     expected__nodeId__inflatedNumericStartCoordinateTuple = None
