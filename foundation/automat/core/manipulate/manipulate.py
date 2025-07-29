@@ -48,12 +48,13 @@ class Manipulate:
         self.grammarParser = None
         self.inputGrammar = self.rawRegexes[idx][direction]['scheme']
         self.outputGrammar = self.rawRegexes[idx][direction]['return']
+        self.variableMinArgs = self.rawRegexes[idx]['minArgs']
 
 
     def initGrammerParser(self):
         #check if inputGrammar has no variables, 
         #if inputGrammar has no variables, then replace the outputGrammar's variables with variable, that is not in eq
-        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, verbose=self.verbose, recordMaking=True)#memoise the grammarParser TODO
+        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, verbose=self.verbose, recordMaking=True, variableMinArgs=self.variableMinArgs)#memoise the grammarParser TODO
 
 
     def outputGrammarHasVariables(self):

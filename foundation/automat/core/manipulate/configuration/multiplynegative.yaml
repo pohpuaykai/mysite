@@ -9,3 +9,5 @@ manipulations:
     hin:
       scheme: '(- 0 $0)'
       return: '(* "-1" $0)'
+    minArgs:
+      $0: 0

@@ -10,6 +10,8 @@ manipulations:
     hin:
       scheme: "(tan $0)"
       return: "(/ (sin $0) (cos $0))"
+    minArgs:
+      $0: 0
   - type: "regex"
     vor:
       scheme: "(/ (cos $0) (sin $0))"
@@ -17,6 +19,8 @@ manipulations:
     hin:
       scheme: "(cot $0)"
       return: "(/ (cos $0) (sin $0))"
+    minArgs:
+      $0: 0
   - type: "regex"
     vor:
       scheme: "(/ 1 (sin $0))"
@@ -24,6 +28,8 @@ manipulations:
     hin:
       scheme: "(cosec $0)"
       return: "(/ 1 (sin $0))"
+    minArgs:
+      $0: 0
   - type: "regex"
     vor:
       scheme: "(/ 1 (cos $0))"
@@ -31,6 +37,8 @@ manipulations:
     hin:
       scheme: "(sec $0)"
       return: "(/ 1 (sec $0))"
+    minArgs:
+      $0: 0
   - type: "regex"
     vor:
       scheme: "(/ 1 (tan $0))"
@@ -38,6 +46,8 @@ manipulations:
     hin:
       scheme: "(cot $0)"
       return: "(/ 1 (tan $0))"
+    minArgs:
+      $0: 0
   - type: "regex"
     vor:
       scheme: "(/ 1 (cot $0))"
@@ -45,3 +55,5 @@ manipulations:
     hin:
       scheme: "(tan $0)"
       return: "(/ 1 (cot $0))"
+    minArgs:
+      $0: 0

@@ -9,6 +9,8 @@ manipulations:
     hin:
       scheme: "$0"
       return: '(- 0 $0)'
+    minArgs:
+      $0: 0
   - type: "regex"
     vor:
       scheme: '(- $0 0)'
@@ -16,3 +18,5 @@ manipulations:
     hin:
       scheme: "$0"
       return: '(- $0 0)'
+    minArgs:
+      $0: 0

@@ -9,6 +9,10 @@ manipulations:
     hin:
       scheme: "(/ $2 (* $0 $1))"
       return: "(/ (/ $2 $0) $1)"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
   - type: "regex"
     vor:
       scheme: "(/ $0 (/ $2 $1))"
@@ -16,3 +20,7 @@ manipulations:
     hin:
       scheme: "(/ (* $0 $1) $2)"
       return: "(/ $0 (/ $2 $1))"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0

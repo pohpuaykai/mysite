@@ -47,13 +47,14 @@ class Generator:
                 for idx, manipulations in enumerate(config['manipulations']):
                     if manipulations['type'] == 'regex':
                         for direction, d in manipulations.items():
-                            if direction in ['type']:
+                            if direction in ['type', 'minArgs']:
                                 continue
                             #import pdb;pdb.set_trace()
                             infix = f'{direction}{idx}'
                             defName = defNameTemplate(infix)
                             callStr = f'{defName}(True) # Not tested yet'
                             testCallStrs.append(callStr)
+                            print(TEST_DATUM[testDatumFirstTag])
                             testDatum = TEST_DATUM[testDatumFirstTag][(direction, str(idx))]
                             inputDatum = testDatum['input']
                             renderedDefNameTemplate = defTemplate.render({

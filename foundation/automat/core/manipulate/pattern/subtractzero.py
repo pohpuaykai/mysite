@@ -12,5 +12,5 @@ class Subtractzero(Manipulate):
         """
 
         """
-        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(- 0 $0)', 'return': '$0'}, 'hin': {'scheme': '$0', 'return': '(- 0 $0)'}}, {'type': 'regex', 'vor': {'scheme': '(- $0 0)', 'return': '$0'}, 'hin': {'scheme': '$0', 'return': '(- $0 0)'}}]
+        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(- 0 $0)', 'return': '$0'}, 'hin': {'scheme': '$0', 'return': '(- 0 $0)'}, 'minArgs': {'$0': 0}}, {'type': 'regex', 'vor': {'scheme': '(- $0 0)', 'return': '$0'}, 'hin': {'scheme': '$0', 'return': '(- $0 0)'}, 'minArgs': {'$0': 0}}]
         super().__init__(equation, direction, idx, verbose=verbose)

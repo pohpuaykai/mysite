@@ -12,5 +12,5 @@ class Crossmultiply(Manipulate):
         """
 
         """
-        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(+ (/ $0 $1) (/ $2 $3))', 'return': '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))'}, 'hin': {'scheme': '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))', 'return': '(+ (/ $0 $1) (/ $2 $3))'}}]
+        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(+ (/ $0 $1) (/ $2 $3))', 'return': '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))'}, 'hin': {'scheme': '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))', 'return': '(+ (/ $0 $1) (/ $2 $3))'}, 'minArgs': {'$0': 0, '$1': 0}}]
         super().__init__(equation, direction, idx, verbose=verbose)

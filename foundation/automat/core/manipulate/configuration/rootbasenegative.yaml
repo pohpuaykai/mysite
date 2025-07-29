@@ -9,3 +9,6 @@ manipulations:
     hin:
       scheme: "(nroot $0 (/ 1 $1))"
       return: "(nroot (- 0 $0) $1)"
+    minArgs:
+      $0: 0
+      $1: 0

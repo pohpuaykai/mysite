@@ -10,6 +10,10 @@ manipulations:
     hin:
       scheme: "(^ $1 (/ $2 $0))"
       return: "(nroot $0 (^ $1 $2))"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
   - type: "regex"
     vor:
       scheme: '(^ (nroot $0 $1) $2)'
@@ -17,6 +21,10 @@ manipulations:
     hin:
       scheme: "(nroot $0 (^ $1 $2))"
       return: "(^ (nroot $0 $1) $2)"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
   - type: "regex"
     vor:
       scheme: '(^ (nroot $0 $1) $2)'
@@ -24,6 +32,10 @@ manipulations:
     hin:
       scheme: "(^ $1 (/ $2 $0))"
       return: "(^ (nroot $0 $1) $2)"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
 #below does not work for complex numbers, sqrt(ab) = sqrt(a)sqrt(b)
 #Looks like distributivity, maybe can further refactor...
   - type: "regex"
@@ -33,6 +45,10 @@ manipulations:
     hin:
       scheme: "(* (nroot $2 $0) (nroot $2 $1))"
       return: "(nroot $2 (* $0 $1))"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
 #Looks like distributivity, maybe can further refactor...
   - type: "regex"
     vor:
@@ -41,3 +57,7 @@ manipulations:
     hin:
       scheme: "(/ (nroot $2 $0) (nroot $2 $1))"
       return: "(nroot $2 (/ $0 $1))"
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0

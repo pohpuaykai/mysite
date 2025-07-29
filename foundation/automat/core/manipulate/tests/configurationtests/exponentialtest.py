@@ -45,7 +45,7 @@ def test__hin0__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # 1
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= a (+ (^ v_{2} 0) (+ (^ v_{1} 0) (^ v_{0} 0))))' # (^ $0 0)
+    expected = '(= a (+ (^ v_{0} 0) (+ (^ v_{1} 0) (^ v_{2} 0))))' # (^ $0 0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 

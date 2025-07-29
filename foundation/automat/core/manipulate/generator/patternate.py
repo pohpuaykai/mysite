@@ -31,7 +31,8 @@ class Patternate:
                     info(f'processing {filename}')
                 config = self._loadYAMLFromFilePath(os.path.join(self.manipulateConfigFileFolder, filename))
                 if self.verbose:
-                    info(config)
+                    # info(config)
+                    print(self.pformat(config))
 
                 #fill template for pattern
                 mainFTemplate = environment.get_template("manipulate.py.jinja2")

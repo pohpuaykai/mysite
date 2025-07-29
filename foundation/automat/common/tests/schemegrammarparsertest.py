@@ -13,7 +13,8 @@ def test__ideal__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(+ 1 2)'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(+ 2 1)'
     # expected_verPosWord = [   
@@ -47,7 +48,8 @@ def test__idealNested__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(+ (+ c d) e)'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(+ e (+ d c))' 
     # e from 11 to 3 change:-8
@@ -107,7 +109,8 @@ def test__simpleLeft__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(= a (+ b c))'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(= a (+ c b))'
     # expected_verPosWord = [   
@@ -144,7 +147,8 @@ def test__simpleRight__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(= (+ b c) a)'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(= (+ c b) a)'
     # expected_verPosWord = [   
@@ -182,7 +186,8 @@ def test__sameLevel__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(= (+ a b) (+ c d))'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(= (+ b a) (+ d c))'
     # expected_verPosWord = [   
@@ -224,7 +229,8 @@ def test__nested__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(= a (+ d (+ c b)))'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(= a (+ (+ b c) d))'
     #d OG: 8 RE: 16 change: 8
@@ -280,7 +286,8 @@ def test__nestedSameLevel__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(= (+ a b) (+ (+ c d) e))'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(= (+ b a) (+ e (+ d c)))'
     # expected_verPosWord = [   
@@ -339,7 +346,8 @@ def test__2deep2wide__addition(verbose=False):
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
     schemeword = '(= (+ (+ a b) (+ c d)) (+ (+ e f) (+ g h)))'
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)
     expected = '(= (+ (+ d c) (+ b a)) (+ (+ h g) (+ f e)))'
     # expected_verPosWord = [
@@ -428,7 +436,8 @@ def test__2deep2wideSkip__addition(verbose=False):
     outputPattern = '(+ $1 $0)'
     schemeword = '(= (+ (+ a b) (+ c d)) (+ (+ e f) (+ g h)))'
     nodeIdsToSkip = [1]#[12]
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= (+ (+ d c) (+ a b)) (+ (+ h g) (+ f e)))'
     # expected_verPosWord = [   
@@ -513,7 +522,8 @@ def test__notApplicable__addition(verbose=False):
     outputPattern = '(+ $1 $0)'
     schemeword = '(= a (- (* c (/ 5 10)))) c))'
     nodeIdsToSkip = [12]
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= a (- (* c (/ 5 10)))) c))'
     expected_verPosWord = [   
@@ -556,7 +566,8 @@ def test__functionCountChanges__subtractZero(verbose=False):
     outputPattern = '$0' # try to nest this to see if it will work
     schemeword = '(= (* I_{R} R) (- (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}) 0))'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= (* I_{R} R) (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}))'
     # expected_verPosWord = [   
@@ -617,7 +628,8 @@ def test__functionCountChanges__distributivity(verbose=False):
     outputPattern = '(* $0 (+ $1 $2))'
     schemeword = '(= a (+ (* b12 c34) (* b12 d56)))'#'(= a (+ (* b c) (* b d)))'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0, '$2':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= a (* b12 (+ c34 d56)))'#'(= a (* b (+ c d)))'
     # expected_verPosWord = [   
@@ -675,41 +687,60 @@ def test__moreVariableOutputThanInput__exponential1IsAnythingToThe0(verbose=Fals
     outputPattern = '(^ $0 0)'
     schemeword = '(= a (+ 1 (+ 1 1)))'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= a (+ (^ v_{0} 0) (+ (^ v_{1} 0) (^ v_{2} 0))))'
+    # expected_verPosWord = [
+    # {'d': 'r', 'e': 9, 'n': 1, 's': 8, 't': 'n', 'v': None, 'w': '1'},
+    # {   'd': 'a',
+    #     'e': 18,
+    #     'n': 1,
+    #     's': 8,
+    #     't': 'n',
+    #     'v': None,
+    #     'w': '(^ v_{0} 0)'},
+    # {'d': 'r', 'e': 14, 'n': 2, 's': 13, 't': 'n', 'v': None, 'w': '1'},
+    # {   'd': 'a',
+    #     'e': 33,
+    #     'n': 2,
+    #     's': 23,
+    #     't': 'n',
+    #     'v': None,
+    #     'w': '(^ v_{1} 0)'},
+    # {'d': 'r', 'e': 16, 'n': 3, 's': 15, 't': 'n', 'v': None, 'w': '1'},
+    # {   'd': 'a',
+    #     'e': 45,
+    #     'n': 3,
+    #     's': 35,
+    #     't': 'n',
+    #     'v': None,
+    #     'w': '(^ v_{2} 0)'}]
     expected_verPosWord = [
-    {'d': 'r', 'e': 9, 'n': 1, 's': 8, 't': 'n', 'v': None, 'w': '1'},
-    {   'd': 'a',
-        'e': 18,
-        'n': 1,
-        's': 8,
-        't': 'n',
-        'v': None,
-        'w': '(^ v_{0} 0)'},
-    {'d': 'r', 'e': 14, 'n': 2, 's': 13, 't': 'n', 'v': None, 'w': '1'},
-    {   'd': 'a',
-        'e': 33,
+    {'d': 'e', 'e': 8, 'n': 1, 's': 8, 't': 'p', 'v': '1', 'w': '(^ v_{0} 0)'},
+    {   'd': 'e',
+        'e': 23,
         'n': 2,
-        's': 23,
-        't': 'n',
-        'v': None,
+        's': 13,
+        't': 'p',
+        'v': '1',
         'w': '(^ v_{1} 0)'},
-    {'d': 'r', 'e': 16, 'n': 3, 's': 15, 't': 'n', 'v': None, 'w': '1'},
-    {   'd': 'a',
-        'e': 45,
+    {   'd': 'e',
+        'e': 35,
         'n': 3,
-        's': 35,
-        't': 'n',
-        'v': None,
+        's': 15,
+        't': 'p',
+        'v': '1',
         'w': '(^ v_{2} 0)'}]
     if verbose:
         print('OG:')
         print(schemeword)
         print('result:')
         print(manipulatedSchemeword)
-        # print('id__data:')
-        # pp.pprint(parser.id__data)
+        print('enclosureTree: ')
+        pp.pprint(parser.enclosureTree)
+        print('id__data:')
+        pp.pprint(parser.id__data)
         print('verPosWord(positional changes):')
         pp.pprint(parser.verPosWord) # positional changes
     print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
@@ -718,18 +749,134 @@ def test__moreVariableOutputThanInput__exponential1IsAnythingToThe0(verbose=Fals
         # expected_verPosWord == parser.verPosWord 
         )
 
-
-
-def test__onlyVariable__multiplyDivideCancal(verbose=False):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typing REQUIRED
+def test__manipulateLogarithm__logSameBaseAsArgumentGives1(verbose=False):
     """"""
-    inputPattern = '$1'
-    outputPattern = '(* (/ $1 $0) $0)'
+    inputPattern = '1'
+    outputPattern = '(log $0 $0)'
+    schemeword = '(= a 1)'
+    nodeIdsToSkip = []
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
+    expected = '(= a (log v_{0} v_{0}))'
+    expected_verPosWord = [
+    {   'd': 'e',
+        'e': 5,
+        'n': 1,
+        's': 5,
+        't': 'p',
+        'v': '1',
+        'w': '(log v_{0} v_{0})'}]
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('id__data:')
+        pp.pprint(parser.id__data)
+        print('verPosWord(positional changes):')
+        pp.pprint(parser.verPosWord) # positional changes
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword and \
+        expected_verPosWord == parser.verPosWord 
+        )
+
+
+def test__manipulateExponential__exponential1IsAnythingToThe1(verbose=False):
+    """"""
+    inputPattern = '$0'
+    outputPattern = '(^ $0 1)'
     schemeword = '(= a a)'
     nodeIdsToSkip = []
     parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
-    expected = '(= (* (/ a v_{0}) v_{0}) (* (/ a v_{1}) v_{1}) )'
-    expected_verPosWord = None
+    expected = '(= (^ a 1) (^ a 1))'
+    expected_verPosWord = [
+        {'d': 'e', 'e': 3, 'n': 1, 's': 3, 't': 'p', 'v': '$0', 'w': '(^ a 1)'},
+        {'d': 'e', 'e': 11, 'n': 2, 's': 5, 't': 'p', 'v': '$0', 'w': '(^ a 1)'}
+    ]
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('verPosWord(positional changes):')
+        pp.pprint(parser.verPosWord) # positional changes
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword and \
+        expected_verPosWord == parser.verPosWord 
+        )
+
+
+def test__manipulateLogarithm__changeBaseFormula(verbose=False):
+    """"""
+    inputPattern = '(log $0 $1)'
+    outputPattern = '(/ (log $2 $1) (log $2 $0))'
+    schemeword = '(= a (log b c))'
+    nodeIdsToSkip = []
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
+    expected = '(= a (/ (log v_{0} c) (log v_{0} b)))'
+    expected_verPosWord = [
+    {'d': 'a', 'e': 18, 'n': 0, 's': 13, 't': 'n', 'v': '$2', 'w': 'v_{0}'},
+    {'d': 'a', 'e': 32, 'n': 0, 's': 27, 't': 'n', 'v': '$2', 'w': 'v_{0}'},
+    {'d': 'e', 'e': 19, 'n': 2, 's': 12, 't': 'p', 'v': '$1', 'w': 'c'},
+    {'d': 'e', 'e': 33, 'n': 1, 's': 10, 't': 'p', 'v': '$0', 'w': 'b'},
+    {   'd': 'a',
+        'e': 18,
+        'n': 0,
+        's': 5,
+        't': 's',
+        'v': None,
+        'w': '(/ (log $ $) '},
+    {'d': 'a', 'e': 35, 'n': 0, 's': 34, 't': 's', 'v': None, 'w': ')'}]
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('verPosWord(positional changes):')
+        pp.pprint(parser.verPosWord) # positional changes
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword and \
+        expected_verPosWord == parser.verPosWord 
+        )
+
+
+def test__onlyVariable__multiplyDivideCancal(verbose=False):
+    """
+inputPattern
+$0, means match all the arguments<<< this is essentially a plainOldSchemeParser catching all possible arguments?
+$0 $1, means match all double arguments? so if we have
+(+ 1 2 3 4), does it match
+$0=1 $1=2
+$0=2 $1=3
+$0=3 $1=4 ? Then it is still a plainOldSchemeParser catching all possible arguments, and then making a slidingWindow equals to the number of arguments
+if
+$0 $1 ... $n, where n is an integer, its still a plainOldSchemeParser catching all possible arguments, and then making a slidingWindow...?
+    """
+    inputPattern = '$1'#this kind to be processed on a function seperate from findAll
+    outputPattern = '(* (/ $1 $0) $0)'
+    schemeword = '(= a a)'
+    nodeIdsToSkip = []
+    variableMinArgs = {'$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
+    manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
+    expected = '(= (* (/ a v_{0}) v_{0}) (* (/ a v_{1}) v_{1}))'
+    expected_verPosWord = [
+    {   'd': 'e',
+        'e': 3,
+        'n': 1,
+        's': 3,
+        't': 'p',
+        'v': '$1',
+        'w': '(* (/ a v_{0}) v_{0})'},
+    {   'd': 'e',
+        'e': 25,
+        'n': 2,
+        's': 5,
+        't': 'p',
+        'v': '$1',
+        'w': '(* (/ a v_{1}) v_{1})'}]
     if verbose:
         print('OG:')
         print(schemeword)
@@ -741,8 +888,8 @@ def test__onlyVariable__multiplyDivideCancal(verbose=False):#<<<<<<<<<<<<<<<<<<<
         pp.pprint(parser.verPosWord) # positional changes
     print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
         expected == manipulatedSchemeword 
-        # and \
-        # expected_verPosWord == parser.verPosWord 
+        and \
+        expected_verPosWord == parser.verPosWord 
         )
 
 
@@ -754,7 +901,8 @@ def test__latexParserUnparse__sqrtInSqrt(verbose=False):
     outputPattern = '(sqrt $4 $1)'# outputPattern = '(sqrt $1 $3)'
     schemeword = '(= (nroot (sqrt (/ pi 22)) (nroot (sin pi) pi)) F)'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$4':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= (sqrt (sqrt (/ pi 22)) (sqrt (sin pi) pi)) F)'
     expected_verPosWord = [
@@ -803,7 +951,8 @@ def test__latexParserUnparse__parallelSumOfCapacitance(verbose=False):
     outputPattern = '(frac $1 $3)'
     schemeword = '(= C^{parallelTotal}_{k} (/ (prod (= k_0 1) k C_{k_0}) (sum (= k_1 1) k (/ (prod (= k_0 1) k C_{k_0}) C_{k_1}))))'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$3':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= C^{parallelTotal}_{k} (frac (prod (= k_0 1) k C_{k_0}) (sum (= k_1 1) k (frac (prod (= k_0 1) k C_{k_0}) C_{k_1}))))'
     expected_verPosWord = [
@@ -840,8 +989,8 @@ def test__latexParserUnparse__parallelSumOfCapacitance(verbose=False):
         print(schemeword)
         print('result:')
         print(manipulatedSchemeword)
-        # print('id__data:')
-        # pp.pprint(parser.id__data)
+        print('id__data:')
+        pp.pprint(parser.id__data)
         print('verPosWord(positional changes):')
         pp.pprint(parser.verPosWord) # positional changes
     print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
@@ -857,7 +1006,8 @@ def test__latexParserUnparser__impedanceOfParallelRLCCircuit1(verbose=False):
     outputPattern = '(frac $1 $3)'
     schemeword = '(= (/ (+ (/ (- (nroot (- 0 1) Z) (/ 1 R)) j) (/ 1 (* omega L))) omega) C)'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$3':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
     expected = '(= (frac (+ (frac (- (nroot (- 0 1) Z) (frac 1 R)) j) (frac 1 (* omega L))) omega) C)'
     expected_verPosWord = [
@@ -937,10 +1087,57 @@ def test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1(verb
     outputPattern = '(\\frac $0 $1)'
     schemeword = '(= (/ (- (- 0 V_{ R_{ 1 } }) 0) I_{ R_{ 0 } }) (- 0 (/ 1 (- (/ 1 X_{ total_{ 6 } }) (/ 1 (- 0 R_{ R_{ 1 } }))))))'
     nodeIdsToSkip = []
-    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
+    variableMinArgs = {'$0':0, '$1':0}
+    parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword, nodeIdsToSkip)
-    expected = None
-    expected_verPosWord = None
+    expected = '(= (\\frac (- (- 0 V_{ R_{ 1 } }) 0) I_{ R_{ 0 } }) (- 0 (\\frac 1 (- (\\frac 1 X_{ total_{ 6 } }) (\\frac 1 (- 0 R_{ R_{ 1 } }))))))'
+    expected_verPosWord = [
+    {   'd': 'e',
+        'e': 10,
+        'n': 1,
+        's': 6,
+        't': 'p',
+        'v': '$0',
+        'w': '(- (- 0 V_{ R_{ 1 } }) 0)'},
+    {   'd': 'e',
+        'e': 36,
+        'n': 2,
+        's': 32,
+        't': 'p',
+        'v': '$1',
+        'w': 'I_{ R_{ 0 } }'},
+    {'d': 'e', 'e': 63, 'n': 3, 's': 55, 't': 'p', 'v': '$0', 'w': '1'},
+    {   'd': 'e',
+        'e': 65,
+        'n': 4,
+        's': 57,
+        't': 'p',
+        'v': '$1',
+        'w': '(- (/ 1 X_{ total_{ 6 } }) (/ 1 (- 0 R_{ R_{ 1 } })))'},
+    {'d': 'e', 'e': 75, 'n': 5, 's': 63, 't': 'p', 'v': '$0', 'w': '1'},
+    {   'd': 'e',
+        'e': 77,
+        'n': 6,
+        's': 65,
+        't': 'p',
+        'v': '$1',
+        'w': 'X_{ total_{ 6 } }'},
+    {'d': 'e', 'e': 103, 'n': 7, 's': 87, 't': 'p', 'v': '$0', 'w': '1'},
+    {   'd': 'e',
+        'e': 105,
+        'n': 8,
+        's': 89,
+        't': 'p',
+        'v': '$1',
+        'w': '(- 0 R_{ R_{ 1 } })'},
+    {'d': 'r', 'e': 5, 'n': 0, 's': 4, 't': 's', 'v': None, 'w': '/'},
+    {'d': 'r', 'e': 54, 'n': 0, 's': 53, 't': 's', 'v': None, 'w': '/'},
+    {'d': 'a', 'e': 9, 'n': 0, 's': 4, 't': 's', 'v': None, 'w': '\\frac'},
+    {'d': 'a', 'e': 62, 'n': 0, 's': 57, 't': 's', 'v': None, 'w': '\\frac'},
+    {'d': 'r', 'e': 62, 'n': 4, 's': 61, 't': 's', 'v': None, 'w': '/'},
+    {'d': 'r', 'e': 86, 'n': 4, 's': 85, 't': 's', 'v': None, 'w': '/'},
+    {'d': 'a', 'e': 74, 'n': 4, 's': 69, 't': 's', 'v': None, 'w': '\\frac'},
+    {'d': 'a', 'e': 102, 'n': 4, 's': 97, 't': 's', 'v': None, 'w': '\\frac'}]
     if verbose:
         print('OG:')
         print(schemeword)
@@ -977,24 +1174,32 @@ def test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1(verb
 
 
 if __name__=='__main__':
-    # test__ideal__addition(True)
-    # test__idealNested__addition(True)
-    # test__simpleLeft__addition(True)
-    # test__simpleRight__addition(True)
-    # test__sameLevel__addition(True)
-    # test__nested__addition(True)
-    # test__nestedSameLevel__addition(True)
-    # test__2deep2wide__addition(True)
-    # test__2deep2wideSkip__addition(True)
-    # test__notApplicable__addition(True)
-    # test__functionCountChanges__subtractZero(True)
-    # test__functionCountChanges__distributivity(True)
+    # test__ideal__addition()
+    # test__idealNested__addition()
+    # test__simpleLeft__addition()
+    # test__simpleRight__addition()
+    # test__sameLevel__addition()
+    # test__nested__addition()
+    # test__nestedSameLevel__addition()
+    # test__2deep2wide__addition()
+    # test__2deep2wideSkip__addition()
+    # test__notApplicable__addition()
+    # test__functionCountChanges__subtractZero()
+    # test__functionCountChanges__distributivity()
+    # test__moreVariableOutputThanInput__exponential1IsAnythingToThe0()
+    test__manipulateLogarithm__logSameBaseAsArgumentGives1(True)
+    """
+the cases between 
+0. no variable in input (test__moreVariableOutputThanInput__exponential1IsAnythingToThe0)
+1. more variable in output and input (test__manipulateLogarithm__changeBaseFormula)
 
-    # test__moreVariableOutputThanInput__exponential1IsAnythingToThe0(True)
-    # # test__onlyVariable__multiplyDivideCancal(True)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typing REQUIRED postponed until pipeline
-
-    # test__latexParserUnparse__sqrtInSqrt(True)
-    # test__latexParserUnparse__parallelSumOfCapacitance(True)
-    # test__latexParserUnparser__impedanceOfParallelRLCCircuit1(True)
-    test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1(True)
-    #after this test latexparser again
+SHOULD be handled differently....
+    """
+    # test__manipulateExponential__exponential1IsAnythingToThe1()
+    # test__manipulateLogarithm__changeBaseFormula()
+    # test__onlyVariable__multiplyDivideCancal()
+    # test__latexParserUnparse__sqrtInSqrt()
+    # test__latexParserUnparse__parallelSumOfCapacitance()
+    # test__latexParserUnparser__impedanceOfParallelRLCCircuit1()
+    # test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1()
+    #after this test latexUnparse again
