@@ -58,6 +58,7 @@ def automat_findEquationsAndSolve(request):
 
 
     from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
+    EquationFinder._has_run_common_code = False # run common code on every HTTPRequest
     # print('existing EquationFinder has ', len(EquationFinder.list_equations), ' equations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # EquationFinder.list_equations = []
     listOfCollectedEquationStrs = []; listOfCollectedEquations = []; allVariables = set()

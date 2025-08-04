@@ -10,39 +10,57 @@ class KCLEquationFinder(EquationFinder):
         """
         added2DegEdges = set()
         for deg2NodeId in self.list_nodeIds___deg2: # need both directions.... the edge not just the node.#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            print('self.networkGraph[deg2NodeId]', )
+            
             [neighbour0, neighbour1] = self.networkGraph[deg2NodeId]
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~self.networkGraph[deg2NodeId]', self.networkGraph[deg2NodeId])
+            print('typeOfneighbour0: ', self.id__type[neighbour0])
+            print('typeOfneighbour1: ', self.id__type[neighbour1])
             if neighbour0 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour0) not in added2DegEdges and\
             self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
                 #
                 added2DegEdges.add((deg2NodeId, neighbour0)); added2DegEdges.add((neighbour0, deg2NodeId))
                 #
-                componentType = self.id__type[deg2NodeId]
-                variable0 = self.getVariable('current', componentType, deg2NodeId)
-                self.addVariableToComponentIdx(deg2NodeId, variable0)
-                #
-                componentType = self.id__type[neighbour0]
-                variable1 = self.getVariable('current', componentType, neighbour0)
-                self.addVariableToComponentIdx(neighbour0, variable1)
-                #add equation
-                latexStr = f'{variable0}={variable1}'
-                print('latexStr: ', latexStr)
-                self.addLatexStrAsEquation(latexStr)
+                if self.id__type[deg2NodeId] not in ['wire']:
+                    componentType = self.id__type[deg2NodeId]
+                    variable0___nc0 = self.getVariable('current', componentType, deg2NodeId)
+                    self.addVariableToComponentIdx(deg2NodeId, variable0___nc0)
+                    #
+                    componentType = self.id__type[neighbour0]
+                    variable1___nc0 = self.getVariable('current', componentType, neighbour0)
+                    self.addVariableToComponentIdx(neighbour0, variable1___nc0)
+                    #add equation
+                    latexStr = f'{variable0___nc0}={variable1___nc0}'
+                    print('latexStr: ', latexStr)
+                    self.addLatexStrAsEquation(latexStr)
             #
             if neighbour1 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour1) not in added2DegEdges and\
             self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
                 #
                 added2DegEdges.add((deg2NodeId, neighbour1)); added2DegEdges.add((neighbour1, deg2NodeId))
                 #
-                componentType = self.id__type[deg2NodeId]
-                variable0 = self.getVariable('current', componentType, deg2NodeId)
-                self.addVariableToComponentIdx(deg2NodeId, variable0)
+                if self.id__type[deg2NodeId] not in ['wire']:
+                    componentType = self.id__type[deg2NodeId]
+                    variable0___nc1 = self.getVariable('current', componentType, deg2NodeId)
+                    self.addVariableToComponentIdx(deg2NodeId, variable0___nc1)
+                    #
+                    componentType = self.id__type[neighbour1]
+                    variable1___nc1 = self.getVariable('current', componentType, neighbour1)
+                    self.addVariableToComponentIdx(neighbour1, variable1___nc1)
+                    #add equation
+                    latexStr = f'{variable0___nc1}={variable1___nc1}'
+                    print('latexStr: ', latexStr)
+                    self.addLatexStrAsEquation(latexStr)
+
+            if self.id__type[deg2NodeId] in ['wire']:
                 #
                 componentType = self.id__type[neighbour1]
-                variable1 = self.getVariable('current', componentType, neighbour1)
-                self.addVariableToComponentIdx(neighbour1, variable1)
-                #add equation
-                latexStr = f'{variable0}={variable1}'
+                variable1___nc1 = self.getVariable('current', componentType, neighbour1)
+                self.addVariableToComponentIdx(neighbour1, variable1___nc1)
+                #
+                componentType = self.id__type[neighbour0]
+                variable1___nc0 = self.getVariable('current', componentType, neighbour0)
+                self.addVariableToComponentIdx(neighbour0, variable1___nc0)
+                latexStr = f'{variable1___nc0}={variable1___nc1}'
                 print('latexStr: ', latexStr)
                 self.addLatexStrAsEquation(latexStr)
 

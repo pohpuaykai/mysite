@@ -25,6 +25,7 @@ import {GuiControls} from './static/custom/GuiControls.js';
 // import {Wire} from './static/meshes/Wire.js';
 import {DCTwoResistorSeries} from './static/pieces/dc_twoResistor_series.js';
 import {DCTwoResistorParallel} from './static/pieces/dc_twoResistor_parallel.js';
+import {Q3_21__P18} from './static/pieces/3000_solved_problems_in_electric_circuits__syedANasar/Q3_21__P18.js';
 
 
 
@@ -65,8 +66,8 @@ function onWindowResize() {
     render();
 }
 
-// const circuit = new DCTwoResistorSeries(scene, camera, renderer, {});
-const circuit = new DCTwoResistorParallel(scene, camera, renderer, {});
+const circuit = new DCTwoResistorSeries(scene, camera, renderer, {});
+// const circuit = new DCTwoResistorParallel(scene, camera, renderer, {});
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 
