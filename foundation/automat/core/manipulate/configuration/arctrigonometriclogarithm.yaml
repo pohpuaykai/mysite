@@ -1,0 +1,76 @@
+---
+className: "Arctrigonometriclogarithm"
+type: "trigonometric_standard"
+manipulations:
+
+#\arcsin(x)=-i\ln(i x+\sqrt[2]{1-x^2})
+  - type: "regex"
+    vor:
+      scheme: '(arcsin $0)'
+      return: '(- "0" (* "i" (log "e" (+ (* "i" $0) (nroot "2" (- "1" (^ $0 "2")))))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arccos(x)=-i\ln(x+\sqrt[2]{x^2 -1})
+  - type: "regex"
+    vor:
+      scheme: '(arccos $0)'
+      return: '(- "0" (* "i" (log "e" (+ $0 (nroot "2" (- (^ $0 "2") "1"))))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arctan(x)=\frac{i}{2}\ln(\frac{i+x}{i-x})
+  - type: "regex"
+    vor:
+      scheme: '(arctan $0)'
+      return: '(* (/ "i" "2") (log "e" (/ (+ "i" $0) (- "i" $0))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arccosec(x)=-i\ln(\frac{i}{x}+\sqrt[2]{1-\frac{1}{x^2}})
+  - type: "regex"
+    vor:
+      scheme: '(arccosec $0)'
+      return: '(- "0" (* "i" (log "e" (+ (/ "i" $0) (nroot "2" (- "1" (/ "1" (^ $0 "2"))))))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arcsec(x)=-i\ln(\frac{1}{x}+i\sqrt[2]{1-\frac{1}{x^2}})
+  - type: "regex"
+    vor:
+      scheme: '(arcsec $0)'
+      return: '(- "0" (* "i" (log "e" (+ (/ "1" $0) (* "i" (nroot "2" (- "1" (/ "1" (^ $0 "2")))))))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arccot(x)=\frac{i}{2}\ln(\frac{x-i}{x+i})
+  - type: "regex"
+    vor:
+      scheme: '(arccot $0)'
+      return: '(* (/ "i" "2") (log "e" (/ (- $0 "i") (+ $0 "i"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

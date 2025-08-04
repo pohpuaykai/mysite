@@ -36,7 +36,15 @@ class Patternate:
 
                 #fill template for pattern
                 mainFTemplate = environment.get_template("manipulate.py.jinja2")
-
+                #we only keep the vor direction but not the hin, so we create it here
+                # print(self.pformat(config['manipulations'])); import pdb;pdb.set_trace()
+                for manipulation in config['manipulations']:
+                    manipulation['hin']={
+                        'scheme':manipulation['vor']['return'],
+                        'return':manipulation['vor']['scheme']
+                    }
+                print(len(config['manipulations']), ' manipulations, make sure same number in configuration tests')
+                # print(self.pformat(config['manipulations']))
                 renderedMainFTemplate = mainFTemplate.render({
                     'type':config['type'],
                     'className':config['className'],

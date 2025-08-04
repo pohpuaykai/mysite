@@ -1,0 +1,144 @@
+---
+className: "Archyperbolictrigonometricdefinition"
+type: "archyperbolictrigonometric_standard"
+manipulations:
+
+
+#arc and trig cancel out
+
+#sin
+  - type: "regex"
+    vor:
+      scheme: '(arcsinh (sinh $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+  - type: "regex"
+    vor:
+      scheme: '(sinh (arcsinh $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#cos
+  - type: "regex"
+    vor:
+      scheme: '(arccosh (cosh $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+  - type: "regex"
+    vor:
+      scheme: '(cosh (arccosh $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#tan
+  - type: "regex"
+    vor:
+      scheme: '(arctanh (tanh $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+  - type: "regex"
+    vor:
+      scheme: '(tanh (arctanh $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#sec
+  - type: "regex"
+    vor:
+      scheme: '(arcsech (sech $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+  - type: "regex"
+    vor:
+      scheme: '(sech (arcsech $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#cosec
+  - type: "regex"
+    vor:
+      scheme: '(arccosech (cosech $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+  - type: "regex"
+    vor:
+      scheme: '(cosech (arccosech $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#cot
+  - type: "regex"
+    vor:
+      scheme: '(arccoth (coth $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+  - type: "regex"
+    vor:
+      scheme: '(coth (arccoth $0))'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

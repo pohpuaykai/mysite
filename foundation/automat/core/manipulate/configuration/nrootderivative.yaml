@@ -1,0 +1,38 @@
+---
+className: "Nrootderivative"
+type: "nroot_derivative"
+manipulations:
+#general
+  - type: "regex"
+    vor:
+      scheme: '(D (nroot $0 $1) $2)'
+      return: '(* (nroot $0 $1) (/ (- (/ (* (D $1 $2) $0) $1) (* (D $0 $2) (log "e" $1))) (^ $0 2)))'
+    minArgs:
+      $0: 1
+      $1: 1
+      $2: 1
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+#index$0 is a number, radicand$1 is a function, this is similar to polynomial_derivative
+  - type: "regex"
+    vor:
+      scheme: '(D (nroot $0 $1) $2)'
+      return: '(* (* (D $1 $2) (/ "1" $0)) (^ $1 (- (/ "1" $0) "1")))'
+    minArgs:
+      $0: 0
+      $1: 1
+      $2: 1
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null

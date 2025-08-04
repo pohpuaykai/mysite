@@ -7,57 +7,86 @@ manipulations:
     vor:
       scheme: '(nroot $0 (^ $1 $2))'
       return: '(^ $1 (/ $2 $0))'
-    hin:
-      scheme: "(^ $1 (/ $2 $0))"
-      return: "(nroot $0 (^ $1 $2))"
     minArgs:
       $0: 0
       $1: 0
       $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+
   - type: "regex"
     vor:
       scheme: '(^ (nroot $0 $1) $2)'
       return: '(nroot $0 (^ $1 $2))'
-    hin:
-      scheme: "(nroot $0 (^ $1 $2))"
-      return: "(^ (nroot $0 $1) $2)"
     minArgs:
       $0: 0
       $1: 0
       $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+
   - type: "regex"
     vor:
       scheme: '(^ (nroot $0 $1) $2)'
       return: '(^ $1 (/ $2 $0))'
-    hin:
-      scheme: "(^ $1 (/ $2 $0))"
-      return: "(^ (nroot $0 $1) $2)"
     minArgs:
       $0: 0
       $1: 0
       $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+
 #below does not work for complex numbers, sqrt(ab) = sqrt(a)sqrt(b)
 #Looks like distributivity, maybe can further refactor...
   - type: "regex"
     vor:
       scheme: '(nroot $2 (* $0 $1))'
       return: '(* (nroot $2 $0) (nroot $2 $1))'
-    hin:
-      scheme: "(* (nroot $2 $0) (nroot $2 $1))"
-      return: "(nroot $2 (* $0 $1))"
     minArgs:
       $0: 0
       $1: 0
       $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+        
 #Looks like distributivity, maybe can further refactor...
   - type: "regex"
     vor:
       scheme: '(nroot $2 (/ $0 $1))'
       return: '(/ (nroot $2 $0) (nroot $2 $1))'
-    hin:
-      scheme: "(/ (nroot $2 $0) (nroot $2 $1))"
-      return: "(nroot $2 (/ $0 $1))"
     minArgs:
       $0: 0
       $1: 0
       $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null

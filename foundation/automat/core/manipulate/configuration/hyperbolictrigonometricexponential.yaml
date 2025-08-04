@@ -1,0 +1,64 @@
+---
+className: "Hyperbolictrigonometricexponential"
+type: "essential"
+manipulations:
+
+  #e^{x}=\sqrt[2]{\frac{1+\tanh(x)}{1-\tanh(x)}}
+  - type: "regex"
+    vor:
+      scheme: '(^ "e" $0)'
+      return: '(nroot "2" (/ (+ "1" (tanh $0)) (- "1" (tanh $0))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #e^{x}=\frac{1+\tanh(\frac{x}{2})}{1-\tanh(\frac{x}{2})}
+  - type: "regex"
+    vor:
+      scheme: '(^ "e" $0)'
+      return: '(/ (+ "1" (tanh (/ $0 "2"))) (- "1" (tanh (/ $0 "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #e^{i x}=\sinh(i x)+\cosh(i x)
+  - type: "regex"
+    vor:
+      scheme: '(^ "e" (* "i" $0))'
+      return: '(+ (sinh (* "i" $0)) (cosh (* "i" $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #e^{x} = \sinh(x)+\cosh(x)
+  - type: "regex"
+    vor:
+      scheme: '(^ "e" $0)'
+      return: '(+ (sinh $0) (cosh $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #e^{-x} = \cosh(x)-\sinh(x)
+  - type: "regex"
+    vor:
+      scheme: '(^ "e" (- "0" $0))'
+      return: '(- (cosh $0) (sinh $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

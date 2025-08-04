@@ -197,12 +197,12 @@ def test__hin3__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest()
-    test__hin0__configTest()
-    test__vor1__configTest()
-    test__hin1__configTest()
-    test__vor2__configTest()
-    test__hin2__configTest()
-    test__vor3__configTest()
-    test__hin3__configTest()
+    test__vor0__configTest() # Not tested yet
+    test__hin0__configTest() # Not tested yet
+    test__vor1__configTest() # Not tested yet
+    test__hin1__configTest() # Not tested yet
+    test__vor2__configTest() # Not tested yet
+    test__hin2__configTest() # Not tested yet
+    test__vor3__configTest() # Not tested yet
+    test__hin3__configTest() # Not tested yet
     

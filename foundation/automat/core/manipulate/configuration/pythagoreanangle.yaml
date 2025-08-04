@@ -6,16 +6,75 @@ manipulations:
 #Elliptic
   - type: "regex"
     vor:
-      scheme: "(+ (^ (sin $0) 2) (^ (cos $0) 2))"
-      return: "1"
-    hin:
-      scheme: "1"
-      return: "(+ (^ (sin $0) 2) (^ (cos $0) 2))"
-#Hyperbolic
+      scheme: '(+ (^ (sin $0) "2") (^ (cos $0) "2"))'
+      return: '"1"'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#1+\tan^2(x)=\sec^2(x)
   - type: "regex"
     vor:
-      scheme: '(- (^ (sinh $0) "2") (^ (cosh $0) "2"))'
-      return: '1'
-    hin:
-      scheme: ''
-      return: ''
+      scheme: '(+ "1" (^ (tan $0) "2"))'
+      return: '(^ (sec $0) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot^2(x)+1=\cosec^2(x)
+  - type: "regex"
+    vor:
+      scheme: '(+ (^ (cot $0) "2") "1")'
+      return: '(^ (cosec $0) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#Hyperbolic
+#\cosh^2(x)-\sinh^2(x)=1
+  - type: "regex"
+    vor:
+      scheme: '(- (^ (cosh $0) "2") (^ (sinh $0) "2"))'
+      return: '"1"'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#\sech^2(x)=1-\tanh^2(x)
+  - type: "regex"
+    vor:
+      scheme: '(^ (sech $0) "2")'
+      return: '(- "1" (^ (tanh $0) "2"))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#\cosech^2(x)=\coth^2(x)-1
+  - type: "regex"
+    vor:
+      scheme: '(^ (cosech $0) "2")'
+      return: '(- (^ (coth $0) "2") "1")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+

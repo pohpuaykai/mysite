@@ -4,19 +4,33 @@ type: "essential"
 manipulations:
   - type: "regex"
     vor:
-      scheme: '(- 0 $0)'
-      return: "$0"
-    hin:
-      scheme: "$0"
-      return: '(- 0 $0)'
+      scheme: '(+ "0" $0)'
+      return: '$0'
     minArgs:
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
   - type: "regex"
     vor:
-      scheme: '(- $0 0)'
-      return: "$0"
-    hin:
-      scheme: "$0"
-      return: '(- $0 0)'
+      scheme: '(+ $0 "0")'
+      return: '$0'
     minArgs:
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  - type: "regex"
+    vor:
+      scheme: '(- $0 "0")'
+      return: '$0'
+    minArgs:
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

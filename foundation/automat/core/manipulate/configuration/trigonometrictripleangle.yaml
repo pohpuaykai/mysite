@@ -1,0 +1,76 @@
+---
+className: "Trigonometrictripleangle"
+type: "trigonometric_standard"
+manipulations:
+
+#\sin(3 x)=3\sin(x)-4\sin^3(x)
+  - type: "regex"
+    vor:
+      scheme: '(sin (* "3" x))'
+      return: '(- (* "3" (sin x)) (* "4" (^ (sin x) "3")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(3 x)=4\cos^3(x)-3\cos(x)
+  - type: "regex"
+    vor:
+      scheme: '(cos (* "3" x))'
+      return: '(- (* "4" (^ (cos x) "3")) (* "3" (cos x)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(3 x)=\frac{3\tan(x)-\tan^3(x)}{1-3\tan^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(tan (* "3" x))'
+      return: '(/ (- (* "3" (tan x)) (^ (tan x) "3")) (- "1" (* "3" (^ (tan x) "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(3 x)=\frac{3\cot(x)-\cot^3(x)}{1-3\cot^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cot (* "3" x))'
+      return: '(/ (- (* "3" (cot x)) (^ (cot x) "3")) (- "1" (* "3" (^ (cot x) "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sec(3 x)=\frac{\sec^3(x)}{4-3\sec^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(sec (* "3" x))'
+      return: '(/ (^ (sec x) "3") (- "4" (* "3" (^ (sec x) "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cosec(3 x)=\frac{\cosec^3(x)}{3\cosec^3(x)-4}
+  - type: "regex"
+    vor:
+      scheme: '(cosec (* "3" x))'
+      return: '(/ (^ (cosec x) "3") (- (* "3" (^ (cosec x) "3")) "4"))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

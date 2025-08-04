@@ -1,0 +1,99 @@
+className: 'Arctrigonometricintegration'
+type: 'integration_trigonometric'
+manipulations:
+- type: 'regex'
+  vor:
+    scheme: '(int (* (/ "1" (nroot "2" (- "1" (* $0 $0)))) (D $0 $1)) $1)'
+    return: '(+ (arcsin $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (- "0" (/ "1" (nroot "2" (- "1" (* $0 $0))))) (D $0 $1)) $1)'
+    return: '(+ (arccos $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (/ "1" (+ "1" (* $0 $0))) (D $0 $1)) $1)'
+    return: '(+ (arctan $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (/ "1" (* $0 (nroot "2" (- (* $0 $0) "1")))) (D $0 $1)) $1)'
+    return: '(+ (arcsec $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (nroot "2" (- (* $0 $0) "1")) (D $0 $1)) $1)'
+    return: '(+ (arccosec $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (- "0" (/ "1" (+ "1" (* $0 $0)))) (D $0 $1)) $1)'
+    return: '(+ (arccot $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null

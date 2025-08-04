@@ -1,0 +1,220 @@
+---
+className: "Trigonometricarctrigonometric"
+type: "trigonometric_standard"
+manipulations:
+
+#\sin(\arcsin(x))=x
+  - type: "regex"
+    vor:
+      scheme: '(sin (arcsin $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(\arccos(x))=\sqrt[2]{1-x^2}
+  - type: "regex"
+    vor:
+      scheme: '(sin (arccos $0))'
+      return: '(nroot "2" (- "1" (^ $0 "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(\arctan(x))=\frac{x}{\sqrt[2]{1+x^2}}
+  - type: "regex"
+    vor:
+      scheme: '(sin (arctan $0))'
+      return: '(/ $0 (nroot "2" (+ "1" (^ $0 "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(\arccosec(x))=\frac{1}{x}
+  - type: "regex"
+    vor:
+      scheme: '(sin (arccosec $0))'
+      return: '(/ "1" $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(\arcsec(x))=\frac{\sqrt[2]{x^2-1}}{x}
+  - type: "regex"
+    vor:
+      scheme: '(sin (arcsec $0))'
+      return: '(/ (nroot "2" (- (^ $0 "2") "1")) $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(\arccot(x))=\frac{1}{\sqrt[2]{1+x^2}}
+  - type: "regex"
+    vor:
+      scheme: '(sin (arccot $0))'
+      return: '(/ "1" (nroot "2" (+ "1" (^ $0 "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(\arcsin(x))=\sqrt[2]{1-x^2}
+  - type: "regex"
+    vor:
+      scheme: '(cos (arcsin $0))'
+      return: '(nroot "2" (- "1" (^ $0 "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(\arccos(x))=x
+  - type: "regex"
+    vor:
+      scheme: '(cos (arccos $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(\arctan(x))=\frac{1}{\sqrt[2]{1+x^2}}
+  - type: "regex"
+    vor:
+      scheme: '(cos (arctan $0))'
+      return: '(/ "1" (nroot "2" (+ "1" (^ $0 "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(\arccosec(x))=\frac{\sqrt[2]{x^2-1}}{x}
+  - type: "regex"
+    vor:
+      scheme: '(cos (arccosec $0))'
+      return: '(/ (nroot "2" (- (^ $0 "2") "1")) $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(\arcsec(x))
+  - type: "regex"
+    vor:
+      scheme: '(cos (arcsec $0))'
+      return: '(/ "1" $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(\arccot(x))=\frac{x}{\sqrt[2]{1+x^2}}
+  - type: "regex"
+    vor:
+      scheme: '(cos (arccot $0))'
+      return: '(/ $0 (nroot "2" (+ "1" (^ $0 "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\arcsin(x))=\frac{x}{\sqrt[2]{1-x^2}}
+  - type: "regex"
+    vor:
+      scheme: '(tan (arcsin $0))'
+      return: '(/ $0 (nroot "2" (- "1" (^ $0 "2"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\arccos(x))=\frac{\sqrt[2]{1-x^2}}{x}
+  - type: "regex"
+    vor:
+      scheme: '(tan (arccos $0))'
+      return: '(/ (nroot "2" (- "1" (^ $0 "2"))) $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\arctan(x))=x
+  - type: "regex"
+    vor:
+      scheme: '(tan (arctan $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\arccosec(x))=\frac{1}{\sqrt[2]{x^2-1}}
+  - type: "regex"
+    vor:
+      scheme: '(tan (arccosec $0))'
+      return: '(/ "1" (nroot "2" (- (^ $0 "2") "1")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\arcsec(x))=\sqrt[2]{x^2-1}
+  - type: "regex"
+    vor:
+      scheme: '(tan (arcsec $0))'
+      return: '(nroot "2" (- (^ $0 "2") "1"))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\arccot(x))=\frac{1}{x}
+  - type: "regex"
+    vor:
+      scheme: '(tan (arccot $0))'
+      return: '(/ "1" $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

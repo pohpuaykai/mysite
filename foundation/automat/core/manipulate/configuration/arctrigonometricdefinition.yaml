@@ -1,0 +1,113 @@
+---
+className: "Arctrigonometricdefinition"
+type: "arctrigonometric_standard"
+manipulations:
+
+#sin
+  - type: "regex"
+    vor:
+      scheme: '(arcsin (sin $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#cos
+  - type: "regex"
+    vor:
+      scheme: '(arccos (cos $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#tan
+  - type: "regex"
+    vor:
+      scheme: '(arctan (tan $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#sec
+  - type: "regex"
+    vor:
+      scheme: '(arcsec (sec $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#cosec
+  - type: "regex"
+    vor:
+      scheme: '(arccosec (cosec $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#cot
+  - type: "regex"
+    vor:
+      scheme: '(arccot (cot $0))'
+      return: '$0'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arcsech(x)=\arccosh(\frac{1}{x})
+  - type: "regex"
+    vor:
+      scheme: '(arcsech $0)'
+      return: '(arccosh (/ "1" $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arccosech(x)=\arcsinh(\frac{1}{x})
+  - type: "regex"
+    vor:
+      scheme: '(arccosech $0)'
+      return: '(arcsinh (/ "1" $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\arccoth(x)=\arctanh(\frac{1}{x})
+  - type: "regex"
+    vor:
+      scheme: '(arccoth $0)'
+      return: '(arctanh (/ "1" $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

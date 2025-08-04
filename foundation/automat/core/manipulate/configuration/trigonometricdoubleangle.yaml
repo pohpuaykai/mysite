@@ -1,0 +1,160 @@
+---
+className: "Trigonometricdoubleangle"
+type: "trigonometric_standard"
+manipulations:
+
+#\sin(2 x)=2\sin(x)\cos(x)
+  - type: "regex"
+    vor:
+      scheme: '(sin (* "2" $0))'
+      return: '(* (* "2" (sin $0)) (cos $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(2 x)=\frac{2\tan(x)}{1+\tan^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(sin (* "2" $0))'
+      return: '(/ (* "2" (tan $0)) (+ "1" (^ (tan $0) "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(2 x)=\cos^2(x)-\sin^2(x)
+  - type: "regex"
+    vor:
+      scheme: '(cos (* "2" $0))'
+      return: '(- (^ (cos $0) "2") (^ (sin $0) "2"))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(2 x)=2\cos^2(x)-1
+  - type: "regex"
+    vor:
+      scheme: '(cos (* "2" $0))'
+      return: '(- (* "2" (^ (cos $0) "2")) "1")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(2 x)=1-2\sin^2(x)
+  - type: "regex"
+    vor:
+      scheme: '(cos (* "2" $0))'
+      return: '(- "1" (* "2" (^ (sin $0) "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(2 x)=\frac{1-\tan^2(x)}{1+\tan^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cos (* "2" $0))'
+      return: '(/ (- "1" (^ (tan $0) "2")) (+ "1" (^ (tan $0) "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(2 x)=\frac{2\tan(x)}{1-\tan^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(tan (* "2" $0))'
+      return: '(/ (* "2" (tan $0)) (- "1" (^ (tan $0) "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(2 x)=\frac{cot^2(x)-1}{2\cot(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cot (* "2" $0))'
+      return: '(/ (- (* (^ cot "2") $0) "1") (* "2" (cot $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(2 x)=\frac{1-tan^2(x)}{2\tan(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cot (* "2" $0))'
+      return: '(/ (- "1" (* (^ tan "2") $0)) (* "2" (tan $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sec(2 x)=\frac{\sec^2(x)}{2-sec^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(sec (* "2" $0))'
+      return: '(/ (^ (sec $0) "2") (- "2" (* (^ sec "2") $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sec(2 x)=\frac{1+tan^2(x)}{1-tan^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(sec (* "2" $0))'
+      return: '(/ (+ "1" (* (^ tan "2") $0)) (- "1" (* (^ tan "2") $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cosec(2 x)=\frac{\sec(x)\cosec(x)}{2}
+  - type: "regex"
+    vor:
+      scheme: '(cosec (* "2" $0))'
+      return: '(/ (* (sec $0) (cosec $0)) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cosec(2 x)=\frac{1+tan^2(x)}{2\tan(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cosec (* "2" $0))'
+      return: '(/ (+ "1" (* (^ tan "2") $0)) (* "2" (tan $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

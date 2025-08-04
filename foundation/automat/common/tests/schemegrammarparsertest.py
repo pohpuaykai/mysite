@@ -12,7 +12,7 @@ def test__ideal__addition(verbose=False):
     """
     inputPattern = '(+ $0 $1)'
     outputPattern = '(+ $1 $0)'
-    schemeword = '(+ 1 2)'
+    schemeword = '(+ 1 2)'#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<anything in "" should be treated as argLen=0, else it is a variable with argLen=1, functions_that_take_at_least_1_arg and above should have argLen>1
     variableMinArgs = {'$0':0, '$1':0}
     parser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True, variableMinArgs=variableMinArgs)
     manipulatedSchemeword = parser.parse(schemeword)

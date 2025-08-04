@@ -1,0 +1,64 @@
+---
+className: "Hyperbolictrigonometricdoubleangle"
+type: "essential"
+manipulations:
+
+  #\cosh(2 x)=\sinh^2(x)+\cosh^2(x)
+  - type: "regex"
+    vor:
+      scheme: '(cosh (* "2" $0))'
+      return: '(+ (^ (sinh $0) "2") (^ (cosh $0) "2"))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\cosh(2 x)=2\sinh^2(x)+1
+  - type: "regex"
+    vor:
+      scheme: '(cosh (* "2" $0))'
+      return: '(+ (* "2" (^ (sinh $0) "2")) "1")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\cosh(2 x)=2\cosh^2(x)-1
+  - type: "regex"
+    vor:
+      scheme: '(cosh (* "2" $0))'
+      return: '(- (* "2" (^ (cosh $0) "2")) "1")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\sinh(2 x)=2\sinh(x)\cosh(x)
+  - type: "regex"
+    vor:
+      scheme: '(sinh (* "2" $0))'
+      return: '(* (* "2" (sinh $0)) (cosh $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\tanh(2 x)=\frac{2\tanh(x)}{1+\tanh^2(x)}
+  - type: "regex"
+    vor:
+      scheme: '(tanh (* "2" $0))'
+      return: '(/ (* "2" (tanh $0)) (+ "1" (^ (tanh $0) "2")))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

@@ -12,5 +12,5 @@ class Communtativity(Manipulate):
         """
 
         """
-        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(+ $0 $1)', 'return': '(+ $1 $0)'}, 'hin': {'scheme': '(+ $1 $0)', 'return': '(+ $0 $1)'}, 'minArgs': {'$0': 0, '$1': 0}}, {'type': 'regex', 'vor': {'scheme': '(* $0 $1)', 'return': '(* $1 $0)'}, 'hin': {'scheme': '(* $1 $0)', 'return': '(* $0 $1)'}, 'minArgs': {'$0': 0, '$1': 0}}, {'type': 'regex', 'vor': {'scheme': '(= $0 $1)', 'return': '(= $1 $0)'}, 'hin': {'scheme': '(= $1 $0)', 'return': '(= $0 $1)'}, 'minArgs': {'$0': 0, '$1': 0}}]
+        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(+ $0 $1)', 'return': '(+ $1 $0)'}, 'minArgs': {'$0': 0, '$1': 0}, 'maxArgs': {'$0': None, '$1': None}, 'preCond': {'$0': None, '$1': None}, 'hin': {'scheme': '(+ $1 $0)', 'return': '(+ $0 $1)'}}, {'type': 'regex', 'vor': {'scheme': '(* $0 $1)', 'return': '(* $1 $0)'}, 'minArgs': {'$0': 0, '$1': 0}, 'maxArgs': {'$0': None, '$1': None}, 'preCond': {'$0': None, '$1': None}, 'hin': {'scheme': '(* $1 $0)', 'return': '(* $0 $1)'}}, {'type': 'regex', 'vor': {'scheme': '(= $0 $1)', 'return': '(= $1 $0)'}, 'minArgs': {'$0': 0, '$1': 0}, 'maxArgs': {'$0': None, '$1': None}, 'preCond': {'$0': None, '$1': None}, 'hin': {'scheme': '(= $1 $0)', 'return': '(= $0 $1)'}}]
         super().__init__(equation, direction, idx, verbose=verbose)

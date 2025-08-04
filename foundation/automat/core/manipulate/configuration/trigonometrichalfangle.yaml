@@ -1,0 +1,160 @@
+---
+className: "Trigonometrichalfangle"
+type: "trigonometric_standard"
+manipulations:
+
+#\sin^2(\frac{x}{2})=\frac{1-\cos(x)}{2}
+  - type: "regex"
+    vor:
+      scheme: '(^ (sin (/ $0 "2")) "2")'
+      return: '(/ (- "1" (cos $0)) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos^2(\frac{x}{2})=\frac{1+\cos(x)}{2}
+  - type: "regex"
+    vor:
+      scheme: '(^ (cos (/ $0 "2")) "2")'
+      return: '(/ (+ "1" (cos $0)) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\frac{x}{2})=\cosec(x)-\cot(x)
+  - type: "regex"
+    vor:
+      scheme: '(tan (/ $0 "2"))'
+      return: '(- (cosec $0) (cot $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\frac{x}{2})=\sqrt[2]{\frac{1-\cos(x)}{1+\cos(x)}}
+  - type: "regex"
+    vor:
+      scheme: '(tan (/ $0 "2"))'
+      return: '(nroot "2" (/ (- "1" (cos $0)) (+ "1" (cos $0))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\frac{x}{2})=-\sqrt[2]{\frac{1-\cos(x)}{1+\cos(x)}}
+  - type: "regex"
+    vor:
+      scheme: '(tan (/ $0 "2"))'
+      return: '(- "0" (nroot "2" (/ (- "1" (cos $0)) (+ "1" (cos $0)))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\frac{x}{2})=\frac{\sin(x)}{1+\cos(x)}
+  - type: "regex"
+    vor:
+      scheme: '(tan (/ $0 "2"))'
+      return: '(- "0" (nroot "2" (/ (- "1" (cos $0)) (+ "1" (cos $0)))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\frac{x}{2})=\frac{\sin(x)}{1+\cos(x)}
+  - type: "regex"
+    vor:
+      scheme: '(tan (/ $0 "2"))'
+      return: '(/ (sin $0) (+ "1" (cos $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(\frac{x}{2})=\frac{1-\cos(x)}{\sin(x)}
+  - type: "regex"
+    vor:
+      scheme: '(tan (/ $0 "2"))'
+      return: '(/ (- "1" (cos $0)) (sin $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(\frac{x}{2})=\cosec(x)+\cot(x)
+  - type: "regex"
+    vor:
+      scheme: '(cot (/ $0 "2"))'
+      return: '(+ (cosec $0) (cot $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(\frac{x}{2})=\sqrt[2]{\frac{1+\cos(x)}{1-\cos(x)}}
+  - type: "regex"
+    vor:
+      scheme: '(cot (/ $0 "2"))'
+      return: '(nroot "2" (/ (+ "1" (cos $0)) (- "1" (cos $0))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(\frac{x}{2})=-\sqrt[2]{\frac{1+\cos(x)}{1-\cos(x)}}
+  - type: "regex"
+    vor:
+      scheme: '(cot (/ $0 "2"))'
+      return: '(- "0" (nroot "2" (/ (+ "1" (cos $0)) (- "1" (cos $0)))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(\frac{x}{2})=\frac{\sin(x)}{1-\cos(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cot (/ $0 "2"))'
+      return: '(/ (sin $0) (- "1" (cos $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cot(\frac{x}{2})=\frac{1+\cos(x)}{\sin(x)}
+  - type: "regex"
+    vor:
+      scheme: '(cot (/ $0 "2"))'
+      return: '(/ (+ "1" (cos $0)) (sin $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

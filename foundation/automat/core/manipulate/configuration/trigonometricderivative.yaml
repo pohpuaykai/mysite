@@ -6,52 +6,94 @@ manipulations:
     vor:
       scheme: '(D (sin $0) $1)'
       return: '(* (cos $0) (D $0 $1))'
-    hin:
-      scheme: '(* (cos $0) (D $0 $1))'
-      return: '(D (sin $0) $1)'
+    minArgs:
+      $0: 1 # variable
+      $1: 1 # variable
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
 
 
   - type: "regex"
     vor:
       scheme: '(D (cos $0) $1)'
       return: '(* (- "0" (sin $0)) (D $0 $1))'
-    hin:
-      scheme: ''
-      return: ''
+    minArgs:
+      $0: 1 # variable
+      $1: 1 # variable
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
 
 
   - type: "regex"
     vor:
       scheme: '(D (tan $0) $1)'
-      return: '(* (^ (sec $0) 2) (D $0 $1))'
-    hin:
-      scheme: ''
-      return: ''
+      return: '(* (^ (sec $0) "2") (D $0 $1))'
+    minArgs:
+      $0: 1 # variable
+      $1: 1 # variable
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
 
 
   - type: "regex"
     vor:
       scheme: '(D (sec $0) $1)'
       return: '(* (* (sec $0) (tan $0)) (D $0 $1))'
-    hin:
-      scheme: ''
-      return: ''
+    minArgs:
+      $0: 1 # variable
+      $1: 1 # variable
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
 
 
   - type: "regex"
     vor:
       scheme: '(D (cosec $0) $1)'
       return: '(* (- "0" (* (cosec $0) (cot $0))) (D $0 $1))'
-    hin:
-      scheme: ''
-      return: ''
+    minArgs:
+      $0: 1 # variable
+      $1: 1 # variable
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
 
 
   - type: "regex"
     vor:
       scheme: '(D (cot $0) $1)'
-      return: '(* (- "0" (^ cosec $0) 2) (D $0 $1))'
-    hin:
-      scheme: ''
-      return: ''
+      return: '(* (- "0" (^ cosec $0) "2") (D $0 $1))'
+    minArgs:
+      $0: 1 # variable
+      $1: 1 # variable
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
 

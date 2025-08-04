@@ -1,0 +1,30 @@
+---
+className: "Unitofmultiplication"
+type: "essential"
+manipulations:
+  - type: "regex"
+    vor:
+      scheme: '(* $0 "1")'
+      return: '$0'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+  - type: "regex"
+    vor:
+      scheme: '(/ $0 "1")'
+      return: '$0'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

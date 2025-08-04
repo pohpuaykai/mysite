@@ -365,6 +365,7 @@ class Latexparser(Parser):
         self.parserName = 'latex'#VAR:inheritance
 
         if ast is None: # parse Mode
+            self.ast = None
             self.equationStr = equationStr #processed rawEquationStr
             self.matrices_pos_type = None # replace with entitystorage, the collating of intervals (bubble merge) needs work
             self.allBrackets = None # all of the bracket STATIC, 
@@ -1838,6 +1839,9 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
                     #
                     if not bad:
                         replacement[pReplacementNode] = replacementChildren
+                        #change the rootOfTree if pReplacementNode == rootOfTree
+                        if self.rootOfTree == pNode:
+                            self.rootOfTree = pReplacementNode
 
                 #heran, we need to replace parent in children, with instructions['rootOfResultTemplate']
                 newReplacement = {}
@@ -1862,132 +1866,6 @@ self.entitystorage.tuple_nodeId_argIdx__pNodeId
         (d/dx)(uv), because a misses a tree, by popping u instead of d
 
         """
-        # """
-
-        # 6. (* (/ d (* d t)) A) => (ð A t) # d will collide with differential symbol
-        # 7. (/ (* d u) (* d t)) => (ð u t)
-        # 8. (*  (/ partial (partial t) A)
-        # 9. (/ (partial u) (partial t)) => (ð u t)
-        # """
-        # differentialOperatorSigns = ['d', 'partial']
-        # differentialOperatorReplacementSign = '$$'
-        # differentialTreePatterns = [
-        #     {
-        #     'tree':{#6 & 8
-        #             ('*', '$0'):[('/', '$1'), ('$2', '$3')],
-        #             ('/', '$1'):[('$$', '$4'), ('*', '$5')],
-        #             ('*', '$5'):[('$$', '$6'), ('$7', '$8')]
-        #         },
-        #     'root':('*', '$0'),
-        #     'replacementPattern':{
-        #             ('ð', '$4'):[('$2', '$3'), ('$7', '$8')]
-        #         },
-        #     'replacementPatternRoot':('ð', '$4')
-        #     },
-        #     {
-        #     'tree':{#7 & 9
-        #             ('/', '$0'):[('*', '$1'), ('*', '$2')],
-        #             ('*', '$1'):[('$$', '$3'), ('$4', '$5')],
-        #             ('*', '$2'):[('$$', '$6'), ('$7', '$8')]
-        #         },
-        #     'root':('/', '$0'),
-        #     'replacementPattern':{
-        #             ('ð', '$3'):[('$4', '$5'), ('$7', '$8')]
-        #         },
-        #     'replacementPatternRoot':('ð', '$3')
-        #     }
-        # ]
-        # def treeReplacement(tree, root, updateComponentOfNode):
-        #     def updateNode(node):
-        #         #assume each node is a tuple
-        #         newNode = []
-        #         for nodeComponent in list(node):
-        #             newNode.append(updateComponentOfNode(nodeComponent))
-        #         return tuple(newNode)
-        #     stack, returnedTree = [root], {}
-        #     while len(stack) > 0:
-        #         jetzt = stack.pop()
-        #         children = tree.get(jetzt, [])
-        #         stack += children
-        #         jetzt = updateNode(jetzt)
-        #         newChildren = []
-        #         for child in children:
-        #             child = updateNode(child)
-        #             newChildren.append(child)
-        #         if len(newChildren) > 0:
-        #             returnedTree[jetzt] = newChildren
-        #     newRoot = updateNode(root)
-        #     return newRoot, returnedTree
-
-        # current__replaced = {}
-        # newAst, nodesToAvoidInNewAst = {}, []
-        # for differentialOperatorSign in differentialOperatorSigns:
-        #     for differentialTreePattern in differentialTreePatterns:
-        #         def replaceDifferentialOperatorSign(nodeComponent):
-        #             if nodeComponent == differentialOperatorReplacementSign:
-        #                 return differentialOperatorSign
-        #             return nodeComponent
-        #         treePatternRoot, treePattern = treeReplacement(differentialTreePattern['tree'], differentialTreePattern['root'], replaceDifferentialOperatorSign)
-        #         print('searching for treePattern: ', treePattern)
-        #         treeRoot__matchedVar__val = {}
-        #         global GLOBAL___matchedVar__val
-        #         GLOBAL___matchedVar__val = None
-        #         def callbackForTreeTreeMatchingStart(targetTreeRoot):
-        #             global GLOBAL___matchedVar__val
-        #             GLOBAL___matchedVar__val = {}
-        #             # print('initialized matchedVar__val', GLOBAL___matchedVar__val)
-
-        #         def _nodeMatch(gesuchteCurrent, targetCurrent):
-        #             global GLOBAL___matchedVar__val
-        #             # print('_nodeMatch: matchedVar__val', GLOBAL___matchedVar__val)
-        #             if GLOBAL___matchedVar__val is not None and gesuchteCurrent[1].startswith('$'):
-        #                 GLOBAL___matchedVar__val[gesuchteCurrent[1]]=targetCurrent[1]
-        #                 # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<_nodeMatch:', GLOBAL___matchedVar__val)
-
-        #             if gesuchteCurrent[0].startswith('$'): #its a variable
-        #                 if GLOBAL___matchedVar__val is not None:
-        #                     GLOBAL___matchedVar__val[gesuchteCurrent[0]]=targetCurrent[0]
-        #                 # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<_nodeMatch:', GLOBAL___matchedVar__val)
-        #                 return True# variables match anything in targetTree, ignores Optional|Compulsory
-        #             return gesuchteCurrent[0] == targetCurrent[0]
-        #         def callbackForMatchCompletion(targetTreeRoot):#<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the _unparse with this NEW_FUNCTION
-        #             global GLOBAL___matchedVar__val
-        #             treeRoot__matchedVar__val[targetTreeRoot] = GLOBAL___matchedVar__val
-        #             # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>treeRoot__matchedVar__val:', treeRoot__matchedVar__val)
-        #             GLOBAL___matchedVar__val = None
-
-
-        #         def componentUpdate(nodeComponent, var__val):
-        #             # print('nodeComponent', nodeComponent, var__val.get(nodeComponent, nodeComponent));import pdb;pdb.set_trace()
-        #             return var__val.get(nodeComponent, nodeComponent)
-        #         for rootNode in self.list_of_ast_roots:
-        #             print(rootNode, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-        #             for treeRoot, matchedTree in FindTreeInTree.findAllTreeInTree(
-        #                 treePattern, treePatternRoot, self.ast, rootNode, 
-        #                 _nodeMatch, 
-        #                 callbackForMatchCompletion, 
-        #                 callbackForTreeTreeMatchingStart):
-
-        #                 replacementRoot, replacementTree = treeReplacement(differentialTreePattern['replacementPattern'], differentialTreePattern['replacementPatternRoot'], lambda x: componentUpdate(x, treeRoot__matchedVar__val[treeRoot]))
-        #                 nodesToAvoidInNewAst += list(set(matchedTree.keys()) - set([treeRoot]))
-        #                 newAst.update(replacementTree)
-        #                 current__replaced[treeRoot] = replacementRoot
-        #                 print('treeRoot', treeRoot)
-        #                 print('matchedTree', matchedTree)
-        #                 print('matchedVar__val', treeRoot__matchedVar__val[treeRoot])
-        #                 print('replacementTree', replacementTree)
-        #                 print('nodesToAvoidInNewAst', nodesToAvoidInNewAst)
-        #                 print('_______________________________________________________________________');import pdb;pdb.set_trace()
-        #                 #also need to replace the parent's children with new Nodes... the differential is a new node
-        #                 #remove every node in matchedTree from newAst
-        # for pNode, children in self.ast.items():
-        #     if pNode not in nodesToAvoidInNewAst:
-        #         newChildren = []
-        #         for child in children:
-        #             newChildren.append(current__replaced.get(child, child))
-        #         newAst[pNode] = newChildren
-        # print('newAst**********************')
-        # print(newAst)
 
 
 
@@ -2261,6 +2139,8 @@ count by EntityType:
             # print(self.rootOfTree)
         else:
             self.latexAST = theAst
+            self.rootOfTree = theRootOfTree
+            # print('%^&&^%&^%&^%?')
 
 
 
@@ -2666,8 +2546,12 @@ EntityTypes to handle:
 
 
     def latexToScheme(self):
-        pass#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO<<<<<<<<scheme has to take a startNode
-
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser
+        if self.ast is None:
+            self._parse()
+            print(self.ast); print(self.rootOfTree)
+        schemeStr = Schemeparser(ast=self.ast, rootOfTree=self.rootOfTree)._unparse()
+        return schemeStr
 
     @classmethod
     def makePlusAndMinus(cls, listOfPlusAndMinus, equivalentVariableDict):

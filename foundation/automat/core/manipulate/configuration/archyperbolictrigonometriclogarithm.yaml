@@ -1,0 +1,88 @@
+---
+className: "Archyperbolictrigonometriclogarithm"
+type: "essential"
+manipulations:
+
+  #\arcsinh(x)=\ln(x+\sqrt[2]{x^2+1})
+  - type: "regex"
+    vor:
+      scheme: '(arcsinh $0)'
+      return: '(log "e" (+ $0 (nroot "2" (+ (^ $0 "2") "1"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\arccosh(x)=\ln(x+\sqrt[2]{x^2-1})
+  - type: "regex"
+    vor:
+      scheme: '(arccosh $0)'
+      return: '(log "e" (+ $0 (nroot "2" (- (^ $0 "2") "1"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\arctanh(x)=\frac{\ln(\frac{1+x}{1-x})}{2}
+  - type: "regex"
+    vor:
+      scheme: '(arctanh $0)'
+      return: '(/ (log "e" (/ (+ "1" $0) (- "1" $0))) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\arccoth(x)=\frac{\ln(\frac{x+1}{x-1})}{2}
+  - type: "regex"
+    vor:
+      scheme: '(arccoth $0)'
+      return: '(/ (log "e" (/ (+ $0 "1") (- $0 "1"))) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\arcsech(x)=\ln(\frac{1}{x}+\sqrt[2]{\frac{1}{x^2}-1})
+  - type: "regex"
+    vor:
+      scheme: '(arcsech $0)'
+      return: '(log "e" (+ (/ "1" $0) (nroot "2" (- (/ "1" (^ $0 "2")) "1"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\arcsech(x)=\ln(\frac{1+\sqrt[2]{1-x^2}}{x})
+  - type: "regex"
+    vor:
+      scheme: '(arcsech $0)'
+      return: '(log "e" (/ (+ "1" (nroot "2" (- "1" (^ $0 "2")))) $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+  #\arccosech(x)=\ln(\frac{1}{x}+\sqrt[2]{\frac{1}{x^2}+1}) 
+  - type: "regex"
+    vor:
+      scheme: '(arccosech $0)'
+      return: '(log "e" (+ (/ "1" $0) (nroot "2" (+ (/ "1" (^ $0 "2")) "1"))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

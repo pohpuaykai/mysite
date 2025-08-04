@@ -1,19 +1,195 @@
 ---
-className: "HyperbolicTrigonometryDefinition"
+className: "Hyperbolictrigonometricdefinition"
 type: "essential"
 manipulations:
   - type: "regex"
     vor:
       scheme: '(cosh $0)'
-      return: '(/ (- (^ "e" $0) (^ "e" (- "0" $0))) "2")'
-    hin:
-      scheme: ''
-      return: ''
+      return: '(/ (+ (^ "e" $0) (^ "e" (- "0" $0))) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
 
   - type: "regex"
     vor:
       scheme: '(sinh $0)'
-      return: '(/ (+ (^ "e" $0) (^ "e" (- "0" $0))) "2")'
-    hin:
-      scheme: ''
-      return: ''
+      return: '(/ (- (^ "e" $0) (^ "e" (- "0" $0))) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#\cosh(-x) = \cosh(x)
+  - type: "regex"
+    vor:
+      scheme: '(cosh (- "0" $0))'
+      return: '(cosh $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(x) = -i \sinh(i x)
+  - type: "regex"
+    vor:
+      scheme: '(sin $0)'
+      return: '(- "0" (* "i" (sinh (* "i" $0))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(x) = \cosh(i x)
+  - type: "regex"
+    vor:
+      scheme: '(cos $0)'
+      return: '(cosh (* "i" $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(i x) = i \sinh(x)
+  - type: "regex"
+    vor:
+      scheme: '(sin (* "i" $0))'
+      return: '(* "i" (sinh $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(i x) = \cosh(x)
+  - type: "regex"
+    vor:
+      scheme: '(cos (* "i" $0))'
+      return: '(cosh $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sinh(-x) = -\sinh(x)
+  - type: "regex"
+    vor:
+      scheme: '(sinh (- "0" $0))'
+      return: '(- "0" (sinh $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tan(x)=-i\tanh(i x)
+  - type: "regex"
+    vor:
+      scheme: '(tan $0)'
+      return: '(- "0" (* "i" (tanh (* "i" $0))))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+#\cot(x)=i\coth(i x)
+  - type: "regex"
+    vor:
+      scheme: '(cot $0)'
+      return: '(* "i" (coth (* "i" $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sec(x)=\sech(i x)
+  - type: "regex"
+    vor:
+      scheme: '(sec $0)'
+      return: '(sech (* "i" $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cosec(x)=i\cosech(i x)
+  - type: "regex"
+    vor:
+      scheme: '(cosec $0)'
+      return: '(* "i" (cosech (* "i" $0)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\tanh(-x)=-\tanh(x)
+  - type: "regex"
+    vor:
+      scheme: '(tanh (- "0" $0))'
+      return: '(- "0" (tanh $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\coth(-x)=-\coth(x)
+  - type: "regex"
+    vor:
+      scheme: '(coth (- "0" $0))'
+      return: '(- "0" (coth $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sech(-x)=\sech(x)
+  - type: "regex"
+    vor:
+      scheme: '(sech (- "0" $0))'
+      return: '(sech $0)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cosech(-x)=-\cosech(x)
+  - type: "regex"
+    vor:
+      scheme: '(cosech (- "0" $0))'
+      return: '(- "0" (cosech $0))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

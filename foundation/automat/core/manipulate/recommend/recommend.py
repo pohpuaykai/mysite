@@ -120,6 +120,7 @@ class Recommend:
     def _retrieveMetaInformation(self, rederive=False):
         """
         TODO change to SINGLETON, um this function load faster, so that the loading only done on application load once.
+#maybe have tags for each manipulation, for what equation it is suitable for???? should be done in the experience file.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         #~ DRAFT ~#
 
@@ -180,6 +181,20 @@ class Recommend:
 
     def simplify(self, hint=None):
         """
+###
+Cannot be applied to Differentiation|Integration
+Please see:
+hi Sir, i just found something irritating in a computer algebra system(CAS)... i will write in latex
+Suppose we are to solve $\frac{d}{dx} \log_a(B(x))$, where a is any number
+If the CAS took the wrong route and went:
+$\frac{d}{dx} \ln(e^{\log_a(B(x))})$
+it would have gotten:
+$\frac{(\log_a(B(x)))(e^{\log_a(B(x)))}}{e^{\log_a(B(x))}}$
+and after simplifying it would have gotten:
+$\log_a(B(x))$
+Which is wrong, but all the rules applied are valid... is there some kind of hiearchy_of_rules or some rules that are omitted?
+###
+
         #~ DRAFT ~#
 
 

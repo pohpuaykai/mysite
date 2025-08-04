@@ -4,10 +4,11 @@ type: "essential"
 manipulations:
   - type: "regex"
     vor:
-      scheme: "(* $0 $0)"
-      return: "(^ $0 2)"
-    hin:
-      scheme: "(^ $0 2)"
-      return: "(* $0 $0)"
+      scheme: '(* $0 $0)'
+      return: '(^ $0 "2")'
     minArgs:
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

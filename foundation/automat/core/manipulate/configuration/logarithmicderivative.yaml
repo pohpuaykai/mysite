@@ -2,4 +2,52 @@
 className: "Logarithmicderivative"
 type: "derivative_logarithm"
 manipulations:
-# log
+# log_derivative both base and argument are functions
+
+  - type: "regex"
+    vor:
+      scheme: '(D (log $0 $1) $2)'
+      return: '(/ (- (* (* (D $1 $2) (/ "1" $1)) (log "e" $0)) (* (* (D $0 $2) (/ "1" $0)) (log "e" $1))) (^ (log "e" $0) "2"))'
+    minArgs:
+      $0: 1
+      $1: 1
+      $2: 1
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+# log_derivative base=number and argument is a function
+  - type: "regex"
+    vor:
+      scheme: '(D (log $0 $1) $2)'
+      return: '(/ (D $1 $2) (* $1 (log "e" $0)))'
+    minArgs:
+      $0: 0
+      $1: 1
+      $2: 1
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+# log_derivative base="e" and argument is a function
+  - type: "regex"
+    vor:
+      scheme: '(D (log "e" $0) $1)'
+      return: '(/ (D $0 $1) $1)'
+    minArgs:
+      $0: 1
+      $1: 1
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

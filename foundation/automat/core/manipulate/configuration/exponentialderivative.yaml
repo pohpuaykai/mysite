@@ -6,16 +6,31 @@ manipulations:
     vor:
       scheme: '(D (^ "e" $0) $1)'
       return: '(* (^ "e" $0) (D $0 $1))'
-    hin:
-      scheme: ''
-      return: ''
-#for base is a number<<<<<<<need to do symbolic_calculation first
+    minArgs:
+      $0: 1
+      $1: 1
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+#for base is a number<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
 
 #general
   - type: "regex"
     vor:
-      scheme: ''
-      return: ''
-    hin:
-      scheme: ''
-      return: ''
+      scheme: '(D (^ $0 $1) $2)'
+      return: '(* (^ $0 $1) (+ (* (D $1 $2) (log "e" $0)) (* (D $0 $2) (/ $1 $0))))'
+    minArgs:
+      $0: 1
+      $1: 1
+      $2: 1
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null

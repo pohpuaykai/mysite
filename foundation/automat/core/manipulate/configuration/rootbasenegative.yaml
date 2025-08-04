@@ -4,11 +4,14 @@ type: "pretty"
 manipulations:
   - type: "regex"
     vor:
-      scheme: "(nroot (- 0 $0) $1)"
-      return: "(nroot $0 (/ 1 $1))"
-    hin:
-      scheme: "(nroot $0 (/ 1 $1))"
-      return: "(nroot (- 0 $0) $1)"
+      scheme: '(nroot (- "0" $0) $1)'
+      return: '(nroot $0 (/ "1" $1))'
     minArgs:
       $0: 0
       $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

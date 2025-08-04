@@ -1,3 +1,5 @@
+import importlib
+import inspect
 import os
 
 from jinja2 import Environment, FileSystemLoader
@@ -18,7 +20,7 @@ class Generator:
         self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
 
     def generateClass(self, toRun=None):
-        from foundation.automat.core.manipulate.tests.configurationtests.generator.testdatum import TEST_DATUM
+        # from foundation.automat.core.manipulate.tests.configurationtests.generator.testdatum import TEST_DATUM
 
 
         #copied from https://realpython.com/primer-on-jinja-templating/
@@ -38,8 +40,16 @@ class Generator:
                 # if self.verbose:
                 #     info(config)
 
-                testDatumFirstTag = filename[:filename.index('.yaml')]
+                #add the hin
+                for manipulation in config['manipulations']:
+                    manipulation['hin']={
+                        'scheme':manipulation['vor']['return'],
+                        'return':manipulation['vor']['scheme']
+                    }
 
+                testDatumFirstTag = filename[:filename.index('.yaml')]
+                module_obj = importlib.import_module(f'.{testDatumFirstTag}', package='foundation.automat.core.manipulate.tests.configurationtests.generator.testdatum')
+                testDatumAll = module_obj.TEST_DATUM
                 defNameTemplate = lambda infix: f"test__{infix}__configTest"
                 defTemplate = environment.get_template("test_definition.py.jinja2")
                 testDefinitionStrs = []
@@ -47,15 +57,16 @@ class Generator:
                 for idx, manipulations in enumerate(config['manipulations']):
                     if manipulations['type'] == 'regex':
                         for direction, d in manipulations.items():
-                            if direction in ['type', 'minArgs']:
+                            if direction in ['type', 'minArgs', 'maxArgs', 'preCond']:
                                 continue
                             #import pdb;pdb.set_trace()
                             infix = f'{direction}{idx}'
                             defName = defNameTemplate(infix)
                             callStr = f'{defName}(True) # Not tested yet'
                             testCallStrs.append(callStr)
-                            print(TEST_DATUM[testDatumFirstTag])
-                            testDatum = TEST_DATUM[testDatumFirstTag][(direction, str(idx))]
+                            # print(TEST_DATUM[testDatumFirstTag])
+                            # testDatum = TEST_DATUM[testDatumFirstTag][(direction, str(idx))]
+                            testDatum = testDatumAll[(direction, str(idx))]
                             inputDatum = testDatum['input']
                             renderedDefNameTemplate = defTemplate.render({
                                 'defName':defName,

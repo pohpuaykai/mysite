@@ -1,0 +1,99 @@
+className: 'Archyperbolictrigonometricintegration'
+type: 'integration_archyperbolictrigonometric'
+manipulations:
+- type: 'regex'
+  vor:
+    scheme: '(int (* (sech (arcsinh $0)) (D $0 $1)) $1)'
+    return: '(+ (arcsinh $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0 # integration_constant
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0 # integration_constant
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (cosech (arccosh $0)) (D $0 $1)) $1)'
+    return: '(+ (arccosh $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0 # integration_constant
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (/ (+ "1" (cosh (* "2" (arctanh $0)))) "2") (D $0 $1)) $1)'
+    return: '(+ (arctanh $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0 # integration_constant
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (* (- "0" (cosh (arcsech $0))) (coth (arcsech $0))) (D $0 $1)) $1)'
+    return: '(+ (arcsech $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0 # integration_constant
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (* (- "0" (sinh (arccosech $0)))) (D $0 $1)) $1)'
+    return: '(+ (arccosech $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0 # integration_constant
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (/ (- "1" (sinh (arccoth $0))) "2") (D $0 $1)) $1)'
+    return: '(+ (arccoth $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0 # integration_constant
+  preCond:
+    $0: null
+    $1: null
+    $2: null

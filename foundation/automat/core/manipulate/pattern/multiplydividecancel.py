@@ -12,5 +12,5 @@ class Multiplydividecancel(Manipulate):
         """
 
         """
-        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(* (/ $1 $0) $0)', 'return': '$1'}, 'hin': {'scheme': '$1', 'return': '(* (/ $1 $0) $0)'}, 'minArgs': {'$0': 0, '$1': 0}}, {'type': 'regex', 'vor': {'scheme': '(/ (* $1 $0) $0)', 'return': '$1'}, 'hin': {'scheme': '$1', 'return': '(/ (* $1 $0) $0)'}, 'minArgs': {'$0': 0, '$1': 0}}]
+        self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(* (/ $1 $0) $0)', 'return': '$1'}, 'minArgs': {'$0': 0, '$1': 0}, 'maxArgs': {'$0': None, '$1': None}, 'preCond': {'$0': None, '$1': None}, 'hin': {'scheme': '$1', 'return': '(* (/ $1 $0) $0)'}}, {'type': 'regex', 'vor': {'scheme': '(/ (* $1 $0) $0)', 'return': '$1'}, 'minArgs': {'$0': 0, '$1': 0}, 'maxArgs': {'$0': None, '$1': None}, 'preCond': {'$0': None, '$1': None}, 'hin': {'scheme': '$1', 'return': '(/ (* $1 $0) $0)'}}]
         super().__init__(equation, direction, idx, verbose=verbose)

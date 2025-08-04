@@ -1,0 +1,79 @@
+---
+className: "Trigonometricsumtoproduct"
+type: "trigonometric_standard"
+manipulations:
+
+#\sin(x)+\sin(y)=2\sin(\frac{x+y}{2})\cos(\frac{x-y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(+ (sin $0) (sin $1))'
+      return: '(* (* "2" (sin (/ (+ $0 $1) "2"))) (cos (/ (- $0 $1) "2")))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\sin(x)-\sin(y)=2\sin(\frac{x-y}{2})\cos(\frac{x+y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(- (sin $0) (sin $1))'
+      return: '(* (* "2" (sin (/ (- $0 $1) "2"))) (cos (/ (+ $0 $1) "2")))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\cos(x)-\cos(y)=-2\sin(\frac{x+y}{2})\sin(\frac{x-y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(- (cos $0) (cos $1))'
+      return: '(- "0" (* (* "2" (sin (/ (+ $0 $1) "2"))) (sin (/ (- $0 $1) "2"))))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\tan(x)+\tan(y)=\frac{\sin(x+y)}{\cos(x)\cos(y)}
+  - type: "regex"
+    vor:
+      scheme: '(+ (tan $0) (tan $1))'
+      return: '(/ (sin (+ $0 $1)) (* (cos $0) (cos $1)))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\tan(x)-\tan(y)=\frac{\sin(x-y)}{\cos(x)\cos(y)}
+  - type: "regex"
+    vor:
+      scheme: '(- (tan $0) (tan $1))'
+      return: '(/ (sin (- $0 $1)) (* (cos $0) (cos $1)))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

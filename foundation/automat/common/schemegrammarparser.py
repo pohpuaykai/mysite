@@ -119,7 +119,8 @@ class SchemeGrammarParser:
                 #make missing variables
                 outValues = []; variable__val = {}
                 if len(self.outVariables) > len(self.variables):
-                    outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables))-len(set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
+                    # outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables))-len(set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
+                    outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)-set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
                     variable__val = dict(zip(sorted(list(set(self.outVariables) - set(self.variables))), outValues))
                 #
                 currentId += 1
@@ -766,17 +767,21 @@ class SchemeGrammarParser:
         so here, we count the argLen of each captured_variable in self.id__data
 
         if the self.variableMinArgs are not satisfied by this count, then we do not substitute and do not add the change to verPosWord
+        
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<anything in "" should be treated as argLen=0, else it is a variable with argLen=1, functions_that_take_at_least_1_arg and above should have argLen>1
         """
         # self.pp.pprint(self.id__data)
         for nodeId, data in filter(lambda t: 'inVars' in t[1], self.id__data.items()):
             for matchGroup in data['inVars']:
                 for (var, templatePos), matchStart, matchEnd, matchNodeId in matchGroup:
                     variableVal = self.id__data[matchNodeId]['w']
-                    if not variableVal.startswith('(') and not variableVal.endswith(')'): # not a scheme, argLen=0
-                        argLen = 0
+                    if variableVal.startswith('"') and variableVal.endswith('"'):
+                        argLen = 0 # primitive
+                    elif not variableVal.startswith('(') and not variableVal.endswith(')'): # not a scheme, argLen=0
+                        argLen = 1 # variable #takes a primitive as input
                     else:# do otherBracketAccounting to count number of variables
                         argLen = 1 # if there are (), then it must have at least 1 arg
-                        openBra__count___others = {'{':0, '[':0}; closeBra__openBra = {'}':'{', ']':'['} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
+                        openBra__count___others = {'{':0, '[':0, '"':0}; closeBra__openBra = {'}':'{', ']':'[', '"':'"'} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
                         for idx, c in enumerate(variableVal):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<do bracket_accounting here
                             #
                             if c in openBra__count___others.keys():
@@ -982,8 +987,10 @@ class SchemeGrammarParser:
                 # print('inVarPos__replaceStr', inVarPos__replaceStr)
                 # print('replacementListVariableAndPos', list(replacementListVariableAndPos))
                 #adding 
-                if len(self.variables) > 0 and len(set(self.outVariables)) > len(set(self.variables)): # (len(self.variables)==0) is handled in findAll
-                    outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)) - len(set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
+                # if len(self.variables) > 0 and len(set(self.outVariables)) > len(set(self.variables)): # (len(self.variables)==0) is handled in findAll
+                if len(self.variables) > 0 and len(set(self.outVariables)-set(self.variables)) > 0:
+                    # outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)) - len(set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
+                    outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)-set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
                     outValues = sorted(outValues)
                     # print('outValues: ', outValues)
                     for outValue, missingVar in zip(outValues, sorted(list(set(self.outVariables)-set(self.variables)))):
@@ -1256,9 +1263,10 @@ class SchemeGrammarParser:
         #3
         # print('self.iUnmatchedFrags', self.iUnmatchedFrags)
         # print('self.oUnmatchedFrags', self.oUnmatchedFrags)
+        # self.pp.pprint(self.id__data)
         def findOffsetInRangeDictionary(point, rangeDictionary):
             for (oStart, oEnd), (eStart, eEnd) in rangeDictionary.items():
-                if oStart <= point and point < oEnd:
+                if oStart <= point and point <= oEnd:
                     return eStart - oStart
         if len(self.variables) > 0 and not self.onlyVariablesAndSpace:
             for nodeId, data in filter(lambda t: t[0] in matchedNodeIds and t[0] not in self.nodeIdsToSkip, self.id__data.items()):
@@ -1276,7 +1284,8 @@ class SchemeGrammarParser:
                     if unmatchedInfo['w'].strip() == '$':
                         continue
                     for rangeDictionary in data['outStatics']:
-                        # print(rangeDictionary)
+                        # print(rangeDictionary, '<<<<<<<<<<<rangeDictionary')
+                        # print(unmatchedInfo['s'], "<<<<<<<<<<<<<<<<<<<<<<unmatchedInfo['s']")
                         offset = findOffsetInRangeDictionary(unmatchedInfo['s'], rangeDictionary)
                         self.verPosWord.append({
                             'd': 'a', 'e': offset+unmatchedInfo['e'], 'n': nodeId, 's': offset+unmatchedInfo['s'], 't': 's', 'v': None, 'w': unmatchedInfo['w']

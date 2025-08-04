@@ -83,10 +83,10 @@ class Manipulate:
         #~ DRAFT ~#
         return manipulated equation
         """
-        if not self.outputGrammarHasVariables(): # no variables
-            if self.verbose:
-                print(f'{self.outputGrammar} has no grammar')
-            return self.outputGrammar # output does not depend on input variables, no manipulation needed.
+        # if not self.outputGrammarHasVariables(): # no variables
+        #     if self.verbose:
+        #         print(f'{self.outputGrammar} has no grammar')
+        #     return self.outputGrammar # output does not depend on input variables, no manipulation needed.
         # import pdb;pdb.set_trace()
         if self.applicable(): # here we have matches
             existingVariables = list(self.eq.variablesScheme.keys())

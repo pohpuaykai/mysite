@@ -5,55 +5,126 @@ type: "trigonometric_standard"
 manipulations:
   - type: "regex"
     vor:
-      scheme: "(/ (sin $0) (cos $0))"
-      return: "(tan $0)"
-    hin:
-      scheme: "(tan $0)"
-      return: "(/ (sin $0) (cos $0))"
-    minArgs:
+      scheme: '(/ (sin $0) (cos $0))'
+      return: '(tan $0)'
+    minArgs: #actually this is a preCond too
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
   - type: "regex"
     vor:
-      scheme: "(/ (cos $0) (sin $0))"
-      return: "(cot $0)"
-    hin:
-      scheme: "(cot $0)"
-      return: "(/ (cos $0) (sin $0))"
-    minArgs:
+      scheme: '(/ (cos $0) (sin $0))'
+      return: '(cot $0)'
+    minArgs: #actually this is a preCond too
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
   - type: "regex"
     vor:
-      scheme: "(/ 1 (sin $0))"
-      return: "(cosec $0)"
-    hin:
-      scheme: "(cosec $0)"
-      return: "(/ 1 (sin $0))"
-    minArgs:
+      scheme: '(/ "1" (sin $0))'
+      return: '(cosec $0)'
+    minArgs: #actually this is a preCond too
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
   - type: "regex"
     vor:
-      scheme: "(/ 1 (cos $0))"
-      return: "(sec $0)"
-    hin:
-      scheme: "(sec $0)"
-      return: "(/ 1 (sec $0))"
-    minArgs:
+      scheme: '(/ "1" (cos $0))'
+      return: '(sec $0)'
+    minArgs: #actually this is a preCond too
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
   - type: "regex"
     vor:
-      scheme: "(/ 1 (tan $0))"
-      return: "(cot $0)"
-    hin:
-      scheme: "(cot $0)"
-      return: "(/ 1 (tan $0))"
-    minArgs:
+      scheme: '(/ "1" (tan $0))'
+      return: '(cot $0)'
+    minArgs: #actually this is a preCond too
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
   - type: "regex"
     vor:
-      scheme: "(/ 1 (cot $0))"
-      return: "(tan $0)"
-    hin:
-      scheme: "(tan $0)"
-      return: "(/ 1 (cot $0))"
-    minArgs:
+      scheme: '(/ "1" (cot $0))'
+      return: '(tan $0)'
+    minArgs: #actually this is a preCond too
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(-x)=-\sin(x)
+  - type: "regex"
+    vor:
+      scheme: '(sin (- "0" x))'
+      return: '(- "0" (sin x))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(-x)=\cos(x)
+  - type: "regex"
+    vor:
+      scheme: '(cos (- "0" x))'
+      return: '(cos x)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\sin(x) = \frac{e^{i x}-e^{-i x}}{2 i}
+  - type: "regex"
+    vor:
+      scheme: '(sin x)'
+      return: '(/ (- (^ "e" (* "i" x)) (^ "e" (- "0" (* "i" x)))) (* "2" "i"))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#\cos(x) = \frac{e^{i x}+e^{-i x}}{2}
+  - type: "regex"
+    vor:
+      scheme: '(cos x)'
+      return: '(/ (+ (^ "e" (* "i" x)) (^ "e" (- "0" (* "i" x)))) "2")'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+#e^{i x}=\cos(x)+ i\sin(x)
+  - type: "regex"
+    vor:
+      scheme: '(^ "e" (* "i" x))'
+      return: '(+ (cos x) (* "i" (sin x)))'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

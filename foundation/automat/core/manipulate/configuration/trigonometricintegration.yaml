@@ -1,0 +1,99 @@
+className: 'Trigonometricintegration'
+type: 'integration_trigonometric'
+manipulations:
+- type: 'regex'
+  vor:
+    scheme: '(int (* (cos $0) (D $0 $1)) $1)'
+    return: '(+ (sin $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (- "0" (sin $0)) (D $0 $1)) $1)'
+    return: '(+ (cos $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (^ (sec $0) "2") (D $0 $1)) $1)'
+    return: '(+ (tan $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (* (sec $0) (tan $0)) (D $0 $1)) $1)'
+    return: '(+ (sec $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (- "0" (* (cosec $0) (cot $0))) (D $0 $1)) $1)'
+    return: '(+ (cosec $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null
+- type: 'regex'
+  vor:
+    scheme: '(int (* (- "0" (^ cosec $0) "2") (D $0 $1)) $1)'
+    return: '(+ (cot $0) $2)'
+  minArgs:
+    $0: 1
+    $1: 1
+    $2: 0
+  maxArgs:
+    $0: null
+    $1: null
+    $2: 0
+  preCond:
+    $0: null
+    $1: null
+    $2: null

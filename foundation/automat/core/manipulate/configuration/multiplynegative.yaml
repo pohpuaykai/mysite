@@ -5,9 +5,10 @@ manipulations:
   - type: "regex"
     vor:
       scheme: '(* "-1" $0)'
-      return: '(- 0 $0)'
-    hin:
-      scheme: '(- 0 $0)'
-      return: '(* "-1" $0)'
+      return: '(- "0" $0)'
     minArgs:
       $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null

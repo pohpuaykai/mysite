@@ -252,7 +252,7 @@ def test__vor5__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (log $0 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '1' # 1
+    expected = '(= a "1")' # "1"
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -265,14 +265,14 @@ def test__vor5__configTest(verbose=False):
     
 
 def test__hin5__configTest(verbose=False):
-    eqs = '(= a 1)' # fill it in
+    eqs = '(= a "1")' # fill it in
     eqsType = 'scheme'
     #filename = 'logarithm'
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # 1
+    manipulatedSchemeEquation = ma0.apply() # "1"
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (log v_{0} v_{0}))' # (log $0 $0)
@@ -288,17 +288,17 @@ def test__hin5__configTest(verbose=False):
     
 
 def test__vor6__configTest(verbose=False):
-    eqs = '(= a (log b 1))' # fill it in
+    eqs = '(= a (log b "1"))' # fill it in
     eqsType = 'scheme'
     #filename = 'logarithm'
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (log $0 1)
+    manipulatedSchemeEquation = ma0.apply() # (log $0 "1")
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '0' # 0
+    expected = '(= a "0")' # "0"
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -311,17 +311,17 @@ def test__vor6__configTest(verbose=False):
     
 
 def test__hin6__configTest(verbose=False):
-    eqs = '(= a 0)' # fill it in
+    eqs = '(= a "0")' # fill it in
     eqsType = 'scheme'
     #filename = 'logarithm'
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # 0
+    manipulatedSchemeEquation = ma0.apply() # "0"
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= a (log v_{0} 1))' # (log $0 1)
+    expected = '(= a (log v_{0} "1"))' # (log $0 "1")
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 

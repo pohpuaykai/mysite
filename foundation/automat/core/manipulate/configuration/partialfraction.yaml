@@ -2,12 +2,182 @@
 className: "Partialfraction"
 type: "essential"
 manipulations:
+#general case need derivative to be mature first... here is the solution:https://en.m.wikipedia.org/wiki/Partial_fraction_decomposition<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+#\frac{p x+q}{(x-a)(x-b)}=\frac{A}{x-a}+\frac{B}{x-b}
+#
+#Solution1\\
+#$p=A+B$\\#(= p (+ A B))
+#$q=A b+a B$\\#(= q (+ (* A b) (* a B)))
+#$A=p-\frac{(q-p b)b}{a-b}$\\#(= A (- p (/ (* (- q (* p b)) b) (- a b))))
+#$B=\frac{(q-b p)b}{a-b}$\\#(= B (/ (* (- q (* b p)) b) (- a b)))
+#$\frac{p x+q}{(x-a)(x-b)}=\frac{p-\frac{(q-p b)b}{a-b}}{x-a}+\frac{\frac{(q-b p)b}{a-b}}{x-b}$\\#(= (/ (+ (* p x) q) (* (- x a) (- x b))) (+ (/ (- p (/ (* (- q (* p b)) b) (- a b))) (- x a)) (/ (/ (* (- q (* b p)) b) (- a b)) (- x b))))
 
   - type: "regex"
     vor:
-      scheme: ''
-      return: ''
-    hin:
-      scheme: ''
-      return: ''
+      scheme: '(/ (+ (* $1 $0) $2) (* (- $0 $3) (- $0 $4)))'
+      return: '(+ (/ (- $1 (/ (* (- $2 (* $1 $4)) $4) (- $3 $4))) (- $0 $3)) (/ (/ (* (- $2 (* $4 $1)) $4) (- $3 $4)) (- $0 $4)))'
+    minArgs:
+      $0: 1 #x
+      $1: 0 #p
+      $2: 0 #q
+      $3: 0 #a
+      $4: 0 #b
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+
+#\frac{p x+q}{(x-a)^2}=\frac{A}{x-a}+\frac{B}{(x-a)^2}
+#
+#Solution2\\
+#$p=A$\\#(= p A)
+#$q=A a+B$\\#(= q (+ (* A a) B))
+#$A=p$\\ #(= A p)
+#$B=a p+q$\\#(= B (+ (* a p) q))
+#$\frac{p x+q}{(x-a)^2}=\frac{p}{x-a}+\frac{a p+q}{(x-a)^2}$\\#(= (/ (+ (* p x) q) (^ (- x a) 2)) (+ (/ p (- x a)) (/ (+ (* a p) q) (^ (- x a) 2))))
+
+  - type: "regex"
+    vor:
+      scheme: '(/ (+ (* $1 $0) $2) (^ (- $0 $3) "2"))'
+      return: '(+ (/ $1 (- $0 $3)) (/ (+ (* $3 $1) $2) (^ (- $0 $3) "2")))'
+    minArgs:
+      $0: 1 #x
+      $1: 0 #p
+      $2: 0 #q
+      $3: 0 #a
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+
+#\frac{p x^2+q x+r}{(x-a)(x-b)(x-c)}=\frac{A}{x-a}+\frac{B}{x-b}+\frac{C}{x-c}
+#
+#Solution3\\
+#$p=A+B+C$\\#(= p (+ (+ A B) C))
+#$q=A b+A c+B a+B c+C a+C b=(b+c)A+(a+c)B+(a+b)C$\\#(= q (+ (+ (+ (+ (+ (* A b) (* A c)) (* B a)) (* B c)) (* C a)) (* C b)))
+#$r=A b c+B a c+C a b=(b c)A+(a c)B+(a b)C$\\#(= r (+ (+ (* (* A b) c) (* (* B a) c)) (* (* C a) b)))
+#$A=\frac{a^2 p-a q+r}{(a-b)(a-c)}$\\#(= A (/ (+ (- (* (^ a 2) p) (* a q)) r) (* (- a b) (- a c))))
+#$B=\frac{b q-r-b^2p}{(a-b)(b-c)}$\\#(= B (/ (- (- (* b q) r) (* (^ b 2) p)) (* (- a b) (- b c))))
+#$C=\frac{r-c q+c^2p}{(a-c)(b-c)}$\\#(= C (/ (+ (- r (* c q)) (* (^ c 2) p)) (* (- a c) (- b c))))
+#$\frac{p x^2+q x+r}{(x-a)(x-b)(x-c)}=\frac{\frac{a^2 p-a q+r}{(a-b)(a-c)}}{x-a}+\frac{\frac{b q-r-b^2 p}{(a-b)(b-c)}}{x-b}+\frac{\frac{r-c q+c^2 p}{(a-c)(b-c)}}{x-c}$\\#(= (/ (+ (+ (* p (^ x 2)) (* q x)) r) (* (* (- x a) (- x b)) (- x c))) (+ (+ (/ (/ (+ (- (* (^ a 2) p) (* a q)) r) (* (- a b) (- a c))) (- x a)) (/ (/ (- (- (* b q) r) (* (^ b 2) p)) (* (- a b) (- b c))) (- x b))) (/ (/ (+ (- r (* c q)) (* (^ c 2) p)) (* (- a c) (- b c))) (- x c))))
+
+  - type: "regex"
+    vor:
+      scheme: '(/ (+ (+ (* $1 (^ $0 "2")) (* $2 $0)) $3) (* (* (- $0 $4) (- $0 $5)) (- $0 $6)))'
+      return: '(+ (+ (/ (/ (+ (- (* (^ $4 "2") $1) (* $4 $2)) $3) (* (- $4 $5) (- $4 $6))) (- $0 $4)) (/ (/ (- (- (* $5 $2) $3) (* (^ $5 "2") $1)) (* (- $4 $5) (- $5 $6))) (- $0 $5))) (/ (/ (+ (- $3 (* $6 $2)) (* (^ $6 "2") $1)) (* (- $4 $6) (- $5 $6))) (- $0 $6)))'
+    minArgs:
+      $0: 1 #x
+      $1: 0 #p
+      $2: 0 #q
+      $3: 0 #r
+      $4: 0 #a
+      $5: 0 #b
+      $6: 0 #c
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+      $5: null
+      $6: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+      $5: null
+      $6: null
+
+#\frac{p x^2+q x+r}{(x-a)^2(x-b)}=\frac{A}{x-a}+\frac{B}{(x-a)^2}+\frac{C}{x-b}
+#
+#Solution4\\
+#$p=A+C$\\#(= p (+ A C))
+#$q=-A a-A b+B-2 a C$\\#(= q (+ (- (- 0 (* A a)) (* A b)) (- B (* (* 2 a) C))))
+#$r=A a b-B b+C a^2$\\#(= r (+ (- (* (* A a) b) (* B b)) (* C (^ a 2))))
+#$A=\frac{a^2 p-2 a b p-q b-r}{(b-a)^2}$\\#(= A (/ (- (- (- (* (^ a 2) p) (* (* (* 2 a) b) p)) (* q b)) r) (^ (- b a) 2)))
+#$B=\frac{a^2+a+r}{a-b}$\\#(= B (/ (+ (+ (^ a 2) a) r) (- a b)))
+#$C=\frac{b^2p+b q+r}{(b-a)^2}$\\#(= C (/ (+ (+ (* (^ b 2) p) (* b q)) r) (^ (- b a) 2)))
+#$\frac{p x^2+q x+r}{(x-a)^2(x-b)}=\frac{\frac{a^2 p-2 a b p-q b-r}{(b-a)^2}}{x-a}+\frac{\frac{a^2+a+r}{a-b}}{(x-a)^2}+\frac{\frac{b^2 p+b q+r}{(b-a)^2}}{x-b}$\\#(= (/ (+ (+ (* p (^ x 2)) (* q x)) r) (* (^ (- x a) 2) (- x b))) (+ (+ (/ (/ (- (- (- (* (^ a 2) p) (* (* (* 2 a) b) p)) (* q b)) r) (^ (- b a) 2)) (- x a)) (/ (/ (+ (+ (^ a 2) a) r) (- a b)) (^ (- x a) 2))) (/ (/ (+ (+ (* (^ b 2) p) (* b q)) r) (^ (- b a) 2)) (- x b))))
+
+  - type: "regex"
+    vor:
+      scheme: '(/ (+ (+ (* $1 (^ $0 "2")) (* $2 $0)) $3) (* (^ (- $0 $4) "2") (- $0 $5)))'
+      return: '(+ (+ (/ (/ (- (- (- (* (^ $4 "2") $1) (* (* (* "2" $4) $5) $1)) (* $2 $5)) $3) (^ (- $5 $4) "2")) (- $0 $4)) (/ (/ (+ (+ (^ $4 "2") $4) $3) (- $4 $5)) (^ (- $0 $4) "2"))) (/ (/ (+ (+ (* (^ $5 "2") $1) (* $5 $2)) $3) (^ (- $5 $4) "2")) (- $0 $5)))'
+    minArgs:
+      $0: 1 #x
+      $1: 0 #p
+      $2: 0 #q
+      $3: 0 #r
+      $4: 0 #a
+      $5: 0 #b
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+      $5: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+      $5: null
+
+#\frac{p x^2+q x+r}{(x-a)(x^2+b x+c)}=\frac{A}{x-a}+\frac{B x+C}{x^2+b x+c}
+#
+#Solution5\\
+#$p=A+B$\\#(= p (+ A B))
+#$q=A b-a B+C$\\#(= q (+ (- (* A b) (* a B)) C))
+#$r=A c-a C$\\#(= r (- (* A c) (* a C)))
+#$A=\frac{a^2 p+a q+r}{a^2+a b+c}$\\#(= A (/ (+ (+ (* (^ a 2) p) (* a q)) r) (+ (+ (^ a 2) (* a b)) c)))
+#$B=\frac{a b p-a q+p c-r}{a^2+a b+c}$\\#(= B (/ (+ (- (* (* a b) p) (* a q)) (- (* p c) r)) (+ (+ (^ a 2) (* a b)) c)))
+#$C=\frac{a p c+a r+b r-c q}{a^2+a b+c}$\\#(= C (/ (+ (+ (* (* a p) c) (* a r)) (- (* b r) (* c q))) (+ (+ (^ a 2) (* a b)) c)))
+#$\frac{p x^2+q x+r}{(x-a)(x^2+b x+c)}=\frac{\frac{a^2 p+a q+r}{a^2+a b+c}}{x-a}+\frac{\frac{a b p-a q+p c-r}{a^2+a b+c}x+\frac{a p c+a r+b r-c q}{a^2 +a b+c}}{x^2+b x+c}$\\#(= (/ (+ (+ (* p (^ x 2)) (* q x)) r) (* (- x a) (+ (+ (^ x 2) (* b x)) c))) (+ (/ (/ (+ (+ (* (^ a 2) p) (* a q)) r) (+ (+ (^ a 2) (* a b)) c)) (- x a)) (/ (+ (* (/ (+ (- (* (* a b) p) (* a q)) (- (* p c) r)) (+ (+ (^ a 2) (* a b)) c)) x) (/ (+ (+ (* (* a p) c) (* a r)) (- (* b r) (* c q))) (+ (+ (^ a 2) (* a b)) c))) (+ (+ (^ x 2) (* b x)) c))))
+
+  - type: "regex"
+    vor:
+      scheme: '(/ (+ (+ (* $1 (^ $0 "2")) (* $2 $0)) $3) (* (- $0 $4) (+ (+ (^ $0 "2") (* $5 $0)) $6)))'
+      return: '(+ (/ (/ (+ (+ (* (^ $4 "2") $1) (* $4 $2)) $3) (+ (+ (^ $4 "2") (* $4 $5)) $6)) (- $0 $4)) (/ (+ (* (/ (+ (- (* (* $4 $5) $1) (* $4 $2)) (- (* $1 $6) $3)) (+ (+ (^ $4 "2") (* $4 $5)) $6)) $0) (/ (+ (+ (* (* $4 $1) $6) (* $4 $3)) (- (* $5 $3) (* $6 $2))) (+ (+ (^ $4 "2") (* $4 $5)) $6))) (+ (+ (^ $0 "2") (* $5 $0)) $6)))'
+    minArgs:
+      $0: 1 #x
+      $1: 0 #p
+      $2: 0 #q
+      $3: 0 #r
+      $4: 0 #a
+      $5: 0 #b
+      $6: 0 #c
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+      $5: null
+      $6: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+      $3: null
+      $4: null
+      $5: null
+      $6: null

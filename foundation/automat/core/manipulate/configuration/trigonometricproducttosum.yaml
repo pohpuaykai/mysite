@@ -1,0 +1,96 @@
+---
+className: "Trigonometricproducttosum"
+type: "trigonometric_standard"
+manipulations:
+
+#\cos(x)\cos(y)=\frac{\cos(x-y)+\cos(x+y)}{2}
+  - type: "regex"
+    vor:
+      scheme: '(* (cos $0) (cos $1))'
+      return: '(/ (+ (cos (- $0 $1)) (cos (+ $0 $1))) "2")'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\sin(x)\sin(y)=\frac{\cos(x-y)-\cos(x+y)}{2}
+  - type: "regex"
+    vor:
+      scheme: '(* (sin $0) (sin $1))'
+      return: '(/ (- (cos (- $0 $1)) (cos (+ $0 $1))) "2")'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+
+#\sin(x)\cos(y)=\frac{\sin(x+y)+\sin(x-y)}{2} 
+
+  - type: "regex"
+    vor:
+      scheme: '(* (sin $0) (cos $1))'
+      return: '(/ (+ (sin (+ $0 $1)) (sin (- $0 $1))) "2")'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\cos(x)\sin(y)=\frac{\sin(x+y)-\sin(x-y)}{2}
+  - type: "regex"
+    vor:
+      scheme: '(* (cos $0) (sin $1))'
+      return: '(/ (- (sin (+ $0 $1)) (sin (- $0 $1))) "2")'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\tan(x)\tan(y)=\frac{\cos(x-y)-\cos(x+y)}{\cos(x-y)+\cos(x+y)}
+  - type: "regex"
+    vor:
+      scheme: '(* (tan $0) (tan $1))'
+      return: '(/ (- (cos (- $0 $1)) (cos (+ $0 $1))) (+ (cos (- $0 $1)) (cos (+ $0 $1))))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#\tan(x)\cot(y)=\frac{\sin(x+y)+\sin(x-y)}{\sin(x+y)-\sin(x-y)}
+  - type: "regex"
+    vor:
+      scheme: '(* (tan $0) (cot $1))'
+      return: '(/ (+ (sin (+ $0 $1)) (sin (- $0 $1))) (- (sin (+ $0 $1)) (sin (- $0 $1))))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

@@ -1,0 +1,64 @@
+---
+className: "Hyperbolictrigonometricsumtoproduct"
+type: "essential"
+manipulations:
+
+  #\sinh(x)+\sinh(y)=2\sinh(\frac{x+y}{2})\cosh(\frac{x-y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(+ (sinh $0) (sinh $1))'
+      return: '(* (* "2" (sinh (/ (+ $0 $1) "2"))) (cosh (/ (- $0 $1) "2")))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+  #\cosh(x)+\cosh(y)=2\cosh(\frac{x+y}{2})\cosh(\frac{x-y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(+ (cosh $0) (cosh $1))'
+      return: '(* (* "2" (cosh (/ (+ $0 $1) "2"))) (cosh (/ (- $0 $1) "2")))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+  #\sinh(x)-\sinh(y)=2\cosh(\frac{x+y}{2})\sinh(\frac{x-y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(- (sinh $0) (sinh $1))'
+      return: '(* (* "2" (cosh (/ (+ $0 $1) "2"))) (sinh (/ (- $0 $1) "2")))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+  #\cosh(x)-\cosh(y)=2\sinh(\frac{x+y}{2})\sinh(\frac{x-y}{2})
+  - type: "regex"
+    vor:
+      scheme: '(- (cosh $0) (cosh $1))'
+      return: '(* (* "2" (sinh (/ (+ $0 $1) "2"))) (sinh (/ (- $0 $1) "2")))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
