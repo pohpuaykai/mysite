@@ -3,8 +3,8 @@ from foundation.automat.core.manipulate.recommend.recommend import Recommend
 
 class BipartiteSolver:
 
-    def __init__(self, listOfCollectedEquationStrs, dependentVariableStr, independentVariableStrs):
-        self.listOfCollectedEquationStrs = listOfCollectedEquationStrs
+    def __init__(self, listOfCollectedEquations, dependentVariableStr, independentVariableStrs):
+        self.listOfCollectedEquations = listOfCollectedEquations
         self.dependentVariableStr = dependentVariableStr
         self.independentVariableStrs = independentVariableStrs
         self.vertexIdIssuer = VertexIdIssuer()
@@ -14,18 +14,23 @@ class BipartiteSolver:
 
         """
 
-        listOfCollectedEquations = []; listOfVariables = []; #take the index in list as the id of these
+        listOfCollectedEquations = self.listOfCollectedEquations; listOfVariables = []; #take the index in list as the id of these
         equationVariables_g = {}; 
         type__list_vertexIds = {}; equationKey = 'equation'; variableKey = 'variable';
         equationId__vertexId = {}
         variableId__vertexId = {};#only for this script
         dependentVariableId = None
-        list_independentVariablesIds = []
+        list_independentVariablesIds = set()
 
 
-        for equationId, equationStr in enumerate(self.listOfCollectedEquationStrs):
-            equation = Equation(equationStr=equationStr, parserName='latex')
+        vertexId__EquationOrVariable = {}# for DEBUGGING
+
+
+        # for equationId, equationStr in enumerate(self.listOfCollectedEquationStrs):
+        for equationId, equation in enumerate(listOfCollectedEquations):
+            # equation = Equation(equationStr=equationStr, parserName='latex')
             equationVertexId = self.vertexIdIssuer.getVertexId(equationId)
+            vertexId__EquationOrVariable[equationVertexId] = 'equation'
             # print('equation*****', equationId, equationVertexId)
             equationId__vertexId[equationId] = equationVertexId
             #
@@ -48,10 +53,12 @@ class BipartiteSolver:
                 if variable == self.dependentVariableStr:
                     dependentVariableId = variableId
                 elif variable in self.independentVariableStrs:
-                    list_independentVariablesIds.append(variableId)
+                    list_independentVariablesIds.add(variableId)
                 #
                 # print(variable, variableId, variableVertexId); import pdb;pdb.set_trace()
                 #
+
+                vertexId__EquationOrVariable[variableVertexId] = 'variable'
                 existingNeighbours = type__list_vertexIds.get(variableKey, [])
                 if variableVertexId not in existingNeighbours:
                     existingNeighbours.append(variableVertexId)
@@ -65,13 +72,17 @@ class BipartiteSolver:
                 existingNeighbours.append(variableVertexId)
                 equationVariables_g[equationVertexId] = existingNeighbours
             # print(variables, '<<<<<,variables')
-            listOfCollectedEquations.append(equation)
+            # listOfCollectedEquations.append(equation)
 
         vertexId__equationVariableId = self.vertexIdIssuer.vertexId__equationVariableId
         # dependentVariableId = 2#'X_{ total_{ 6 } }'
         # list_independentVariablesIds = [6, 7, 8]#['V_{ R_{ 1 } }', 'V_{ R_{ 0 } }', 'V_{ DC_{ 4 } }']
+        list_independentVariablesIds = sorted(list(list_independentVariablesIds))
         print(dependentVariableId, 'dependentVariableId')
         print(list_independentVariablesIds, 'list_independentVariablesIds')
+        print('equationVariables_g', equationVariables_g)
+        print('vertexId__equationVariableId', vertexId__equationVariableId)
+        print('vertexId__EquationOrVariable', vertexId__EquationOrVariable)
 
         substitutionPath = Recommend.bipartiteSearch(listOfCollectedEquations, listOfVariables, equationVariables_g, vertexId__equationVariableId, equationId__vertexId, type__list_vertexIds, equationKey, variableKey, dependentVariableId, list_independentVariablesIds)
         broadSteps = []
@@ -79,6 +90,7 @@ class BipartiteSolver:
         #incorporate for displaying_of_latex
         from foundation.automat.parser.sorte.latexparser import Latexparser
         #
+        # import pdb;pdb.set_trace()
         vorEquation = listOfCollectedEquations[vertexId__equationVariableId[substitutionPath[0]]]
         entVariable = listOfVariables[vertexId__equationVariableId[substitutionPath[1]]]
         # print('start: ', Latexparser(ast=vorEquation.astScheme, rootOfTree=vorEquation.rootOfTree)._unparse())
@@ -90,7 +102,9 @@ class BipartiteSolver:
             },
             'sub':''
         })
+        print('converting to solvingSteps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         for idx, vertexId in enumerate(substitutionPath[2:]):
+            print('vertexId', vertexId)
             if idx % 2 == 0: # vertexId==equationVertexId
                 hinEquation = listOfCollectedEquations[vertexId__equationVariableId[vertexId]]
                 hinDict = {

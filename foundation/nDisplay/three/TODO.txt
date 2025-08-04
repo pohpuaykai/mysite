@@ -1,5 +1,4 @@
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
---test simple series
 --<<Schaum's 3000 Solved Problems In Electric Circuits>>
 -make pretty animations :D
 

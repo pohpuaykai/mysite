@@ -472,6 +472,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         print('T:', T); print('R: ', R, '<<<<<<<<<<')
         #find equationNode in T, that has dependentVariableId as start of DFS#[TODO many optimizations possible here, to get a Path that substitutes away all the unwanted variables]
         #since T is spanning, we can just look in list_equations, for ANY equation that has_most_number_of_dependentVariableId_and_list_independentVariableIds[heuristic][TODO many optimizations possible here, on which starting point to pick] Ou est vers origin, ja?
+        print(dependentVariableId, 'dependentVariableId'); print('list_independentVariableIds', list_independentVariableIds)
         wantedVariables = []
         for wantedVariableId in [dependentVariableId]+list_independentVariableIds:
             wantedVariables.append(list_variables[wantedVariableId])
@@ -487,6 +488,9 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         unwantedVariableIds = list(set(type__list_vertexIds[variableKey])-set([dependentVariableId]+list_independentVariableIds)) # any variable that is not dependent|independentVariable
         # dependentVariable = list_variables[dependentVariableId]
         # stack = [{'current':dependentVariableId, 'path':[dependentVariableId]}]; visited = [dependentVariableId]; 
+        #maxEquationVertexId might be None... then for now just get a random one...
+        if maxEquationVertexId is None:#[TODO many optimizations possible here]
+            maxEquationVertexId = list(equationId__vertexId.values())[0]
         stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; visited = [maxEquationVertexId];
         maxLength=0; maxLengthChildDict = None
         while len(stack)>0:
@@ -502,6 +506,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                     print('******')
                     print('current: ', current___dict['current'], ' child: ', childDict['current'], ' path: ', childDict['path'])
                     print('******')
+        print('returning substitutionPath:', maxLengthChildDict['path'])
         return maxLengthChildDict['path']
 
 

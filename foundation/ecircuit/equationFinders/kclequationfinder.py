@@ -10,6 +10,7 @@ class KCLEquationFinder(EquationFinder):
         """
         added2DegEdges = set()
         for deg2NodeId in self.list_nodeIds___deg2: # need both directions.... the edge not just the node.#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            print('self.networkGraph[deg2NodeId]', )
             [neighbour0, neighbour1] = self.networkGraph[deg2NodeId]
             if neighbour0 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour0) not in added2DegEdges and\
             self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:

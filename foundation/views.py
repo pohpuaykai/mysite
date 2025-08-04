@@ -47,37 +47,50 @@ def automat_findEquationsAndSolve(request):
         edgeStart___str, edgeEnd___str = edge.split(',')
         edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
     # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
-    # print('networkGraph')
-    # pp.pprint(networkGraph)
-    # # print('networkGraphNoWires')
-    # # pp.pprint(networkGraphNoWires)
-    # pp.pprint(id__type)
-    # pp.pprint(id__positiveLeadsDirections)
-    # print('edge__solderableIndices:')
-    # pp.pprint(edge__solderableIndices)
+    print('networkGraph')
+    pp.pprint(networkGraph)
+    # print('networkGraphNoWires')
+    # pp.pprint(networkGraphNoWires)
+    pp.pprint(id__type)
+    pp.pprint(id__positiveLeadsDirections)
+    print('edge__solderableIndices:')
+    pp.pprint(edge__solderableIndices)
 
 
     from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
     # print('existing EquationFinder has ', len(EquationFinder.list_equations), ' equations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # EquationFinder.list_equations = []
-    listOfCollectedEquations = []
+    listOfCollectedEquationStrs = []; listOfCollectedEquations = []; allVariables = set()
     for equationFinderClass in EquationFinder.getAllEquationFinders():
         # equationFinderClass.list_equations = []
         print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         print('len(listOfCollectedEquations)', len(listOfCollectedEquations))
         for equation in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
-            listOfCollectedEquations.append(equation._eqs)
+            listOfCollectedEquationStrs.append(equation._eqs)
+            listOfCollectedEquations.append(equation)
+            variables = equation.variablesScheme
+            for variable in variables.keys():
+                allVariables.add(variable)
+    allVariables = sorted(list(allVariables))
     # EquationFinder._has_run_common_code = False
     #print the equations on THREE.scene
     # listOfCollectedEquations = []
     # for equation in EquationFinder.list_equations:
     #     listOfCollectedEquations.append(equation._eqs)
+
+
+    #for now randomly choose a dependentVariable, and choose 3 independentVariables.
+    nonWireVariables = list(filter(lambda s: 'wire' not in s, allVariables))
+    dependentVariableStr = nonWireVariables[0]; independentVariableStrs = nonWireVariables[1:4]
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print(listOfCollectedEquations); print(len(listOfCollectedEquations))
+    print(listOfCollectedEquationStrs); print(len(listOfCollectedEquations));
+    print('dependentVariableStr', dependentVariableStr); print('independentVariableStrs', independentVariableStrs)
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+
     from foundation.ecircuit.equationSolvers.bipartitesolver import BipartiteSolver
-    dependentVariableStr = 'X_{total_{6}}'#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
-    independentVariableStrs = ['V_{R_{1}}', 'V_{R_{0}}', 'V_{DC_{4}}']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
+
+    # dependentVariableStr = 'X_{total_{6}}'#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
+    # independentVariableStrs = ['V_{R_{1}}', 'V_{R_{0}}', 'V_{DC_{4}}']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
     steps = BipartiteSolver(listOfCollectedEquations, dependentVariableStr, independentVariableStrs)._solve()
 
 
@@ -86,4 +99,4 @@ def automat_findEquationsAndSolve(request):
 
     # from foundation.ecircuit.orthogonalLayouts.rcclorthogonallayout import RCCLOrthogonalLayout
 
-    return HttpResponse(dumps({'equations':listOfCollectedEquations, 'solvingSteps':steps}), content_type="text/plain")
+    return HttpResponse(dumps({'equations':listOfCollectedEquationStrs, 'solvingSteps':steps}), content_type="text/plain")

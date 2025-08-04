@@ -27,7 +27,7 @@ class EquationFinder(ABC):
         self.id__type = id__type
         self.id__positiveLeadsDirections = id__positiveLeadsDirections
         self.edge__solderableIndices = edge__solderableIndices
-        # print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+        print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
         if not EquationFinder._has_run_common_code:#THIS CODES are repeated for everyChild class... 
             self.cycles = SmallCycleFinder.findCycles(self.networkGraph)
             self.directedCycles = []#We want it to persist across HTTP requests?
@@ -39,9 +39,10 @@ class EquationFinder(ABC):
             self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
             self.superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
-            self.edge__solderableIndices = EquationFinder.edge__solderableIndices
+            # self.edge__solderableIndices = EquationFinder.edge__solderableIndices
+            EquationFinder.edge__solderableIndices =self.edge__solderableIndices
             self.groupComponentsIntoPathsAndBalls()
-            # print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             EquationFinder._has_run_common_code = True
         else:
             self.cycles = EquationFinder.cycles
@@ -172,6 +173,7 @@ class EquationFinder(ABC):
             # print('self.edge__solderableIndices', self.edge__solderableIndices)
             #
             EquationFinder.edge__solderableIndices = self.edge__solderableIndices
+            print('EquationFinder.edge__solderableIndices', EquationFinder.edge__solderableIndices)
 
             #add directedEdges
             self.directedCycles.append(cycle)#EquationFinder.directedCycles.append(cycle)
