@@ -206,7 +206,8 @@ class EquationFinder(ABC):
         # print(directedEdge, self.directedEdges, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<directedEdgeIsPositive<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')#
         return directedEdge in self.directedEdges
 
-    def getVariable(self, electricalType, componentType, nodeId):
+    @classmethod
+    def getVariable(cls, electricalType, componentType, nodeId):
         """
         This returns an appropriate variable that is parsable by LatexParser
 

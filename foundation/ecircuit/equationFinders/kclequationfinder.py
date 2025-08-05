@@ -22,11 +22,11 @@ class KCLEquationFinder(EquationFinder):
                 #
                 if self.id__type[deg2NodeId] not in ['wire']:
                     componentType = self.id__type[deg2NodeId]
-                    variable0___nc0 = self.getVariable('current', componentType, deg2NodeId)
+                    variable0___nc0 = EquationFinder.getVariable('current', componentType, deg2NodeId)
                     self.addVariableToComponentIdx(deg2NodeId, variable0___nc0)
                     #
                     componentType = self.id__type[neighbour0]
-                    variable1___nc0 = self.getVariable('current', componentType, neighbour0)
+                    variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour0)
                     self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                     #add equation
                     latexStr = f'{variable0___nc0}={variable1___nc0}'
@@ -40,11 +40,11 @@ class KCLEquationFinder(EquationFinder):
                 #
                 if self.id__type[deg2NodeId] not in ['wire']:
                     componentType = self.id__type[deg2NodeId]
-                    variable0___nc1 = self.getVariable('current', componentType, deg2NodeId)
+                    variable0___nc1 = EquationFinder.getVariable('current', componentType, deg2NodeId)
                     self.addVariableToComponentIdx(deg2NodeId, variable0___nc1)
                     #
                     componentType = self.id__type[neighbour1]
-                    variable1___nc1 = self.getVariable('current', componentType, neighbour1)
+                    variable1___nc1 = EquationFinder.getVariable('current', componentType, neighbour1)
                     self.addVariableToComponentIdx(neighbour1, variable1___nc1)
                     #add equation
                     latexStr = f'{variable0___nc1}={variable1___nc1}'
@@ -54,11 +54,11 @@ class KCLEquationFinder(EquationFinder):
             if self.id__type[deg2NodeId] in ['wire']:
                 #
                 componentType = self.id__type[neighbour1]
-                variable1___nc1 = self.getVariable('current', componentType, neighbour1)
+                variable1___nc1 = EquationFinder.getVariable('current', componentType, neighbour1)
                 self.addVariableToComponentIdx(neighbour1, variable1___nc1)
                 #
                 componentType = self.id__type[neighbour0]
-                variable1___nc0 = self.getVariable('current', componentType, neighbour0)
+                variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour0)
                 self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                 latexStr = f'{variable1___nc0}={variable1___nc1}'
                 print('latexStr: ', latexStr)
@@ -87,7 +87,7 @@ class KCLEquationFinder(EquationFinder):
                         prevSelectedComponentType = componentType
                     if selectedComponentId is not None:# and prevSelectedComponentType not in ['wire'] and selectedComponentType not in ['wire']:
                         directedEdge = (prevSelectedComponentId, selectedComponentId)
-                        variable = self.getVariable('current', selectedComponentType, selectedComponentId)
+                        variable = EquationFinder.getVariable('current', selectedComponentType, selectedComponentId)
                         # print('@@@@@@@@@@@@@@@@@@@@variable', variable)
                         #componentDirectionPositive <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<independent of polarity of component?
                         list_vars.append({'varStr':variable, 'positive':self.directedEdgeIsPositive(directedEdge)})#add positive Voltage variable

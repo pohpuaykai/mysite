@@ -19,7 +19,7 @@ class KVLEquationFinder(EquationFinder):
             for idx in range(1, len(directedCycle)):
                 endNode = directedCycle[idx]
                 directedEdge = (startNode, endNode); componentType = self.id__type[startNode]
-                variable = self.getVariable('voltage', componentType, startNode)
+                variable = EquationFinder.getVariable('voltage', componentType, startNode)
                 list_vars.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})#add positive Voltage variable
                 self.addVariableToComponentIdx(startNode, variable)
 

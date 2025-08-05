@@ -15,11 +15,11 @@ class InductortimingEquationFinder(EquationFinder):
 
         for componentId, componentType in self.id__type.items():
             if componentType in ['capacitor']:
-                currentVariable = self.getVariable('current', componentType, componentId)
+                currentVariable = EquationFinder.getVariable('current', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, currentVariable)
-                inductanceVariable = self.getVariable('inductance', componentType, componentId)
+                inductanceVariable = EquationFinder.getVariable('inductance', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, inductanceVariable)
-                voltageVariable = self.getVariable('voltage', componentType, componentId)
+                voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, voltageVariable)
                 timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
                 self.addVariableToComponentIdx(componentId, timeVariable)

@@ -55,13 +55,19 @@ def automat_findEquationsAndSolve(request):
     pp.pprint(id__positiveLeadsDirections)
     print('edge__solderableIndices:')
     pp.pprint(edge__solderableIndices)
+    print('dependentId: ', circuit_details['dependentId'])
+    print('dependentVarType: ', circuit_details['dependentVarType'])
+    print('list_independentId: ', circuit_details['list_independentId'])
+    print('list_independentVarType: ', circuit_details['list_independentVarType'])
+    list_tuple_independentId__independentVarType = zip(circuit_details['list_independentId'], circuit_details['list_independentVarType'])
+    print('dict_independentId__independentVarType: ', list_tuple_independentId__independentVarType)
 
 
     from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
     EquationFinder._has_run_common_code = False # run common code on every HTTPRequest
     # print('existing EquationFinder has ', len(EquationFinder.list_equations), ' equations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # EquationFinder.list_equations = []
-    listOfCollectedEquationStrs = []; listOfCollectedEquations = []; allVariables = set()
+    listOfCollectedEquationStrs = []; listOfCollectedEquations = []; #allVariables = set()
     for equationFinderClass in EquationFinder.getAllEquationFinders():
         # equationFinderClass.list_equations = []
         print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
@@ -70,9 +76,9 @@ def automat_findEquationsAndSolve(request):
             listOfCollectedEquationStrs.append(equation._eqs)
             listOfCollectedEquations.append(equation)
             variables = equation.variablesScheme
-            for variable in variables.keys():
-                allVariables.add(variable)
-    allVariables = sorted(list(allVariables))
+            # for variable in variables.keys():
+            #     allVariables.add(variable)
+    # allVariables = sorted(list(allVariables))
     # EquationFinder._has_run_common_code = False
     #print the equations on THREE.scene
     # listOfCollectedEquations = []
@@ -81,8 +87,19 @@ def automat_findEquationsAndSolve(request):
 
 
     #for now randomly choose a dependentVariable, and choose 3 independentVariables.
-    nonWireVariables = list(filter(lambda s: 'wire' not in s, allVariables))
-    dependentVariableStr = nonWireVariables[0]; independentVariableStrs = nonWireVariables[1:4]
+    # nonWireVariables = list(filter(lambda s: 'wire' not in s, allVariables))
+    # dependentVariableStr = nonWireVariables[0]; independentVariableStrs = nonWireVariables[1:4]
+
+    dependentVariableStr = EquationFinder.getVariable(circuit_details['dependentVarType'], id__type[circuit_details['dependentId']], circuit_details['dependentId']);
+    independentVariableStrs = []
+    for componentId, variableType in list_tuple_independentId__independentVarType:
+        independentVariableStrs.append(EquationFinder.getVariable(
+            variableType, 
+            id__type[componentId], 
+            componentId
+        ))
+
+
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     print(listOfCollectedEquationStrs); print(len(listOfCollectedEquations));
     print('dependentVariableStr', dependentVariableStr); print('independentVariableStrs', independentVariableStrs)

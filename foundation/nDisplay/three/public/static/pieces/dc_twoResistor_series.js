@@ -13,7 +13,6 @@ class DCTwoResistorSeries extends Circuit {
      * **/
     constructor(scene, camera, renderer, meshes) {
         super(scene, camera, renderer, meshes);
-        this.animationAggregator = new Animation(scene, camera, renderer);
     }
 
     act() {
@@ -34,35 +33,52 @@ class DCTwoResistorSeries extends Circuit {
         const wireBetween11 = this.wire(battery0, resistor1, 1.024, 1, 1);
 
         // console.log(this.wiring);
-        const self = this; 
+        // const self = this; 
         //get Equations and solving steps:
-        function CALLBACK__getAllEquationsAndASolvingStep(listOfEquations_latexStrs, solvingSteps){
-            console.log('solvingSteps');
-            console.log(solvingSteps);
-            const YSize = 30;
-            const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
-            function CALLBACK__createLatexMeshes(meshIdx, mesh) {
-                mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);
-                self.scene.add(mesh);
-                // console.log(meshIdx, mesh);
-                self.animationAggregator.appendAction((function(mesh){
-                    return function() {
-                        if (mesh.position.y > 120) {
-                            mesh.visible = false;
-                        } else {
-                            mesh.position.y += 0.1;
-                        }
-                    }
-                })(mesh));
-                self.render();
-                self.animationAggregator.restartAnimation();
-                // renderer.setAnimationLoop( animate );
+        // function CALLBACK__getAllEquationsAndASolvingStep(listOfEquations_latexStrs, solvingSteps){
+        //     console.log('solvingSteps');
+        //     console.log(solvingSteps);
+        //     const YSize = 30;
+        //     const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
+        //     function CALLBACK__createLatexMeshes(meshIdx, mesh) {
+        //         mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);
+        //         self.scene.add(mesh);
+        //         // console.log(meshIdx, mesh);
+        //         self.animationAggregator.appendAction((function(mesh){
+        //             return function() {
+        //                 if (mesh.position.y > 120) {
+        //                     mesh.visible = false;
+        //                 } else {
+        //                     mesh.position.y += 0.1;
+        //                 }
+        //             }
+        //         })(mesh));
+        //         self.render();
+        //         self.animationAggregator.restartAnimation();
+        //         // renderer.setAnimationLoop( animate );
+        //     }
+        //     self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
+        // }
+        //set the dependent and independent variables
+        const dependentUUID = resistor0.uuid;
+        const list_independentUUID = [battery0.uuid, resistor1.uuid];
+        const dependentVarType = 'voltage';
+        const list_independentVarType = ['voltage', 'voltage'];
+        function meshToAnimation(mesh) {
+            return function() {
+                if (mesh.position.y > 120) {
+                    mesh.visible = false;
+                } else {
+                    mesh.position.y += 0.1;
+                }
             }
-            self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
         }
-        this.getAllEquationsAndASolvingStep(CALLBACK__getAllEquationsAndASolvingStep);
+        this.animate_getAllEquationsAndASolvingStep(meshToAnimation, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
+
+        // this.getAllEquationsAndASolvingStep(CALLBACK__getAllEquationsAndASolvingStep, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
         // this.listOfEquations_latexStrs;
         // this.solvingSteps;
+
 
         return {
             'scene':this.scene,

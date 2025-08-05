@@ -37,20 +37,20 @@ class CompleximpedancesumEquationFinder(EquationFinder):
                     else:
                         directedEdge = (directedPath[pathId-1], componentId)
                     if componentType in ['resistor']:
-                        variable = self.getVariable('resistance', componentType, componentId)
+                        variable = EquationFinder.getVariable('resistance', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, variable)
                         list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})
                     elif componentType in ['capacitor']:
-                        capacitanceVariable = self.getVariable('capacitance', componentType, componentId)
+                        capacitanceVariable = EquationFinder.getVariable('capacitance', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, capacitanceVariable)
-                        frequencyVariable = self.getVariable('frequency', componentType, componentId)
+                        frequencyVariable = EquationFinder.getVariable('frequency', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, frequencyVariable)
                         variable = self.makeRatio('1', f'{imaginery_number} {frequencyVariable} {capacitanceVariable}')
                         list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})
                     elif componentType in ['inductor']:
-                        inductanceVariable = self.getVariable('inductance', componentType, componentId)
+                        inductanceVariable = EquationFinder.getVariable('inductance', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, inductanceVariable)
-                        frequencyVariable = self.getVariable('frequency', componentType, componentId)
+                        frequencyVariable = EquationFinder.getVariable('frequency', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, frequencyVariable)
                         variable = f'{imaginery_number} {frequencyVariable} {inductanceVariable}'
                         list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})
@@ -59,14 +59,14 @@ class CompleximpedancesumEquationFinder(EquationFinder):
                     latexStr = latexStrWithEqual.replace('=', '')
                     list_equationVars.append({'varStr':latexStr, 'positive':True})#for harmonic_sum
                     if len(list_var) > 1:
-                        totalImpedanceVariable = self.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
+                        totalImpedanceVariable = EquationFinder.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
                         self.addVariableToComponentIdx(componentId, totalImpedanceVariable)
                         totalVariableIdx += 1
                         # print('list_var:', list_var)
                         self.sumOfPositiveNegativeToLatexAndScheme(list_var, {'varStr':totalImpedanceVariable, 'positive':True})#<<not associated with any
 
             if not nonlinearBall: #add_harmonic
-                totalImpedanceVariable = self.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
+                totalImpedanceVariable = EquationFinder.getVariable('impedance', 'total', totalVariableIdx)#not a real component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WHAT ID?
                 self.addVariableToComponentIdx(componentId, totalImpedanceVariable)
                 totalVariableIdx += 1
                 # print('list_equationVars', list_equationVars)

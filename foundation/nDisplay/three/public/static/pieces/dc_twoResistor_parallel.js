@@ -39,32 +39,35 @@ class DCTwoResistorParallel extends Circuit {
         const wireBetween00 = this.wire(battery0, wireBetween01, 1.024, 0);
 
         //get Equations and solving steps:
-        this.getAllEquationsAndASolvingStep();
-
-        function animate(){
-
-        // let rotatingObject = resistor0;
-        // rotatingObject.rotation.x += (Math.PI/(360*6));
-        // rotatingObject.rotation.y += (Math.PI/(360*6));
-        // rotatingObject.rotation.z += (Math.PI/(360*6));
-        // render();
-            
+        const dependentUUID = resistor0.uuid;
+        const list_independentUUID = [battery0.uuid, resistor1.uuid];
+        const dependentVarType = 'voltage';
+        const list_independentVarType = ['voltage', 'voltage'];
+        function meshToAnimation(mesh) {
+            return function() {
+                if (mesh.position.y > 120) {
+                    mesh.visible = false;
+                } else {
+                    mesh.position.y += 0.1;
+                }
+            }
         }
+        this.animate_getAllEquationsAndASolvingStep(meshToAnimation, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
 
         return {
             'scene':this.scene,
             'camera':this.camera,
             'renderer':this.renderer,
-            'meshes':{
-                'resistor0':resistor0,
-                'battery0':battery0,
-                'resistor1':resistor1,
-                'wireBetween01':wireBetween01,
-                'wireBetween10':wireBetween10,
-                'wireBetween11':wireBetween11,
-                'wireBetween00':wireBetween00
-            },
-            'animate':animate
+            // 'meshes':{
+            //     'resistor0':resistor0,
+            //     'battery0':battery0,
+            //     'resistor1':resistor1,
+            //     'wireBetween01':wireBetween01,
+            //     'wireBetween10':wireBetween10,
+            //     'wireBetween11':wireBetween11,
+            //     'wireBetween00':wireBetween00
+            // },
+            // 'animate':animate
         }
 
     }

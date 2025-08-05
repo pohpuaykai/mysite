@@ -11,11 +11,11 @@ class OhmlawEquationFinder(EquationFinder):
         """
         for componentId, componentType in self.id__type.items():
             if componentType not in ['wire', 'AC_signal_generator', 'battery']:
-                resistanceVariable = self.getVariable('resistance', componentType, componentId)
+                resistanceVariable = EquationFinder.getVariable('resistance', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, resistanceVariable)
-                voltageVariable = self.getVariable('voltage', componentType, componentId)
+                voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, voltageVariable)
-                currentVariable = self.getVariable('current', componentType, componentId)
+                currentVariable = EquationFinder.getVariable('current', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, currentVariable)
                 self.simpleRatioToLatexAndScheme(resistanceVariable, voltageVariable, currentVariable)
         return self.list_equations

@@ -61,32 +61,29 @@ class Q3_21__P18 extends Circuit {
         const wire_battery_b = this.wire(battery0, resistor__16Ohm__series, 1.024, 0, 0);
         const wire_battery_a = this.wire(battery0, wire_1OhmSeries_8OhmParallel_L, 1.024, 1);
 
+
+        //this question needs to get the sum of 3 components, not just each component
         //get Equations and solving steps:
-        this.getAllEquationsAndASolvingStep();
+        // const dependentUUID = resistor0.uuid;
+        // const list_independentUUID = [battery0.uuid, resistor1.uuid];
+        // const dependentVarType = 'voltage';
+        // const list_independentVarType = ['voltage', 'voltage'];
+        // function meshToAnimation(mesh) {
+        //     return function() {
+        //         if (mesh.position.y > 120) {
+        //             mesh.visible = false;
+        //         } else {
+        //             mesh.position.y += 0.1;
+        //         }
+        //     }
+        // }
+        // this.animate_getAllEquationsAndASolvingStep(meshToAnimation, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
 
-        function animate(){
-
-        // let rotatingObject = resistor0;
-        // rotatingObject.rotation.x += (Math.PI/(360*6));
-        // rotatingObject.rotation.y += (Math.PI/(360*6));
-        // rotatingObject.rotation.z += (Math.PI/(360*6));
-        // render();
-            
-        }
 
         return {
             'scene':this.scene,
             'camera':this.camera,
             'renderer':this.renderer,
-            'meshes':{
-                // 'resistor0':resistor0,
-                // 'battery0':battery0,
-                // 'resistor1':resistor1,
-                // 'wireBetween01':wireBetween01,
-                // 'wireBetween10':wireBetween10,
-                // 'wireBetween11':wireBetween11
-            },
-            'animate':animate
         }
 
     }
