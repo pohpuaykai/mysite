@@ -173,7 +173,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
         let tF1 = null;
         let tF0Idx = null; let tF1Idx = null;
         if (solderableLeadIdx0 === null && solderableLeadIdx1 === null) {
-
+            console.log('CASE0<<<<<');
             //0
             let cornerCoordinates__solderableLeadIdx = {};
             let cornerCoordinates__faceIdx = {};
@@ -229,6 +229,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
 
         } else if (solderableLeadIdx0 != null && solderableLeadIdx1 === null) {//assume !=null means its a valid index
 
+            console.log('CASE1<<<<<');
             //0
             let cornerCoordinates__solderableLeadIdx = {};
             let cornerCoordinates__faceIdx = {};
@@ -277,6 +278,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
 
         } else if (solderableLeadIdx0 === null && solderableLeadIdx1 != null) {//assume !=null means its a valid index
 
+            console.log('CASE2<<<<<');
             //0
             let cornerCoordinates__solderableLeadIdx = {};
             let cornerCoordinates__faceIdx = {};
@@ -325,6 +327,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
 
         } else { // we have both solderableLead0 && solderableLead1
 
+            console.log('CASE3<<<<<');
             const solderableLeads0 = component0.getAllTouchingBoxesAndInsertVectors();
             const solderableLead0 = solderableLeads0[solderableLeadIdx0];
             const solderableLeads1 = component1.getAllTouchingBoxesAndInsertVectors();

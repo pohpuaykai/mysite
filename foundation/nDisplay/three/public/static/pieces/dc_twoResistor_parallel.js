@@ -2,10 +2,10 @@
 import {asyncCreateTextMesh} from '../custom/TextMeshCreater.js';
 import {ComponentResistor} from '../meshes/ComponentResistor.js';
 import {ComponentBattery} from '../meshes/ComponentBattery.js';
-import {Piece} from './piece.js';
+import {Circuit} from './circuit.js';
 import {Wire} from '../meshes/Wire.js';
 
-class DCTwoResistorParallel extends Piece {
+class DCTwoResistorParallel extends Circuit {
 
     /**
      * 
@@ -37,6 +37,9 @@ class DCTwoResistorParallel extends Piece {
         const wireBetween11 = this.wire(battery0, wireBetween10, 1.024, 1);
 
         const wireBetween00 = this.wire(battery0, wireBetween01, 1.024, 0);
+
+        //get Equations and solving steps:
+        this.getAllEquationsAndASolvingStep();
 
         function animate(){
 

@@ -1,6 +1,10 @@
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
 --<<Schaum's 3000 Solved Problems In Electric Circuits>>
+---solvingSteps to take a parameters, dependentVariable and independentVariables from frontEnd?
 -make pretty animations :D
+--also animate solving steps
+--refactor the animation to circuit.js?
+--put in the nice looking wires?
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS

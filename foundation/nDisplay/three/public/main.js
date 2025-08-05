@@ -3,8 +3,8 @@ import * as THREE from './static/three/three.module.js';
 // import {GLTFLoader} from './static/three/GLTFLoader.js';
 import {SVGLoader} from './static/three/SVGLoader.js';
 
-import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
-import {asyncCreateLatexMesh} from './static/custom/LatexMeshCreater.js';
+// import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
+// import {asyncCreateLatexMesh} from './static/custom/LatexMeshCreater.js';
 
 // import {mesh as cylinder_mesh} from './static/meshes/mesh_cylinder.js';
 // import {mesh as wall_mesh} from './static/meshes/mesh_wall.js';
@@ -68,51 +68,53 @@ function onWindowResize() {
 
 const circuit = new DCTwoResistorSeries(scene, camera, renderer, {});
 // const circuit = new DCTwoResistorParallel(scene, camera, renderer, {});
+// const circuit = new Q3_21__P18(scene, camera, renderer, {});
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 
-const resistor0 = rD['meshes']['resistor0']; const battery0 = rD['meshes']['battery0']; const resistor1 = rD['meshes']['resistor1'];
-const wireBetween01 = rD['meshes']['wireBetween01']; 
+//const resistor0 = rD['meshes']['resistor0']; const battery0 = rD['meshes']['battery0']; const resistor1 = rD['meshes']['resistor1'];
+//const wireBetween01 = rD['meshes']['wireBetween01']; 
 // const wireBetween10 = rD['meshes']['wireBetween10'];
 // const wireBetween11 = rD['meshes']['wireBetween11'];
-const animate = rD['animate'];
+// const animate = rD['animate'];
 console.log('circuit network:', circuit.getNetworkGraph());
 console.log('circuit network stringify:', JSON.stringify(circuit.getNetworkGraph()));
 console.log('circuit id__type: ', circuit.id__type);
 console.log('circuit edge__solderableIndices: ', circuit.edge__solderableIndices);
 // console.log('sending data to: ', findEquationsAndSolve_url);
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 
 ////////////////////////
+// function getAllEquationsAndASolvingStep() {
+//     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+//     const xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange  = function(){
 
-const xhr = new XMLHttpRequest();
-xhr.onreadystatechange  = function(){
+//         if (this.readyState == 4 && this.status == 200) {
+//           const responseDict = JSON.parse(this.responseText);
+//           const listOfEquations_latexStrs = responseDict['equations'];
+//           const solvingSteps = responseDict['solvingSteps'];
+//           console.log(listOfEquations_latexStrs);
+//           console.log('solvingSteps');
+//           console.log(solvingSteps);
 
-    if (this.readyState == 4 && this.status == 200) {
-      const responseDict = JSON.parse(this.responseText);
-      const listOfEquations_latexStrs = responseDict['equations'];
-      const solvingSteps = responseDict['solvingSteps'];
-      console.log(listOfEquations_latexStrs);
-      console.log('solvingSteps');
-      console.log(solvingSteps);
-
-      asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
-    }
-}
-// xhr.onerror = function(){}
-xhr.open('POST', findEquationsAndSolve_url);
-xhr.setRequestHeader('X-CSRFToken', csrftoken);
-// xhr.setRequestHeader('Content-Type', 'application/json');
-circuit.getNetworkGraph();
-xhr.send(JSON.stringify({
-    // 'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
-    'networkGraph':circuit.networkGraph,
-    // 'networkGraphNoWires': circuit.networkGraphNoWires,
-    'id__type':circuit.id__type,
-    'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections,
-    'edge__solderableIndices':circuit.edge__solderableIndices
-}));
+//           asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
+//         }
+//     }
+//     // xhr.onerror = function(){}
+//     xhr.open('POST', findEquationsAndSolve_url);
+//     xhr.setRequestHeader('X-CSRFToken', csrftoken);
+//     // xhr.setRequestHeader('Content-Type', 'application/json');
+//     circuit.getNetworkGraph();
+//     xhr.send(JSON.stringify({
+//         // 'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
+//         'networkGraph':circuit.networkGraph,
+//         // 'networkGraphNoWires': circuit.networkGraphNoWires,
+//         'id__type':circuit.id__type,
+//         'id__positiveLeadsDirections':circuit.id__positiveLeadsDirections,
+//         'edge__solderableIndices':circuit.edge__solderableIndices
+//     }));
+// }
 ////////////////////////
 
 
@@ -128,4 +130,4 @@ window.addEventListener( 'resize', onWindowResize );
 
 render();
 
-renderer.setAnimationLoop( animate );
+// renderer.setAnimationLoop( animate );
