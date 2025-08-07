@@ -136,7 +136,7 @@ class Function:#(metaclass=FunctionHook):
         return invertedResults, functionCountChange, primitiveCountChange, totalNodeCountChange, ast, permutation, key0, key1, replacementDictionary
 
 
-    def reverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId, nodeId__len): # TODO refactor, startPos__nodeId&nodeId__len, get from self.eq.
+    def reverse(self, equationSide, argumentIdx, nodeIds, startPos__nodeId, nodeId__len, rootOfTree): # TODO refactor, startPos__nodeId&nodeId__len, get from self.eq.
         """
         make argumentIdx the subject of the subAST
 
@@ -162,16 +162,19 @@ class Function:#(metaclass=FunctionHook):
             print('invertedResults')
             print(invertedResults)
 
-
+        newRootOfTree = rootOfTree
         for oldKey, oldValue in invertedResults.items():
             if oldKey in ast: # due to addition of operations, `oldKey` might not exist in ast
                 del ast[oldKey]
             ast[oldValue['newKey']] = list(oldValue['newValue'])
+            #replace rootOfTree
+            if oldKey == rootOfTree:
+                newRootOfTree = oldValue['newKey']
 
         altered__startPos__nodeId, altered__nodeId__len = self._reverse__startPosRecalculation(permutation, replacementDictionary, ast, key0, key1, startPos__nodeId, invertedResults, nodeId__len)
 
 
-        return ast, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, altered__startPos__nodeId, altered__nodeId__len
+        return ast, newRootOfTree, functionCountChange, primitiveCountChange, totalNodeCountChange, invertedResults, altered__startPos__nodeId, altered__nodeId__len
 
 
     def _reverse__startPosRecalculation(self, permutation, replacementDictionary, ast, key0, key1, startPos__nodeId, invertedResults, nodeId__len):

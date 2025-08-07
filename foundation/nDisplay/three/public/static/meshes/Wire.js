@@ -1,40 +1,7 @@
 import * as THREE from '../three/three.module.js';
 import {kDTree} from '../common/kDTree.js';
 import {RayIntersectBox} from '../common/RayIntersectBox.js';
-
 /**
- *
- * connects 2 components together with this wire
- * 0. find tF0=touchingFace0 of component0 and tF1=touchingFace1 of component1 with smallest distance apart
- * 1. wB = THREE.Box3().setFromPoints(corners(tF0)+corners(tF1))
- * 2. Find C0=corner of F0 closest to tF0, Find tFC0=corner of tF0 closest to any face of wB
- * 3. Find C1=corner of F1 closest to tF1, Find tFC1=corner of tF1 closest to any face of WB
- * 4. Find path_of_wire, we expect the path_of_wire to be shortest distance between C0 and C1, following the edges of wB
- *   0. Connect tBC0 to C0
- *   1. Use Hamming_code to check away_by, and which path to follow, note that C0 and C1 are corners of wB.
- *     0. Translate index_of_C0_in_wB and index_of_C1_in_wB to HammingCode -> hIndex_of_C0_in_wB and hIndex_of_C1_in_wB
- *     1. difference_number = XOR(hIndex_of_C0_in_wB, hIndex_of_C1_in_wB)
- *     2. Change difference_number into binaryString bs of length 3, lastVertexIdx = hIndex_of_C0_in_wB
- *       0. If there is a "1" in the first digit of difference_number, 
- *         0. If lastVertexIdx is a "1" in the first digit, add xx0_hIndex_of_wB to path_of_wire, where xx are the third&second digit of lastVertexIdx respectively
- *           0. Update lastVertexIdx to the xx0_hIndex_of_wB just added
- *         1. If lastVertexIdx is a "0" in the first digit, add xx1_hIndex_of_wB to path_of_wire, where xx are the third&second digit of lastVertexIdx respectively
- *           0. Update lastVertexIdx to the xx1_hIndex_of_wB just added
- *       1. If there is a "1" in the second digit of difference_number,
- *         0. If lastVertexIdx is a "1" in the second digit, add x0x_hIndex_of_wB to path_of_wire, where x x are the third&first digit of lastVertexIdx respectively
- *           0. Update lastVertexIdx to the x0x_hIndex_of_wB just added
- *         1. If lastVertexIdx is a "0" in the second digit, add x1x_hIndex_of_wB to path_of_wire, where x x are the third&first digit of lasteVertexIdx respectively
- *           0. Update lastVertexIdx to the x1x_hIndex_of_wB just added
- *       2. If there is a "1" in the third digit of difference_number, 
- *         0. If lastVertexIdx is a "1" in the third digit, add 0xx_hIndex_of_wB to path_of_wire, where xx are the second&first digit of lastVertexIdx respectively
- *           0. Update lastVertexIdx to the 0xx_hIndex_of_wB just added
- *         1. If lastVertexIdx is a "0" in the third digit, add 1xx_hIndex_of_wB to path_of_wire, where xx are the second&first digit of lastVertexIdx respectively
- *           0. Update lastVertexIdx to the 1xx_hIndex_of_wB just added
- *   2. Connect path_of_wire to tBC1
- *         
- * 
- * Every point in path_of_wire is a BEND, the first and last BENDs are not 90 degrees
- * 
  * 
  * @param radius {Number} - we follow the American_wire_gauge from this source: https://en.wikipedia.org/wiki/American_wire_gauge#Tables_of_AWG_wire_sizes
  * Here is a reproduction of 2 columns in millimetres:
@@ -89,9 +56,224 @@ class Wire extends THREE.Object3D {//THREE.Line {
     /**
      * 
      * **/
-    constructor(component0, component1, radius, solderableLeadIdx0=null, solderableLeadIdx1=null) {
+    // constructor(component0, component1, radius, solderableLeadIdx0=null, solderableLeadIdx1=null) {
+    constructor(config) {
         super();
         this.type = 'wire';
+
+        //overloading
+        if (typeof config === "object" && config != null) {
+            if ('x' in config && 'y' in config && 'z' in config && 'radius' in config) {
+                let x; let y; let z; let radius;
+                ({x, y, z, radius}=config);
+                this.constructor__fakeNode(x, y, z, radius);
+            } else if ('component0' in config && 'component1' in config && 'radius' in config) {// maybe check type of component0, component1 and radius
+                let component0; let component1; let radius; let solderableLeadIdx0; let solderableLeadIdx1; let hamming3Idx;
+                ({component0, component1, radius, solderableLeadIdx0=null, solderableLeadIdx1=null, hamming3Idx='214'}=config);
+                this.constructor__connection(component0, component1, radius, solderableLeadIdx0, solderableLeadIdx1, hamming3Idx);//making connection between component0 and component1
+            }
+        } else {
+            throw Exception()
+        }
+
+    }
+
+
+    /**
+     * This constructor is used to make a fakeNode (sphere in space), in contrast with the other constructor which us used to make connection between components
+     * **/
+    constructor__fakeNode(x, y, z, radius) {
+        /**
+         * Constructor Parameters for THREE.SphereGeometry
+         * 
+         * radius — sphere radius. Default is 1.<<<<< we are only using this, 
+            widthSegments — number of horizontal segments. Minimum value is 3, and the default is 32.
+            heightSegments — number of vertical segments. Minimum value is 2, and the default is 16.
+            phiStart — specify horizontal starting angle. Default is 0.
+            phiLength — specify horizontal sweep angle size. Default is Math.PI * 2.
+            thetaStart — specify vertical starting angle. Default is 0.
+            thetaLength — specify vertical sweep angle size. Default is Math.PI.
+         * **/
+        const geometry = new THREE.SphereGeometry(radius);
+        const material = new THREE.MeshBasicMaterial({color: 0xffff00})
+        const sphere = new THREE.Mesh(geometry, material);
+        this.add(sphere);
+        // super(geometry, material);
+        this.position.set(x, y, z);
+
+        console.log('x', x, 'y', y, 'z', z);
+        //below is the attributes needed to use this Wire as a Component
+        this.positiveLeadsDirections = [[0, 0]]; //only one sphere
+        const bufferLength = 0;
+        const left=x-radius-bufferLength; //-x 
+        const right=x+radius+bufferLength;//+x
+        const down=y-radius-bufferLength;//-y
+        const up=y+radius+bufferLength;//+y
+        const out=z-radius-bufferLength;//-z
+        const inx=z+radius+bufferLength;//+z
+        // const left=-radius-bufferLength; //-x
+        // const right=radius+bufferLength;//+x
+        // const down=-radius-bufferLength;//-y
+        // const up=radius+bufferLength;//+y
+        // const out=-radius-bufferLength;//-z
+        // const inx=radius+bufferLength;//+z
+        console.log('left: ', left);
+        console.log('right: ', right);
+        
+        console.log('down: ', down);
+        
+        console.log('up: ', up);
+        
+        console.log('out: ', out);
+        
+        console.log('inx: ', inx);
+        
+
+        const coordinates = [
+            [left, up, inx],
+            [right, up, inx],
+            [right, up, out],
+            [left, up, out],
+            [left, down, inx],
+            [right, down, inx],
+            [right, down, out],
+            [left, down, out]
+        ]
+        let solderableLeads = [];
+        solderableLeads.push([
+            {//topFace
+                'touchingFaceCoordinates':[
+                    coordinates[0][0], coordinates[0][1], coordinates[0][2], 
+                    coordinates[1][0], coordinates[1][1], coordinates[1][2], 
+                    coordinates[2][0], coordinates[2][1], coordinates[2][2], 
+                    coordinates[3][0], coordinates[3][1], coordinates[3][2],
+                ]
+            },
+            {//leftFace; rightFace
+                'touchingFaceCoordinates':[
+                    coordinates[0][0], coordinates[0][1], coordinates[0][2], 
+                    coordinates[3][0], coordinates[3][1], coordinates[3][2], 
+                    coordinates[7][0], coordinates[7][1], coordinates[7][2], 
+                    coordinates[4][0], coordinates[4][1], coordinates[4][2], 
+                ]
+            },
+            {//rightFace; leftFace
+                'touchingFaceCoordinates':[
+                    coordinates[1][0], coordinates[1][1], coordinates[1][2], 
+                    coordinates[2][0], coordinates[2][1], coordinates[2][2], 
+                    coordinates[6][0], coordinates[6][1], coordinates[6][2], 
+                    coordinates[5][0], coordinates[5][1], coordinates[5][2], 
+                ]
+            },
+            {//inxFace
+                'touchingFaceCoordinates':[
+                    coordinates[0][0], coordinates[0][1], coordinates[0][2], 
+                    coordinates[1][0], coordinates[1][1], coordinates[1][2], 
+                    coordinates[5][0], coordinates[5][1], coordinates[5][2], 
+                    coordinates[4][0], coordinates[4][1], coordinates[4][2], 
+                ]
+            },
+            {//outFace
+                'touchingFaceCoordinates':[
+                    coordinates[3][0], coordinates[3][1], coordinates[3][2], 
+                    coordinates[2][0], coordinates[2][1], coordinates[2][2], 
+                    coordinates[6][0], coordinates[6][1], coordinates[6][2], 
+                    coordinates[7][0], coordinates[7][1], coordinates[7][2], 
+                ]
+            },
+            {//downFace
+                'touchingFaceCoordinates':[
+                    coordinates[4][0], coordinates[4][1], coordinates[4][2], 
+                    coordinates[5][0], coordinates[5][1], coordinates[5][2], 
+                    coordinates[6][0], coordinates[6][1], coordinates[6][2], 
+                    coordinates[7][0], coordinates[7][1], coordinates[7][2], 
+                ]
+            },
+        ]);// we do a cube around the sphere, only one solderableLead
+        this.solderableLeads = solderableLeads;
+
+
+        // console.log("solderableLeads", solderableLeads);
+        const solderableLeadsIdx_touchingBoxesIdx__attachmentId = {}; const attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
+        const uuid__type = {};
+        for ( let i = 0; i<solderableLeads.length; i++) {
+            let touchingFaces = solderableLeads[i];
+            // console.log('touchingFaces', touchingFaces);
+            for(let j = 0; j<touchingFaces.length; j++) {
+                const touchingFaceCoordinates = new Float32Array(touchingFaces[j]['touchingFaceCoordinates']);//this needs to be flat...
+                // console.log(touchingFaceCoordinates);
+                // console.log('touchingFaceCoordinates', touchingFaceCoordinates)
+                const touchingFaceGeometry = new THREE.BufferGeometry();
+                touchingFaceGeometry.setAttribute('position', new THREE.BufferAttribute(touchingFaceCoordinates, 3));
+                const touchingFaceColors = new Float32Array([//2 triangles per face,  each row is R G B, R G B, R G B,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                ]);
+                touchingFaceGeometry.setAttribute('color', new THREE.BufferAttribute(touchingFaceColors, 3));
+                const touchingFaceIndices = new Uint16Array([
+                    0, 1, 3, 2, 3, 1, //top face
+                ]);
+                touchingFaceGeometry.setIndex(new THREE.BufferAttribute(touchingFaceIndices, 1));
+                const touchingFaceMaterial = new THREE.MeshBasicMaterial({
+                    vertexColors: true,
+                    // flatShading: true, // this disables vertex interpolation, also known as Blending Does not exist in our version of THREE
+                    side: THREE.DoubleSide //ensure backface shows color too
+                });
+                const touchingFace = new THREE.Line(touchingFaceGeometry, touchingFaceMaterial);
+                // this.add(touchingFace); // this make solderableLeads position relative to this wire
+                this.attach(touchingFace); // this make solderableLeads position relative to this wire
+                uuid__type[touchingFace.uuid] = 'TOUCHING_BOX';
+                solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]] = touchingFace.uuid;
+                attachmentId__solderableLeadsIdx_touchingBoxesIdx[touchingFace.uuid] = [i, j];
+            }
+        }
+        this.solderableLeadsIdx_touchingBoxesIdx__attachmentId = solderableLeadsIdx_touchingBoxesIdx__attachmentId;
+        this.attachmentId__solderableLeadsIdx_touchingBoxesIdx = attachmentId__solderableLeadsIdx_touchingBoxesIdx;
+        this.uuid__type = uuid__type;
+    }
+
+
+
+    /**
+     * This constructor is used to make connection between components, in contrast with the other constructor which forms a fakeNode (sphere in space)
+     * ConnectionConstructor
+     * 
+     * 
+     *
+     * connects 2 components together with this wire
+     * 0. find tF0=touchingFace0 of component0 and tF1=touchingFace1 of component1 with smallest distance apart
+     * 1. wB = THREE.Box3().setFromPoints(corners(tF0)+corners(tF1))
+     * 2. Find C0=corner of F0 closest to tF0, Find tFC0=corner of tF0 closest to any face of wB
+     * 3. Find C1=corner of F1 closest to tF1, Find tFC1=corner of tF1 closest to any face of WB
+     * 4. Find path_of_wire, we expect the path_of_wire to be shortest distance between C0 and C1, following the edges of wB
+     *   0. Connect tBC0 to C0
+     *   1. Use Hamming_code to check away_by, and which path to follow, note that C0 and C1 are corners of wB.
+     *     0. Translate index_of_C0_in_wB and index_of_C1_in_wB to HammingCode -> hIndex_of_C0_in_wB and hIndex_of_C1_in_wB
+     *     1. difference_number = XOR(hIndex_of_C0_in_wB, hIndex_of_C1_in_wB)
+     *     2. Change difference_number into binaryString bs of length 3, lastVertexIdx = hIndex_of_C0_in_wB
+     *       0. If there is a "1" in the first digit of difference_number, 
+     *         0. If lastVertexIdx is a "1" in the first digit, add xx0_hIndex_of_wB to path_of_wire, where xx are the third&second digit of lastVertexIdx respectively
+     *           0. Update lastVertexIdx to the xx0_hIndex_of_wB just added
+     *         1. If lastVertexIdx is a "0" in the first digit, add xx1_hIndex_of_wB to path_of_wire, where xx are the third&second digit of lastVertexIdx respectively
+     *           0. Update lastVertexIdx to the xx1_hIndex_of_wB just added
+     *       1. If there is a "1" in the second digit of difference_number,
+     *         0. If lastVertexIdx is a "1" in the second digit, add x0x_hIndex_of_wB to path_of_wire, where x x are the third&first digit of lastVertexIdx respectively
+     *           0. Update lastVertexIdx to the x0x_hIndex_of_wB just added
+     *         1. If lastVertexIdx is a "0" in the second digit, add x1x_hIndex_of_wB to path_of_wire, where x x are the third&first digit of lasteVertexIdx respectively
+     *           0. Update lastVertexIdx to the x1x_hIndex_of_wB just added
+     *       2. If there is a "1" in the third digit of difference_number, 
+     *         0. If lastVertexIdx is a "1" in the third digit, add 0xx_hIndex_of_wB to path_of_wire, where xx are the second&first digit of lastVertexIdx respectively
+     *           0. Update lastVertexIdx to the 0xx_hIndex_of_wB just added
+     *         1. If lastVertexIdx is a "0" in the third digit, add 1xx_hIndex_of_wB to path_of_wire, where xx are the second&first digit of lastVertexIdx respectively
+     *           0. Update lastVertexIdx to the 1xx_hIndex_of_wB just added
+     *   2. Connect path_of_wire to tBC1
+     *         
+     * 
+     * Every point in path_of_wire is a BEND, the first and last BENDs are not 90 degrees
+     * 
+     * **/
+    constructor__connection(component0, component1, radius, solderableLeadIdx0=null, solderableLeadIdx1=null, hamming3Idx='214') {
+
         /**
          * HELPERS start
          * **/
@@ -423,7 +605,49 @@ class Wire extends THREE.Object3D {//THREE.Line {
         //
         const wirePath = [];
         //6.1.0
-        const OG__HammingCode = {0:0, 1:1, 2:5, 3:4, 4:2, 5:3, 6:7, 7:6};
+        const OG__HammingCode__124 = {0:0, 1:1, 2:5, 3:4, 4:2, 5:3, 6:7, 7:6};
+        const OG__HammingCode__142 = {0:0, 1:1, 2:3, 3:2, 4:4, 5:5, 6:7, 7:6};
+        const OG__HammingCode__214 = {0:0, 1:2, 2:6, 3:4, 4:1, 5:3, 6:7, 7:5};
+        const OG__HammingCode__241 = {0:0, 1:2, 2:3, 3:1, 4:4, 5:6, 6:7, 7:5};
+        const OG__HammingCode__412 = {0:0, 1:4, 2:6, 3:2, 4:1, 5:5, 6:7, 7:3};
+        const OG__HammingCode__421 = {0:0, 1:4, 2:5, 3:1, 4:2, 5:6, 6:7, 7:3};
+
+        let OG__HammingCode;
+        //1 of the 6 possible OG__HammingCode mapping, we should help the user to choose the most pretty..., HOW? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        switch(hamming3Idx) {
+        case '124':
+            OG__HammingCode = OG__HammingCode__124;
+            break;
+
+        case '142':
+            OG__HammingCode = OG__HammingCode__142;
+            break;
+
+        case '214':
+            OG__HammingCode = OG__HammingCode__214;
+            break;
+
+        case '241':
+            OG__HammingCode = OG__HammingCode__241;
+            break;
+
+        case '412':
+            OG__HammingCode = OG__HammingCode__412;
+            break;
+
+        case '421':
+            OG__HammingCode = OG__HammingCode__421;
+            break;
+
+        default:
+            OG__HammingCode = OG__HammingCode__214;
+        }
+        
+        
+        
+        
+        
+        
         //
         const HammingCode__OG = {}
         for (var OG in OG__HammingCode) {
@@ -433,13 +657,14 @@ class Wire extends THREE.Object3D {//THREE.Line {
         const C0hIndexOfwB = OG__HammingCode[C0IndexOfwB]; const C1hIndexOfwB = OG__HammingCode[C1IndexOfwB];
         const difference_number = (C0hIndexOfwB ^ C1hIndexOfwB).toString(2).padStart(3, '0'); //^ is XOR, toString(2) is to change it to binaryString
         // console.log('C0hIndexOfwB', C0hIndexOfwB); console.log('C1hIndexOfwB', C1hIndexOfwB);
-        // console.log("difference_number", difference_number);
+        console.log("difference_number", difference_number);
         wirePath.push(tbC0);
         if (! cEquals(tbC0, C0)) {
             wirePath.push(C0);//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<check if tbC0==C0
         }
         
         let lastVertexIdx = C0hIndexOfwB.toString(2).padStart(3, '0');
+        console.log('lastVertexIdx: ', lastVertexIdx);
         for (let digitNum=0; digitNum<difference_number.length; digitNum++) {
             if (difference_number[digitNum] == '1') {
                 // console.log('difference_number', difference_number, ' on digitNum:', digitNum);
@@ -467,6 +692,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
         this.wirePath = wirePath;
         // console.log('wirePath');console.log(wirePath);
 
+        //below is the attributes needed to use this Wire as a Component
         const positiveLeadsDirections = [];
         for(let i=0; i<this.wirePath.length; i++) {
             for(let j=i+1; j<this.wirePath.length; j++) {
@@ -552,10 +778,10 @@ class Wire extends THREE.Object3D {//THREE.Line {
                 },
                 {//downFace
                     'touchingFaceCoordinates':[
-                        coordinates[0][0], coordinates[0][1], coordinates[0][2], 
-                        coordinates[1][0], coordinates[1][1], coordinates[1][2], 
-                        coordinates[5][0], coordinates[5][1], coordinates[5][2], 
                         coordinates[4][0], coordinates[4][1], coordinates[4][2], 
+                        coordinates[5][0], coordinates[5][1], coordinates[5][2], 
+                        coordinates[6][0], coordinates[6][1], coordinates[6][2], 
+                        coordinates[7][0], coordinates[7][1], coordinates[7][2], 
                     ]
                 },
             ]);
@@ -645,6 +871,8 @@ class Wire extends THREE.Object3D {//THREE.Line {
 
     /**
      * get all touchingBoxes
+     * 
+     * used by ConnectionConstructor
      * **/
     getAllTouchingBoxesAndInsertVectors() {
         let updatedSolderableLeads = [];
@@ -665,6 +893,8 @@ class Wire extends THREE.Object3D {//THREE.Line {
 
     /**
      * Converts THREE.Object3D.geometry.position.array to a Javascript.Array of [x, y, z]; where x, y, z are Javascript floats
+     * 
+     * used by ConnectionConstructor
      * **/
     updateListOfCoordinates(threeObject3D) {
         threeObject3D.geometry.computeBoundingBox(); threeObject3D.updateMatrixWorld(true);
@@ -679,6 +909,8 @@ class Wire extends THREE.Object3D {//THREE.Line {
     }
     /**
      * A list of floats, whose amount is divisible by 3. Rearrange every 3 floats into a coordinate point.
+     * 
+     * used by ConnectionConstructor
      * **/
     threeFloatsToAPoint(coordinates) {
         const points = []; let point = [];

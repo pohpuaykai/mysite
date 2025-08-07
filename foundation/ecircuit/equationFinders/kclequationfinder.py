@@ -11,8 +11,8 @@ class KCLEquationFinder(EquationFinder):
         added2DegEdges = set()
         for deg2NodeId in self.list_nodeIds___deg2: # need both directions.... the edge not just the node.#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
-            [neighbour0, neighbour1] = self.networkGraph[deg2NodeId]
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~self.networkGraph[deg2NodeId]', self.networkGraph[deg2NodeId])
+            [neighbour0, neighbour1] = self.networkGraph[deg2NodeId]
             print('typeOfneighbour0: ', self.id__type[neighbour0])
             print('typeOfneighbour1: ', self.id__type[neighbour1])
             if neighbour0 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour0) not in added2DegEdges and\
@@ -30,7 +30,7 @@ class KCLEquationFinder(EquationFinder):
                     self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                     #add equation
                     latexStr = f'{variable0___nc0}={variable1___nc0}'
-                    print('latexStr: ', latexStr)
+                    print('0latexStr: ', latexStr)
                     self.addLatexStrAsEquation(latexStr)
             #
             if neighbour1 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour1) not in added2DegEdges and\
@@ -48,10 +48,11 @@ class KCLEquationFinder(EquationFinder):
                     self.addVariableToComponentIdx(neighbour1, variable1___nc1)
                     #add equation
                     latexStr = f'{variable0___nc1}={variable1___nc1}'
-                    print('latexStr: ', latexStr)
+                    print('1latexStr: ', latexStr)
                     self.addLatexStrAsEquation(latexStr)
 
-            if self.id__type[deg2NodeId] in ['wire']:
+            if self.id__type[deg2NodeId] in ['wire'] and\
+            self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
                 #
                 componentType = self.id__type[neighbour1]
                 variable1___nc1 = EquationFinder.getVariable('current', componentType, neighbour1)
@@ -61,20 +62,23 @@ class KCLEquationFinder(EquationFinder):
                 variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour0)
                 self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                 latexStr = f'{variable1___nc0}={variable1___nc1}'
-                print('latexStr: ', latexStr)
+                print('2latexStr: ', latexStr)
                 self.addLatexStrAsEquation(latexStr)
 
 
-        list_equationVars = []; visitedUndirected = set()
+        list_equationVars = []; 
+        # visitedUndirected = set()
         for startSuperNodeId in self.superNodeIds:
             startComponentType = self.id__type[startSuperNodeId]
             list_vars = []
             for endSuperNodeId in self.superNodeUndirectedGraph[startSuperNodeId]:
-                if (startSuperNodeId, endSuperNodeId) in visitedUndirected:
-                    continue
-                visitedUndirected.add((startSuperNodeId, endSuperNodeId));visitedUndirected.add((endSuperNodeId, startSuperNodeId))
+                #
+                # if (startSuperNodeId, endSuperNodeId) in visitedUndirected:
+                #     continue
+                # visitedUndirected.add((startSuperNodeId, endSuperNodeId));visitedUndirected.add((endSuperNodeId, startSuperNodeId))
+                #
                 endComponentType = self.id__type[endSuperNodeId]
-                list_directedPath = self.tuple_startSuperNodeId_endSuperNodeId__list_path[(startSuperNodeId, endSuperNodeId)]
+                list_directedPath = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId)))
                 for directedPath in list_directedPath:
                     #find first non_wire_component
                     selectedComponentId = None; selectedComponentType = None; prevSelectedComponentId = startSuperNodeId; prevSelectedComponentType = self.id__type[startSuperNodeId]

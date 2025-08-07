@@ -33,15 +33,23 @@ class EquationFinder(ABC):
             self.directedCycles = []#We want it to persist across HTTP requests?
             self.directedEdges = [] # a part of directedCycles, for convienence
             self.list_equations = []#EquationFinder.list_equations
-            self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
+            EquationFinder.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.assignDirectionToEdges()#produces self.directedCycles
             self.superNodeIds = EquationFinder.superNodeIds
             self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
-            self.superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
+            self.superNodeUndirectedGraph = EquationFinder.superNodeUndirectedGraph#{}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
             # self.edge__solderableIndices = EquationFinder.edge__solderableIndices
             EquationFinder.edge__solderableIndices =self.edge__solderableIndices
             self.groupComponentsIntoPathsAndBalls()
+            print('superNodeIds: ')
+            print(self.superNodeIds)
+            print('list_nodeIds___degs: ')
+            print(self.list_nodeIds___deg2)
+            print('tuple_startSuperNodeId_endSuperNodeId__list_path')
+            print(self.tuple_startSuperNodeId_endSuperNodeId__list_path)
+            print('superNodeUndirectedGraph: ')
+            print(self.superNodeUndirectedGraph)
             print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             EquationFinder._has_run_common_code = True
         else:
@@ -49,7 +57,7 @@ class EquationFinder(ABC):
             self.directedCycles = EquationFinder.directedCycles
             self.directedEdges = EquationFinder.directedEdges
             self.list_equations = []#EquationFinder.list_equations
-            self.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
+            EquationFinder.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.superNodeIds = EquationFinder.superNodeIds
             self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
@@ -75,13 +83,6 @@ class EquationFinder(ABC):
                     if name in ['EquationFinder']:
                         continue
                     equationFinders.append(cls)
-                    # print(name, '<<<<<<<className')#this is an equationfinder, but need to run it <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    # globals()[name] = cls # export the class as well
-                    # for method_name, method in inspect.getmembers(cls, predicate=inspect.ismethod):
-                    #     if (isinstance(inspect.getattr_static(cls, method_name), staticmethod)) or \
-                    #        (isinstance(inspect.getattr_static(cls, method_name), classmethod)):
-                    #        #is a static or class method
-                    #        globals()[method_name] = method
         return equationFinders
 
     def groupComponentsIntoPathsAndBalls(self):
@@ -107,15 +108,31 @@ class EquationFinder(ABC):
             #get paths
             sortedIndices_indexOnDirectedCycle = sorted(indexOnDirectedCycle__superNodeId.keys())
             for idxOfIdxOnCycle in range(0, len(sortedIndices_indexOnDirectedCycle)):
-                startIdxOnCycle = sortedIndices_indexOnDirectedCycle[idxOfIdxOnCycle]; startSuperNodeId = indexOnDirectedCycle__superNodeId[startIdxOnCycle]
+                startIdxOnCycle = sortedIndices_indexOnDirectedCycle[idxOfIdxOnCycle]
+                startSuperNodeId = indexOnDirectedCycle__superNodeId[startIdxOnCycle]
                 if idxOfIdxOnCycle == len(sortedIndices_indexOnDirectedCycle) - 1: # if its the lastIdx, go back on itself
                     # endIdxOnCycle = #need to make indices loop around..., purely indexing does not work in Python
-                    directedPath = tuple(directedCycle[startIdxOnCycle+1:len(sortedIndices_indexOnDirectedCycle)]+directedCycle[:sortedIndices_indexOnDirectedCycle[0]])
+                    # directedPath = tuple(directedCycle[startIdxOnCycle+1:len(sortedIndices_indexOnDirectedCycle)]+directedCycle[:sortedIndices_indexOnDirectedCycle[0]])
+                    directedPath = tuple(directedCycle[startIdxOnCycle+1:]+directedCycle[1:sortedIndices_indexOnDirectedCycle[0]])
+                    
                     endSuperNodeId = indexOnDirectedCycle__superNodeId[sortedIndices_indexOnDirectedCycle[0]]
+                    #####
+                    # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~0')
+                    # print((startSuperNodeId, endSuperNodeId), (endSuperNodeId, startSuperNodeId))
+                    # print('directedCycle: ', directedCycle); print('startIdxOnCycle', startIdxOnCycle);
+                    # print('sortedIndices_indexOnDirectedCycle', sortedIndices_indexOnDirectedCycle)
+                    # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~0')
+                    #####
                 else:
                     endIdxOnCycle = sortedIndices_indexOnDirectedCycle[idxOfIdxOnCycle+1]
                     directedPath = tuple(directedCycle[startIdxOnCycle+1:endIdxOnCycle])#+1 on startIdxOnCycle to exclude the superNode
                     endSuperNodeId = indexOnDirectedCycle__superNodeId[endIdxOnCycle]
+                    #####
+                    # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1')
+                    # print((startSuperNodeId, endSuperNodeId), (endSuperNodeId, startSuperNodeId)); 
+                    # print('startIdxOnCycle', startIdxOnCycle); print('endIdxOnCycle', endIdxOnCycle)
+                    # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1')
+                    #####
                 #check for repeats and store
                 existingPaths = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), [])#check both (startSuperNodeId, endSuperNodeId) & (endSuperNodeId, startSuperNodeId), but store only (startSuperNodeId, endSuperNodeId)
                 if len(existingPaths) == 0: #check the other direction
@@ -154,22 +171,25 @@ class EquationFinder(ABC):
                 if (startNode, endNode) in self.directedEdges:
                     break
                 elif (endNode, startNode) in self.directedEdges:
-                    cycle = reversed(cycle)
+                    cycle = list(reversed(cycle))
                     break
                 startNode = endNode
             #check if all the non-wire-components are connected in edge__solderableIndices
             startNonWireComponent = None; solderableIdx = None;
+            print('cycle:', cycle, 'startNode: ', startNode, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             for startNodeId in range(0, len(cycle)-1):
-                endNodeId = cycle[startNodeId+1]; edge = (startNodeId, endNodeId)
-                if startNonWireComponent is not None and self.id__type[endNodeId] not in ['wire']:
+                # endNodeId = cycle[startNodeId+1]; edge = (startNodeId, endNodeId)
+                endNode = cycle[startNodeId+1]; startNode = cycle[startNodeId]; edge = (startNode, endNode)
+                print(edge);
+                if startNonWireComponent is not None and self.id__type[endNode] not in ['wire']:
                     solderableIdx = self.edge__solderableIndices[edge]
-                    if startNonWireComponent != endNodeId:
-                        self.edge__solderableIndices[(startNonWireComponent, endNodeId)] = solderableIdx
-                        self.edge__solderableIndices[(endNodeId, startNonWireComponent)] = solderableIdx
-                        # print('adding: ', (startNonWireComponent, endNodeId))
-                    startNonWireComponent = endNodeId; #reset
-                if startNonWireComponent is None and self.id__type[startNodeId] not in ['wire']:
-                    startNonWireComponent = startNodeId
+                    if startNonWireComponent != endNode:
+                        self.edge__solderableIndices[(startNonWireComponent, endNode)] = solderableIdx
+                        self.edge__solderableIndices[(endNode, startNonWireComponent)] = solderableIdx
+                        # print('adding: ', (startNonWireComponent, endNode))
+                    startNonWireComponent = endNode; #reset
+                if startNonWireComponent is None and self.id__type[startNode] not in ['wire']:
+                    startNonWireComponent = startNode
             # print('self.edge__solderableIndices', self.edge__solderableIndices)
             #
             EquationFinder.edge__solderableIndices = self.edge__solderableIndices
@@ -188,8 +208,11 @@ class EquationFinder(ABC):
 
 
     def addVariableToComponentIdx(self, componentIdx, variableStr):
-        if variableStr not in self.componentId__list_variables[componentIdx]: # might be repeated because different equationFinder ask for the same variable
-            self.componentId__list_variables[componentIdx].append(variableStr)
+        if componentIdx not in EquationFinder.componentId__list_variables or variableStr not in EquationFinder.componentId__list_variables[componentIdx]: # might be repeated because different equationFinder ask for the same variable
+            existing = EquationFinder.componentId__list_variables.get(componentIdx, [])
+            existing.append(variableStr)
+            EquationFinder.componentId__list_variables[componentIdx] = existing
+            # EquationFinder.componentId__list_variables[componentIdx].append(variableStr)
 
     def componentDirectionPositive(self, directedEdge):#TODO this should be renamed to componentDirectionPositive
         solderableIndices = self.edge__solderableIndices[directedEdge]

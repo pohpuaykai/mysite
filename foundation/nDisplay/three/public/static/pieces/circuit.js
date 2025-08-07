@@ -1,5 +1,6 @@
 import {Wire} from '../meshes/Wire.js';
 import {LatexMeshCreator} from '../custom/LatexMeshCreater.js'
+import {asyncCreateTextMesh} from '../custom/TextMeshCreater.js'
 import {Piece} from './piece.js';
 import {Animation} from '../custom/Animation.js';
 
@@ -37,7 +38,7 @@ class Circuit extends Piece{
 
             // Now getBBox
             const bbox = svgElement.getBBox();
-            console.log(bbox);
+            // console.log(bbox);
 
             // Optional: clean up
             svgElement.remove();
@@ -48,7 +49,7 @@ class Circuit extends Piece{
         componenttypeSVGFilepath_ajax.addEventListener("load", function() {
             const componenttype__svgfilepath___str = componenttypeSVGFilepath_ajax.responseText;
             const COMPONENTTYPE__SVGFILEPATH___entries = Object.entries(JSON.parse(componenttype__svgfilepath___str));
-            console.log(COMPONENTTYPE__SVGFILEPATH___entries);
+            // console.log(COMPONENTTYPE__SVGFILEPATH___entries);
             let componentType; let svgFilepath;let absolutePath;
             for (let i=0; i<COMPONENTTYPE__SVGFILEPATH___entries.length; i++) {
                 // if (COMPONENTTYPE__SVGFILEPATH___entries[i] != undefined) { //https://developer.mozilla.org/en-US/docs/Web/API/SVGGraphicsElement/getBBox
@@ -60,13 +61,13 @@ class Circuit extends Piece{
                             // console.log(ajax.responseText);
                             let svgString = ajax.responseText;
                             let svgBBox = getBBoxFromSVGString(svgString);
-                            console.log(componentType, svgBBox);
+                            // console.log(componentType, svgBBox);
                             // self.componentType__boundingBox[componentType] = svgBBox;
                             self.componentType__boundingBox[componentType] = {'width':svgBBox.width, 'height':svgBBox.height};
                             // console.log('componentType__boundingBox', JSON.stringify(self.componentType__boundingBox));
                         }
                     }(componentType));
-                    console.log(componentType, absolutePath);
+                    // console.log(componentType, absolutePath);
                     ajax.open("GET", absolutePath);
                     ajax.send();
             }
@@ -75,39 +76,33 @@ class Circuit extends Piece{
         componenttypeSVGFilepath_ajax.send();
     }
 
-    animate_getAllEquationsAndASolvingStep(meshToAnimation, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType) {
+    animate_findEquations(meshToAnimation, solvingCallback) {
         const self = this;
-        function CALLBACK__getAllEquationsAndASolvingStep(listOfEquations_latexStrs, solvingSteps){
-            console.log('solvingSteps');
-            console.log(solvingSteps);
+        function CALLBACK__findEquations(equationStr__variables, componentId__list_variables){
+            console.log("equationStr__variables"); console.log(equationStr__variables)
+            console.log("componentId__list_variables"); console.log(componentId__list_variables)
+
+            solvingCallback(equationStr__variables, componentId__list_variables);
+
+            let listOfEquations_latexStrs = Object.keys(equationStr__variables);
             const YSize = 30;
             const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
+            self.animationAggregator.resetAggregatedAnimations();
             function CALLBACK__createLatexMeshes(meshIdx, mesh) {
                 mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);// here we are fixing the position....<<<<<<<<<<<<<<<
                 self.scene.add(mesh);
-                // console.log(meshIdx, mesh);
-                // self.animationAggregator.appendAction((function(mesh){
-                //     return function() {
-                //         if (mesh.position.y > 120) {
-                //             mesh.visible = false;
-                //         } else {
-                //             mesh.position.y += 0.1;
-                //         }
-                //     }
-                // })(mesh));
                 self.animationAggregator.appendAction(meshToAnimation(mesh));
                 self.render();
                 self.animationAggregator.restartAnimation();
-                // renderer.setAnimationLoop( animate );
             }
             self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
         }
 
-        this.getAllEquationsAndASolvingStep(CALLBACK__getAllEquationsAndASolvingStep, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
+        this.findEquations(CALLBACK__findEquations);
         
     }
 
-    getAllEquationsAndASolvingStep(callback, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType) {//TODO allow the child_circuit to choose what dependentVar, and independentVars<<<<<<<<<<<<<<
+    findEquations(callback) {//TODO allow the child_circuit to choose what dependentVar, and independentVars<<<<<<<<<<<<<<
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
         const self = this;
@@ -115,37 +110,86 @@ class Circuit extends Piece{
 
             if (this.readyState == 4 && this.status == 200) {
               const responseDict = JSON.parse(this.responseText);
-              const listOfEquations_latexStrs = responseDict['equations'];
-              const solvingSteps = responseDict['solvingSteps'];
-              self.listOfEquations_latexStrs = listOfEquations_latexStrs;
-              self.solvingSteps = solvingSteps;
-              // console.log(listOfEquations_latexStrs);
-              // console.log('solvingSteps');
-              // console.log(solvingSteps);
-              callback(listOfEquations_latexStrs, solvingSteps);
+              const equationStr__variables = responseDict['equationStr__variables']
+              self.equationStr__variables = equationStr__variables;
+              const componentId__list_variables = responseDict['componentId__list_variables']
+              self.componentId__list_variables = componentId__list_variables
+              console.log('equationStr__variables', self.equationStr__variables);
+              console.log('componentId__list_variables', self.componentId__list_variables);
+              callback(equationStr__variables, componentId__list_variables);
+            }
+        }
+        // xhr.onerror = function(){}
+        xhr.open('POST', findEquations_url);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        self.getNetworkGraph();
+
+        xhr.send(JSON.stringify({
+            'networkGraph':self.networkGraph, //circuit.networkGraph,
+            'id__type':self.id__type,//circuit.id__type,
+            'id__positiveLeadsDirections':self.id__positiveLeadsDirections,//circuit.id__positiveLeadsDirections,
+            'edge__solderableIndices':self.edge__solderableIndices,//circuit.edge__solderableIndices
+        }));
+    }
+
+    animate_solveEquations(meshToAnimation, list_equationStr, dependentVarStr, list_independentVarStr) {
+        //
+    // list_equationStr
+    // id__type
+    // dependentVarStr
+    // list_independentVarStr
+        const self = this;
+        function CALLBACK__solveEquations(steps) {
+            self.animationAggregator.resetAggregatedAnimations();
+            const YSize = 30;
+            const startYCoordinate = -list_equationStr.length* YSize/2;
+            function CALLBACK__createLatexMeshes(meshIdx, mesh) {
+                mesh.position.set(128, startYCoordinate+YSize*meshIdx, 100);
+                self.scene.add(mesh);
+                self.animationAggregator.appendAction(meshToAnimation(mesh));
+                self.render();
+                self.animationAggregator.restartAnimation();
+            }
+            console.log('steps:******'); console.log(steps);
+            //flatten steps into a list, for now, we just take the broadSteps, KIV the substeps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            let list_broadLatexVorStr = steps.map(function(broadStep){
+                return broadStep['vor']['latex'];
+            });
+            self.createLatexMeshes(list_broadLatexVorStr, CALLBACK__createLatexMeshes);
+        }
+        this.solveEquations(CALLBACK__solveEquations, list_equationStr, dependentVarStr, list_independentVarStr)
+    }
+
+    solveEquations(callback, list_equationStr, dependentVarStr, list_independentVarStr) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        const self = this;
+        xhr.onreadystatechange  = function(){
+
+            if (this.readyState == 4 && this.status == 200) {
+              const responseDict = JSON.parse(this.responseText);
+              const steps = responseDict['steps']
+              self.steps = steps;
+              callback(steps);
 
               // asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
             }
         }
         // xhr.onerror = function(){}
-        xhr.open('POST', findEquationsAndSolve_url);
+        xhr.open('POST', solveEquations_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         // xhr.setRequestHeader('Content-Type', 'application/json');
         // circuit.getNetworkGraph();
         self.getNetworkGraph();
 
         xhr.send(JSON.stringify({
-            // 'networkGraph':JSON.stringify(circuit.getNetworkGraph()).replaceAll('"', ''), //because keys gets converted to string internally in javscript, and we want everything to be in integers
-            'networkGraph':self.networkGraph, //circuit.networkGraph,
-            // 'networkGraphNoWires': circuit.networkGraphNoWires,
-            'id__type':self.id__type,//circuit.id__type,
-            'id__positiveLeadsDirections':self.id__positiveLeadsDirections,//circuit.id__positiveLeadsDirections,
-            'edge__solderableIndices':self.edge__solderableIndices,//circuit.edge__solderableIndices
-            'dependentId':self.uuid__id[dependentUUID],
-            'list_independentId':list_independentUUID.map((uuid) => self.uuid__id[uuid]),
-            'dependentVarType':dependentVarType,
-            'list_independentVarType':list_independentVarType
+            'list_equationStr':list_equationStr,
+            'id__type':self.id__type,
+            'dependentVarStr':dependentVarStr,
+            'list_independentVarStr':list_independentVarStr
         }));
+
     }
 
     createLatexMeshes(listOfLatexStrs, callback) {
@@ -156,9 +200,16 @@ class Circuit extends Piece{
 
     //wiring and network information
 
-    wire(component0, component1, wireRadius, solderableLeadIdx0=null, solderableLeadIdx1=null) {
+    wire(component0, component1, wireRadius, solderableLeadIdx0=null, solderableLeadIdx1=null, hamming3Idx='214') {
 
-        const wireBetween = new Wire(component0, component1, wireRadius, solderableLeadIdx0, solderableLeadIdx1);//AWG18
+        const wireBetween = new Wire({
+            'component0':component0, 
+            'component1':component1, 
+            'radius':wireRadius, 
+            'solderableLeadIdx0':solderableLeadIdx0, 
+            'solderableLeadIdx1':solderableLeadIdx1,
+            'hamming3Idx':hamming3Idx
+        });//AWG18
         if (solderableLeadIdx0 === null) {
             solderableLeadIdx0 = wireBetween.solderableLeadIdx0
         }
@@ -166,79 +217,6 @@ class Circuit extends Piece{
             solderableLeadIdx1 = wireBetween.solderableLeadIdx1
         }
         this.scene.add(wireBetween); this.render();
-        // this.wiring.push([component0.uuid, wireBetween.uuid, solderableLeadIdx0]);
-        // this.wiring.push([component1.uuid, wireBetween.uuid, solderableLeadIdx1]);
-        // let networkGraph = {};
-        // if ((component0.type == 'wire') || (component1.type == 'wire')) {
-        //     //construct dictionary_list of this.wiring
-        //     let component0_uuid; let component1_uuid;
-        //     for (let i=0; i<this.wiring.length; i++) {
-        //         // [component0_uuid, component1_uuid, component0_solderableIdx] = this.wiring[i];
-        //         [component0_uuid, component1_uuid] = this.wiring[i];
-        //         //
-        //         let existingNeighbours = networkGraph[component0_uuid];
-        //         if (existingNeighbours===undefined) {
-        //             existingNeighbours = [];
-        //         }
-        //         existingNeighbours.push(component1_uuid);
-        //         networkGraph[component0_uuid] = existingNeighbours;
-        //         //
-        //         //
-        //         existingNeighbours = networkGraph[component1_uuid];
-        //         if (existingNeighbours===undefined) {
-        //             existingNeighbours = [];
-        //         }
-        //         existingNeighbours.push(component0_uuid);
-        //         networkGraph[component1_uuid] = existingNeighbours;
-        //         //
-        //     }
-        //     //BFS this.wiring(list_of_edges) from component0, if child is non-wire add to this.wiringSansWires, and do not add to queue
-        //     if (component0.type == 'wire') {
-        //         const queue = [component0.uuid]; const visited = [component0.uuid]; const noWireNeighbours = [];
-        //         while (queue.length > 0) {
-        //             const current = queue.shift(); const neighbours = networkGraph[current];
-        //             for (let i=0; i<neighbours.length; i++) {
-        //                 const neighbour = neighbours[i];
-        //                 if (this.uuid__type[neighbour] == 'wire') {
-        //                     if (visited.indexOf(neighbour) == -1) {
-        //                         queue.push(neighbour); visited.push(neighbour);
-        //                     }
-        //                 } else {
-        //                     noWireNeighbours.push(neighbour); visited.push(neighbour);
-        //                 }
-        //             }
-        //         }
-        //         for (let i=0; i<noWireNeighbours.length; i++) {//component1 is not wire, since cannot be both wires.... <<<<<<<<need to check and throw ?
-        //             const noWireNeighbour = noWireNeighbours[i];
-        //             this.wiringSansWires.push([noWireNeighbour, component1.uuid]);
-        //             this.wiringSansWires.push([component1.uuid, noWireNeighbour]);
-        //         }
-        //     }
-
-        //     if (component1.type == 'wire') {
-        //         const queue = [component1.uuid]; const visited = [component0.uuid]; const noWireNeighbours = [];
-        //         while(queue.length > 0) {
-        //             const current = queue.shift(); const neighbours = networkGraph[current];
-        //             for (let i=0; i<neighbours.length; i++) {
-        //                 const neighbour = neighbours[i];
-        //                 if (this.uuid__type[neighbour] == 'wire') {
-        //                     if (visited.indexOf(neighbour) == -1) {
-        //                         queue.push(neighbour); visited.push(neighbour);
-        //                     }
-        //                 } else {
-        //                     noWireNeighbours.push(neighbour); visited.push(neighbour);
-        //                 }
-        //             }
-        //         }
-        //         for (let i=0; i<noWireNeighbours.length; i++) {//component0 is not wire, since cannot be both wires.... <<<<<<<<need to check and throw ?
-        //             const noWireNeighbour = noWireNeighbours[i];
-        //             this.wiringSansWires.push([noWireNeighbour, component0.uuid]);
-        //             this.wiringSansWires.push([component0.uuid, noWireNeighbour]);
-        //         }
-        //     }
-        // } else {
-        //     this.wiringSansWires.push([component0.uuid, component1.uuid]);
-        // }
 
 
         this.wiring.push([component0.uuid, wireBetween.uuid]);
@@ -283,37 +261,6 @@ class Circuit extends Piece{
         }
         // console.log('this.edge__solderableIndices', this.edge__solderableIndices);
 
-        //find networkGraphNoWires
-        // console.log('wiringSansWires:', this.wiringSansWires);
-        // this.networkGraphNoWires = {};
-        // for (let i=0; i<this.wiringSansWires.length; i++) {
-        //     [component0_uuid, component1_uuid] = this.wiringSansWires[i];
-        //     console.log(this.uuid__id[component0_uuid], this.uuid__id[component1_uuid]);
-        //     //
-        //     let existingNeighbours = this.networkGraphNoWires[this.uuid__id[component0_uuid]];
-        //     if (existingNeighbours===undefined) {
-        //         existingNeighbours = [];
-        //     }
-        //     if (existingNeighbours.indexOf(this.uuid__id[component1_uuid]) == -1) {
-        //         console.log('parent:', this.uuid__id[component0_uuid], 'existingNeighbours', existingNeighbours, 'adding:', this.uuid__id[component1_uuid]);
-        //         existingNeighbours.push(this.uuid__id[component1_uuid]);
-        //     }
-        //     this.networkGraphNoWires[this.uuid__id[component0_uuid]] = existingNeighbours;
-        //     //
-        //     //
-        //     existingNeighbours = this.networkGraphNoWires[this.uuid__id[component1_uuid]];
-        //     if (existingNeighbours===undefined) {
-        //         existingNeighbours = [];
-        //     }
-        //     if (existingNeighbours.indexOf(this.uuid__id[component0_uuid]) == -1) {
-        //         console.log('parent:', this.uuid__id[component1_uuid], 'existingNeighbours', existingNeighbours, 'adding:', this.uuid__id[component0_uuid]);
-        //         existingNeighbours.push(this.uuid__id[component0_uuid]);
-        //     }
-        //     this.networkGraphNoWires[this.uuid__id[component1_uuid]] = existingNeighbours;
-        //     //
-        // }
-        // console.log('this.networkGraphNoWires', this.networkGraphNoWires); console.log('*************************************************')
-
         // console.log(this.uuid__id); console.log(this.id__uuid);
         let networkGraph = {}; let idNetworkGraph = {}; let id__type = {};
         // let component0_uuid; let component1_uuid; 
@@ -343,6 +290,7 @@ class Circuit extends Piece{
             //
         }
         this.networkGraph = networkGraph;
+        console.log('id__uuid: ');console.log(this.id__uuid);
         return networkGraph;
     }
 }

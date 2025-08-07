@@ -281,7 +281,7 @@ class Schemeparser(Parser):
             print('self.ast***********')
             pp.pprint(self.ast)
             print('*******************')
-        return Latexparser(ast=self.ast)._unparse()
+        return Latexparser(ast=self.ast, rootOfTree=self.rootOfTree)._unparse()
 
 
 class Backtracker:

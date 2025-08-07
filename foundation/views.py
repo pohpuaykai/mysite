@@ -12,7 +12,7 @@ def index(request):
     # return render(request, "foundation/index.html", {})#TODO please remove this<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
-def automat_findEquationsAndSolve(request):
+def automat_findEquations(request):
 
     """
     #KVL (this is also voltage_divider) #MST, APSP on MST, find subtracted edges, putback subtracted edges with shortestpath to form faces
@@ -37,7 +37,6 @@ def automat_findEquationsAndSolve(request):
     pp = pprint.PrettyPrinter(indent=4)
     # pp.pprint(circuit_details)
     #because json keys has to be str.
-    # exec(f"global networkGraph;networkGraph={circuit_details['networkGraph']}"); 
     networkGraph = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraph'].items()))
     # networkGraphNoWires = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraphNoWires'].items()))
     id__type = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['id__type'].items()))
@@ -46,75 +45,108 @@ def automat_findEquationsAndSolve(request):
     for edge, solderableLeads in circuit_details['edge__solderableIndices'].items():
         edgeStart___str, edgeEnd___str = edge.split(',')
         edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
-    # networkGraph = circuit_details['networkGraph']; id__type = circuit_details['id__type']
     print('networkGraph')
     pp.pprint(networkGraph)
-    # print('networkGraphNoWires')
-    # pp.pprint(networkGraphNoWires)
     pp.pprint(id__type)
     pp.pprint(id__positiveLeadsDirections)
     print('edge__solderableIndices:')
     pp.pprint(edge__solderableIndices)
-    print('dependentId: ', circuit_details['dependentId'])
-    print('dependentVarType: ', circuit_details['dependentVarType'])
-    print('list_independentId: ', circuit_details['list_independentId'])
-    print('list_independentVarType: ', circuit_details['list_independentVarType'])
-    list_tuple_independentId__independentVarType = zip(circuit_details['list_independentId'], circuit_details['list_independentVarType'])
-    print('dict_independentId__independentVarType: ', list_tuple_independentId__independentVarType)
 
+    componentId__list_variables = {}
+    def updateDictList(newComponentId__list_variables):
+        for newComponentId, newList_variables in newComponentId__list_variables.items():
+            existing = componentId__list_variables.get(newComponentId, [])
+            existing += newList_variables
+            componentId__list_variables[newComponentId] = list(set(existing))
 
     from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
     EquationFinder._has_run_common_code = False # run common code on every HTTPRequest
     # print('existing EquationFinder has ', len(EquationFinder.list_equations), ' equations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # EquationFinder.list_equations = []
-    listOfCollectedEquationStrs = []; listOfCollectedEquations = []; #allVariables = set()
+    equationStr__variables = {}
+    # listOfCollectedEquationStrs = []; listOfCollectedEquations = []; #allVariables = set()
     for equationFinderClass in EquationFinder.getAllEquationFinders():
         # equationFinderClass.list_equations = []
         print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-        print('len(listOfCollectedEquations)', len(listOfCollectedEquations))
+        # print('len(equationStr__variables)', len(equationStr__variables))
         for equation in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
-            listOfCollectedEquationStrs.append(equation._eqs)
-            listOfCollectedEquations.append(equation)
-            variables = equation.variablesScheme
-            # for variable in variables.keys():
-            #     allVariables.add(variable)
-    # allVariables = sorted(list(allVariables))
-    # EquationFinder._has_run_common_code = False
-    #print the equations on THREE.scene
-    # listOfCollectedEquations = []
-    # for equation in EquationFinder.list_equations:
-    #     listOfCollectedEquations.append(equation._eqs)
+            
+            # print('componentId__list_variables: ')
+            updateDictList(EquationFinder.componentId__list_variables)
+            # pp.pprint(componentId__list_variables)
+            # print('>><><><><><><><><><><')
+            equationStr__variables[equation._eqs] = list(equation.variablesScheme.keys())
+
+    # print('equationStr__variables: ')
+    # pp.pprint(equationStr__variables)
+    # print('componentId__list_variables: ')
+    # pp.pprint(EquationFinder.componentId__list_variables)
+    # print('>><><><><><><><><><><')
+    pp.pprint(equationStr__variables)
+    #cache this, return the cache id, and then for solveEquations endpoint, give option of using the cached items, like Equation instead of equationStr, to speed things <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    return HttpResponse(dumps({'equationStr__variables':equationStr__variables, 'componentId__list_variables':componentId__list_variables}), content_type="text/plain")
+
+def automat_solveEquations(request):
+    """
+    input:
+    list_equationStr
+    id__type
+    dependentVarStr
+    list_independentVarStr
+    """
+    equation_details = loads(request.body)
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+    # print('equation_details: ')
+    # pp.pprint(equation_details); import pdb;pdb.set_trace()
+    id__type = dict(map(lambda t: (int(t[0]), t[1]), equation_details['id__type'].items()))
+    list_equationStr = equation_details['list_equationStr']
+    dependentVarStr = equation_details['dependentVarStr']
+    list_independentVarStr = equation_details['list_independentVarStr']
+    print('id__type')
+    pp.pprint(id__type)
+    print('list_equationStr')
+    pp.pprint(list_equationStr)
+    print('dependentVarStr')
+    print(dependentVarStr)
+    print('list_independentVarStr')
+    pp.pprint(list_independentVarStr)
+    # print('dependentId: ', equation_details['dependentId'])
+    # print('dependentVarType: ', equation_details['dependentVarType'])
+    # print('list_independentId: ', equation_details['list_independentId'])
+    # print('list_independentVarType: ', equation_details['list_independentVarType'])
+    # list_tuple_independentId__independentVarType = zip(equation_details['list_independentId'], equation_details['list_independentVarType'])
+    # print('dict_independentId__independentVarType: ', list_tuple_independentId__independentVarType)
+    # print('list_equationStr: ', equation_details['list_equationStr'])
 
 
-    #for now randomly choose a dependentVariable, and choose 3 independentVariables.
-    # nonWireVariables = list(filter(lambda s: 'wire' not in s, allVariables))
-    # dependentVariableStr = nonWireVariables[0]; independentVariableStrs = nonWireVariables[1:4]
+    # dependentVariableStr = EquationFinder.getVariable(equation_details['dependentVarType'], id__type[equation_details['dependentId']], circuit_details['dependentId']);
+    # independentVariableStrs = []
+    # for componentId, variableType in list_tuple_independentId__independentVarType:
+    #     independentVariableStrs.append(EquationFinder.getVariable(
+    #         variableType, 
+    #         id__type[componentId], 
+    #         componentId
+    #     ))
 
-    dependentVariableStr = EquationFinder.getVariable(circuit_details['dependentVarType'], id__type[circuit_details['dependentId']], circuit_details['dependentId']);
-    independentVariableStrs = []
-    for componentId, variableType in list_tuple_independentId__independentVarType:
-        independentVariableStrs.append(EquationFinder.getVariable(
-            variableType, 
-            id__type[componentId], 
-            componentId
-        ))
 
 
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print(listOfCollectedEquationStrs); print(len(listOfCollectedEquations));
-    print('dependentVariableStr', dependentVariableStr); print('independentVariableStrs', independentVariableStrs)
+    print(list_equationStr); print(len(list_equationStr));
+    print('dependentVarStr', dependentVarStr); print('list_independentVarStr', list_independentVarStr)
     print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+    from foundation.automat.core.equation import Equation
+    listOfCollectedEquations = []; 
+    for latexEquationStr in list_equationStr:
+        listOfCollectedEquations.append(Equation(equationStr=latexEquationStr, parserName='latex'))
 
     from foundation.ecircuit.equationSolvers.bipartitesolver import BipartiteSolver
 
     # dependentVariableStr = 'X_{total_{6}}'#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
     # independentVariableStrs = ['V_{R_{1}}', 'V_{R_{0}}', 'V_{DC_{4}}']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
-    steps = BipartiteSolver(listOfCollectedEquations, dependentVariableStr, independentVariableStrs)._solve()
+    steps = BipartiteSolver(listOfCollectedEquations, dependentVarStr, list_independentVarStr)._solve()
 
+    pp.pprint(steps)
 
-
-
-
-    # from foundation.ecircuit.orthogonalLayouts.rcclorthogonallayout import RCCLOrthogonalLayout
-
-    return HttpResponse(dumps({'equations':listOfCollectedEquationStrs, 'solvingSteps':steps}), content_type="text/plain")
+    return HttpResponse(dumps({'steps':steps}), content_type="text/plain")

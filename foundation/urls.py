@@ -4,5 +4,6 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("automat_findEquationsAndSolve/", views.automat_findEquationsAndSolve, name="findEquationsAndSolve"),
+    path("automat_findEquations/", views.automat_findEquations, name="findEquations"),
+    path("automat_solveEquations/", views.automat_solveEquations, name="solveEquations"),
 ]

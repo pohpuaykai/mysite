@@ -9,17 +9,24 @@ class KVLEquationFinder(EquationFinder):
         #requires the polarity of each edge
         list_equationVars = []
         # print('KVL directedCycles:', EquationFinder.directedCycles)
-        for directedCycle in EquationFinder.directedCycles:
+        for directedCycle___OG in EquationFinder.directedCycles:
             # print(directedCycle)
             #skip wires by filtering them out
-            directedCycle = list(filter(lambda nodeId: self.id__type[nodeId] != 'wire', directedCycle))
+            directedCycle = list(filter(lambda nodeId: self.id__type[nodeId] != 'wire', directedCycle___OG))
             # print('filteredDirectedCycle', directedCycle)
             startNode = directedCycle[0]
             list_vars = []
             for idx in range(1, len(directedCycle)):
                 endNode = directedCycle[idx]
-                directedEdge = (startNode, endNode); componentType = self.id__type[startNode]
+                # directedEdge = (startNode, endNode); 
+                componentType = self.id__type[startNode]
                 variable = EquationFinder.getVariable('voltage', componentType, startNode)
+                #get the original directedEdge in directedCycle___OG, to be used in self.componentDirectionPositive
+                startIdxOnOGCycle = directedCycle___OG.index(startNode); endIdxOnOGCycle = directedCycle___OG.index(endNode);
+                if startIdxOnOGCycle < endIdxOnOGCycle:
+                    directedEdge = (startNode, directedCycle___OG[startIdxOnOGCycle+1])
+                else: #startIdxOnOGCycle > endIdxOnOGCycle
+                    directedEdge = (directedCycle___OG[startIdxOnOGCycle-1], startNode)
                 list_vars.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})#add positive Voltage variable
                 self.addVariableToComponentIdx(startNode, variable)
 

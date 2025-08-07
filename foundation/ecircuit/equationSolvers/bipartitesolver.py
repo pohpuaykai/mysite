@@ -100,8 +100,18 @@ class BipartiteSolver:
                 'scheme':vorEquation.schemeStr,
                 'root':vorEquation.rootOfTree,
             },
-            'sub':''
+            'sub':'',
+            'vor__subSteps':[],
+            'hin__subSteps':[],
         })
+        # import pprint;pp = pprint.PrettyPrinter(indent=4)
+        def remove_AST_AND_RootOfTree(subStepList):
+            newSubStepList = []
+            for subStep in subStepList:
+                del subStep['resultAST']
+                del subStep['resultRootOfTree']
+                newSubStepList.append(subStep)
+            return newSubStepList
         print('converting to solvingSteps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         for idx, vertexId in enumerate(substitutionPath[2:]):
             print('vertexId', vertexId)
@@ -115,10 +125,16 @@ class BipartiteSolver:
                 #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
                 _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+                
+
                 # print('hinEq steps:')
                 # pp.pprint(_stepsWithoutSimplify___hin)
                 # print('vorEq steps:')
-                # pp.pprint(_stepsWithoutSimplify___vor)
+                # pp.pprint(_stepsWithoutSimplify___vor); import pdb;pdb.set_trace()
+
+                #for now, we just take out the ast, rootOfTree from the _stepsWithoutSimplify
+                _stepsWithoutSimplify___hin = remove_AST_AND_RootOfTree(_stepsWithoutSimplify___hin)
+                _stepsWithoutSimplify___vor = remove_AST_AND_RootOfTree(_stepsWithoutSimplify___vor)
                 # print('substitutionStepAst ', (idx/2), ': ', hinEquation.astScheme, ' subVar: ', entVariable)
                 # pp.pprint(hinEquation.astScheme)
                 # print('substitutionStepLatex ', (idx/2), ': ', Latexparser(ast=hinEquation.astScheme, rootOfTree=hinEquation.rootOfTree)._unparse(), ' subVar: ', entVariable)
@@ -132,7 +148,9 @@ class BipartiteSolver:
                         'scheme':vorEquation.schemeStr,
                         'root':vorEquation.rootOfTree
                     },
-                    'sub':entVariable
+                    'sub':entVariable,
+                    'vor__subSteps':_stepsWithoutSimplify___vor,
+                    'hin__subSteps':_stepsWithoutSimplify___hin
                 })
             else: # vertexId==variableVertexId
                 entVariable = listOfVariables[vertexId__equationVariableId[vertexId]]

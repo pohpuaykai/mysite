@@ -32,33 +32,6 @@ class DCTwoResistorSeries extends Circuit {
 
         const wireBetween11 = this.wire(battery0, resistor1, 1.024, 1, 1);
 
-        // console.log(this.wiring);
-        // const self = this; 
-        //get Equations and solving steps:
-        // function CALLBACK__getAllEquationsAndASolvingStep(listOfEquations_latexStrs, solvingSteps){
-        //     console.log('solvingSteps');
-        //     console.log(solvingSteps);
-        //     const YSize = 30;
-        //     const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
-        //     function CALLBACK__createLatexMeshes(meshIdx, mesh) {
-        //         mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);
-        //         self.scene.add(mesh);
-        //         // console.log(meshIdx, mesh);
-        //         self.animationAggregator.appendAction((function(mesh){
-        //             return function() {
-        //                 if (mesh.position.y > 120) {
-        //                     mesh.visible = false;
-        //                 } else {
-        //                     mesh.position.y += 0.1;
-        //                 }
-        //             }
-        //         })(mesh));
-        //         self.render();
-        //         self.animationAggregator.restartAnimation();
-        //         // renderer.setAnimationLoop( animate );
-        //     }
-        //     self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
-        // }
         //set the dependent and independent variables
         const dependentUUID = resistor0.uuid;
         const list_independentUUID = [battery0.uuid, resistor1.uuid];
@@ -71,28 +44,36 @@ class DCTwoResistorSeries extends Circuit {
                 } else {
                     mesh.position.y += 0.1;
                 }
-            }
+            }//TODO refactor this<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<, this animation will end... if you do not aggregate it to the solving animation.....
         }
-        this.animate_getAllEquationsAndASolvingStep(meshToAnimation, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
+        function onlySubString(s, subString){return s.includes(subString)}
+        const self = this;
+        function solvingCallback(equationStr__variables, componentId__list_variables) {
+            
+            let dependentVarStr = componentId__list_variables[self.uuid__id[resistor0.uuid]].filter(function(s){return onlySubString(s, 'V')})[0];//take the voltage of resistor0
+            let list_independentVarStr = [
+                componentId__list_variables[self.uuid__id[battery0.uuid]].filter(function(s){return onlySubString(s, 'V')})[0],//take the voltage of battery0
+                componentId__list_variables[self.uuid__id[resistor1.uuid]].filter(function(s){return onlySubString(s, 'V')})[0] //take the voltage of resistor1
+            ];
+            function meshToAnimation_solve(mesh) {
+                return function() {
+                    if (mesh.position.y > 120) {
+                        mesh.visible = false;
+                    } else {
+                        mesh.position.y += 0.1;
+                    }
+                }//TODO refactor this<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            }
+            self.animate_solveEquations(meshToAnimation_solve, Object.keys(equationStr__variables), dependentVarStr, list_independentVarStr)
+        }
+        this.animate_findEquations(meshToAnimation, solvingCallback);
 
-        // this.getAllEquationsAndASolvingStep(CALLBACK__getAllEquationsAndASolvingStep, dependentUUID, list_independentUUID, dependentVarType, list_independentVarType);
-        // this.listOfEquations_latexStrs;
-        // this.solvingSteps;
 
 
         return {
             'scene':this.scene,
             'camera':this.camera,
             'renderer':this.renderer,
-            // 'meshes':{
-            //     'resistor0':resistor0,
-            //     'battery0':battery0,
-            //     'resistor1':resistor1,
-            //     'wireBetween01':wireBetween01,
-            //     'wireBetween10':wireBetween10,
-            //     'wireBetween11':wireBetween11
-            // },
-            // 'animate':animate// This will be set within the piece, no need to return this anymore
         }
 
     }

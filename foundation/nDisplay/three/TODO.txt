@@ -1,9 +1,11 @@
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
 --<<Schaum's 3000 Solved Problems In Electric Circuits>>
 -make pretty animations :D
---also animate the other examples from <<3000>>, problem was that there is no explicit for sum_of_resistance, might have to break the endpoint into 2 endpoints
---also animate solving steps
+--Q3_21__P18, should allow false_wire(fakeNode) to be created, to make the topology more like what is in the textbook....
+--also animate the other examples from <<3000>>
+---The equations found looks weird for Q3_21__P18, something wrong with compleximpedancesumequationfinder.py
 --put in the nice looking wires?
+--also animate solving steps, the Yspacing between is hardcoded, not good enough for complicated formulas.... but we want the working to light up with the relevant formulas
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
