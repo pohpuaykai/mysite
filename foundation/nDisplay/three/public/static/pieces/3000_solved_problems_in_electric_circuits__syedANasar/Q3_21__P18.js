@@ -34,19 +34,19 @@ class Q3_21__P18 extends Circuit {
         this.scene.add(resistor__6Ohm__parallel); resistor__6Ohm__parallel.setAllTouchingBoxVisibility(false);//this.render();
         console.log('6OhmParallel'); console.log(resistor__6Ohm__parallel.uuid);
 
-        const a = new Wire({'x':30, 'y':0, 'z':-20, 'radius': 1.024}); //point a on diagram
+        const a = new Wire({'x':30, 'y':0, 'z':-20, 'radius': 0.644/2}); //point a on diagram
         a.setAllTouchingBoxVisibility(false);
         this.scene.add(a);
 
-        const c = new Wire({'x': 10, 'y': 0, 'z':-20, 'radius': 1.024});//point c on the diagram
+        const c = new Wire({'x': 10, 'y': 0, 'z':-20, 'radius': 0.644/2});//point c on the diagram
         c.setAllTouchingBoxVisibility(false);
         this.scene.add(c);
 
-        const d = new Wire({'x': -10, 'y': 0, 'z':-20, 'radius': 1.024});//point d on the diagram
+        const d = new Wire({'x': -10, 'y': 0, 'z':-20, 'radius': 0.644/2});//point d on the diagram
         d.setAllTouchingBoxVisibility(false);
         this.scene.add(d);
 
-        const e = new Wire({'x': -30, 'y': 0, 'z':-20, 'radius': 1.024});//point e on the diagram
+        const e = new Wire({'x': -30, 'y': 0, 'z':-20, 'radius': 0.644/2});//point e on the diagram
         e.setAllTouchingBoxVisibility(false);
         this.scene.add(e);
 
@@ -67,42 +67,42 @@ class Q3_21__P18 extends Circuit {
         console.log('16OhmSeries'); console.log(resistor__16Ohm__series.uuid);
 
         //make the wire connections
-        const wire_c_2OhmParallel_L = this.wire(resistor__2Ohm__parallel, c, 1.024, 1);
+        const wire_c_2OhmParallel_L = this.wire(resistor__2Ohm__parallel, c, 0.644/2, 1);
         wire_c_2OhmParallel_L.setAllTouchingBoxVisibility(false);
-        const wire_c_3OhmParallel_L = this.wire(resistor__3Ohm__parallel, c, 1.024, 1);
+        const wire_c_3OhmParallel_L = this.wire(resistor__3Ohm__parallel, c, 0.644/2, 1);
         wire_c_3OhmParallel_L.setAllTouchingBoxVisibility(false);
-        const wire_c_6OhmParallel_L = this.wire(resistor__6Ohm__parallel, c, 1.024, 1);
+        const wire_c_6OhmParallel_L = this.wire(resistor__6Ohm__parallel, c, 0.644/2, 1);
         wire_c_6OhmParallel_L.setAllTouchingBoxVisibility(false);
 
-        const wire_d_2OhmParallel_R = this.wire(resistor__2Ohm__parallel, d, 1.024, 0);
+        const wire_d_2OhmParallel_R = this.wire(resistor__2Ohm__parallel, d, 0.644/2, 0);
         wire_d_2OhmParallel_R.setAllTouchingBoxVisibility(false);
-        const wire_d_3OhmParallel_R = this.wire(resistor__3Ohm__parallel, d, 1.024, 0);
+        const wire_d_3OhmParallel_R = this.wire(resistor__3Ohm__parallel, d, 0.644/2, 0);
         wire_d_3OhmParallel_R.setAllTouchingBoxVisibility(false);
-        const wire_d_6OhmParallel_R = this.wire(resistor__6Ohm__parallel, d, 1.024, 0);
+        const wire_d_6OhmParallel_R = this.wire(resistor__6Ohm__parallel, d, 0.644/2, 0);
         wire_d_6OhmParallel_R.setAllTouchingBoxVisibility(false);
 
-        const wire_d_6OhmSeries_L = this.wire(resistor__6Ohm__series, d, 1.024, 1);//TODO please fix: if you specify a solderableLead to WireComponent, it goes to CASE3 and BREAKs!
+        const wire_d_6OhmSeries_L = this.wire(resistor__6Ohm__series, d, 0.644/2, 1);//TODO please fix: if you specify a solderableLead to WireComponent, it goes to CASE3 and BREAKs!
         wire_d_6OhmSeries_L.setAllTouchingBoxVisibility(false);
-        const wire_e_6OhmSeries_R = this.wire(resistor__6Ohm__series, e, 1.024, 0);
+        const wire_e_6OhmSeries_R = this.wire(resistor__6Ohm__series, e, 0.644/2, 0);
         wire_e_6OhmSeries_R.setAllTouchingBoxVisibility(false);
 
-        const wire_c_1OhmSeries_R = this.wire(resistor__1Ohm__series, c, 1.024, 0);
+        const wire_c_1OhmSeries_R = this.wire(resistor__1Ohm__series, c, 0.644/2, 0);
         wire_c_1OhmSeries_R.setAllTouchingBoxVisibility(false);
-        const wire_a_1OhmSeries_L = this.wire(resistor__1Ohm__series, a, 1.024, 1);
+        const wire_a_1OhmSeries_L = this.wire(resistor__1Ohm__series, a, 0.644/2, 1);
         wire_a_1OhmSeries_L.setAllTouchingBoxVisibility(false);
         
-        const wire_a_8hmParallel_L = this.wire(resistor__8Ohm__parallel, a, 1.024, 1);
+        const wire_a_8hmParallel_L = this.wire(resistor__8Ohm__parallel, a, 0.644/2, 1);
         wire_a_8hmParallel_L.setAllTouchingBoxVisibility(false);
 
-        const wire_8OhmParallel_e_R = this.wire(resistor__8Ohm__parallel, e, 1.024, 0);
+        const wire_8OhmParallel_e_R = this.wire(resistor__8Ohm__parallel, e, 0.644/2, 0);
         wire_8OhmParallel_e_R.setAllTouchingBoxVisibility(false);
 
-        const wire_16OhmSeries_e_L = this.wire(resistor__16Ohm__series, e, 1.024, 1);
+        const wire_16OhmSeries_e_L = this.wire(resistor__16Ohm__series, e, 0.644/2, 1);
         wire_16OhmSeries_e_L.setAllTouchingBoxVisibility(false);
 
-        const wire_battery_b = this.wire(battery0, resistor__16Ohm__series, 1.024, 0, 0);
+        const wire_battery_b = this.wire(battery0, resistor__16Ohm__series, 0.644/2, 0, 0);
         wire_battery_b.setAllTouchingBoxVisibility(false);
-        const wire_battery_a = this.wire(battery0, a, 1.024, 1);
+        const wire_battery_a = this.wire(battery0, a, 0.644/2, 1);
         wire_battery_a.setAllTouchingBoxVisibility(false);
 
 
@@ -163,7 +163,7 @@ class Q3_21__P18 extends Circuit {
             }
             self.animate_solveEquations(meshToAnimation_solve, Object.keys(equationStr__variables), dependentVarStr, list_independentVarStr)
         }
-        this.animate_findEquations(meshToAnimation, solvingCallback);
+        // this.animate_findEquations(meshToAnimation, solvingCallback);
 
         return {
             'scene':this.scene,

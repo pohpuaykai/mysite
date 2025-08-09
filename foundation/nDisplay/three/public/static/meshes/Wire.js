@@ -60,7 +60,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
     constructor(config) {
         super();
         this.type = 'wire';
-
+        this.wireColor = 0x99d6ff;
         //overloading
         if (typeof config === "object" && config != null) {
             if ('x' in config && 'y' in config && 'z' in config && 'radius' in config) {
@@ -95,7 +95,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
             thetaLength — specify vertical sweep angle size. Default is Math.PI.
          * **/
         const geometry = new THREE.SphereGeometry(radius);
-        const material = new THREE.MeshBasicMaterial({color: 0xffff00})
+        const material = new THREE.MeshBasicMaterial({color: this.wireColor})
         const sphere = new THREE.Mesh(geometry, material);
         this.add(sphere);
         // super(geometry, material);
@@ -899,15 +899,17 @@ class Wire extends THREE.Object3D {//THREE.Line {
          *  );
          * **/
         // console.log('radius', radius);
-        // const tubeMaterial = new THREE.MeshBasicMaterial({ color: 0xce702b });
-        // const wirePathCurve = new WirePathCurve(wirePath);
-        // wirePathCurve.arcLengthDivisions = 1;
+        const tubeMaterial = new THREE.MeshBasicMaterial({ color: this.wireColor });
+        const wirePathCurve = new WirePathCurve(wirePath);
+        wirePathCurve.arcLengthDivisions = 1;
+        // wirePathCurve.arcLengthDivisions = wirePath.length-1;
         // console.log('wirePath.length', wirePath.length);
         // const tubeGeometry = new THREE.TubeGeometry(wirePathCurve, wirePath.length-1, radius, 12, false);//not working very well, doesn't draw orthogonally
+        const tubeGeometry = new THREE.TubeGeometry(wirePathCurve, 128, radius, 12, false);//TODO adjust 128 accounting to total_length of wirePath.
         
-        // const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+        const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
         // console.log('tubeGeometry.vertices: ', tube.geometry.getAttribute('position').array);
-        // this.add(tube);
+        this.add(tube);
 
 
         
@@ -998,10 +1000,72 @@ class Wire extends THREE.Object3D {//THREE.Line {
 }
 
 class WirePathCurve extends THREE.Curve {//TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<display is not very good yet...., not sure why?
+    //Maybe learn how QuadraticBezierCurve3 implements a THREE.Curve ???
     constructor(wirePath) {
         super();
         this.wirePath = wirePath;
-        this.numberOfTimesZeroWasCalled = -1;//This is equivalent to SegmentIdx
+        //calculate length of wirePath
+
+        this.totalLenOfWire = 0;
+        this.list_minSegmentLen_wirePathIdx = [[0.0, 0]]
+        for(let i=0; i<this.wirePath.length-1; i++) {
+            this.totalLenOfWire += this.distance(this.wirePath[i], this.wirePath[i+1]);
+            this.list_minSegmentLen_wirePathIdx.push([this.totalLenOfWire, i+1])// in increasing order of tup[0]
+        }
+        // console.log('~~~~~~~~~~~~~~~~~');
+        // console.log('this.list_minSegmentLen_wirePathIdx', this.list_minSegmentLen_wirePathIdx);
+        // console.log('this.totalLenOfWire', this.totalLenOfWire);
+        // console.log('~~~~~~~~~~~~~~~~~');
+        // this.numberOfTimesZeroWasCalled = -1;//This is equivalent to SegmentIdx
+    }
+
+
+    /**
+     * Euclidean Distance
+     * **/
+    vectorLength(v) {
+        return Math.sqrt((v[0]*v[0])+(v[1]*v[1])+(v[2]*v[2]));
+    }
+
+    distance(v0, v1) {
+        const v = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]];
+        return this.vectorLength(v);
+    }
+
+    getRealPosition(t) {
+        if(t ==1) { t = t-0.0001}
+
+        const actualT = t * this.totalLenOfWire;
+        let startIdx = 0; let endIdx = 1; let minLen = this.list_minSegmentLen_wirePathIdx[0][0]
+        for(let i=0; i<this.list_minSegmentLen_wirePathIdx.length; i++) {
+            if (actualT<this.list_minSegmentLen_wirePathIdx[i][0]) {
+                startIdx = this.list_minSegmentLen_wirePathIdx[i][1]-1; endIdx = this.list_minSegmentLen_wirePathIdx[i][1];
+                minLen = this.list_minSegmentLen_wirePathIdx[i-1][0];
+                // console.log('GOT!!!!!')
+                break
+            }
+        }
+        const startPoint = this.wirePath[startIdx]; const endPoint = this.wirePath[endIdx];
+        const segmentLength = this.distance(startPoint, endPoint);
+        // const directionalVec = [endPoint[0]-startPoint[0], endPoint[1]-startPoint[1], endPoint[2]-startPoint[2]];
+        const s = ((actualT - minLen)/segmentLength);
+        const aa = [
+            startPoint[0]+s*(endPoint[0]-startPoint[0]),
+            startPoint[1]+s*(endPoint[1]-startPoint[1]),
+            startPoint[2]+s*(endPoint[2]-startPoint[2]),
+        ];
+        // console.log('~~~~~~~~~~~~~~~~~~~~');
+        // console.log('t', t)
+        // console.log('actualT', actualT)
+        // console.log('startPoint: ', startPoint);
+        // console.log('endPoint: ', endPoint);
+        // console.log('directionalVec: ', [(endPoint[0]-startPoint[0]), (endPoint[1]-startPoint[1]), (endPoint[2]-startPoint[2])])
+        // console.log('minLen', minLen);
+        // console.log('segmentLength: ', segmentLength);
+        // console.log('s', s);
+        // console.log('aa', aa);
+        // console.log('~~~~~~~~~~~~~~~~~~~~')
+        return aa
     }
 
     /**
@@ -1012,22 +1076,38 @@ class WirePathCurve extends THREE.Curve {//TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
      * TODO we are not doing the bends for now. 
      * For bends, use THREE.ArcCurve to make the bend_shape
      * **/
-    getPoint(t) {//line 37273 three.core.js
-        if (t===0) {this.numberOfTimesZeroWasCalled++;}
-        // console.log('segmentIdx:', this.numberOfTimesZeroWasCalled)
-        const segmentIdx = this.numberOfTimesZeroWasCalled;
-        const startCoordinate = this.wirePath[segmentIdx]; const endCoordinate = this.wirePath[segmentIdx+1];
-        // console.log('t', t);
-        // console.log('returnVec: ', [
+    getPoint(t, optionalTarget = new THREE.Vector3()) {//line 37273 three.core.js
+        const point = optionalTarget;
+        const positionArray = this.getRealPosition(t);
+        point.set(
+            positionArray[0], positionArray[1], positionArray[2]
+        );
+        return point
+
+
+
+        // if (t===0) {this.numberOfTimesZeroWasCalled++;}
+        // // console.log('segmentIdx:', this.numberOfTimesZeroWasCalled)
+        // const segmentIdx = this.numberOfTimesZeroWasCalled;
+        // const startCoordinate = this.wirePath[segmentIdx]; const endCoordinate = this.wirePath[segmentIdx+1];
+        // // console.log('t', t);
+        // // console.log('returnVec: ', [
+        // //     startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
+        // //     startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
+        // //     startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
+        // // ]);
+        // return new THREE.Vector3(
         //     startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
         //     startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
         //     startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
-        // ]);
-        return new THREE.Vector3(
-            startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
-            startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
-            startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
-        )
+        // )
+
+
+
+
+
+
+
         //break t into (wirePath.length -1) segments EVENLY
         // const wirePathIdx = Math.floor(t*(this.wirePath.length -1));
         // let startCoordinate; let endCoordinate;

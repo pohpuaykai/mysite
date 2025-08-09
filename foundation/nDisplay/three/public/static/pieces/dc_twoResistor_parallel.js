@@ -31,39 +31,30 @@ class DCTwoResistorParallel extends Circuit {
         resistor1.setAllTouchingBoxVisibility(false); this.render();
         console.log('resistor1'); console.log(resistor1.uuid);
 
-        const c = new Wire({'x': 15, 'y': 0, 'z':-20, 'radius': 1.024});//point c on the diagram
+        const c = new Wire({'x': 15, 'y': 0, 'z':-20, 'radius': 0.644/2});//point c on the diagram
         this.scene.add(c);
         c.setAllTouchingBoxVisibility(false);
         console.log(c);
 
-        const d = new Wire({'x': -15, 'y': 0, 'z':-20, 'radius': 1.024});//point d on the diagram
+        const d = new Wire({'x': -15, 'y': 0, 'z':-20, 'radius': 0.644/2});//point d on the diagram
         this.scene.add(d);
         d.setAllTouchingBoxVisibility(false);
 
 
         //network|connection information
-        const wire_c_resistor0 = this.wire(resistor0, c, 1.024, 1);
+        const wire_c_resistor0 = this.wire(resistor0, c, 0.644/2, 1);
         wire_c_resistor0.setAllTouchingBoxVisibility(false);
-        const wire_c_resistor1 = this.wire(resistor1, c, 1.024, 1);
+        const wire_c_resistor1 = this.wire(resistor1, c, 0.644/2, 1);
         wire_c_resistor1.setAllTouchingBoxVisibility(false);
-        const wire_d_resistor0 = this.wire(resistor0, d, 1.024, 0);
+        const wire_d_resistor0 = this.wire(resistor0, d, 0.644/2, 0);
         wire_d_resistor0.setAllTouchingBoxVisibility(false);
-        const wire_d_resistor1 = this.wire(resistor1, d, 1.024, 0);
+        const wire_d_resistor1 = this.wire(resistor1, d, 0.644/2, 0);
         wire_d_resistor1.setAllTouchingBoxVisibility(false);
-        const wireBetween11 = this.wire(battery0, d, 1.024, 0);
+        const wireBetween11 = this.wire(battery0, d, 0.644/2, 0);
         wireBetween11.setAllTouchingBoxVisibility(false);
-        const wireBetween00 = this.wire(battery0, c, 1.024, 1);
+        const wireBetween00 = this.wire(battery0, c, 0.644/2, 1);
         wireBetween00.setAllTouchingBoxVisibility(false);
 
-
-
-        // const wireBetween01 = this.wire(resistor0, resistor1, 1.024);
-
-        // const wireBetween10 = this.wire(resistor0, resistor1, 1.024, 1, 1);
-
-        // const wireBetween11 = this.wire(battery0, wireBetween10, 1.024, 1);
-
-        // const wireBetween00 = this.wire(battery0, wireBetween01, 1.024, 0);
 
         //get Equations and solving steps:
         const dependentUUID = resistor0.uuid;
@@ -100,7 +91,7 @@ class DCTwoResistorParallel extends Circuit {
             }
             self.animate_solveEquations(meshToAnimation_solve, Object.keys(equationStr__variables), dependentVarStr, list_independentVarStr)
         }
-        this.animate_findEquations(meshToAnimation, solvingCallback);
+        // this.animate_findEquations(meshToAnimation, solvingCallback);
         
         return {
             'scene':this.scene,

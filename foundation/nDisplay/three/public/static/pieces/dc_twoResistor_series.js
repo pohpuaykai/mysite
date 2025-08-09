@@ -29,13 +29,13 @@ class DCTwoResistorSeries extends Circuit {
         this.scene.add(resistor1); resistor1.setAllTouchingBoxVisibility(false); this.render();
         console.log('resistor1'); console.log(resistor1.uuid);
 
-        const wireBetween01 = this.wire(resistor0, battery0, 1.024, 0, 0, '241');
+        const wireBetween01 = this.wire(resistor0, battery0, 0.644/2, 0, 0, '241');
         wireBetween01.setAllTouchingBoxVisibility(false);
 
-        const wireBetween10 = this.wire(resistor0, resistor1, 1.024, 1, 0);
+        const wireBetween10 = this.wire(resistor0, resistor1, 0.644/2, 1, 0);
         wireBetween10.setAllTouchingBoxVisibility(false);
 
-        const wireBetween11 = this.wire(battery0, resistor1, 1.024, 1, 1, '142');
+        const wireBetween11 = this.wire(battery0, resistor1, 0.644/2, 1, 1, '142');
         wireBetween11.setAllTouchingBoxVisibility(false);
 
         //set the dependent and independent variables
@@ -72,7 +72,7 @@ class DCTwoResistorSeries extends Circuit {
             }
             self.animate_solveEquations(meshToAnimation_solve, Object.keys(equationStr__variables), dependentVarStr, list_independentVarStr)
         }
-        this.animate_findEquations(meshToAnimation, solvingCallback);
+        // this.animate_findEquations(meshToAnimation, solvingCallback);
 
 
 
