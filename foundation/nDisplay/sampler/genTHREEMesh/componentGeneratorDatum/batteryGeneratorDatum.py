@@ -83,7 +83,8 @@ diameter = body_diameter
 ##########################################################################################
 solderableLeads = [
     #left_lead #button +ve
-    [
+{
+    'touchingFaceCoordinates':[
         ([#left_touchingBox #left -> right
 ( -length*(3/4) ,  diameter/2 ,  diameter/2 ), # (right, up, inx)
 ( -length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (right, up, out)
@@ -128,12 +129,11 @@ solderableLeads = [
     ],
 
 
+    'touchingCoordinate':(-length/2, 0, 0), #middle of right touching face
+},
 
-
-
-
-    #right_lead -ve
-    [
+{#right_lead -ve
+    'touchingFaceCoordinates':[
         ([#right_touchingBox # right -> left
 ( length*(3/4) ,  diameter/2 ,  diameter/2 ), # (left, up, inx)
 ( length*(3/4) ,  diameter/2 ,  -diameter/2 ), # (left, up, out)
@@ -177,6 +177,18 @@ solderableLeads = [
 
 
     ],
+
+    'touchingCoordinate':(length/2, 0, 0), #middle of left touching face
+}
+    
+
+
+
+
+
+
+    
+    
 ]
 
 positiveLeadsDirections = [(1, 0)] # if leftSolderableLead to rightSolderableLead, the positive, numbers are indices of solderableLeads

@@ -144,7 +144,9 @@ out = -(diameter*(1/2))-(diameter*(1/2))
 
 solderableLeads = [
     #left_lead
-    [
+{
+    
+    'touchingFaceCoordinates':[
         ([#left_touchingBox #left -> right
 ( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (left, up, inx)
 ( xzCentre-(diameter*(1/2))-(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (left, up, out)
@@ -180,6 +182,10 @@ solderableLeads = [
 #<<<<<<<<<<<<
 
     ],
+    'touchingCoordinate':(xzCentre, yStart, 0),  #middle of downFace
+
+}
+    
 
 ]
 
@@ -248,7 +254,8 @@ xzCentre = right_lead_xzCentre
 solderableLeads += [
 
     #right_lead
-    [
+{
+    'touchingFaceCoordinates':[
         ([#right_touchingBox # right -> left
 ( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  (diameter*(1/2)) ), # (right, up, inx)
 ( xzCentre+(diameter*(1/2))+(diameter*(1/2)) ,  yStart+length ,  -(diameter*(1/2)) ), # (right, up, out)
@@ -285,6 +292,11 @@ solderableLeads += [
 
 
     ],
+
+
+    'touchingCoordinate':(xzCentre, yStart, 0),  #middle of downFace
+}
+    
 ]
 
 

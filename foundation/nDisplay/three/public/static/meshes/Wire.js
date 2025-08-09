@@ -104,6 +104,8 @@ class Wire extends THREE.Object3D {//THREE.Line {
         console.log('x', x, 'y', y, 'z', z);
         //below is the attributes needed to use this Wire as a Component
         this.positiveLeadsDirections = [[0, 0]]; //only one sphere
+        const touchPointsOfSolderableLeads = [];
+
         const bufferLength = 0;
         const left=x-radius-bufferLength; //-x 
         const right=x+radius+bufferLength;//+x
@@ -140,6 +142,10 @@ class Wire extends THREE.Object3D {//THREE.Line {
             [left, down, out]
         ]
         let solderableLeads = [];
+        //take center of each segment
+        touchPointsOfSolderableLeads.push([
+            (left+right)/2, (up+down)/2, (inx+out)/2
+        ]);
         solderableLeads.push([
             {//topFace
                 'touchingFaceCoordinates':[
@@ -190,12 +196,28 @@ class Wire extends THREE.Object3D {//THREE.Line {
                 ]
             },
         ]);// we do a cube around the sphere, only one solderableLead
+        this.touchPointsOfSolderableLeads = touchPointsOfSolderableLeads;
+
+        const uuid__type = {}; this.solderableIdx__touchPointUUID = {}
+        this.touchPointsOfSolderableLeads = touchPointsOfSolderableLeads;
+        for (let i=0; i<touchPointsOfSolderableLeads.length; i++) {
+            let touchPoint = touchPointsOfSolderableLeads[i];
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(touchPoint, 3));
+
+            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+            const point = new THREE.Points(geometry, material);
+            this.attach(point); // scene or any Object3D
+
+            uuid__type[point.uuid] = 'TOUCH_POINT';
+            this.solderableIdx__touchPointUUID[i] = point.uuid;
+        }
         this.solderableLeads = solderableLeads;
 
 
         // console.log("solderableLeads", solderableLeads);
         const solderableLeadsIdx_touchingBoxesIdx__attachmentId = {}; const attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
-        const uuid__type = {};
         for ( let i = 0; i<solderableLeads.length; i++) {
             let touchingFaces = solderableLeads[i];
             // console.log('touchingFaces', touchingFaces);
@@ -603,7 +625,9 @@ class Wire extends THREE.Object3D {//THREE.Line {
         // console.log('wB', wB);
         // console.log('')
         //
-        const wirePath = [];
+        console.log('component0.getTouchPoint(solderableLeadIdx0)', component0.getTouchPoint(solderableLeadIdx0));
+        const wirePath = [component0.getTouchPoint(solderableLeadIdx0)];
+        // const wirePath = [];
         //6.1.0
         const OG__HammingCode__124 = {0:0, 1:1, 2:5, 3:4, 4:2, 5:3, 6:7, 7:6};
         const OG__HammingCode__142 = {0:0, 1:1, 2:3, 3:2, 4:4, 5:5, 6:7, 7:6};
@@ -688,9 +712,10 @@ class Wire extends THREE.Object3D {//THREE.Line {
         if (! cEquals(wirePath[wirePath.length -1], tbC1)) {
             wirePath.push(tbC1);//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<check if last coordinate same as tbC1
         }
+        wirePath.push(component1.getTouchPoint(solderableLeadIdx1));
         
         this.wirePath = wirePath;
-        // console.log('wirePath');console.log(wirePath);
+        console.log('wirePath');console.log(wirePath);
 
         //below is the attributes needed to use this Wire as a Component
         const positiveLeadsDirections = [];
@@ -704,7 +729,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
 
 
         //add touchingFaces to this wire.
-        const solderableLeads = []; const offset = radius+0.001; console.log(offset);
+        const solderableLeads = []; const offset = radius+0.001; console.log(offset); const touchPointsOfSolderableLeads = [];
         for (let i=0; i<wirePath.length-1; i++) {//number_of_solderableLeads == wirePath.length
             const startCoordinate = wirePath[i]; const endCoordinate = wirePath[i+1];
             // console.log('s', startCoordinate); console.log('e', endCoordinate);
@@ -735,6 +760,10 @@ class Wire extends THREE.Object3D {//THREE.Line {
                 [left, down, out]
             ]
             // console.log('coordinates', coordinates);
+            //take center of each segment
+            touchPointsOfSolderableLeads.push([
+                (left+right)/2, (up+down)/2, (inx+out)/2
+            ]);
             solderableLeads.push([
                 {//topFace
                     'touchingFaceCoordinates':[
@@ -787,10 +816,27 @@ class Wire extends THREE.Object3D {//THREE.Line {
             ]);
         }
 
+        this.touchPointsOfSolderableLeads = touchPointsOfSolderableLeads;
+
+        const uuid__type = {}; this.solderableIdx__touchPointUUID = {}
+        this.touchPointsOfSolderableLeads = touchPointsOfSolderableLeads;
+        for (let i=0; i<touchPointsOfSolderableLeads.length; i++) {
+            let touchPoint = touchPointsOfSolderableLeads[i];
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(touchPoint, 3));
+
+            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+            const point = new THREE.Points(geometry, material);
+            this.add(point); // scene or any Object3D
+
+            uuid__type[point.uuid] = 'TOUCH_POINT';
+            this.solderableIdx__touchPointUUID[i] = point.uuid;
+        }
+
         this.solderableLeads = solderableLeads;
         // console.log("solderableLeads", solderableLeads);
         const solderableLeadsIdx_touchingBoxesIdx__attachmentId = {}; const attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
-        const uuid__type = {};
         for ( let i = 0; i<solderableLeads.length; i++) {
             let touchingFaces = solderableLeads[i];
             // console.log('touchingFaces', touchingFaces);
@@ -889,6 +935,31 @@ class Wire extends THREE.Object3D {//THREE.Line {
             updatedSolderableLeads.push(updatedSolderableLead);
         }
         return updatedSolderableLeads;
+    }
+
+
+    /**
+     * get touchPoint of solderableIdx, in javascript array [x, y, z]
+     * **/
+    getTouchPoint(solderableIdx) {
+        let point = this.getObjectByProperty('uuid', this.solderableIdx__touchPointUUID[solderableIdx]);
+        return this.updateListOfCoordinates(point)[0];
+    }
+
+
+    /**
+     * hides the touchingBoxes
+     * **/
+    setAllTouchingBoxVisibility(visible) {
+        for ( let i = 0; i < this.solderableLeads.length; i ++ ) {
+            let touchingBoxes = this.solderableLeads[i];
+            let updatedSolderableLead = [];
+            for ( let j = 0; j < touchingBoxes.length; j ++ ) {
+                let touchingBoxAttachmentId = this.solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]];
+                let touchingBox = this.getObjectByProperty('uuid', touchingBoxAttachmentId);//is THREE.Line
+                touchingBox.visible=visible;
+            }
+        }
     }
 
     /**

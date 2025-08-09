@@ -55,9 +55,9 @@ class Component{{className}} extends THREE.Object3D {
 
 
         const solderableLeads = [
-        {% for touchingFaces in solderableLeads %}
+        {% for solderableLeadsInfo in solderableLeads %}
         [
-            {% for touchingFacePoints in touchingFaces %}
+            {% for touchingFacePoints in solderableLeadsInfo['touchingFaceCoordinates'] %}
             {
                 'touchingFaceCoordinates':[
                     {% for touchingFacePoint in touchingFacePoints %}{{touchingFacePoint[0]}}, {{touchingFacePoint[1]}}, {{touchingFacePoint[2]}},
@@ -69,10 +69,31 @@ class Component{{className}} extends THREE.Object3D {
         {% endfor %}
         ];
 
+        const touchPointsOfSolderableLeads = [
+        {% for solderableLeadsInfo in solderableLeads %}
+            [{{solderableLeadsInfo['touchingCoordinate'][0]}}, {{solderableLeadsInfo['touchingCoordinate'][1]}}, {{solderableLeadsInfo['touchingCoordinate'][2]}}],
+        {% endfor %}
+
+        ]
+        const uuid__type = {}; this.solderableIdx__touchPointUUID = {}
+        this.touchPointsOfSolderableLeads = touchPointsOfSolderableLeads;
+        for (let i=0; i<touchPointsOfSolderableLeads.length; i++) {
+            let touchPoint = touchPointsOfSolderableLeads[i];
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(touchPoint, 3));
+
+            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+            const point = new THREE.Points(geometry, material);
+            this.add(point); // scene or any Object3D
+
+            uuid__type[point.uuid] = 'TOUCH_POINT';
+            this.solderableIdx__touchPointUUID[i] = point.uuid;
+        }
+
 
         this.solderableLeads = solderableLeads;
         const solderableLeadsIdx_touchingBoxesIdx__attachmentId = {}; const attachmentId__solderableLeadsIdx_touchingBoxesIdx = {};
-        const uuid__type = {};
         for ( let i = 0; i<solderableLeads.length; i++) {
             let touchingFaces = solderableLeads[i];
             for(let j = 0; j<touchingFaces.length; j++) {
@@ -130,6 +151,14 @@ class Component{{className}} extends THREE.Object3D {
     }
 
     /**
+     * get touchPoint of solderableIdx, in javascript array [x, y, z]
+     * **/
+    getTouchPoint(solderableIdx) {
+        let point = this.getObjectByProperty('uuid', this.solderableIdx__touchPointUUID[solderableIdx]);
+        return this.updateListOfCoordinates(point)[0];
+    }
+
+    /**
      * Converts THREE.Object3D.geometry.position.array to a Javascript.Array of [x, y, z]; where x, y, z are Javascript floats
      * **/
     updateListOfCoordinates(threeObject3D) {
@@ -142,6 +171,21 @@ class Component{{className}} extends THREE.Object3D {
             updatedPoints.push([updatedPoint.x, updatedPoint.y, updatedPoint.z]);
         }
         return updatedPoints;
+    }
+
+    /**
+     * hides the touchingBoxes
+     * **/
+    setAllTouchingBoxVisibility(visible) {
+        for ( let i = 0; i < this.solderableLeads.length; i ++ ) {
+            let touchingBoxes = this.solderableLeads[i];
+            let updatedSolderableLead = [];
+            for ( let j = 0; j < touchingBoxes.length; j ++ ) {
+                let touchingBoxAttachmentId = this.solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]];
+                let touchingBox = this.getObjectByProperty('uuid', touchingBoxAttachmentId);//is THREE.Line
+                touchingBox.visible=visible;
+            }
+        }
     }
 
     /**
