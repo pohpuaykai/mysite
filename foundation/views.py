@@ -51,6 +51,8 @@ def automat_findEquations(request):
     pp.pprint(id__positiveLeadsDirections)
     print('edge__solderableIndices:')
     pp.pprint(edge__solderableIndices)
+    print('id__positiveLeadsDirections')
+    pp.pprint(id__positiveLeadsDirections)
 
     componentId__list_variables = {}
     def updateDictList(newComponentId__list_variables):

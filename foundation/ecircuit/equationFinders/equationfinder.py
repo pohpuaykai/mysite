@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from foundation.automat.core.equation import Equation
 from foundation.automat.parser.sorte.latexparser import Latexparser
 from foundation.automat.common.smallcyclefinder import SmallCycleFinder
+from foundation.automat.common.spanningtree import SpanningTree
 
 class EquationFinder(ABC):
 
@@ -34,14 +35,15 @@ class EquationFinder(ABC):
             self.directedEdges = [] # a part of directedCycles, for convienence
             self.list_equations = []#EquationFinder.list_equations
             EquationFinder.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
-            self.assignDirectionToEdges()#produces self.directedCycles
+            self.assignDirectionToEdges()#produces self.directedCycles# self.edge__solderableIndices = EquationFinder.edge__solderableIndices
+            print('directedCycles: ', EquationFinder.directedCycles)
+            EquationFinder.edge__solderableIndices =self.edge__solderableIndices
+            self.groupComponentsIntoPathsAndBalls()
             self.superNodeIds = EquationFinder.superNodeIds
             self.list_nodeIds___deg2 = EquationFinder.list_nodeIds___deg2 # for KCL
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
             self.superNodeUndirectedGraph = EquationFinder.superNodeUndirectedGraph#{}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
-            # self.edge__solderableIndices = EquationFinder.edge__solderableIndices
-            EquationFinder.edge__solderableIndices =self.edge__solderableIndices
-            self.groupComponentsIntoPathsAndBalls()
+            
             print('superNodeIds: ')
             print(self.superNodeIds)
             print('list_nodeIds___degs: ')
@@ -79,8 +81,9 @@ class EquationFinder(ABC):
                 # print('module_name::', module_name)
                 # module_obj = importlib.import_module(f'.', package=__name__)
                 module_obj = importlib.import_module(f'..{module_name}', package=__name__)
-                for name, cls in inspect.getmembers(module_obj, predicate=inspect.isclass):
-                    if name in ['EquationFinder']:
+                for name, cls in inspect.getmembers(module_obj, predicate=inspect.isclass): # TODO parametrise this, according to circuit_type
+                    if name in ['EquationFinder'] or \
+                    'all' not in cls.usageTags:
                         continue
                     equationFinders.append(cls)
         return equationFinders
@@ -153,58 +156,192 @@ class EquationFinder(ABC):
 
 
     def assignDirectionToEdges(self):
-        # self.directedEdges = []
-        #init, first cycle there are no directedEdges, so we assign according to the existing cycle's list direction
-        startNode = self.cycles[0][0]
-        for idx in range(1, len(self.cycles[0])):
-            endNode = self.cycles[0][idx]
-            self.directedEdges.append((startNode, endNode))
-            startNode = endNode
-        self.directedCycles.append(self.cycles[0])#EquationFinder.directedCycles.append(self.cycles[0])
-        #check if the cycle has any directedEdges, then we go according to that direction
-        for cycleIdx in range(1, len(self.cycles)):
-            cycle = self.cycles[cycleIdx]
-            #look for directedEdges
-            startNode = cycle[0]
-            for idx in range(1, len(cycle)):
-                endNode = cycle[idx]
-                if (startNode, endNode) in self.directedEdges:
-                    break
-                elif (endNode, startNode) in self.directedEdges:
-                    cycle = list(reversed(cycle))
-                    break
-                startNode = endNode
-            #check if all the non-wire-components are connected in edge__solderableIndices
-            startNonWireComponent = None; solderableIdx = None;
-            print('cycle:', cycle, 'startNode: ', startNode, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-            for startNodeId in range(0, len(cycle)-1):
-                # endNodeId = cycle[startNodeId+1]; edge = (startNodeId, endNodeId)
-                endNode = cycle[startNodeId+1]; startNode = cycle[startNodeId]; edge = (startNode, endNode)
-                print(edge);
-                if startNonWireComponent is not None and self.id__type[endNode] not in ['wire']:
-                    solderableIdx = self.edge__solderableIndices[edge]
-                    if startNonWireComponent != endNode:
-                        self.edge__solderableIndices[(startNonWireComponent, endNode)] = solderableIdx
-                        self.edge__solderableIndices[(endNode, startNonWireComponent)] = solderableIdx
-                        # print('adding: ', (startNonWireComponent, endNode))
-                    startNonWireComponent = endNode; #reset
-                if startNonWireComponent is None and self.id__type[startNode] not in ['wire']:
-                    startNonWireComponent = startNode
-            # print('self.edge__solderableIndices', self.edge__solderableIndices)
-            #
-            EquationFinder.edge__solderableIndices = self.edge__solderableIndices
-            print('EquationFinder.edge__solderableIndices', EquationFinder.edge__solderableIndices)
+        """
+Make DFSTree on supergraph instead? its faster? unless the supergraph is empty
+Follow the paths of the DFSTree and assign direction
+-
+for the removed edges follow the direction of the edge before the removed edge
 
-            #add directedEdges
-            self.directedCycles.append(cycle)#EquationFinder.directedCycles.append(cycle)
-            startNode = cycle[0]
-            for idx in range(1, len(cycle)):
-                endNode = cycle[idx]
-                self.directedEdges.append((startNode, endNode))
-                startNode = endNode
-        EquationFinder.directedCycles = self.directedCycles # we want it to persist across HTTP Requests
+self.directedEdges = a list of 2-tuples, each item is a nodeId
+        """
+        from copy import deepcopy
+        startNode = list(self.networkGraph.keys())[0]
+        directedSpanningTree, subtracted_edges = SpanningTree.undirectedSpanningTreeDBFSSearchUndirectedGraph(
+            self.networkGraph, startNode=startNode, breadthFirst=False, directed='current')
+
+        print(directedSpanningTree)
+        print(subtracted_edges)
+        print('startNode: ', startNode)
+        stack = [{'current': startNode, 'path':[startNode]}]; paths = []
+        while len(stack) > 0:
+            cd = stack.pop()
+            children = directedSpanningTree.get(cd['current'], [])
+            for child in children:
+                nd = deepcopy(cd)
+                nd['current'] = child
+                nd['path'].append(child)
+                stack.append(nd)
+            if len(children) == 0: # end of path, leaf
+                paths.append(cd['path'])
+
+
+        #remove all the single-sided edges from subtracted_edges, since the other side of these single-sided edges must be in the directedSpanningTree
+        doubleSided_subtracted_edges = []
+        for edge in subtracted_edges:
+            #doubleSided, and the other side not already added to doubleSided_subtracted_edges
+            if edge in subtracted_edges and (edge[1], edge[0]) in subtracted_edges and edge not in doubleSided_subtracted_edges and (edge[1], edge[0]) not in doubleSided_subtracted_edges:
+                doubleSided_subtracted_edges.append(edge)
+
+        # print('doubleSided_subtracted_edges', doubleSided_subtracted_edges); import pdb;pdb.set_trace()
+
+        #find paths that this edge connects to, loops back on itself
+        self.directedEdges = [] # need to store directed edges, so that we can check that directedCycles do not contradict themselves
+        for edge in doubleSided_subtracted_edges:
+            for path in paths:
+                # import pdb;pdb.set_trace()
+                try:
+                    idx0 = path.index(edge[0]); idx1 = path.index(edge[1])
+                    startIdx = min(idx0, idx1); endIdx = max(idx0, idx1)
+                    directedCycle = path[startIdx, endIdx+1]#inclusive of the endIdx
+                    directedCycle += [directedCycle[0]] # add the first node to the end to complete the cycle
+                    self.directedCycles.append(directedCycle)
+                    for i in range(0, len(directedCycle)-1):
+                        self.directedEdges.append((directedCycle[i], directedCycle[i+1]))
+                except:
+                    pass
+
+        #find 2 paths that this edge connects to, and form a cycle
+        for edge in doubleSided_subtracted_edges:
+            connectedPaths = [] # must have exactly 2
+            for path in paths:
+                try:
+                    connectedPaths.append({'path':path, 'index':path.index(edge[0])})
+                except:
+                    try:
+                        connectedPaths.append({'path':path, 'index':path.index(edge[1])})
+                    except:
+                        pass
+                if len(connectedPaths) == 2:
+                    break
+            if len(connectedPaths) == 2:
+                #find largest index common item in each path, by construction_of_path above, paths must at least share a startNode, and might have many similar node down the zip, only take the dissimilar
+                commonPath = list(map(lambda zt: zt[0], filter(lambda t: t[0]==t[1], zip(connectedPaths[0]['path'], connectedPaths[1]['path']))))
+                #if the edge was on the commonPath, it would have been caught by above "loops back on itself", so edge[0] and edge[1] are on seperate paths
+                #so we remove the commonPath from each connectedPaths, except for 1 node at the beginning for checking of directedEdges
+                path0 = connectedPaths[0]['path'][len(commonPath)-1:connectedPaths[0]['index']+1]
+                path1 = connectedPaths[1]['path'][len(commonPath)-1:connectedPaths[1]['index']+1]
+
+                # import pdb;pdb.set_trace()
+
+                #need to check which edge already exist in the directedEdges, to avoid contradiction
+                directedEdge = None#NOT NEEDED????<<<<<<<
+                # if edge in directedEdges:# this case should have been caught in the above
+                #     directedEdge  = edge
+                # elif (edge[1], edge[0]) in directedEdges:# this case should have been caught in the above
+                #     directedEdge = (edge[1], edge[0])
+                # else:
+                #only this case is possible
+                frontPath = None; backPath = None
+                for i in range(0, len(path0)-1):
+                    pEdge = (path0[i], path0[i+1])
+                    if pEdge in self.directedEdges:
+                        directedEdge = pEdge; frontPath = path0; backPath = path1; break
+                    elif (pEdge[1], pEdge[0]) in self.directedEdges:
+                        directedEdge = (pEdge[1], pEdge[0]); frontPath = list(reversed(path0))[:-1]; backPath = list(reversed(path1+[frontPath[0]])); break
+                if not directedEdge: #path0 does not have an edge in directedEdges, we check if path1 has an edge in directedEdges
+                    for i in range(0, len(path1)-1):
+                        pEdge = (path1[i], path1[i+1])
+                        if pEdge in self.directedEdges:
+                            directedEdge = pEdge; frontPath = path1; backPath = path0; break
+                        elif (pEdge[1], pEdge[0]) in self.directedEdges:
+                            directedEdge = (pEdge[1], pEdge[0]); frontPath = list(reversed(path1))[:-1]; backPath = list(reversed(path0+[frontPath[0]])); break
+                # print('directedEdges: ', self.directedEdges); import pdb;pdb.set_trace()
+                if directedEdge is None: # we can have any direction we want
+                    frontPath = path0; backPath = path1
+                directedCycle = [] # default
+                if frontPath!= backPath: #when path0 is a subpath of path1, TODO why?
+                    directedCycle = frontPath + list(reversed(backPath))
+                if len(directedCycle) > 0:
+                    self.directedCycles.append(directedCycle)
+                    #then add each directed edge into the directedEdges
+                    for i in range(0, len(directedCycle)-1):
+                        self.directedEdges.append((directedCycle[i], directedCycle[i+1]))
+
+
+        print('directedCycles: ', self.directedCycles)
+
+        EquationFinder.directedCycles = self.directedCycles
         EquationFinder.directedEdges = self.directedEdges  # we want it to persist across HTTP Requests
-        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CREATED self.directedCycles', self.directedCycles)
+        # print(directedSpanningTree)
+        # print(subtracted_edges)
+        # import pdb;pdb.set_trace()
+
+
+
+
+
+
+        # if len(self.superNodeUndirectedGraph) > 0:
+        #     undirectedSpanningTree, subtracted_edges = SpanningTree.undirectedSpanningTreeDBFSSearchUndirectedGraph(
+        #         self.superNodeUndirectedGraph, startNode=list(self.superNodeUndirectedGraph.keys())[0], breadthFirst=False)
+        #     print(undirectedSpanningTree)
+        #     print(subtracted_edges)
+        #     import pdb;pdb.set_trace()
+        # else:#all the nodes are at most degree 2, there is only 1 cycle.
+        #     self.directedCycles = [self.cycles[0]]
+        # EquationFinder.directedCycles = self.directedCycles # we want it to persist across HTTP Requests
+        # # self.directedEdges = []
+        # #init, first cycle there are no directedEdges, so we assign according to the existing cycle's list direction
+        # startNode = self.cycles[0][0]
+        # for idx in range(1, len(self.cycles[0])):
+        #     endNode = self.cycles[0][idx]
+        #     self.directedEdges.append((startNode, endNode))
+        #     startNode = endNode
+        # self.directedCycles.append(self.cycles[0])#EquationFinder.directedCycles.append(self.cycles[0])
+        # #check if the cycle has any directedEdges, then we go according to that direction
+        # for cycleIdx in range(1, len(self.cycles)):
+        #     cycle = self.cycles[cycleIdx]
+        #     #look for directedEdges
+        #     startNode = cycle[0]
+        #     for idx in range(1, len(cycle)):
+        #         endNode = cycle[idx]
+        #         if (startNode, endNode) in self.directedEdges:
+        #             break
+        #         elif (endNode, startNode) in self.directedEdges:
+        #             cycle = list(reversed(cycle))
+        #             break
+        #         startNode = endNode
+        #     #check if all the non-wire-components are connected in edge__solderableIndices
+        #     startNonWireComponent = None; solderableIdx = None;
+        #     print('cycle:', cycle, 'startNode: ', startNode, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        #     for startNodeId in range(0, len(cycle)-1):
+        #         # endNodeId = cycle[startNodeId+1]; edge = (startNodeId, endNodeId)
+        #         endNode = cycle[startNodeId+1]; startNode = cycle[startNodeId]; edge = (startNode, endNode)
+        #         print(edge);
+        #         if startNonWireComponent is not None and self.id__type[endNode] not in ['wire']:
+        #             solderableIdx = self.edge__solderableIndices[edge]
+        #             if startNonWireComponent != endNode:
+        #                 self.edge__solderableIndices[(startNonWireComponent, endNode)] = solderableIdx
+        #                 self.edge__solderableIndices[(endNode, startNonWireComponent)] = solderableIdx
+        #                 # print('adding: ', (startNonWireComponent, endNode))
+        #             startNonWireComponent = endNode; #reset
+        #         if startNonWireComponent is None and self.id__type[startNode] not in ['wire']:
+        #             startNonWireComponent = startNode
+        #     # print('self.edge__solderableIndices', self.edge__solderableIndices)
+        #     #
+        #     EquationFinder.edge__solderableIndices = self.edge__solderableIndices
+        #     print('EquationFinder.edge__solderableIndices', EquationFinder.edge__solderableIndices)
+
+        #     #add directedEdges
+        #     self.directedCycles.append(cycle)#EquationFinder.directedCycles.append(cycle)
+        #     startNode = cycle[0]
+        #     for idx in range(1, len(cycle)):
+        #         endNode = cycle[idx]
+        #         self.directedEdges.append((startNode, endNode))
+        #         startNode = endNode
+        # EquationFinder.directedCycles = self.directedCycles # we want it to persist across HTTP Requests
+        # EquationFinder.directedEdges = self.directedEdges  # we want it to persist across HTTP Requests
+        # # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CREATED self.directedCycles', self.directedCycles)
 
 
     def addVariableToComponentIdx(self, componentIdx, variableStr):
@@ -214,10 +351,26 @@ class EquationFinder(ABC):
             EquationFinder.componentId__list_variables[componentIdx] = existing
             # EquationFinder.componentId__list_variables[componentIdx].append(variableStr)
 
-    def componentDirectionPositive(self, directedEdge):#TODO this should be renamed to componentDirectionPositive
+    def componentDirectionPositive(self, directedEdge):
+        """
+        the directedEdge is soldered together by 
+        end of the component of directedEdge[0] = A
+        start of the component of directedEdge[1] = B
+        so all the positiveLeadDirections for directedEdge should be AXB (A cartesian_product B)
+        """
         solderableIndices = self.edge__solderableIndices[directedEdge]
-        isPositive = list(solderableIndices) in self.id__positiveLeadsDirections[directedEdge[0]] # take the start...., or should have taken the end? directedEdges[1]
-        # print('>>>>>', list(solderableIndices), self.id__positiveLeadsDirections[directedEdge[0]], isPositive)
+
+        print('solderableIndices', list(solderableIndices))
+        print('directedEdge[0]', self.id__positiveLeadsDirections[directedEdge[0]])
+        print('directedEdge[1]', self.id__positiveLeadsDirections[directedEdge[1]])
+        all_positiveLeads = []
+        for solderableIdx0 in map(lambda solderableTup: solderableTup[1], self.id__positiveLeadsDirections[directedEdge[0]]):
+            for solderableIdx1 in map(lambda solderableTup: solderableTup[0], self.id__positiveLeadsDirections[directedEdge[1]]):
+                all_positiveLeads.append([solderableIdx0, solderableIdx1])
+
+
+        isPositive = list(solderableIndices) in all_positiveLeads
+        print('>>>>>', list(solderableIndices), all_positiveLeads, isPositive)
         return isPositive
 
     def directedEdgeIsPositive(self, directedEdge):#TODO this should be renamed to directedEdgeIsPositive

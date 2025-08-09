@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class CompleximpedancesumEquationFinder(EquationFinder):
+    usageTags = []# not all circuits can be added like this, for now we remove this equationFinder for all circuits
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
         super().__init__(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices)
@@ -40,21 +41,21 @@ class CompleximpedancesumEquationFinder(EquationFinder):
                     if componentType in ['resistor']:
                         variable = EquationFinder.getVariable('resistance', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, variable)
-                        list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})
+                        list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge, componentId)})
                     elif componentType in ['capacitor']:
                         capacitanceVariable = EquationFinder.getVariable('capacitance', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, capacitanceVariable)
                         frequencyVariable = EquationFinder.getVariable('frequency', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, frequencyVariable)
                         variable = self.makeRatio('1', f'{imaginery_number} {frequencyVariable} {capacitanceVariable}')
-                        list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})
+                        list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge, componentId)})
                     elif componentType in ['inductor']:
                         inductanceVariable = EquationFinder.getVariable('inductance', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, inductanceVariable)
                         frequencyVariable = EquationFinder.getVariable('frequency', componentType, componentId)
                         self.addVariableToComponentIdx(componentId, frequencyVariable)
                         variable = f'{imaginery_number} {frequencyVariable} {inductanceVariable}'
-                        list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})
+                        list_var.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge, componentId)})
                 print('not nonlinearPath: ', not nonlinearPath, ' and len(list_var) > 0:', len(list_var) > 0)
                 if not nonlinearPath and len(list_var) > 0: # add_normal
                     latexStrWithEqual = self.sumOfPositiveNegativeToLatexAndScheme(list_var, {'varStr':'', 'positive':True}, addAsEquation=False) # just to get the imcomplete equation for harmonic_add later

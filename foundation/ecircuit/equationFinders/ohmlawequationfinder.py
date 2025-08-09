@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class OhmlawEquationFinder(EquationFinder):
+    usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
         super().__init__(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices)

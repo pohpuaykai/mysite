@@ -494,7 +494,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; visited = [maxEquationVertexId];
         maxLength=0; maxLengthChildDict = None
         while len(stack)>0:
-            current___dict = stack.pop()#lastOut
+            current___dict = stack.pop()#lastOut,  what if we choose the neighbour, that is in the unwanted_variable set ? will that be a better path?
             for neighbour in equationVariables_bg[current___dict['current']]:
             # for neighbour in T[current___dict['current']]: # this is the correct one, but does not perform as well
                 if neighbour not in visited:

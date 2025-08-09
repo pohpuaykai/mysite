@@ -18,13 +18,16 @@ class DCTwoResistorSeries extends Circuit {
     act() {
 
         const resistor0 = new ComponentResistor({x:0, y:0, z:-20});
-        this.scene.add(resistor0); this.render();
+        this.scene.add(resistor0); //this.render();
+        console.log('resistor0'); console.log(resistor0.uuid);
 
         const battery0 = new ComponentBattery({x:0, y:0, z:10});
-        this.scene.add(battery0); this.render();
+        this.scene.add(battery0); //this.render();
+        console.log('battery0'); console.log(battery0.uuid);
 
         const resistor1 = new ComponentResistor({x:15, y:0, z:-20});
         this.scene.add(resistor1); this.render();
+        console.log('resistor1'); console.log(resistor1.uuid);
 
         const wireBetween01 = this.wire(resistor0, battery0, 1.024);
 

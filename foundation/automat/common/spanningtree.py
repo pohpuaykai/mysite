@@ -40,11 +40,16 @@ class SpanningTree:
 
 
     @classmethod
-    def undirectedSpanningTreeDBFSSearchUndirectedGraph(cls, g, startNode=None, breadthFirst=False):
+    def undirectedSpanningTreeDBFSSearchUndirectedGraph(cls, g, startNode=None, breadthFirst=False, directed=False):
         """
         g is undirected_connected_graph
 
         if breadthFirst is false, then its depthFirst
+
+        directed can take 
+        0. False, then its undirected
+        1. current, then we only take current->neighbour
+        2. neighbour, then we only take neighbour->current
         """
         if breadthFirst:
             popOrder = 0 # first out -> queue
@@ -63,15 +68,17 @@ class SpanningTree:
                     visited.add(neighbour);
                     stack.append(neighbour) # last in
                     #add to undirected_spanning_tree
-                    existingNeighbours = undirectedSpanningTree.get(current, [])
-                    existingNeighbours.append(neighbour)
-                    undirectedSpanningTree[current] = existingNeighbours
-                    edgesSelected.add((current, neighbour))
+                    if not directed or directed == 'current':
+                        existingNeighbours = undirectedSpanningTree.get(current, [])
+                        existingNeighbours.append(neighbour)
+                        undirectedSpanningTree[current] = existingNeighbours
+                        edgesSelected.add((current, neighbour))
                     #if undirected then we only add one side
-                    existingNeighbours = undirectedSpanningTree.get(neighbour, [])
-                    existingNeighbours.append(current)
-                    undirectedSpanningTree[neighbour] = existingNeighbours
-                    edgesSelected.add((neighbour, current))
+                    if not directed or directed == 'neighbour':
+                        existingNeighbours = undirectedSpanningTree.get(neighbour, [])
+                        existingNeighbours.append(current)
+                        undirectedSpanningTree[neighbour] = existingNeighbours
+                        edgesSelected.add((neighbour, current))
         #
         subtracted_edges = []
         for parentNode, neighbours in g.items(): #since g is undirected_connected_graph, every edge is on g
