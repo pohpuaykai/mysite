@@ -54,39 +54,72 @@ def automat_findEquations(request):
     print('id__positiveLeadsDirections')
     pp.pprint(id__positiveLeadsDirections)
 
-    componentId__list_variables = {}
-    def updateDictList(newComponentId__list_variables):
-        for newComponentId, newList_variables in newComponentId__list_variables.items():
-            existing = componentId__list_variables.get(newComponentId, [])
-            existing += newList_variables
-            componentId__list_variables[newComponentId] = list(set(existing))
+    # componentId__list_variables = {}
+    # def updateDictList(newComponentId__list_variables):
+    #     for newComponentId, newList_variables in newComponentId__list_variables.items():
+    #         existing = componentId__list_variables.get(newComponentId, [])
+    #         existing += newList_variables
+    #         componentId__list_variables[newComponentId] = list(set(existing))
 
     from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
     EquationFinder._has_run_common_code = False # run common code on every HTTPRequest
     # print('existing EquationFinder has ', len(EquationFinder.list_equations), ' equations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # EquationFinder.list_equations = []
-    equationStr__variables = {}
+    # equationStr__variables = {}
+    returnData = []
     # listOfCollectedEquationStrs = []; listOfCollectedEquations = []; #allVariables = set()
+    #backend to associate formulas with graph information and variable information
+    """
+    {
+        'equation':,#inLatexFormat
+        'equationFinderDisplayName':,#like "Ohms Law", "Kirchoff Voltage Law"
+        'list_list_networkNodeIds':,#like for Kirchoff Voltage Law, a list of directedCycles, for Ohms Law, list_list of nodeIds?
+        'variableInfos':[
+            {
+                'variable':,
+                'networkNodeIds':, # for totals, take a list of networkIds
+            }
+        ]
+    }
+    """
     for equationFinderClass in EquationFinder.getAllEquationFinders():
         # equationFinderClass.list_equations = []
         print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         # print('len(equationStr__variables)', len(equationStr__variables))
-        for equation in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
-            
+
+        for infoD in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
+            equation = infoD['equation']; list_list_networkNodeIds = infoD['list_list_networkNodeIds']
             # print('componentId__list_variables: ')
-            updateDictList(EquationFinder.componentId__list_variables)
+            # updateDictList(EquationFinder.componentId__list_variables)
             # pp.pprint(componentId__list_variables)
             # print('>><><><><><><><><><><')
-            equationStr__variables[equation._eqs] = list(equation.variablesScheme.keys())
+            # equationStr__variables[equation._eqs] = list(equation.variablesScheme.keys())
+            # import pdb;pdb.set_trace()
+
+            variableStr__nodeId = {}
+            for nodeId, list_variableStr in EquationFinder.componentId__list_variables.items():
+                for variableStr in list_variableStr:
+                    variableStr__nodeId[variableStr] = nodeId
+
+            returnData.append({
+                'equation':equation._eqs,
+                'equationFinderDisplayName':equationFinderClass.equationFinderDisplayName,
+                'list_list_networkNodeIds':list_list_networkNodeIds,#like for Kirchoff Voltage Law, a list of directedCycles, for Ohms Law, list_list of nodeIds?
+                'variableInfos':EquationFinder.componentId__list_variables,
+                'variables':list(equation.variables.keys()),
+                'variableStr__nodeId':variableStr__nodeId
+            })
 
     # print('equationStr__variables: ')
     # pp.pprint(equationStr__variables)
     # print('componentId__list_variables: ')
     # pp.pprint(EquationFinder.componentId__list_variables)
     # print('>><><><><><><><><><><')
-    pp.pprint(equationStr__variables)
+    pp.pprint(returnData)
     #cache this, return the cache id, and then for solveEquations endpoint, give option of using the cached items, like Equation instead of equationStr, to speed things <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    return HttpResponse(dumps({'equationStr__variables':equationStr__variables, 'componentId__list_variables':componentId__list_variables}), content_type="text/plain")
+    # return HttpResponse(dumps({'equationStr__variables':equationStr__variables, 'componentId__list_variables':componentId__list_variables}), content_type="text/plain")
+    return HttpResponse(dumps(returnData), content_type="text/plain")
+
 
 def automat_solveEquations(request):
     """

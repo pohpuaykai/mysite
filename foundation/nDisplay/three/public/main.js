@@ -45,12 +45,12 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 
 document.body.appendChild( renderer.domElement );
 
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+// const axesHelper = new THREE.AxesHelper(5);
+// scene.add(axesHelper);
 
 //add pointlight TODO light seems to have no difference for MeshBasicMaterial, because i didn't generate UV
-// const light = new THREE.PointLight(0xffffff, 1, 10, 2);//color, intensity, range_of_light, decay_of_light
-// light.position.set(5, 5, 5);
+// const light = new THREE.PointLight(0xffffff, 1, 1000, 2);//color, intensity, range_of_light, decay_of_light
+// light.position.set(5, 5, -20);
 // scene.add(light);
 
 function render() {
@@ -66,9 +66,9 @@ function onWindowResize() {
     render();
 }
 
-// const circuit = new DCTwoResistorSeries(scene, camera, renderer, {});
-// const circuit = new DCTwoResistorParallel(scene, camera, renderer, {});
-const circuit = new Q3_21__P18(scene, camera, renderer, {});
+// const circuit = new DCTwoResistorSeries(scene, camera, renderer, []);
+const circuit = new DCTwoResistorParallel(scene, camera, renderer, []);
+// const circuit = new Q3_21__P18(scene, camera, renderer, []);
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 

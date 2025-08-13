@@ -108,18 +108,18 @@ class Q3_21__P18 extends Circuit {
 
         //this question needs to get the sum of 3 components, not just each component
         //get Equations and solving steps:
-        function meshToAnimation(mesh) {
+        function findEquationAnimation___functionGen(list_equationNetworkInfoDict) {
             return function() {
                 if (mesh.position.y > 120) {
                     mesh.visible = false;
                 } else {
                     mesh.position.y += 0.1;
                 }
-            }
+            }//TODO refactor this<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<, this animation will end... if you do not aggregate it to the solving animation.....
         }
         function onlySubString(s, subString){return s.includes(subString)}
         const self = this;
-        function solvingCallback(equationStr__variables, componentId__list_variables) {
+        function solvingCallback(list_equationNetworkInfoDict) {
             //
             //find the equation that contains R of resistor__16Ohm__series, since total must contain it, set as E
             const theEquationStr = Object.keys(equationStr__variables).filter(function(s){return onlySubString(s, self.uuid__id[resistor__16Ohm__series.uuid])})[0];
@@ -163,7 +163,7 @@ class Q3_21__P18 extends Circuit {
             }
             self.animate_solveEquations(meshToAnimation_solve, Object.keys(equationStr__variables), dependentVarStr, list_independentVarStr)
         }
-        // this.animate_findEquations(meshToAnimation, solvingCallback);
+        // this.animate_findEquations(findEquationAnimation___functionGen, solvingCallback);
 
         return {
             'scene':this.scene,

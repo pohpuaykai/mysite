@@ -11,6 +11,15 @@
   <body>
     <script src="/public/static/mathjax/tex-svg.js"></script>
     <script>
+      window.MathJaxSVG = window.MathJax;
+      delete window.MathJax;
+    </script>
+    <script src="/public/static/mathjax/tex-chtml-full.js"></script>
+    <script>
+      window.MathJaxCHTML = window.MathJax;
+      delete window.MathJax;
+    </script>
+    <script>
       const findEquations_url = "{% url 'findEquations' %}";
       const solveEquations_url = "{% url 'solveEquations' %}";
     </script>

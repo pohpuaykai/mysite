@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class CapacitortimingEquationFinder(EquationFinder):
+    equationFinderDisplayName = "Capacitor Timing"
     usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
@@ -16,6 +17,7 @@ class CapacitortimingEquationFinder(EquationFinder):
 
         for componentId, componentType in self.id__type.items():
             if componentType in ['capacitor']:
+                associatedComponentIdList = [componentId]
                 currentVariable = EquationFinder.getVariable('current', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, currentVariable)
                 capacitanceVariable = EquationFinder.getVariable('capacitance', componentType, componentId)
@@ -23,5 +25,5 @@ class CapacitortimingEquationFinder(EquationFinder):
                 voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, voltageVariable)
                 timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
-                self.firstOrderSeperableDifferentialEquation(currentVariable, capacitanceVariable, voltageVariable, timeVariable)
+                self.firstOrderSeperableDifferentialEquation(currentVariable, capacitanceVariable, voltageVariable, timeVariable, [associatedComponentIdList])
         return self.list_equations

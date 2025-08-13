@@ -5,9 +5,8 @@
 --also animate the other examples from <<3000>> and <<foundations>>
 --animated solving steps, the Yspacing between is hardcoded, not good enough for complicated formulas.... but we want the working to light up with the relevant formulas
 ---relevant_circuit_light_up_with_the_relevant_formulas<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<priority for youtube_videos
-----backend to associate formulas with graph information and variable information
-----frontend to associate latexMesh with variable information to light up relevant parts of formula
-----frontend, lighting up animation
+----equation_variables highlights variable wrongly
+----refactor the findEquation animation, instead of copy and paste
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS

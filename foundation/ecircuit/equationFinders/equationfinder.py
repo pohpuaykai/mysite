@@ -455,30 +455,30 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
         subsubscript = str(nodeId)
         return f'{main_symbol}_{{{subscript}_{{{subsubscript}}}}}'
 
-    def sumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, addAsEquation=True):
+    def sumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, associatedComponentIdList, addAsEquation=True):
         latexStr = Latexparser.makePlusAndMinus(list_vars, equivalentVariableDict)
         print('sumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
         if addAsEquation:
-            self.addLatexStrAsEquation(latexStr)
+            self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
         else:
             return latexStr
 
-    def harmonicSumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict):
+    def harmonicSumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, associatedComponentIdList):
         latexStr = Latexparser.makeHarmonicPlusAndMinusEqualsZero(list_vars, equivalentVariableDict)
         print('harmonicSumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
-        self.addLatexStrAsEquation(latexStr)
+        self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
-    def simpleRatioToLatexAndScheme(self, equivalentRatio, numerator, denominator):
+    def simpleRatioToLatexAndScheme(self, equivalentRatio, numerator, denominator, associatedComponentIdList):
         latexStr = Latexparser.makeSimpleRatio(equivalentRatio, numerator, denominator)
         print('simpleRatioToLatexAndScheme; latexStr: ', latexStr)
-        self.addLatexStrAsEquation(latexStr)
+        self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
-    def firstOrderSeperableDifferentialEquation(self, equivalent, derivativeMultiplier, differentiand, differentiator):
+    def firstOrderSeperableDifferentialEquation(self, equivalent, derivativeMultiplier, differentiand, differentiator, associatedComponentIdList):
         latexStr = Latexparser.makeFirstOrderSeparableDifferentialEquation(equivalent, derivativeMultiplier, differentiand, differentiator)
         print('firstOrderSeperableDifferentialEquation; latexStr: ', latexStr)
-        self.addLatexStrAsEquation(latexStr)
+        self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
-    def makeLinearFirstOrderDifferentialEquation(self, equivalent, listOfTerms):
+    def makeLinearFirstOrderDifferentialEquation(self, equivalent, listOfTerms, associatedComponentIdList):
         """#solving steps are here: https://en.wikipedia.org/wiki/Matrix_differential_equation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<automate when you reach many BJT
         listOfTerms = [
             {'coefficient':, 'differentiand': , 'differentiator': },
@@ -486,22 +486,22 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
         """
         latexStr = Latexparser.makeLinearFirstOrderDifferentialEquation(equivalent, listOfTerms)
         print('makeLinearFirstOrderDifferentialEquation; latexStr: ', latexStr)
-        self.addLatexStrAsEquation(latexStr)
+        self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
-    def addLatexStrAsEquation(self, latexStr):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    def addLatexStrAsEquation(self, latexStr, associatedComponentIdList):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         equation = Equation(equationStr=latexStr, parserName='latex')
         # print('schemeStr: ', equation.schemeStr)
-        self.list_equations.append(equation)
+        self.list_equations.append({'equation':equation, 'list_list_networkNodeIds':associatedComponentIdList})
 
     def makeRatio(self, numerator, denominator):
         latexStr = Latexparser.makeRatio(numerator, denominator)
         print('makeRatio; latexStr: ', latexStr)
         return latexStr
 
-    def exponentialMinusOne(self, equivalent, multiplicative, exponent):
+    def exponentialMinusOne(self, equivalent, multiplicative, exponent, associatedComponentIdList):
         latexStr = Latexparser.exponentialMinusOne(equivalent, multiplicative, exponent)
         print('exponentialMinusOne; latexStr: ', latexStr)
-        self.addLatexStrAsEquation(latexStr)
+        self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
     def getConstantVariable(self, name):
         """

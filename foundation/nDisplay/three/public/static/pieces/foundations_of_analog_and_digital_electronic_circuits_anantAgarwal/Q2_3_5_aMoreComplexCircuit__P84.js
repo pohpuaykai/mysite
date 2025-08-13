@@ -100,7 +100,7 @@ class Q2_3_5_aMoreComplexCircuit__P84 extends Circuit {
         // }
         // function onlySubString(s, subString){return s.includes(subString)}
         // const self = this;
-        // function solvingCallback(equationStr__variables, componentId__list_variables) {
+        // function solvingCallback(list_equationNetworkInfoDict) {
         //     //
         //     //find the equation that contains R of resistor__16Ohm__series, since total must contain it, set as E
         //     const theEquationStr = Object.keys(equationStr__variables).filter(function(s){return onlySubString(s, self.uuid__id[resistor__16Ohm__series.uuid])})[0];

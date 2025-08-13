@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class OhmlawEquationFinder(EquationFinder):
+    equationFinderDisplayName = "Ohm Law"
     usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
@@ -18,5 +19,6 @@ class OhmlawEquationFinder(EquationFinder):
                 self.addVariableToComponentIdx(componentId, voltageVariable)
                 currentVariable = EquationFinder.getVariable('current', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, currentVariable)
-                self.simpleRatioToLatexAndScheme(resistanceVariable, voltageVariable, currentVariable)
+                associatedComponentIdList = [componentId]
+                self.simpleRatioToLatexAndScheme(resistanceVariable, voltageVariable, currentVariable, [associatedComponentIdList])
         return self.list_equations

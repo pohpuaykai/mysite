@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class ShockleydiodeEquationFinder(EquationFinder):
+    equationFinderDisplayName = "Shockley Diode"
     usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
@@ -31,5 +32,6 @@ class ShockleydiodeEquationFinder(EquationFinder):
                 self.addVariableToComponentIdx(componentId, temperatureVariable)
                 temperatureVoltage = self.makeRatio(f'{ideality_factorVariable} {boltzmann_constantVariable} {temperatureVariable}', charge_of_an_electronVariable)
                 exponent = self.makeRatio(diodeVoltageVariable, temperatureVoltage)
-                self.exponentialMinusOne(diodeCurrentVariable, diode_saturationCurrentVariable, exponent)
+                associatedComponentIdList = [componentId]
+                self.exponentialMinusOne(diodeCurrentVariable, diode_saturationCurrentVariable, exponent, [associatedComponentIdList])
         return self.list_equations

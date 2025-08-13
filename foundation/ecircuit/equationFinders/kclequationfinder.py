@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class KCLEquationFinder(EquationFinder):
+    equationFinderDisplayName = "Kirchhoff Current Law"
     usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
@@ -33,7 +34,8 @@ class KCLEquationFinder(EquationFinder):
                     #add equation
                     latexStr = f'{variable0___nc0}={variable1___nc0}'
                     print('0latexStr: ', latexStr)
-                    self.addLatexStrAsEquation(latexStr)
+                    associatedComponentIdList = [deg2NodeId, neighbour0]
+                    self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
             #
             if neighbour1 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour1) not in added2DegEdges and\
             self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
@@ -51,7 +53,8 @@ class KCLEquationFinder(EquationFinder):
                     #add equation
                     latexStr = f'{variable0___nc1}={variable1___nc1}'
                     print('1latexStr: ', latexStr)
-                    self.addLatexStrAsEquation(latexStr)
+                    associatedComponentIdList = [deg2NodeId, neighbour1]
+                    self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
             if self.id__type[deg2NodeId] in ['wire'] and\
             self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
@@ -65,7 +68,8 @@ class KCLEquationFinder(EquationFinder):
                 self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                 latexStr = f'{variable1___nc0}={variable1___nc1}'
                 print('2latexStr: ', latexStr)
-                self.addLatexStrAsEquation(latexStr)
+                associatedComponentIdList = [neighbour1, neighbour0]
+                self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
 
         list_equationVars = []; 
@@ -74,10 +78,13 @@ class KCLEquationFinder(EquationFinder):
         for startSuperNodeId in self.superNodeIds:
             #find components
             #
+            associatedComponentIdList = []
             list_vars = []
             for endSuperNodeId in self.superNodeUndirectedGraph[startSuperNodeId]:
                 list_directedPath = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId)))
                 for directedPath in list_directedPath: #all the components on this directedPath are ALL_positive or ALL_negative
+                    # import pdb;pdb.set_trace()
+                    associatedComponentIdList.append([startSuperNodeId]+list(directedPath)+[endSuperNodeId])
                     directedEdge = (startSuperNodeId, directedPath[0])
                     isPositive = directedEdge in self.directedEdges
                     # print('directedEdge', directedEdge); import pdb;pdb.set_trace()
@@ -91,7 +98,7 @@ class KCLEquationFinder(EquationFinder):
                         list_vars.append({'varStr':variable, 'positive':isPositive})#add positive Voltage variable
                         self.addVariableToComponentIdx(componentId, variable)
             if len(list_vars) > 0:
-                self.sumOfPositiveNegativeToLatexAndScheme(list_vars, {'varStr':'0', 'positive':True})
+                self.sumOfPositiveNegativeToLatexAndScheme(list_vars, {'varStr':'0', 'positive':True}, associatedComponentIdList)
 
 
 

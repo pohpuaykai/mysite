@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class EbermollsEquationFinder(EquationFinder):
+    equationFinderDisplayName = "Eber Molls"
     usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
@@ -17,6 +18,7 @@ class EbermollsEquationFinder(EquationFinder):
         """
         for componentId, componentType in self.id__type.items():
             if componentType in ['transistor']:
+                associatedComponentIdList = [componentId]
                 emitterCurrentVariable = EquationFinder.getVariable("current", componentType, componentId)#<<<<<<<
                 self.addVariableToComponentIdx(componentId, emitterCurrentVariable)
                 emitter_saturationCurrentVariable = EquationFinder.getVariable("current", componentType, componentId)#<<<<<<<
@@ -29,5 +31,5 @@ class EbermollsEquationFinder(EquationFinder):
                 self.addVariableToComponentIdx(componentId, temperatureVariable)
                 temperatureVoltage = self.makeRatio(f'{boltzmann_constantVariable} {temperatureVariable}', charge_of_an_electronVariable)
                 exponent = self.makeRatio(baseEmitterVoltageVariable, temperatureVoltage)
-                self.exponentialMinusOne(emitterCurrentVariable, emitter_saturationCurrentVariable, exponent)
+                self.exponentialMinusOne(emitterCurrentVariable, emitter_saturationCurrentVariable, exponent, [associatedComponentIdList])
         return self.list_equations

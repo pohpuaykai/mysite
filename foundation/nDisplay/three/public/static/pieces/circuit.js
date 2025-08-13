@@ -1,8 +1,10 @@
 import {Wire} from '../meshes/Wire.js';
-import {LatexMeshCreator} from '../custom/LatexMeshCreater.js'
-import {asyncCreateTextMesh} from '../custom/TextMeshCreater.js'
 import {Piece} from './piece.js';
 import {Animation} from '../custom/Animation.js';
+
+//all the components
+import {ComponentResistor} from '../meshes/ComponentResistor.js';
+import {ComponentBattery} from '../meshes/ComponentBattery.js';
 
 class Circuit extends Piece{
     
@@ -76,26 +78,43 @@ class Circuit extends Piece{
         componenttypeSVGFilepath_ajax.send();
     }
 
-    animate_findEquations(meshToAnimation, solvingCallback) {
+
+    animate_findEquations(solvingCallback, readyCallback) {//TODO meshToAnimation, should take a 
         const self = this;
-        function CALLBACK__findEquations(equationStr__variables, componentId__list_variables){
-            console.log("equationStr__variables"); console.log(equationStr__variables)
-            console.log("componentId__list_variables"); console.log(componentId__list_variables)
+        function CALLBACK__findEquations(list_equationNetworkInfoDict){
+            // console.log("equationStr__variables"); console.log(equationStr__variables)
+            // console.log("componentId__list_variables"); console.log(componentId__list_variables)
+            self.list_equationNetworkInfoDict = list_equationNetworkInfoDict;
 
-            solvingCallback(equationStr__variables, componentId__list_variables);
-
-            let listOfEquations_latexStrs = Object.keys(equationStr__variables);
-            const YSize = 30;
-            const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
-            self.animationAggregator.resetAggregatedAnimations();
-            function CALLBACK__createLatexMeshes(meshIdx, mesh) {
-                mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);// here we are fixing the position....<<<<<<<<<<<<<<<
-                self.scene.add(mesh);
-                self.animationAggregator.appendAction(meshToAnimation(mesh));
-                self.render();
-                self.animationAggregator.restartAnimation();
+            solvingCallback(list_equationNetworkInfoDict);
+            // const findEquationAnimation = findEquationAnimation___functionGen(list_equationNetworkInfoDict);
+            // self.scheduleAnimation(findEquationAnimation, 0);//0 is a priority, lower number gets animated first.
+            let latexStrs = [];
+            for(let i=0; i<list_equationNetworkInfoDict.length; i++) {
+                latexStrs.push([list_equationNetworkInfoDict[i]['equation'], list_equationNetworkInfoDict[i]['variables']]);
             }
-            self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
+            console.log('list_equationNetworkInfoDict', list_equationNetworkInfoDict)
+            latexStrs = [...new Set(latexStrs)];
+            self.makeLatexMesh(latexStrs, readyCallback); // also give latexStr to variables
+
+
+
+
+
+
+
+            // let listOfEquations_latexStrs = Object.keys(equationStr__variables);
+            // const YSize = 30;
+            // const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
+            // self.animationAggregator.resetAggregatedAnimations();
+            // function CALLBACK__createLatexMeshes(meshIdx, mesh) {
+            //     mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);// here we are fixing the position....<<<<<<<<<<<<<<<
+            //     self.scene.add(mesh);
+            //     self.animationAggregator.appendAction(meshToAnimation(mesh));
+            //     self.render();
+            //     self.animationAggregator.restartAnimation();
+            // }
+            // self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
         }
 
         this.findEquations(CALLBACK__findEquations);
@@ -109,14 +128,32 @@ class Circuit extends Piece{
         xhr.onreadystatechange  = function(){
 
             if (this.readyState == 4 && this.status == 200) {
-              const responseDict = JSON.parse(this.responseText);
-              const equationStr__variables = responseDict['equationStr__variables']
-              self.equationStr__variables = equationStr__variables;
-              const componentId__list_variables = responseDict['componentId__list_variables']
-              self.componentId__list_variables = componentId__list_variables
-              console.log('equationStr__variables', self.equationStr__variables);
-              console.log('componentId__list_variables', self.componentId__list_variables);
-              callback(equationStr__variables, componentId__list_variables);
+              const list_equationNetworkInfoDict = JSON.parse(this.responseText);
+              /**
+               * responseDict is a list that contains many:
+               *     {
+               *        'equation':,#inLatexFormat
+               *        'equationFinderDisplayName':,#like "Ohms Law", "Kirchoff Voltage Law"
+               *        'list_list_networkNodeIds':,#like for Kirchoff Voltage Law, a list of directedCycles, for Ohms Law, list_list of nodeIds?
+               *        'variableInfos':[
+               *            {
+               *                'variable':,
+               *                'networkNodeIds':, # for totals, take a list of networkIds
+               *            }
+               *        ]
+               *    }
+               * 
+               * **/
+
+
+
+              // const equationStr__variables = responseDict['equationStr__variables']
+              // self.equationStr__variables = equationStr__variables;
+              // const componentId__list_variables = responseDict['componentId__list_variables']
+              // self.componentId__list_variables = componentId__list_variables
+              // console.log('equationStr__variables', self.equationStr__variables);
+              // console.log('componentId__list_variables', self.componentId__list_variables);
+              callback(list_equationNetworkInfoDict);
             }
         }
         // xhr.onerror = function(){}
@@ -198,25 +235,57 @@ class Circuit extends Piece{
         // return lmc.generatedMeshes;
     }
 
-    //wiring and network information
+
+
+    //wiring and network information and methods
+
+    createComponent({componentName, position={x:0, y:0, z:0}, additionalInfo={}}) {
+        let component;
+        console.log(componentName);
+        switch(componentName) {
+            case 'resistor':
+                component = new ComponentResistor(position);
+                break;
+            case 'battery':
+                component = new ComponentBattery(position);
+                break;
+            case 'wire':
+
+                component = new Wire(Object.assign({}, additionalInfo, position));//merge the additionalInfo and position together
+                break;
+            default:
+                throw new Error();
+        }
+        this.meshUUID__mesh[component.uuid] = component;
+        return component
+    }
 
     wire(component0, component1, wireRadius, solderableLeadIdx0=null, solderableLeadIdx1=null, hamming3Idx='214') {
 
-        const wireBetween = new Wire({
+        // const wireBetween = new Wire({
+        //     'component0':component0, 
+        //     'component1':component1, 
+        //     'radius':wireRadius, 
+        //     'solderableLeadIdx0':solderableLeadIdx0, 
+        //     'solderableLeadIdx1':solderableLeadIdx1,
+        //     'hamming3Idx':hamming3Idx
+        // });//AWG18
+        const wireBetween = this.createComponent(
+            {componentName:'wire', position:{}, additionalInfo:{
             'component0':component0, 
             'component1':component1, 
             'radius':wireRadius, 
             'solderableLeadIdx0':solderableLeadIdx0, 
             'solderableLeadIdx1':solderableLeadIdx1,
             'hamming3Idx':hamming3Idx
-        });//AWG18
+            }})
         if (solderableLeadIdx0 === null) {
             solderableLeadIdx0 = wireBetween.solderableLeadIdx0
         }
         if (solderableLeadIdx1 === null) {
             solderableLeadIdx1 = wireBetween.solderableLeadIdx1
         }
-        this.scene.add(wireBetween); this.render();
+        this.enter(wireBetween.uuid);// this.scene.add(wireBetween); this.render();
 
 
         this.wiring.push([component0.uuid, wireBetween.uuid]);
@@ -290,7 +359,7 @@ class Circuit extends Piece{
             //
         }
         this.networkGraph = networkGraph;
-        console.log('id__uuid: ');console.log(this.id__uuid);
+        // console.log('id__uuid: ');console.log(this.id__uuid);
         return networkGraph;
     }
 }

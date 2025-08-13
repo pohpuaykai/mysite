@@ -1,6 +1,7 @@
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class BJTcurrentamplificationEquationFinder(EquationFinder):
+    equationFinderDisplayName = "BJT Current Amplification"
     usageTags = ['all']
 
     def __init__(self, networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices):
@@ -24,6 +25,7 @@ class BJTcurrentamplificationEquationFinder(EquationFinder):
         """
         for componentId, componentType in self.id__type.items():
             if componentType in ['transistor']:
+                associatedComponentIdList = [componentId]
                 commonCurrentVariable = EquationFinder.getVariable("current", 'transistor_common', componentId)#<<<<<<<
                 self.addVariableToComponentIdx(componentId, commonCurrentVariable)
                 emitterCurrentVariable = EquationFinder.getVariable("current", 'transistor_emitter', componentId)#<<<<<<<
@@ -51,15 +53,15 @@ class BJTcurrentamplificationEquationFinder(EquationFinder):
                 baseEmitterCapacitanceVariable = EquationFinder.getVariable("capacitance", 'transistor_base_common', componentId)#also capacitance_{\pi} # stores charge <->sets delays in forward biasing
                 self.addVariableToComponentIdx(componentId, baseEmitterCapacitanceVariable)
                 #KCL
-                self.sumOfPositiveNegativeToLatexAndScheme(self, [{'varStr':baseCurrentVariable, 'positive':True}, {'varStr':commonCurrentVariable, 'positive':True}], {'varStr':emitterCurrentVariable, 'positive':True})
+                self.sumOfPositiveNegativeToLatexAndScheme(self, [{'varStr':baseCurrentVariable, 'positive':True}, {'varStr':commonCurrentVariable, 'positive':True}], {'varStr':emitterCurrentVariable, 'positive':True}, associatedComponentIdList)
                 #amplication
-                self.simpleRatioToLatexAndScheme(alphaVariable, commonCurrentVariable, emitterCurrentVariable)
-                self.simpleRatioToLatexAndScheme(betaVariable, commonCurrentVariable, baseCurrentVariable)
-                self.simpleRatioToLatexAndScheme(alphaVariable, betaVariable, betaVariable+'+1')
-                self.simpleRatioToLatexAndScheme(betaVariable, alphaVariable, '1-'+alphaVariable)
+                self.simpleRatioToLatexAndScheme(alphaVariable, commonCurrentVariable, emitterCurrentVariable, associatedComponentIdList)
+                self.simpleRatioToLatexAndScheme(betaVariable, commonCurrentVariable, baseCurrentVariable, associatedComponentIdList)
+                self.simpleRatioToLatexAndScheme(alphaVariable, betaVariable, betaVariable+'+1', associatedComponentIdList)
+                self.simpleRatioToLatexAndScheme(betaVariable, alphaVariable, '1-'+alphaVariable, associatedComponentIdList)
                 #OhmsLaw (Hybrid-pi_model)
-                self.simpleRatioToLatexAndScheme(commonResistanceVariable, commonVoltageVariable+'-'+emitterVoltageVariable, commonCurrentVariable)#take R_{CE}=commonResistanceVariable, V_{CE}=commonVoltageVariable-emitterVoltageVariable
-                self.simpleRatioToLatexAndScheme(baseResistanceVariable, baseVoltageVariable+'-'+emitterVoltageVariable, baseCurrentVariable)#take R_{BE}=baseResistanceVariable, V_{BE}=baseVoltageVariable-emitterVoltageVariable
+                self.simpleRatioToLatexAndScheme(commonResistanceVariable, commonVoltageVariable+'-'+emitterVoltageVariable, commonCurrentVariable, associatedComponentIdList)#take R_{CE}=commonResistanceVariable, V_{CE}=commonVoltageVariable-emitterVoltageVariable
+                self.simpleRatioToLatexAndScheme(baseResistanceVariable, baseVoltageVariable+'-'+emitterVoltageVariable, baseCurrentVariable, associatedComponentIdList)#take R_{BE}=baseResistanceVariable, V_{BE}=baseVoltageVariable-emitterVoltageVariable
                 
                 #compleximpedance should be included in CompleximpedancesumEquationFinder.py<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 #capacitortimingmodel (aka switching_timing_models)
@@ -67,6 +69,6 @@ class BJTcurrentamplificationEquationFinder(EquationFinder):
                 self.makeLinearFirstOrderDifferentialEquation(baseCurrentVariable, [
                     {'coefficient':baseEmitterCapacitanceVariable, 'differentiand':baseVoltageVariable+'-'+emitterVoltageVariable , 'differentiator':timeVariable },
                     {'coefficient':baseCollectorCapacitanceVariable, 'differentiand':baseVoltageVariable+'-'+commonVoltageVariable , 'differentiator':timeVariable }
-                ])
-                self.firstOrderSeperableDifferentialEquation(currentVariable, baseCollectorCapacitanceVariable, voltageVariable, timeVariable)
+                ], associatedComponentIdList)
+                self.firstOrderSeperableDifferentialEquation(currentVariable, baseCollectorCapacitanceVariable, voltageVariable, timeVariable, [associatedComponentIdList])
         return self.list_equations

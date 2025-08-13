@@ -1,4 +1,6 @@
 import * as THREE from '../three/three.module.js';
+import {Actor} from '../custom/Actor.js';
+
 import {kDTree} from '../common/kDTree.js';
 import {RayIntersectBox} from '../common/RayIntersectBox.js';
 /**
@@ -52,7 +54,7 @@ import {RayIntersectBox} from '../common/RayIntersectBox.js';
  * 40|0.0799
  * 
  */
-class Wire extends THREE.Object3D {//THREE.Line {
+class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
     /**
      * 
      * **/
@@ -98,6 +100,8 @@ class Wire extends THREE.Object3D {//THREE.Line {
         const material = new THREE.MeshBasicMaterial({color: this.wireColor})
         const sphere = new THREE.Mesh(geometry, material);
         this.add(sphere);
+        // this.mainMeshUUID = [sphere.uuid];
+        this.addMainMesh(sphere.uuid)
         // super(geometry, material);
         this.position.set(x, y, z);
 
@@ -899,6 +903,7 @@ class Wire extends THREE.Object3D {//THREE.Line {
          *  );
          * **/
         // console.log('radius', radius);
+
         const tubeMaterial = new THREE.MeshBasicMaterial({ color: this.wireColor });
         const wirePathCurve = new WirePathCurve(wirePath);
         wirePathCurve.arcLengthDivisions = 1;
@@ -908,6 +913,8 @@ class Wire extends THREE.Object3D {//THREE.Line {
         const tubeGeometry = new THREE.TubeGeometry(wirePathCurve, 128, radius, 12, false);//TODO adjust 128 accounting to total_length of wirePath.
         
         const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+        // this.mainMeshUUID = [tube.uuid];
+        this.addMainMesh(tube.uuid)
         // console.log('tubeGeometry.vertices: ', tube.geometry.getAttribute('position').array);
         this.add(tube);
 
@@ -917,6 +924,17 @@ class Wire extends THREE.Object3D {//THREE.Line {
     }
 
 
+    /**
+     * Get all disjoint mainMeshes
+     * **/
+    getAllMainMeshes() {
+        const disjointMainMeshes = []; let disjointMesh;
+        this.mainMeshUUID.forEach(meshUUID => {
+            disjointMesh = this.getObjectByProperty('uuid', meshUUID);
+            disjointMainMeshes.push(disjointMesh)
+        })
+        return disjointMainMeshes
+    }
     /**
      * get all touchingBoxes
      * 

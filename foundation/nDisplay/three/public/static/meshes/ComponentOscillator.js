@@ -1,10 +1,12 @@
 import * as THREE from '../three/three.module.js';
 
+import {Actor} from '../custom/Actor.js';
+
 /**
  *
  * Is a THREE.Object3D that has a few disjoint meshes, with a list of touchingFaces, whose corners wires will originate (and end)
  */
-class ComponentOscillator extends THREE.Object3D {
+class ComponentOscillator extends Actor {//extends THREE.Object3D {
 
     constructor(position, rotation={x:0, y:0, z:0}) {
         super();
@@ -4946,7 +4948,7 @@ class ComponentOscillator extends THREE.Object3D {
         ];//disjoint meshes
 
         this.boundingBox = null;
-
+        // this.mainMeshUUID = [];
         for(let i=0; i<listOfVertices.length; i++) {
             const geometry = new THREE.BufferGeometry();
             const vertices = listOfVertices[i];
@@ -4961,6 +4963,8 @@ class ComponentOscillator extends THREE.Object3D {
                 side: THREE.DoubleSide //ensure backface shows color too
             });
             const disjointMesh = new THREE.Mesh(geometry, material);
+            // this.mainMeshUUID.push(disjointMesh.uuid);
+            this.addMainMesh(disjointMesh.uuid);
             this.add(disjointMesh);
         }
 
@@ -5120,6 +5124,8 @@ class ComponentOscillator extends THREE.Object3D {
         this.rotation.set(rotation.x, rotation.y, rotation.z);
     }
 
+
+
     /**
      * get all touchingBoxes
      * **/
@@ -5127,10 +5133,10 @@ class ComponentOscillator extends THREE.Object3D {
         let updatedSolderableLeads = [];
         for ( let i = 0; i < this.solderableLeads.length; i ++ ) {
             let touchingBoxes = this.solderableLeads[i];
-            let updatedSolderableLead = [];
+            let updatedSolderableLead = []; let touchingBox; let touchingBoxAttachmentId;
             for ( let j = 0; j < touchingBoxes.length; j ++ ) {
-                let touchingBoxAttachmentId = this.solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]];
-                let touchingBox = this.getObjectByProperty('uuid', touchingBoxAttachmentId);//is THREE.Line
+                touchingBoxAttachmentId = this.solderableLeadsIdx_touchingBoxesIdx__attachmentId[[i, j]];
+                touchingBox = this.getObjectByProperty('uuid', touchingBoxAttachmentId);//is THREE.Line
                 updatedSolderableLead.push({
                     'touchingBox':this.updateListOfCoordinates(touchingBox)
                 });
