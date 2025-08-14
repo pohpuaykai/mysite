@@ -42,13 +42,14 @@ class DCTwoResistorParallel extends Circuit {
         this.enter(c.uuid);
         // this.scene.add(c);
         c.setAllTouchingBoxVisibility(false);
-        console.log(c);
+        console.log('c', c);
 
         // const d = new Wire({'x': -15, 'y': 0, 'z':-20, 'radius': 0.644/2});//point d on the diagram
         const d = this.createComponent({componentName:'wire', position:{'x': -15, 'y': 0, 'z':-20}, additionalInfo:{'radius': 0.644/2}})
         this.enter(d.uuid);
         // this.scene.add(d);
         d.setAllTouchingBoxVisibility(false);
+        console.log('d', d);
 
 
         //network|connection information

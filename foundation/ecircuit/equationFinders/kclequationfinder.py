@@ -34,7 +34,7 @@ class KCLEquationFinder(EquationFinder):
                     #add equation
                     latexStr = f'{variable0___nc0}={variable1___nc0}'
                     print('0latexStr: ', latexStr)
-                    associatedComponentIdList = [deg2NodeId, neighbour0]
+                    associatedComponentIdList = [[deg2NodeId, neighbour0]]
                     self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
             #
             if neighbour1 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour1) not in added2DegEdges and\
@@ -53,7 +53,7 @@ class KCLEquationFinder(EquationFinder):
                     #add equation
                     latexStr = f'{variable0___nc1}={variable1___nc1}'
                     print('1latexStr: ', latexStr)
-                    associatedComponentIdList = [deg2NodeId, neighbour1]
+                    associatedComponentIdList = [[deg2NodeId, neighbour1]]
                     self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
             if self.id__type[deg2NodeId] in ['wire'] and\
@@ -68,7 +68,7 @@ class KCLEquationFinder(EquationFinder):
                 self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                 latexStr = f'{variable1___nc0}={variable1___nc1}'
                 print('2latexStr: ', latexStr)
-                associatedComponentIdList = [neighbour1, neighbour0]
+                associatedComponentIdList = [[neighbour1, neighbour0]]
                 self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
 

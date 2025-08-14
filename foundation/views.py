@@ -89,12 +89,12 @@ def automat_findEquations(request):
 
         for infoD in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
             equation = infoD['equation']; list_list_networkNodeIds = infoD['list_list_networkNodeIds']
-            # print('componentId__list_variables: ')
-            # updateDictList(EquationFinder.componentId__list_variables)
-            # pp.pprint(componentId__list_variables)
-            # print('>><><><><><><><><><><')
-            # equationStr__variables[equation._eqs] = list(equation.variablesScheme.keys())
-            # import pdb;pdb.set_trace()
+
+            ######for debugging of frontEnd_matching of variableLetterString to meshUUID <<<<<<<<<<<<<remove after the test is done
+            # if not(equation._eqs =='-V_{R_{0}}-V_{R_{3}}+V_{DC_{1}}=0'):
+            #     continue # so far only this equation is giving problems on the frontEnd, so we restrict the backend to make testing easier for frontend
+            #######################################################################################################################
+
 
             variableStr__nodeId = {}
             for nodeId, list_variableStr in EquationFinder.componentId__list_variables.items():
@@ -110,14 +110,8 @@ def automat_findEquations(request):
                 'variableStr__nodeId':variableStr__nodeId
             })
 
-    # print('equationStr__variables: ')
-    # pp.pprint(equationStr__variables)
-    # print('componentId__list_variables: ')
-    # pp.pprint(EquationFinder.componentId__list_variables)
-    # print('>><><><><><><><><><><')
     pp.pprint(returnData)
     #cache this, return the cache id, and then for solveEquations endpoint, give option of using the cached items, like Equation instead of equationStr, to speed things <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    # return HttpResponse(dumps({'equationStr__variables':equationStr__variables, 'componentId__list_variables':componentId__list_variables}), content_type="text/plain")
     return HttpResponse(dumps(returnData), content_type="text/plain")
 
 

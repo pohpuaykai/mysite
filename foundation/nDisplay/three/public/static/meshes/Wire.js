@@ -82,7 +82,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
 
 
     /**
-     * This constructor is used to make a fakeNode (sphere in space), in contrast with the other constructor which us used to make connection between components
+     * This constructor is used to make a fakeNode (sphere in space) like a component with 1_solderableLead, in contrast with the other constructor which is used to make connection between components
      * **/
     constructor__fakeNode(x, y, z, radius) {
         /**
@@ -105,7 +105,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         // super(geometry, material);
         this.position.set(x, y, z);
 
-        console.log('x', x, 'y', y, 'z', z);
+        // console.log('x', x, 'y', y, 'z', z);
         //below is the attributes needed to use this Wire as a Component
         this.positiveLeadsDirections = [[0, 0]]; //only one sphere
         const touchPointsOfSolderableLeads = [];
@@ -123,16 +123,16 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         // const up=radius+bufferLength;//+y
         // const out=-radius-bufferLength;//-z
         // const inx=radius+bufferLength;//+z
-        console.log('left: ', left);
-        console.log('right: ', right);
+        // console.log('left: ', left);
+        // console.log('right: ', right);
         
-        console.log('down: ', down);
+        // console.log('down: ', down);
         
-        console.log('up: ', up);
+        // console.log('up: ', up);
         
-        console.log('out: ', out);
+        // console.log('out: ', out);
         
-        console.log('inx: ', inx);
+        // console.log('inx: ', inx);
         
 
         const coordinates = [
@@ -210,7 +210,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(touchPoint, 3));
 
-            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+            const material = new THREE.PointsMaterial({ color: this.wireColor, size: 0.1 });
             const point = new THREE.Points(geometry, material);
             this.attach(point); // scene or any Object3D
 
@@ -381,7 +381,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         let tF1 = null;
         let tF0Idx = null; let tF1Idx = null;
         if (solderableLeadIdx0 === null && solderableLeadIdx1 === null) {
-            console.log('CASE0<<<<<');
+            // console.log('CASE0<<<<<');
             //0
             let cornerCoordinates__solderableLeadIdx = {};
             let cornerCoordinates__faceIdx = {};
@@ -437,7 +437,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
 
         } else if (solderableLeadIdx0 != null && solderableLeadIdx1 === null) {//assume !=null means its a valid index
 
-            console.log('CASE1<<<<<');
+            // console.log('CASE1<<<<<');
             //0
             let cornerCoordinates__solderableLeadIdx = {};
             let cornerCoordinates__faceIdx = {};
@@ -486,7 +486,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
 
         } else if (solderableLeadIdx0 === null && solderableLeadIdx1 != null) {//assume !=null means its a valid index
 
-            console.log('CASE2<<<<<');
+            // console.log('CASE2<<<<<');
             //0
             let cornerCoordinates__solderableLeadIdx = {};
             let cornerCoordinates__faceIdx = {};
@@ -535,7 +535,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
 
         } else { // we have both solderableLead0 && solderableLead1
 
-            console.log('CASE3<<<<<');
+            // console.log('CASE3<<<<<');
             const solderableLeads0 = component0.getAllTouchingBoxesAndInsertVectors();
             const solderableLead0 = solderableLeads0[solderableLeadIdx0];
             const solderableLeads1 = component1.getAllTouchingBoxesAndInsertVectors();
@@ -629,7 +629,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         // console.log('wB', wB);
         // console.log('')
         //
-        console.log('component0.getTouchPoint(solderableLeadIdx0)', component0.getTouchPoint(solderableLeadIdx0));
+        // console.log('component0.getTouchPoint(solderableLeadIdx0)', component0.getTouchPoint(solderableLeadIdx0));
         const wirePath = [component0.getTouchPoint(solderableLeadIdx0)];
         // const wirePath = [];
         //6.1.0
@@ -685,14 +685,14 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         const C0hIndexOfwB = OG__HammingCode[C0IndexOfwB]; const C1hIndexOfwB = OG__HammingCode[C1IndexOfwB];
         const difference_number = (C0hIndexOfwB ^ C1hIndexOfwB).toString(2).padStart(3, '0'); //^ is XOR, toString(2) is to change it to binaryString
         // console.log('C0hIndexOfwB', C0hIndexOfwB); console.log('C1hIndexOfwB', C1hIndexOfwB);
-        console.log("difference_number", difference_number);
+        // console.log("difference_number", difference_number);
         wirePath.push(tbC0);
         if (! cEquals(tbC0, C0)) {
             wirePath.push(C0);//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<check if tbC0==C0
         }
         
         let lastVertexIdx = C0hIndexOfwB.toString(2).padStart(3, '0');
-        console.log('lastVertexIdx: ', lastVertexIdx);
+        // console.log('lastVertexIdx: ', lastVertexIdx);
         for (let digitNum=0; digitNum<difference_number.length; digitNum++) {
             if (difference_number[digitNum] == '1') {
                 // console.log('difference_number', difference_number, ' on digitNum:', digitNum);
@@ -719,7 +719,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         wirePath.push(component1.getTouchPoint(solderableLeadIdx1));
         
         this.wirePath = wirePath;
-        console.log('wirePath');console.log(wirePath);
+        // console.log('wirePath');console.log(wirePath);
 
         //below is the attributes needed to use this Wire as a Component
         const positiveLeadsDirections = [];
@@ -830,7 +830,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(touchPoint, 3));
 
-            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+            const material = new THREE.PointsMaterial({ color: this.wireColor, size: 0.1 });
             const point = new THREE.Points(geometry, material);
             this.add(point); // scene or any Object3D
 
@@ -878,7 +878,7 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
 
 
         // keep this Line as well
-        const material = new THREE.LineBasicMaterial( { color: 0xf0f0f0 } );
+        const material = new THREE.LineBasicMaterial( { color: this.wireColor } );
         const points = [];
         for (let i=0; i<wirePath.length; i++) {
             points.push( new THREE.Vector3( wirePath[i][0], wirePath[i][1], wirePath[i][2] ) );
@@ -888,21 +888,6 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
         const line = new THREE.Line( geometry, material );
         this.add(line);
         // super(geometry, material);
-
-
-
-        //TODO  try to add thickness (FOR MAXWELL!) to it, by replacing it with CylinderGeometry, and the bends with ShapeGeometry (bezierCurve) or TubeGeometry, maybe use a THREE.ArcCurve to make the bend shape<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        /**
-         * Example code: (from three.core.js: 37382)
-         * new TubeGeometry(
-         *     new Curves[ data.path.type ]().fromJSON( data.path ), //Curve
-         *     data.tubularSegments, //number
-         *     data.radius, //number
-         *     data.radialSegments, //number
-         *     data.closed //boolean
-         *  );
-         * **/
-        // console.log('radius', radius);
 
         const tubeMaterial = new THREE.MeshBasicMaterial({ color: this.wireColor });
         const wirePathCurve = new WirePathCurve(wirePath);
@@ -1102,67 +1087,6 @@ class WirePathCurve extends THREE.Curve {//TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         );
         return point
 
-
-
-        // if (t===0) {this.numberOfTimesZeroWasCalled++;}
-        // // console.log('segmentIdx:', this.numberOfTimesZeroWasCalled)
-        // const segmentIdx = this.numberOfTimesZeroWasCalled;
-        // const startCoordinate = this.wirePath[segmentIdx]; const endCoordinate = this.wirePath[segmentIdx+1];
-        // // console.log('t', t);
-        // // console.log('returnVec: ', [
-        // //     startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
-        // //     startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
-        // //     startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
-        // // ]);
-        // return new THREE.Vector3(
-        //     startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
-        //     startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
-        //     startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
-        // )
-
-
-
-
-
-
-
-        //break t into (wirePath.length -1) segments EVENLY
-        // const wirePathIdx = Math.floor(t*(this.wirePath.length -1));
-        // let startCoordinate; let endCoordinate;
-        // if (t ===1) {
-        //     startCoordinate = this.wirePath[wirePathIdx-1]; endCoordinate = this.wirePath[wirePathIdx];
-        // } else {
-        //     startCoordinate = this.wirePath[wirePathIdx]; endCoordinate = this.wirePath[wirePathIdx+1];
-        // }
-        // console.log('t', t, 'wirePathIdx',wirePathIdx, ); console.log('startCoordinate', startCoordinate); console.log('endCoordinate', endCoordinate);
-        // console.log('directionVec: ', [
-        //     endCoordinate[0]-startCoordinate[0],
-        //     endCoordinate[1]-startCoordinate[1],
-        //     endCoordinate[2]-startCoordinate[2]
-        // ]);
-        // console.log('returnVec: ', [
-        //     startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
-        //     startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
-        //     startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
-        // ]);
-        // console.log('***********************');
-        // return new THREE.Vector3(
-        //     startCoordinate[0]+(t)*(endCoordinate[0]-startCoordinate[0]), 
-        //     startCoordinate[1]+(t)*(endCoordinate[1]-startCoordinate[1]), 
-        //     startCoordinate[2]+(t)*(endCoordinate[2]-startCoordinate[2]), 
-        // )
-        // console.log('return ', startCoordinate);
-        // console.log('t', t);
-        // console.log('***********************');
-        // // return new THREE.Vector3(startCoordinate[0], startCoordinate[1], startCoordinate[2]);
-        // if (t===0) {
-        //     console.log(startCoordinate);
-        //     return new THREE.Vector3(startCoordinate[0], startCoordinate[1], startCoordinate[2]);
-        // }
-        // else {
-        //     console.log(endCoordinate);
-        //     return new THREE.Vector3(endCoordinate[0], endCoordinate[1], endCoordinate[2]);
-        // }
     }
 }
 

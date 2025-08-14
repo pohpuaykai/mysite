@@ -59,13 +59,13 @@ class LatexMeshCreator {
         const loader = new SVGLoader();
         const variablesPos__list_chaMeshUUID = {}; //TODO remove
         const list_variableInfoDict = []
+        let startVariableMatching = false;// if this true, then we are within the variable_capturing range of the latexStr
         loader.load(url, (data) => {
           let currentVariableToMatch = list_startPosEndPosVariableStr.pop();//will take the earliest in the latexStr, because we are poping the end of list_startPosEndPosVariableStr, which is ordered in descending
           let variableMatchLeftOver = currentVariableToMatch[2]; let list_variableLetterMeshesUUID = [];
           const paths = data.paths;
           const group = new Actor();// const group = new THREE.Group();
           group.name = latexStr;
-
 
           for (const path of paths) {
             const xlinkHref = path.userData.node.id;
@@ -105,9 +105,11 @@ class LatexMeshCreator {
               variableMatchLeftOver = variableMatchLeftOver.replace(chaStr, '')
               list_variableLetterMeshesUUID.push([chaStr, letter.uuid]);
               meshUUID__mesh[letter.uuid] = letter;//letterMesh
-            } else {
+              startVariableMatching = true;
+            } else if (startVariableMatching) {//we can this truc: "variable letters are consecutive in paths, if there is letter that is not part of the variable, then we should not keep it as a variable"
               //keep fully_groupped variable in variablesPos__list_chaMeshUUID
               // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
+              startVariableMatching = false;
               list_variableInfoDict.push({
                 'variableStr':currentVariableToMatch[2],
                 'startPos':currentVariableToMatch[0],
@@ -125,21 +127,24 @@ class LatexMeshCreator {
                   meshUUID__mesh[letter.uuid] = letter;//letterMesh
                 }
               }
-            }
+            }//else ignore, they are not part of any variable... we do not capture them for now
 
           }
           meshUUID__mesh[group.uuid] = group; // group is the whole latexStr
 
           //keep fully_groupped variable in variablesPos__list_chaMeshUUID
           // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
-          list_variableInfoDict.push({
-            'variableStr':currentVariableToMatch[2],
-            'startPos':currentVariableToMatch[0],
-            'endPos':currentVariableToMatch[1],
-            'info':list_variableLetterMeshesUUID
-          });
-          //reset
-          list_variableLetterMeshesUUID = [];
+          if (list_variableLetterMeshesUUID.length > 0) {
+            list_variableInfoDict.push({
+              'variableStr':currentVariableToMatch[2],
+              'startPos':currentVariableToMatch[0],
+              'endPos':currentVariableToMatch[1],
+              'info':list_variableLetterMeshesUUID
+            });
+            //reset
+            list_variableLetterMeshesUUID = [];
+            
+          }
           // console.log('variablesPos__list_chaMeshUUID', variablesPos__list_chaMeshUUID)
           // self.generatedMeshes.push(group);//each group is an equation
 

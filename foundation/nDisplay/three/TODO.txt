@@ -7,6 +7,17 @@
 ---relevant_circuit_light_up_with_the_relevant_formulas<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<priority for youtube_videos
 ----equation_variables highlights variable wrongly
 ----refactor the findEquation animation, instead of copy and paste
+----animate the solvingSteps
+-----0.turn around? and face a blank
+-----1.equation_hin fly to right side of screen
+-----2.equation_vor fly to left side of screen
+------for subStep in equation_vor.subSteps
+-------show subStep, hide previous subStep
+------for subStep in equation_hin.subSteps
+--------show subStep, hide previous subStep
+-----'join' the transformed_equation_vor with the transformed_equation_hin, by taking out the subject_of_the_equation
+-----move the joined_equation to the right side of screen as the new equation_hin
+-----GOTO step 2, if there are still solvingSteps.
 
 
 USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first, then use your textbookS
