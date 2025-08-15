@@ -4,11 +4,20 @@ class Actor extends THREE.Group{
     
     constructor() {
         super();
-        this.mainMeshUUID = []
+        this.mainMeshUUID = [];
+        this.requestingAnimationName = null;
     }
 
     addMainMesh(meshUUID) {
         this.mainMeshUUID.push(meshUUID);
+    }
+
+    setType(type) {
+        this.type = type;// cannot set in constructor because ~Component.js sets this as rawAttribute of this class <<<<<TODO
+    }
+
+    setRequestingAnimation(animationName) {
+        this.requestingAnimationName = animationName;
     }
 
 

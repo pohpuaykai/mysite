@@ -97,9 +97,11 @@ class BipartiteSolver:
         broadSteps.append({
             'vor':{
                 'latex':Latexparser(ast=vorEquation.astScheme, rootOfTree=vorEquation.rootOfTree)._unparse(),
+                'variables':list(vorEquation.variables.keys()),
                 'scheme':vorEquation.schemeStr,
                 'root':vorEquation.rootOfTree,
             },
+            'hin':{},
             'sub':'',
             'vor__subSteps':[],
             'hin__subSteps':[],
@@ -119,6 +121,7 @@ class BipartiteSolver:
                 hinEquation = listOfCollectedEquations[vertexId__equationVariableId[vertexId]]
                 hinDict = {
                     'latex':Latexparser(ast=hinEquation.astScheme, rootOfTree=hinEquation.rootOfTree)._unparse(),
+                    'variables':list(hinEquation.variables.keys()),
                     'scheme':hinEquation.schemeStr,
                     'root':hinEquation.rootOfTree
                 }
@@ -145,6 +148,7 @@ class BipartiteSolver:
                     'hin': hinDict,
                     'vor':{
                         'latex':Latexparser(ast=vorEquation.astScheme, rootOfTree=vorEquation.rootOfTree)._unparse(),
+                        'variables':list(vorEquation.variables.keys()),
                         'scheme':vorEquation.schemeStr,
                         'root':vorEquation.rootOfTree
                     },

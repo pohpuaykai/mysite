@@ -237,7 +237,12 @@ class Equation:
                 'id':vorOp['id'], #this is the function nodeId
                 'lastId':rootId # always going to be equals, after then prevOp....
             })
-        ops = deepcopy(operationOrderWithIdx); solvingResultingSchemeStrs = []; solvingResultingAsts = []; solvingResultingAstRootOfTree = []; solvingResultingLatexStrs = []#part of solving steps, excluding simplify
+        ops = deepcopy(operationOrderWithIdx); 
+        #subSteps collection START
+        solvingResultingSchemeStrs = []; solvingResultingAsts = []; 
+        solvingResultingAstRootOfTree = []; solvingResultingLatexStrs = []#part of solving steps, excluding simplify
+        solvingResultingVariableStrs = []
+        #subSteps collection END
         if self.verbose:
             print('ops', ops)
         if simplify:
@@ -268,8 +273,16 @@ class Equation:
             self.startPos__nodeIdScheme = startPos__nodeId
             self.astScheme = invertedAst
             self.rootOfTree = rootOfTree
-            self.schemeStr = Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)._unparse()
-            solvingResultingSchemeStrs.insert(0, self.schemeStr); solvingResultingAsts.insert(0, invertedAst); solvingResultingAstRootOfTree.insert(0, self.rootOfTree); solvingResultingLatexStrs.insert(0, Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)._toLatex())
+            subStepSchemeParser = Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)
+            # self.schemeStr = Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)._unparse()
+            self.schemeStr = subStepSchemeParser._unparse()
+            #subSteps collection START
+            solvingResultingSchemeStrs.insert(0, self.schemeStr); solvingResultingAsts.insert(0, invertedAst); 
+            solvingResultingAstRootOfTree.insert(0, self.rootOfTree); 
+            # solvingResultingLatexStrs.insert(0, Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)._toLatex())
+            solvingResultingLatexStrs.insert(0, subStepSchemeParser._toLatex())
+            solvingResultingVariableStrs.insert(0, list(subStepSchemeParser.variables.keys()))
+            #subSteps collection END
             if self.verbose:
                 print('AFTER nodeId__lenScheme', self.nodeId__lenScheme)
                 print('AFTER astScheme:', self.astScheme)
@@ -363,6 +376,7 @@ class Equation:
             op['resultAST'] = solvingResultingAsts[i];
             op['resultLatexStr'] = solvingResultingLatexStrs[i];
             op['resultRootOfTree'] = solvingResultingAstRootOfTree[i];
+            op['resultVariables'] = solvingResultingVariableStrs[i];
         return self.astScheme, operationOrderWithIdx
 
 

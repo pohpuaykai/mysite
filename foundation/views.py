@@ -140,23 +140,6 @@ def automat_solveEquations(request):
     print(dependentVarStr)
     print('list_independentVarStr')
     pp.pprint(list_independentVarStr)
-    # print('dependentId: ', equation_details['dependentId'])
-    # print('dependentVarType: ', equation_details['dependentVarType'])
-    # print('list_independentId: ', equation_details['list_independentId'])
-    # print('list_independentVarType: ', equation_details['list_independentVarType'])
-    # list_tuple_independentId__independentVarType = zip(equation_details['list_independentId'], equation_details['list_independentVarType'])
-    # print('dict_independentId__independentVarType: ', list_tuple_independentId__independentVarType)
-    # print('list_equationStr: ', equation_details['list_equationStr'])
-
-
-    # dependentVariableStr = EquationFinder.getVariable(equation_details['dependentVarType'], id__type[equation_details['dependentId']], circuit_details['dependentId']);
-    # independentVariableStrs = []
-    # for componentId, variableType in list_tuple_independentId__independentVarType:
-    #     independentVariableStrs.append(EquationFinder.getVariable(
-    #         variableType, 
-    #         id__type[componentId], 
-    #         componentId
-    #     ))
 
 
 

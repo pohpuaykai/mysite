@@ -8,8 +8,8 @@ import {ComponentBattery} from '../meshes/ComponentBattery.js';
 
 class Circuit extends Piece{
     
-    constructor(scene, camera, renderer, meshes) {
-        super(scene, camera, renderer, meshes);
+    constructor(scene, camera, renderer, controls, meshes) {
+        super(scene, camera, renderer, controls, meshes);
 
         this.animationAggregator = new Animation(scene, camera, renderer);
         
@@ -79,14 +79,14 @@ class Circuit extends Piece{
     }
 
 
-    animate_findEquations(solvingCallback, readyCallback) {//TODO meshToAnimation, should take a 
+    animate_findEquations(readyCallback, animationName) {//TODO meshToAnimation, should take a 
         const self = this;
         function CALLBACK__findEquations(list_equationNetworkInfoDict){
             // console.log("equationStr__variables"); console.log(equationStr__variables)
             // console.log("componentId__list_variables"); console.log(componentId__list_variables)
             self.list_equationNetworkInfoDict = list_equationNetworkInfoDict;
 
-            solvingCallback(list_equationNetworkInfoDict);
+            // solvingCallback(list_equationNetworkInfoDict);
             // const findEquationAnimation = findEquationAnimation___functionGen(list_equationNetworkInfoDict);
             // self.scheduleAnimation(findEquationAnimation, 0);//0 is a priority, lower number gets animated first.
             let latexStrs = [];
@@ -95,33 +95,14 @@ class Circuit extends Piece{
             }
             console.log('list_equationNetworkInfoDict', list_equationNetworkInfoDict)
             latexStrs = [...new Set(latexStrs)];
-            self.makeLatexMesh(latexStrs, readyCallback); // also give latexStr to variables
-
-
-
-
-
-
-
-            // let listOfEquations_latexStrs = Object.keys(equationStr__variables);
-            // const YSize = 30;
-            // const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
-            // self.animationAggregator.resetAggregatedAnimations();
-            // function CALLBACK__createLatexMeshes(meshIdx, mesh) {
-            //     mesh.position.set(-64, startYCoordinate+YSize*meshIdx, 100);// here we are fixing the position....<<<<<<<<<<<<<<<
-            //     self.scene.add(mesh);
-            //     self.animationAggregator.appendAction(meshToAnimation(mesh));
-            //     self.render();
-            //     self.animationAggregator.restartAnimation();
-            // }
-            // self.createLatexMeshes(listOfEquations_latexStrs, CALLBACK__createLatexMeshes);
+            self.makeLatexMesh(latexStrs, readyCallback, 'findEquations'); // also give latexStr to variables mapping
         }
 
         this.findEquations(CALLBACK__findEquations);
         
     }
 
-    findEquations(callback) {//TODO allow the child_circuit to choose what dependentVar, and independentVars<<<<<<<<<<<<<<
+    findEquations(callback) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
         const self = this;
@@ -129,30 +110,6 @@ class Circuit extends Piece{
 
             if (this.readyState == 4 && this.status == 200) {
               const list_equationNetworkInfoDict = JSON.parse(this.responseText);
-              /**
-               * responseDict is a list that contains many:
-               *     {
-               *        'equation':,#inLatexFormat
-               *        'equationFinderDisplayName':,#like "Ohms Law", "Kirchoff Voltage Law"
-               *        'list_list_networkNodeIds':,#like for Kirchoff Voltage Law, a list of directedCycles, for Ohms Law, list_list of nodeIds?
-               *        'variableInfos':[
-               *            {
-               *                'variable':,
-               *                'networkNodeIds':, # for totals, take a list of networkIds
-               *            }
-               *        ]
-               *    }
-               * 
-               * **/
-
-
-
-              // const equationStr__variables = responseDict['equationStr__variables']
-              // self.equationStr__variables = equationStr__variables;
-              // const componentId__list_variables = responseDict['componentId__list_variables']
-              // self.componentId__list_variables = componentId__list_variables
-              // console.log('equationStr__variables', self.equationStr__variables);
-              // console.log('componentId__list_variables', self.componentId__list_variables);
               callback(list_equationNetworkInfoDict);
             }
         }
@@ -170,7 +127,7 @@ class Circuit extends Piece{
         }));
     }
 
-    animate_solveEquations(meshToAnimation, list_equationStr, dependentVarStr, list_independentVarStr) {
+    animate_solveEquations(readyCallback, list_equationStr, dependentVarStr, list_independentVarStr, animationName) {
         //
     // list_equationStr
     // id__type
@@ -178,22 +135,45 @@ class Circuit extends Piece{
     // list_independentVarStr
         const self = this;
         function CALLBACK__solveEquations(steps) {
-            self.animationAggregator.resetAggregatedAnimations();
-            const YSize = 30;
-            const startYCoordinate = -list_equationStr.length* YSize/2;
-            function CALLBACK__createLatexMeshes(meshIdx, mesh) {
-                mesh.position.set(128, startYCoordinate+YSize*meshIdx, 100);
-                self.scene.add(mesh);
-                self.animationAggregator.appendAction(meshToAnimation(mesh));
-                self.render();
-                self.animationAggregator.restartAnimation();
-            }
             console.log('steps:******'); console.log(steps);
-            //flatten steps into a list, for now, we just take the broadSteps, KIV the substeps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            let list_broadLatexVorStr = steps.map(function(broadStep){
-                return broadStep['vor']['latex'];
+            // debugger;
+            //flatten steps into a list
+            self.solvingSteps = steps; let runningStepsIdx = -1; let branchedStepsIdx = []; let latexStr; let variables;
+            const latexStrs = []; const branchedStepsIdx__latexStrs = {}; const runningStepsIdx__branchedStepsIdx = {}
+            steps.forEach((stepDict, stepIdx) => {
+                //vor
+                if (stepDict.vor) {
+                    latexStr = stepDict.vor.latex; variables = stepDict.vor.variables;
+                    latexStrs.push([latexStr, variables]); 
+                    runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'vor']; 
+                    branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
+                    stepDict.vor__subSteps.forEach((subStepDict, subStepIdx) => {
+                        latexStr = subStepDict.resultLatexStr; variables = subStepDict.resultVariables
+                        latexStrs.push([latexStr, variables]); 
+                        runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'vor', subStepIdx, 'vor__subSteps']; 
+                        branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
+                    });
+                }
+                //hin(might not exist)
+                // console.log(stepDict.hin, 'latex' in stepDict.hin, stepDict.hin.length)
+                if (stepDict.hin && 'latex' in stepDict.hin) {
+                    latexStr = stepDict.hin.latex; variables = stepDict.hin.variables;
+                    latexStrs.push([latexStr, variables]); 
+                    runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'hin']; 
+                    branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx];
+                    stepDict.hin__subSteps.forEach((subStepDict, subStepIdx) => {
+                        latexStr = subStepDict.resultLatexStr; variables = subStepDict.resultVariables
+                        latexStrs.push([latexStr, variables]); 
+                        runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'hin', subStepIdx, 'hin__subSteps']; 
+                        branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
+                    });
+                }
+                // console.log(branchedStepsIdx__latexStrs)
+                // debugger;
             });
-            self.createLatexMeshes(list_broadLatexVorStr, CALLBACK__createLatexMeshes);
+            self.branchedStepsIdx__latexStrs = branchedStepsIdx__latexStrs; self.runningStepsIdx__branchedStepsIdx = runningStepsIdx__branchedStepsIdx;
+            self.makeLatexMesh(latexStrs, readyCallback, 'solveEquations');
+
         }
         this.solveEquations(CALLBACK__solveEquations, list_equationStr, dependentVarStr, list_independentVarStr)
     }

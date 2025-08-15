@@ -16,7 +16,7 @@ import {SVGLoader} from './static/three/SVGLoader.js';
 import {GuiControls} from './static/custom/GuiControls.js';
 // import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 // import {ComponentBattery} from './static/meshes/ComponentBattery.js';
-// import {ComponentDiode} from './static/meshes/ComponentDiode.js';
+import {ComponentDiode} from './static/meshes/ComponentDiode.js';
 // import {ComponentCapacitor} from './static/meshes/ComponentCapacitor.js';
 // import {ComponentInductor} from './static/meshes/ComponentInductor.js';
 // import {ComponentOscillator} from './static/meshes/ComponentOscillator.js';
@@ -66,8 +66,18 @@ function onWindowResize() {
     render();
 }
 
-// const circuit = new DCTwoResistorSeries(scene, camera, renderer, []);
-const circuit = new DCTwoResistorParallel(scene, camera, renderer, []);
+//controls
+// const controls = new OrbitControls( camera, renderer.domElement );
+const controls = new GuiControls(camera, scene, renderer.domElement);
+controls.target.set( 0, 0, 0 );
+controls.update();
+
+controls.addEventListener( 'change', render );
+
+
+
+const circuit = new DCTwoResistorSeries(scene, camera, renderer, controls, []);
+// const circuit = new DCTwoResistorParallel(scene, camera, renderer, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, []);
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
@@ -83,16 +93,6 @@ console.log('circuit id__type: ', circuit.id__type);
 console.log('circuit edge__solderableIndices: ', circuit.edge__solderableIndices);
 
 
-//controls
-// const controls = new OrbitControls( camera, renderer.domElement );
-const controls = new GuiControls(camera, scene, renderer.domElement);
-controls.target.set( 0, 0, 0 );
-controls.update();
-
-controls.addEventListener( 'change', render );
-
 window.addEventListener( 'resize', onWindowResize );
 
 render();
-
-// renderer.setAnimationLoop( animate );

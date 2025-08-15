@@ -27,7 +27,7 @@ class LatexMeshCreator {
     }
 
 
-    getMeshes(list_latexStr, equationMeshCallback) {
+    getMeshes(list_latexStr, equationMeshCallback, textStr__textMeshUUID___existing, requestingAnimationName) {
       const meshUUID__mesh = {};
       const self = this; //self.generatedMeshes = [];
       // console.log("this.stylizedDecCode__Char", this.stylizedDecCode__Char)
@@ -35,11 +35,15 @@ class LatexMeshCreator {
 
       // const YSize = 30;
       // const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
-      // console.log(list_latexStr)
+      console.log(list_latexStr)
       //need to get variable to UUID<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       for(let i=0; i<list_latexStr.length; i++) {
         let latexStr; let variables;
         [latexStr, variables] = list_latexStr[i];
+        if (latexStr in textStr__textMeshUUID___existing) { // if already exist there is not need to recreate it, it will still be available in circuit.js (latexStr)
+          textStr__textMeshUUID___existing[latexStr].setRequestingAnimation(requestingAnimationName)
+          continue
+        }
         // console.log('variables', variables, 'latexStr', latexStr)
         const list_startPosEndPosVariableStr = []
         variables.forEach(variableStr => {
@@ -66,6 +70,8 @@ class LatexMeshCreator {
           const paths = data.paths;
           const group = new Actor();// const group = new THREE.Group();
           group.name = latexStr;
+          group.setType('latexStr');
+          group.setRequestingAnimation(requestingAnimationName)
 
           for (const path of paths) {
             const xlinkHref = path.userData.node.id;
@@ -78,13 +84,15 @@ class LatexMeshCreator {
             }
             const material = new THREE.MeshBasicMaterial({
               color: path.color,
-              // color:new THREE.Color(0, 0, 0);
+              color:new THREE.Color(1.0, 1.0, 1.0),
               side: THREE.DoubleSide,
               depthWrite: false
             });
 
             const shapes = path.toShapes(true);
             const letter = new Actor();// const letter = new THREE.Group();
+            letter.setType('latexLetter');
+            letter.setRequestingAnimation(requestingAnimationName)
             letter.name = chaStr;
             // console.log(path, chaStr, '#ofshapes: ', shapes.length);
             for (const shape of shapes) {
@@ -93,6 +101,7 @@ class LatexMeshCreator {
               // mesh.position.set(0, startYCoordinate+YSize*i, 100);
               mesh.scale.set(0.01, 0.01, 0.01);
               mesh.rotation.set(0, 0, Math.PI);
+              // mesh.color.set(1.0, 1.0, 1.0)//mesh.color is undefined
               // group.add(mesh);
               letter.add(mesh);
               letter.addMainMesh(mesh.uuid);
