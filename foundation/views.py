@@ -161,4 +161,65 @@ def automat_solveEquations(request):
 
     pp.pprint(steps)
 
-    return HttpResponse(dumps({'steps':steps}), content_type="text/plain")
+    #linearise steps
+    # branchedStepsIdx__latexStrs = {}; 
+    branchedStepsIdxs = []; latexStrs = []; #zip it up on the other side
+    runningStepsIdx__branchedStepsIdx = {}; runningStepsIdx = -1;
+    list_tuple_latexStrVariableStr = []
+    list_runningIdx__toClearAll = []; list_runningIdx__toKeep = []
+
+    #steps[0] is always the beginning
+    beginning = steps.pop(0)
+    branchedStepsIdx = (0, 'vor'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx; 
+    branchedStepsIdxs.append(branchedStepsIdx); latexStrs.append(beginning['vor']['latex'])
+    list_tuple_latexStrVariableStr.append((beginning['vor']['latex'], beginning['vor']['variables']))
+    previousVorRunningStepsIdx = runningStepsIdx; previousHinRunningStepsIdx = None
+
+    #
+    for stepIdx, step in enumerate(steps):
+        hasVorSubStep = False
+        for vorSubStepIdx, vorSubStep in enumerate(step['vor__subSteps']):
+            branchedStepsIdx = (stepIdx+1, 'vor', vorSubStepIdx, 'vor__subSteps'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx; 
+            # if vorSubStepIdx == 1:
+            #     list_branchedStepsIdx__toClearAll.append(branchedStepsIdx)
+            branchedStepsIdxs.append(branchedStepsIdx); latexStrs.append(vorSubStep['resultLatexStr'])
+            list_tuple_latexStrVariableStr.append((vorSubStep['resultLatexStr'], vorSubStep['resultVariables']))
+            if vorSubStepIdx == len(step['vor__subSteps']) - 1: # last vor, vorSubStep might be empty, in which case we should keep the vor
+                list_runningIdx__toKeep.append(runningStepsIdx); hasVorSubStep = True
+        if not hasVorSubStep:
+            list_runningIdx__toKeep.append(previousVorRunningStepsIdx);
+
+        #hin always introduce a new equation
+        branchedStepsIdx = (stepIdx+1, 'hin'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx; 
+        branchedStepsIdxs.append(branchedStepsIdx); latexStrs.append(step['hin']['latex'])
+        list_tuple_latexStrVariableStr.append((step['hin']['latex'], step['hin']['variables']))
+        previousHinRunningStepsIdx = runningStepsIdx
+
+
+        hasHinSubStep = False
+        for hinSubStepIdx, hinSubStep in enumerate(step['hin__subSteps']):
+            branchedStepsIdx = (stepIdx+1, 'hin', hinSubStepIdx, 'hin__subSteps'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx; 
+            branchedStepsIdxs.append(branchedStepsIdx); latexStrs.append(hinSubStep['resultLatexStr'])
+            list_tuple_latexStrVariableStr.append((hinSubStep['resultLatexStr'], hinSubStep['resultVariables']))
+            if hinSubStepIdx == len(step['hin__subSteps']) - 1: # last hin, hinSubStep, might be empty, in which case we should keep the hin
+                list_runningIdx__toKeep.append(runningStepsIdx); hasHinSubStep = True
+        if not hasHinSubStep:
+            list_runningIdx__toKeep.append(previousHinRunningStepsIdx)
+
+
+        #vor is the running_equation, like running_balance
+        branchedStepsIdx = (stepIdx+1, 'vor'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
+        branchedStepsIdxs.append(branchedStepsIdx); latexStrs.append(step['vor']['latex'])
+        list_tuple_latexStrVariableStr.append((step['vor']['latex'], step['vor']['variables']))
+        list_runningIdx__toClearAll.append(runningStepsIdx)
+        previousVorRunningStepsIdx = runningStepsIdx
+
+
+    return HttpResponse(dumps({
+        'steps':steps, 'branchedStepsIdxs':branchedStepsIdxs, 
+        'latexStrs':latexStrs, 
+        'list_tuple_latexStrVariableStr': list_tuple_latexStrVariableStr, 
+        'runningStepsIdx__branchedStepsIdx':runningStepsIdx__branchedStepsIdx,
+        'list_runningIdx__toClearAll':list_runningIdx__toClearAll, 
+        'list_runningIdx__toKeep':list_runningIdx__toKeep
+    }), content_type="text/plain")

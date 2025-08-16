@@ -153,8 +153,8 @@ class BipartiteSolver:
                         'root':vorEquation.rootOfTree
                     },
                     'sub':entVariable,
-                    'vor__subSteps':_stepsWithoutSimplify___vor,
-                    'hin__subSteps':_stepsWithoutSimplify___hin
+                    'vor__subSteps':list(reversed(_stepsWithoutSimplify___vor)),
+                    'hin__subSteps':list(reversed(_stepsWithoutSimplify___hin))
                 })
             else: # vertexId==variableVertexId
                 entVariable = listOfVariables[vertexId__equationVariableId[vertexId]]

@@ -76,9 +76,9 @@ controls.addEventListener( 'change', render );
 
 
 
-const circuit = new DCTwoResistorSeries(scene, camera, renderer, controls, []);
-// const circuit = new DCTwoResistorParallel(scene, camera, renderer, []);
-// const circuit = new Q3_21__P18(scene, camera, renderer, []);
+// const circuit = new DCTwoResistorSeries(scene, camera, renderer, controls, []);
+const circuit = new DCTwoResistorParallel(scene, camera, renderer, controls, []);
+// const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 

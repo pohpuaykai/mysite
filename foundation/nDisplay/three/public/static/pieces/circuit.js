@@ -134,44 +134,8 @@ class Circuit extends Piece{
     // dependentVarStr
     // list_independentVarStr
         const self = this;
-        function CALLBACK__solveEquations(steps) {
-            console.log('steps:******'); console.log(steps);
+        function CALLBACK__solveEquations(steps, latexStrs) {
             // debugger;
-            //flatten steps into a list
-            self.solvingSteps = steps; let runningStepsIdx = -1; let branchedStepsIdx = []; let latexStr; let variables;
-            const latexStrs = []; const branchedStepsIdx__latexStrs = {}; const runningStepsIdx__branchedStepsIdx = {}
-            steps.forEach((stepDict, stepIdx) => {
-                //vor
-                if (stepDict.vor) {
-                    latexStr = stepDict.vor.latex; variables = stepDict.vor.variables;
-                    latexStrs.push([latexStr, variables]); 
-                    runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'vor']; 
-                    branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
-                    stepDict.vor__subSteps.forEach((subStepDict, subStepIdx) => {
-                        latexStr = subStepDict.resultLatexStr; variables = subStepDict.resultVariables
-                        latexStrs.push([latexStr, variables]); 
-                        runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'vor', subStepIdx, 'vor__subSteps']; 
-                        branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
-                    });
-                }
-                //hin(might not exist)
-                // console.log(stepDict.hin, 'latex' in stepDict.hin, stepDict.hin.length)
-                if (stepDict.hin && 'latex' in stepDict.hin) {
-                    latexStr = stepDict.hin.latex; variables = stepDict.hin.variables;
-                    latexStrs.push([latexStr, variables]); 
-                    runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'hin']; 
-                    branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx];
-                    stepDict.hin__subSteps.forEach((subStepDict, subStepIdx) => {
-                        latexStr = subStepDict.resultLatexStr; variables = subStepDict.resultVariables
-                        latexStrs.push([latexStr, variables]); 
-                        runningStepsIdx +=1;branchedStepsIdx = [stepIdx, 'hin', subStepIdx, 'hin__subSteps']; 
-                        branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx;
-                    });
-                }
-                // console.log(branchedStepsIdx__latexStrs)
-                // debugger;
-            });
-            self.branchedStepsIdx__latexStrs = branchedStepsIdx__latexStrs; self.runningStepsIdx__branchedStepsIdx = runningStepsIdx__branchedStepsIdx;
             self.makeLatexMesh(latexStrs, readyCallback, 'solveEquations');
 
         }
@@ -187,8 +151,24 @@ class Circuit extends Piece{
             if (this.readyState == 4 && this.status == 200) {
               const responseDict = JSON.parse(this.responseText);
               const steps = responseDict['steps']
+              const branchedStepsIdxs = responseDict['branchedStepsIdxs']
+              const latexStrs = responseDict['latexStrs']// not needed: list_tuple_latexStrVariableStr
+              const list_tuple_latexStrVariableStr = responseDict['list_tuple_latexStrVariableStr']
+              const list_runningIdx__toClearAll = responseDict['list_runningIdx__toClearAll']
+              const list_runningIdx__toKeep = responseDict['list_runningIdx__toKeep']
+
+              const branchedStepsIdx__latexStrs = {}; let branchedStepsIdx; let latexStr;
+              for(let i=0; i<branchedStepsIdxs.length; i++) {
+                branchedStepsIdx = branchedStepsIdxs[i]; latexStr = latexStrs[i];
+                branchedStepsIdx__latexStrs[branchedStepsIdx] = latexStr
+              }
+              const runningStepsIdx__branchedStepsIdx = responseDict['runningStepsIdx__branchedStepsIdx']
               self.steps = steps;
-              callback(steps);
+              self.branchedStepsIdx__latexStrs = branchedStepsIdx__latexStrs;
+              self.runningStepsIdx__branchedStepsIdx = runningStepsIdx__branchedStepsIdx;
+              self.list_runningIdx__toClearAll = list_runningIdx__toClearAll;
+              self.list_runningIdx__toKeep = list_runningIdx__toKeep;
+              callback(steps, list_tuple_latexStrVariableStr);
 
               // asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
             }

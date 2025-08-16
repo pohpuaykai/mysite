@@ -10,8 +10,8 @@ class Q2_3_5_aMoreComplexCircuit__P84 extends Circuit {
     /**
      * 
      * **/
-    constructor(scene, camera, renderer, meshes) {
-        super(scene, camera, renderer, meshes);
+    constructor(scene, camera, renderer, controls, meshes) {
+        super(scene, camera, renderer, controls, meshes);
     }
 
     act() {

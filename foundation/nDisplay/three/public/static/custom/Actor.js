@@ -36,7 +36,7 @@ class Actor extends THREE.Group{
     getDimensions() {
         const boundingBox = new THREE.Box3();
         boundingBox.setFromObject(this);
-        console.log(boundingBox)
+        // console.log(boundingBox)
         return {
             xLen:boundingBox.max.x-boundingBox.min.x,
             yLen:boundingBox.max.y-boundingBox.min.y,
@@ -104,18 +104,18 @@ class Actor extends THREE.Group{
         meshes.forEach((mesh, idx) => {
             if (mesh.geometry.attributes.color === undefined) {// some colors like Wire and LatexTextMesh's color is not in geometry.attributes, but in material.color
 
-                console.log('set material: ', mesh.userData['OGColorArray'])
+                // console.log('set material: ', mesh.userData['OGColorArray'])
                 mesh.material.color.set(
                     mesh.userData['OGColorArray'].r, 
                     mesh.userData['OGColorArray'].g, 
                     mesh.userData['OGColorArray'].b
                 )
             } else {
-                console.log('set geometry')
+                // console.log('set geometry')
                 mesh.geometry.setAttribute('color', new THREE.BufferAttribute(mesh.userData['OGColorArray'], 3));
             }
         })
-        console.log('unhighlighted: ', this)
+        // console.log('unhighlighted: ', this)
     }
 }
 
