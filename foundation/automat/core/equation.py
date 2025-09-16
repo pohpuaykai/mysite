@@ -289,6 +289,9 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
             if simplify:
                 simplifyDone = False
                 returnTup = recommend.simplify(hint={'invertedResults':invertedResults, 'lastOp':op, 'startPos__nodeId':self.startPos__nodeIdScheme}) # part of solving steps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                if self.verbose:
+                    print('found a simplification: ', returnTup is not None)
+                    # import pdb;pdb.set_trace()
                 if returnTup is not None:
                     rootOfTree___simplified, ast___simplified, startPos__nodeId___simplified, nodeId__len___simplified, schemeStr___simplified, functions___simplified, variables___simplified, primitives___simplified, totalNodeCount___simplified, latexStr___simplified, manipulateType, manipulateClassName, iPattern, oPattern = returnTup
                     self.rootOfTree = rootOfTree___simplified
@@ -330,11 +333,6 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
 
             #update the `stat` of self, note, if there is simplify, then this is NOT_CORRECT, since functionCountChange is not changed at all
             if simplifyDone: #simply maybe turned on, but there might not be simplify done.
-                # self.functionsScheme = simplificationSchemeParser.functions
-                # self.variablesScheme = simplificationSchemeParser.variables # this is most likely not correct, because you do not have a Entschieder between variable and primitives
-                # self.primitivesScheme = simplificationSchemeParser.primitives
-                # self.totalNodeCountScheme = simplificationSchemeParser.totalNodeCount
-
 
                 self.functionsScheme = functions___simplified
                 self.variablesScheme = variables___simplified
@@ -635,7 +633,7 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
         # print('self.totalNodeCountScheme', self.totalNodeCountScheme); print('eq.totalNodeCountScheme', eq.totalNodeCountScheme); import pdb;pdb.set_trace()
         self.totalNodeCountScheme += eq.totalNodeCountScheme - 3 #the equalNode was removed, 2 variables from each AST, total 3 nodes
         # print('resulting: self.totalNodeCountScheme: ', self.totalNodeCountScheme); import pdb;pdb.set_trace()
-        # self.loadASTWithSchemeParser(self.astScheme)
+        self.loadASTWithSchemeParser(self.astScheme) # this make the change inplace...
 
 
         return self.astScheme, self.functionsScheme, self.variablesScheme, \

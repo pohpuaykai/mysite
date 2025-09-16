@@ -185,9 +185,52 @@ def test__hatsukoi__step2(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => s
 
 
 
+
+def test__bipartiteSolverSimpleParallelCircuit__step0(verbose=False): # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => simplication_in_AST
+    eqs0 = '(= (- V_{DC_{8}} V_{R_{3}}) 0)' # hinEq
+    eqs1 = '(= (+ (- 0 V_{R_{0}}) V_{DC_{8}}) 0)' # vorEq
+    eq0 = Equation(eqs0, 'scheme', verbose=verbose)
+    eq1 = Equation(eqs1, 'scheme', verbose=verbose)
+    variableToEliminate = 'V_{DC_{8}}'
+    simplify = False
+    ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate, simplify=simplify)
+    print('eq0.schemeStr: ', eq0.schemeStr, 'simplify: ', simplify); import pdb;pdb.set_trace()
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
+    expectedLatexStr = None # to be filled in 
+    expectedFunctions = None
+    expectedVariables = None
+    expectedPrimitives = None
+    expectedTotalNodeCount = None
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and 
+        expectedFunctions == eq0.functionsScheme and 
+        expectedVariables == eq0.variablesScheme and 
+        expectedPrimitives == eq0.primitivesScheme and 
+        expectedTotalNodeCount == eq0.totalNodeCountScheme)
+    if verbose:
+        print('Results~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('OG: ', eqs0, ' ', eqs1)
+        print('variable to Eliminate: ', variableToEliminate)
+        print('TF: ', latexStr)
+        print('Counts~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('results functions')
+        pp.pprint(eq0.functionsScheme)
+        print('results variables')
+        pp.pprint(eq0.variablesScheme)
+        print('results primitives')
+        pp.pprint(eq0.primitivesScheme)
+        print('results totalNodeCount')
+        pp.pprint(eq0.totalNodeCountScheme)
+        print('stepsWithoutSimplify___self')
+        pp.pprint(stepsWithoutSimplify___self)
+        print('stepsWithoutSimplify___eq')
+        pp.pprint(stepsWithoutSimplify___eq)
+
+
 if __name__=='__main__':
-    test__basic__moveAdditionAndEquate()
-    test__hatsukoi__step0()
-    test__hatsukoi__step1() # TODO SAME_DIVISOR=> simplication_in_AST
-    test__hatsukoi__step2() # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => simplication_in_AST
-    #after testing this, 
+    # test__basic__moveAdditionAndEquate()
+    # test__hatsukoi__step0()
+    # test__hatsukoi__step1() # TODO SAME_DIVISOR=> simplication_in_AST
+    # test__hatsukoi__step2() # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => simplication_in_AST
+    test__bipartiteSolverSimpleParallelCircuit__step0(True)

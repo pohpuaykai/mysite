@@ -127,7 +127,7 @@ class Circuit extends Piece{
         }));
     }
 
-    animate_solveEquations(readyCallback, list_equationStr, dependentVarStr, list_independentVarStr, animationName) {
+    animate_solveEquations(readyCallback, list_equationStr, dependentVarStr, list_independentVarStr, animationName, simplify) {
         //
     // list_equationStr
     // id__type
@@ -139,10 +139,10 @@ class Circuit extends Piece{
             self.makeLatexMesh(latexStrs, readyCallback, 'solveEquations');
 
         }
-        this.solveEquations(CALLBACK__solveEquations, list_equationStr, dependentVarStr, list_independentVarStr)
+        this.solveEquations(CALLBACK__solveEquations, list_equationStr, dependentVarStr, list_independentVarStr, simplify)
     }
 
-    solveEquations(callback, list_equationStr, dependentVarStr, list_independentVarStr) {
+    solveEquations(callback, list_equationStr, dependentVarStr, list_independentVarStr, simplify) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
         const self = this;
@@ -185,7 +185,7 @@ class Circuit extends Piece{
             'id__type':self.id__type,
             'dependentVarStr':dependentVarStr,
             'list_independentVarStr':list_independentVarStr,
-            'simplify':false //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO test
+            'simplify':simplify //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO test
         }));
 
     }
@@ -200,15 +200,15 @@ class Circuit extends Piece{
 
     //wiring and network information and methods
 
-    createComponent({componentName, position={x:0, y:0, z:0}, additionalInfo={}}) {
+    createComponent({componentName, position={x:0, y:0, z:0}, rotation={x:0, y:0, z:0}, additionalInfo={}}) {
         let component;
         console.log(componentName);
         switch(componentName) {
             case 'resistor':
-                component = new ComponentResistor(position);
+                component = new ComponentResistor(position, rotation);
                 break;
             case 'battery':
-                component = new ComponentBattery(position);
+                component = new ComponentBattery(position, rotation);
                 break;
             case 'wire':
 

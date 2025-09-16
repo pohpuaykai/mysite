@@ -16,16 +16,18 @@ import {SVGLoader} from './static/three/SVGLoader.js';
 import {GuiControls} from './static/custom/GuiControls.js';
 // import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 // import {ComponentBattery} from './static/meshes/ComponentBattery.js';
-import {ComponentDiode} from './static/meshes/ComponentDiode.js';
+// import {ComponentDiode} from './static/meshes/ComponentDiode.js';
 // import {ComponentCapacitor} from './static/meshes/ComponentCapacitor.js';
 // import {ComponentInductor} from './static/meshes/ComponentInductor.js';
 // import {ComponentOscillator} from './static/meshes/ComponentOscillator.js';
 // import {ComponentTransistor} from './static/meshes/ComponentTransistor.js';
 // import {ComponentACSignalGenerator} from './static/meshes/ComponentACSignalGenerator.js';
 // import {Wire} from './static/meshes/Wire.js';
-import {DCTwoResistorSeries} from './static/pieces/dc_twoResistor_series.js';
-import {DCTwoResistorParallel} from './static/pieces/dc_twoResistor_parallel.js';
-import {Q3_21__P18} from './static/pieces/3000_solved_problems_in_electric_circuits__syedANasar/Q3_21__P18.js';
+
+// import {DCTwoResistorSeries} from './static/pieces/dc_twoResistor_series.js';
+// import {DCTwoResistorParallel} from './static/pieces/dc_twoResistor_parallel.js';
+import {Q2_3_5_aMoreComplexCircuit__P84} from './static/pieces/foundations_of_analog_and_digital_electronic_circuits_anantAgarwal/Q2_3_5_aMoreComplexCircuit__P84.js';
+// import {Q3_21__P18} from './static/pieces/3000_solved_problems_in_electric_circuits__syedANasar/Q3_21__P18.js';
 
 
 
@@ -79,7 +81,8 @@ controls.addEventListener( 'change', render );
 // const circuit = new DCTwoResistorSeries(scene, camera, renderer, controls, []);
 // const circuit = new DCTwoResistorParallel(scene, camera, renderer, controls, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
-const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
+// const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
+const circuit = new Q2_3_5_aMoreComplexCircuit__P84(scene, camera, renderer, controls, []);
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 

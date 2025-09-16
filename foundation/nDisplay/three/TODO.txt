@@ -1,9 +1,13 @@
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
 --<<Foundations of Analog and Digital Electronic Circuits>> better read and no errors on answers
+---do this to improve bipartiteSolver?
 --<<Schaum's 3000 Solved Problems In Electric Circuits>>
 -make pretty animations :D
---try the circuitAnime/basic.js with simplification=True
---try out using priorityQueue[do it with your BinarySearch]&each_step_variable_in_equation_checking_if_meet_independentVariables_requirement_then_terminateSearch with bipartiteSolver, see if steps are more concise
+--try out each_step_variable_in_equation_checking_if_meet_independentVariables_requirement_then_terminateSearch with bipartiteSolver, see if steps are more concise
+--try to achieve the voltage|current divider equation with bipartite_solver  for 
+---dc_twoResistor_parallel.js
+---dc_twoResistor_series.js
+---Q2_3_5_aMoreComplexCircuit__P84.js
 
 
 

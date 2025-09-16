@@ -15,7 +15,7 @@ manipulations:
 
   - type: 'regex'
     vor:
-      scheme: '(+ $0 0)'
+      scheme: '(+ 0 $0)'
       return: '$0'
     minArgs:
       $0: 0

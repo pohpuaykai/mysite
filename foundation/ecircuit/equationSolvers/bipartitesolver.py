@@ -84,7 +84,18 @@ class BipartiteSolver:
         print('vertexId__equationVariableId', vertexId__equationVariableId)
         print('vertexId__EquationOrVariable', vertexId__EquationOrVariable)
 
-        substitutionPath = Recommend.bipartiteSearch(listOfCollectedEquations, listOfVariables, equationVariables_g, vertexId__equationVariableId, equationId__vertexId, type__list_vertexIds, equationKey, variableKey, dependentVariableId, list_independentVariablesIds)
+        substitutionPath = Recommend.bipartiteSearch(
+            listOfCollectedEquations, 
+            listOfVariables, 
+            equationVariables_g, 
+            vertexId__equationVariableId, 
+            equationId__vertexId, 
+            type__list_vertexIds, 
+            equationKey, 
+            variableKey, 
+            dependentVariableId, 
+            list_independentVariablesIds
+        )
         broadSteps = []
 
         #incorporate for displaying_of_latex
@@ -125,11 +136,19 @@ class BipartiteSolver:
                     'scheme':hinEquation.schemeStr,
                     'root':hinEquation.rootOfTree
                 }
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                # print('hinEquation.schemeStr: ', hinEquation.schemeStr)
+                # print('vorEquation.schemeStr: ', vorEquation.schemeStr)
+                # print('subjectOfEquation: ', entVariable)
+                # print('simplify: ', simplify)
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
                 _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable, simplify=simplify)
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
                 
-
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~solvedHin:')
+                # print('SOLVED hinEquation.schemeStr: ', hinEquation.schemeStr)
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 # print('hinEq steps:')
                 # pp.pprint(_stepsWithoutSimplify___hin)
                 # print('vorEq steps:')

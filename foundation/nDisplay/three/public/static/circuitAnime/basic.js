@@ -1,9 +1,11 @@
 
 
 class CircuitAnime {
-    constructor(circuit, variableSelector) {
+    constructor(animationName, circuit, variableSelector, simplify) {
         this.circuit = circuit;// this is a circuit.js
         this.variableSelector = variableSelector;// it is a function that uses a list_equationNetworkInfoDict, but takes a circuit
+        this.simplify = simplify;
+        this.animationName = animationName;
     }
 
     play() {
@@ -125,7 +127,7 @@ class CircuitAnime {
             let list_equationLatexStr; let dependentVarStr; let list_independentVarStr;
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
-            self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr);//this will just schedule the animation...
+            self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
             function findEquationAnimation___functionGen(// is the parametrisation neccessary, what about using self.?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO?
 

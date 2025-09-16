@@ -6,8 +6,8 @@ import numpy as np
 from yaml import safe_load
 
 from foundation.automat import AUTOMAT_MODULE_DIR, info
-from foundation.automat.common.longestcommonsubsequence import LongestCommonSubsequence
-from foundation.automat.common.regexshorts import Regexshorts as rs
+# from foundation.automat.common.longestcommonsubsequence import LongestCommonSubsequence
+# from foundation.automat.common.regexshorts import Regexshorts as rs
 from foundation.automat.core.manipulate.manipulate import Manipulate
 
 class Recommend:
@@ -29,8 +29,8 @@ class Recommend:
     PATTERN_FILENAMES__CLASSNAMES = Manipulate.PATTERN_FILENAMES__CLASSNAMES()
 
     def __init__(self, equation, verbose=False):
-        # self.verbose=verbose
-        self.verbose = False
+        self.verbose=verbose
+        # self.verbose = False
         self.eq = equation
         self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
         self.metaFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'recommend', 'meta')
@@ -259,7 +259,9 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
             #         funcAdded = oldFuncName
 
             # functionNamesJustAdded = [funcAdded]
-            functionNamesJustAdded = list(map(lambda d: d[0], hint['invertedResults'].keys()))
+            # functionNamesJustAdded = list(map(lambda d: d[0], hint['invertedResults'].keys()))
+            #functionNamesJustAdded should take the newKey from invertedResults
+            functionNamesJustAdded = list(map(lambda d: d['newKey'][0], hint['invertedResults'].values()))
             if len(functionNamesJustAdded) == 0:
                 if self.verbose:
                     print(f'Could not identify functions just added, hint: {hint}')
@@ -267,6 +269,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                 #TODO HEURIS: if no trigo in the formula, can just ignore all the trigoPatterns
                 #TODO HEURIS: if no log/sqrt/expo, not need those patterns .... not sure about that
                 if self.verbose:
+                    print('hint: ', hint)
                     print(functionNamesJustAdded, '<<functionNamesJustAdded')
                     import pdb;pdb.set_trace()#<<<< some thing wrong with 
                 relevantManipulations = self.filterMetaList(self.simplifyingManipulations, 'iFunctions', functionNamesJustAdded)# should use: self.simplifyingManipulations AS a base
@@ -294,7 +297,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                     # import pdb;pdb.set_trace()
                     manipulate = manipulateClass(self.eq, idd['direction'], idd['idx'], verbose=self.verbose)
                     if self.verbose:
-                        print(f"SIMPLIFYING trying applying {idd['filename']}, {idd['idx']}, {idd['direction']} to {self.eq.ast}")
+                        print(f"SIMPLIFYING trying applying {idd['filename']}, {idd['idx']}, {idd['direction']} to {self.eq.ast}", "|", manipulate.inputGrammar, "|", manipulate.outputGrammar)
                     returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)
                     if self.verbose:
                         print(f"SIMPLIFYING tried applying {idd['filename']}, {idd['idx']}, {idd['direction']}, hasResult?: {returnTup is not None}")
@@ -323,135 +326,6 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                         iPattern = sgp.iPattern
                         oPattern = sgp.oPattern
                         return rootOfTree___simplified, ast___simplified, startPos__nodeId___simplified, nodeId__len___simplified, schemeStr___simplified, functions___simplified, variables___simplified, primitives___simplified, totalNodeCount___simplified, latexStr___simplified, manipulateType, manipulateClassName, iPattern, oPattern
-
-
-
-                        # manipulatedSchemeWordSchemeParser, verPosWord, iManipulateSchemeParser, oManipulateSchemeParser  = returnTup
-
-                        # iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount, iStartPos__nodeId = iManipulateSchemeParser._parse() # this is for the input pattern
-                        # iRootOfTree = iManipulateSchemeParser.rootOfTree
-                        # oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount, oStartPos__nodeId = oManipulateSchemeParser._parse() # this is for the output pattern
-                        # oRootOfTree = oManipulateSchemeParser.rootOfTree
-                        # mAst, mFunctionsD, mVariablesD, mPrimitives, mTotalNodeCount, mStartPos__nodeId = manipulatedSchemeWordSchemeParser._parse()
-                        # mRootOfTree = manipulatedSchemeWordSchemeParser.rootOfTree
-                        # # self.eq.startPos__nodeIdScheme #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<you tried updating it, but it is not updated
-                        # if self.verbose:
-                        #     info('successful application')
-                        #     import pprint; pp = pprint.PrettyPrinter(indent=4)
-                        #     pp.pprint(verPosWord)
-                        #     import pdb;pdb.set_trace()
-
-                        # #sometimes the remove and addition NET OUT, and we are only interested in the resulting net. THIS does not happen here, because this only happens if the "same" schemeNodeLabels have different names between iPattern and oPattern
-                        # #in besides remove_and_addition, there is also swapping, otherwise we cannot put the non_uf node back together
-
-
-
-
-
-
-
-                        # additionRemovalTrackingKeys = ['f', 'v', 'p'] # f=function, v=variable, p=primitive
-                        # type__removalNames__nodeIdList = dict(map(lambda k: (k, {}), additionRemovalTrackingKeys))#{'f':{}, 'v':{}, 'p':{}}
-                        # type__additioNames__nodeIdList = dict(map(lambda k: (k, {}), additionRemovalTrackingKeys))#{'f':{}, 'v':{}, 'p':{}}
-
-                        # #NOW verPosWord only has schemeNodeLabels, we do not need rs.lazyPrefixFinder, REFACTOR THIS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
-                        # for changeDict in filter(lambda changeDict: changeDict['d'] in ['r', 'a'] and changeDict['t'] in ['static'], verPosWord): # TODO make use of the other changeDict
-                        # # for changeDict in filter(lambda changeDict: changeDict['d'] in ['r', 'a'] and changeDict['t'] in ['p'], verPosWord): # TODO make use of the other changeDict
-                        #     if changeDict['d'] == 'r': # something was removed from input
-
-                        #         #
-                        #         # print(iStartPos__nodeId)
-                        #         # print('*********', "self.eq.startPos__nodeIdScheme")
-                        #         # print(self.eq.startPos__nodeIdScheme)
-                        #         #
-
-                        #         for function in self.eq.functionsScheme:#iFunctionsD:
-                        #             if function in changeDict['w']:
-                        #                 #find all occurences of function and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
-                        #                 for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
-                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
-                        #                     # print(changeDict)
-                        #                     # print(manipulate.schemeStr)#Wrong one this is the OG...
-                        #                     nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
-                        #                     existingList = type__removalNames__nodeIdList['f'].get(function, [])
-                        #                     existingList.append(nodeId)
-                        #                     type__removalNames__nodeIdList['f'][function] = existingList
-
-                        #         for variable in self.eq.variablesScheme:#iVariablesD:
-                        #             if variable in changeDict['w']:
-                        #                 #find all occurences of variable and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
-                        #                 for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
-                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
-                        #                     nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
-                        #                     existingList = type__removalNames__nodeIdList['v'].get(variable, [])
-                        #                     existingList.append(nodeId)
-                        #                     type__removalNames__nodeIdList['v'][variable] = existingList
-
-
-                        #         for primitive in self.eq.primitivesScheme:#iPrimitives:#iManipulateSchemeParser.primitives:
-                        #             if primitive in changeDict['w']:
-                        #                 #find all occurences of primitive and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
-                        #                 for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
-                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
-                        #                     nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]#
-                        #                     existingList = type__removalNames__nodeIdList['p'].get(primitive, [])
-                        #                     existingList.append(nodeId)
-                        #                     type__removalNames__nodeIdList['p'][primitive] = existingList
-
-
-                        #     elif changeDict['a'] == 'a': #something was added to output
-
-                        #         for function in mFunctionsD:#oManipulateSchemeParser.functions:
-                        #             if function in changeDict['w']:
-                        #                 #find all occurences of function and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
-                        #                 for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
-                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
-                        #                     nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
-                        #                     existingList = type__additioNames__nodeIdList['f'].get(function, [])
-                        #                     existingList.append(nodeId)
-                        #                     type__additioNames__nodeIdList['f'][function] = existingList
-
-                        #         for variable in mVariablesD:#oManipulateSchemeParser.variables:
-                        #             if variable in changeDict['w']:
-                        #                 #find all occurences of variable and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
-                        #                 for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
-                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
-                        #                     nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
-                        #                     existingList = type__additioNames__nodeIdList['v'].get(variable, [])
-                        #                     existingList.append(nodeId)
-                        #                     type__additioNames__nodeIdList['v'][variable] = existingList
-
-
-                        #         for primitive in mPrimitives:#oManipulateSchemeParser.primitives:
-                        #             if primitive in changeDict['w']:
-                        #                 #find all occurences of primitive and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
-                        #                 for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
-                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
-                        #                     nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
-                        #                     existingList = type__additioNames__nodeIdList['p'].get(primitive, [])
-                        #                     existingList.append(nodeId)
-                        #                     type__additioNames__nodeIdList['p'][primitive] = existingList
-
-                        # nonNettedaddRem__type__nodeIdList = {'a':dict(map(lambda k: (k, []), additionRemovalTrackingKeys)), 'r':dict(map(lambda k: (k, []), additionRemovalTrackingKeys))}
-                        # for gk in additionRemovalTrackingKeys:
-                        #     removalNames__nodeIdList = type__removalNames__nodeIdList[gk]
-                        #     additioNames__nodeIdList = type__additioNames__nodeIdList[gk]
-                        #     #find things that NOT NET OUT
-                        #     nettedOutNodeNames = []
-                        #     for commonNodeName in set(removalNames__nodeIdList.keys()).intersection(set(additioNames__nodeIdList.keys())):
-                        #         if len(removalNames__nodeIdList[commonNodeName]) != len(additioNames__nodeIdList[commonNodeName]):
-                        #             nettedOutNodeNames.append(commonNodeName)
-
-                        #     for nodeName, nodeIdList in removalNames__nodeIdList.items():
-                        #         if nodeName not in nettedOutNodeNames:
-                        #             nonNettedaddRem__type__nodeIdList['r'][gk] += nodeIdList
-                        #     for nodeName, nodeIdList in additioNames__nodeIdList.items():
-                        #         if nodeName not in nettedOutNodeNames:
-                        #             nonNettedaddRem__type__nodeIdList['a'][gk] += nodeIdList
-                        # # import pdb;pdb.set_trace()
-                        # return mAst, nonNettedaddRem__type__nodeIdList['r']['p'], nonNettedaddRem__type__nodeIdList['r']['v'], nonNettedaddRem__type__nodeIdList['r']['f'], mRootOfTree, manipulatedSchemeWordSchemeParser
 
             #if we reach here this means non of the prioritised-simplifyingManipulations worked.
             if self.verbose:
@@ -520,27 +394,28 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         :param type__list_vertexIds: type is either (0)equationKey or (1)variableKey (the partite of each vertexId), values are a list of vertexIds of its key's partite
         """
         #[TODO optimization possible, if the bipartite graph equationVariables_bg is disconnected, only take the connected part that is related to dependent|indepedentVariables]
-        from foundation.automat.common.spanningtree import SpanningTree
-        vertexIterable = sorted(list(equationVariables_bg))
-        def isEquation(parentId):
-            return parentId < len(list_equations)
-        edgeIterableSortable = []; edgeWeight = {}#assign edges incident to variables that we want to get rid of, lower weights
-        HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; #[TODO many optimizations possible here]
-        for parentId, neighbours in equationVariables_bg.items():
-            parentKeep = isEquation(parentId) or (parentId in [dependentVariableId]+list_independentVariableIds) # equation=KEEP, dependent|independentVariable=KEEP
-            for neighbourId in neighbours:
-                neighbourKeep = isEquation(neighbourId) or (neighbourId in [dependentVariableId]+list_independentVariableIds)
-                directedEdge = (parentId, neighbourId)
-                edgeIterableSortable.append(directedEdge)
-                if parentKeep and neighbourKeep:# both nodes of directedEdge are either (0)Equation OR (1)dependent|independentVariables, assign HIGH_WEIGHTS to keep
-                    edgeWeight[directedEdge] = HIGH_WEIGHTS
-                else: # either nodes of directedEdge is NOT Equation NOR dependent|independentVariables, assign LOW_WEIGHTS to form subsitutionPath to be eliminated
-                    edgeWeight[directedEdge] = LOW_WEIGHTS
-        T, R = SpanningTree.minimumSpanningTreeKruskal(vertexIterable, edgeIterableSortable, edgeWeight)
-        print('T:', T); print('R: ', R, '<<<<<<<<<<')
+        # from foundation.automat.common.spanningtree import SpanningTree
+        # vertexIterable = sorted(list(equationVariables_bg))
+        # def isEquation(parentId):
+        #     return parentId < len(list_equations)
+        # edgeIterableSortable = []; edgeWeight = {}#assign edges incident to variables that we want to get rid of, lower weights
+        # HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; #[TODO many optimizations possible here]
+        # for parentId, neighbours in equationVariables_bg.items():
+        #     parentKeep = isEquation(parentId) or (parentId in [dependentVariableId]+list_independentVariableIds) # equation=KEEP, dependent|independentVariable=KEEP
+        #     for neighbourId in neighbours:
+        #         neighbourKeep = isEquation(neighbourId) or (neighbourId in [dependentVariableId]+list_independentVariableIds)
+        #         directedEdge = (parentId, neighbourId)
+        #         edgeIterableSortable.append(directedEdge)
+        #         if parentKeep and neighbourKeep:# both nodes of directedEdge are either (0)Equation OR (1)dependent|independentVariables, assign HIGH_WEIGHTS to keep
+        #             edgeWeight[directedEdge] = HIGH_WEIGHTS
+        #         else: # either nodes of directedEdge is NOT Equation NOR dependent|independentVariables, assign LOW_WEIGHTS to form subsitutionPath to be eliminated
+        #             edgeWeight[directedEdge] = LOW_WEIGHTS
+        # T, R = SpanningTree.minimumSpanningTreeKruskal(vertexIterable, edgeIterableSortable, edgeWeight)
+        # print('T:', T); print('R: ', R, '<<<<<<<<<<')
         #find equationNode in T, that has dependentVariableId as start of DFS#[TODO many optimizations possible here, to get a Path that substitutes away all the unwanted variables]
         #since T is spanning, we can just look in list_equations, for ANY equation that has_most_number_of_dependentVariableId_and_list_independentVariableIds[heuristic][TODO many optimizations possible here, on which starting point to pick] Ou est vers origin, ja?
         print(dependentVariableId, 'dependentVariableId'); print('list_independentVariableIds', list_independentVariableIds)
+        from foundation.automat.common.priorityqueue import PriorityQueue
         wantedVariables = []
         for wantedVariableId in [dependentVariableId]+list_independentVariableIds:
             wantedVariables.append(list_variables[wantedVariableId])
@@ -559,10 +434,16 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         #maxEquationVertexId might be None... then for now just get a random one...
         if maxEquationVertexId is None:#[TODO many optimizations possible here]
             maxEquationVertexId = list(equationId__vertexId.values())[0]
-        stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; visited = [maxEquationVertexId];
+        # stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; 
+        print('unwantedVariableIds', unwantedVariableIds); print('wantedVariables', wantedVariables)
+        priorityQueue = PriorityQueue(); priorityQueue.insert({'current':maxEquationVertexId, 'path':[maxEquationVertexId]}, -1)
+        visited = [maxEquationVertexId];
         maxLength=0; maxLengthChildDict = None
-        while len(stack)>0:
-            current___dict = stack.pop()#lastOut,  what if we choose the neighbour, that is in the unwanted_variable set ? will that be a better path? PRIORITY_QUEUE, use your binarySearch to implement priority_queue on []<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+        HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; #[TODO many optimizations possible here]
+        # while len(stack)>0:
+        while len(priorityQueue)>0:
+            # current___dict = stack.pop()#lastOut,  what if we choose the neighbour, that is in the unwanted_variable set ? will that be a better path? PRIORITY_QUEUE, use your binarySearch to implement priority_queue on []<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+            current___dict = priorityQueue.popMax()
             for neighbour in equationVariables_bg[current___dict['current']]:
             # for neighbour in T[current___dict['current']]: # this is the correct one, but does not perform as well
                 if neighbour not in visited:
@@ -570,11 +451,15 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                     childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour]}
                     if len(childDict['path']) > maxLength:
                         maxLength = len(childDict['path']); maxLengthChildDict = childDict
-                    stack.append(childDict)
-                    print('******')
-                    print('current: ', current___dict['current'], ' child: ', childDict['current'], ' path: ', childDict['path'])
-                    print('******')
-        print('returning substitutionPath:', maxLengthChildDict['path'])
+                    # stack.append(childDict)
+                    #
+                    childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableIds else LOW_WEIGHTS
+                    priorityQueue.insert(childDict, childDictPriority)
+                    #
+        #             print('******')
+        #             print('current: ', current___dict['current'], ' child: ', childDict['current'], ' path: ', childDict['path'])
+        #             print('******')
+        # print('returning substitutionPath:', maxLengthChildDict['path'])
         return maxLengthChildDict['path']
 
 

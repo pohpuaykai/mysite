@@ -2594,7 +2594,7 @@ def test__linearEliminationBySubstitution__eq0(verbose=False):
 
 
 
-def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simplication_in_AST TODO
+def test__linearEliminationBySubstitution__eq1(verbose=False):
     latexEq = 'I_{R_{C}} R_{C} - V^{Q1}_{BE} - I_{R} R = 0'
     subject = 'I_{R}'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
@@ -2666,6 +2666,95 @@ def test__linearEliminationBySubstitution__eq1(verbose=False):# MINUS_ZERO=>simp
 
 
 
+def test__bipartiteSolver__simpleParallelCircuit0Vor(verbose=False):
+    latexEq = 'V_{DC_{8}}=0+V_{R_{3}}'
+    subject = 'V_{R_{3}}'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    #
+    # print('In makesubjecttest0.py, schemeStr: ', eq0.schemeStr)
+    # print('In makesubjecttest0.py, astScheme: ', eq0.astScheme)
+    #
+    modifiedAST, stepsWithSimplify = eq0.makeSubject(subject, simplify=True)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    # This is simplify:
+    expectedLatexStr = 'V_{DC_{8}}=V_{R_{3}}'
+    # This is without simplify:
+    #expectedLatexStr = 'I_{R} =\\frac{(I_{R_{C}} R_{C}-V^{Q1}_{BE})-(0)}{R}' # TO be filled in 
+    expected__stepsWithSimplify = [
+    {   'argumentIdx': None,
+        'functionName': ('Subtractzero', 'essential', '(- $0 0)', '$0'),
+        'id': None,
+        'lastId': None,
+        'resultAST': {('=', 1): [('V_{DC_{8}}', 2), ('V_{R_{3}}', 6)]},
+        'resultLatexStr': 'V_{DC_{8}}=V_{R_{3}}',
+        'resultRootOfTree': ('=', 1),
+        'resultSchemeStr': '(= V_{DC_{8}} V_{R_{3}})',
+        'resultVariables': ['V_{DC_{8}}', 'V_{R_{3}}'],
+        'stepType': 'simplification'},
+    {   'argumentIdx': 1,
+        'functionName': '+',
+        'id': 0,
+        'lastId': 1,
+        'resultAST': {   ('-', 0): [('V_{DC_{8}}', 2), ('0', 5)],
+                         ('=', 1): [('-', 0), ('V_{R_{3}}', 6)]},
+        'resultLatexStr': 'V_{DC_{8}}-0=V_{R_{3}}',
+        'resultRootOfTree': ('=', 1),
+        'resultSchemeStr': '(= (- V_{DC_{8}} 0) V_{R_{3}})',
+        'resultVariables': ['V_{DC_{8}}', 'V_{R_{3}}'],
+        'stepType': 'solving'}]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and\
+        expected__stepsWithSimplify == stepsWithSimplify
+    )
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+        print('stepsWithoutSimplify: ')
+        pp.pprint(stepsWithSimplify)
+
+
+
+def test__bipartiteSolver__simpleParallelCircuit0Hin(verbose=False):
+    latexEq = '\\frac{V_{R_{3}}}{I_{R_{3}}}=R_{R_{3}}'
+    subject = 'V_{R_{3}}'
+    eq0 = Equation(latexEq, 'latex', verbose=verbose)
+    #
+    # print('In makesubjecttest0.py, schemeStr: ', eq0.schemeStr)
+    # print('In makesubjecttest0.py, astScheme: ', eq0.astScheme)
+    #
+    modifiedAST, stepsWithSimplify = eq0.makeSubject(subject, simplify=True)
+    from foundation.automat.parser.sorte.latexparser import Latexparser
+    latexStr = Latexparser(ast=modifiedAST, rootOfTree=eq0.rootOfTree)._unparse()
+    # This is simplify:
+    expectedLatexStr = 'V_{R_{3}}=R_{R_{3}}I_{R_{3}}'
+    # This is without simplify:
+    #expectedLatexStr = 'I_{R} =\\frac{(I_{R_{C}} R_{C}-V^{Q1}_{BE})-(0)}{R}' # TO be filled in 
+    expected__stepsWithSimplify = [
+    {   'argumentIdx': 0,
+        'functionName': '/',
+        'id': 0,
+        'lastId': 1,
+        'resultAST': {   ('*', 0): [('R_{R_{3}}', 8), ('I_{R_{3}}', 5)],
+                         ('=', 1): [('V_{R_{3}}', 2), ('*', 0)]},
+        'resultLatexStr': 'V_{R_{3}}=R_{R_{3}}I_{R_{3}}',
+        'resultRootOfTree': ('=', 1),
+        'resultSchemeStr': '(= V_{R_{3}} (* R_{R_{3}} I_{R_{3}}))',
+        'resultVariables': ['V_{R_{3}}', 'R_{R_{3}}', 'I_{R_{3}}'],
+        'stepType': 'solving'}]
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expectedLatexStr == latexStr and\
+        expected__stepsWithSimplify == stepsWithSimplify
+    )
+    if verbose:
+        print('OG: ', latexEq)
+        print('subject: ', subject)
+        print('TF: ', latexStr)
+        print('stepsWithoutSimplify: ')
+        pp.pprint(stepsWithSimplify)
+
+
 if __name__=='__main__':
     test__moreThan1Op__seriesResistance0()
     test__moreThan1Op__seriesResistance1()
@@ -2699,4 +2788,6 @@ if __name__=='__main__':
     test__6levelsDeep__voltageGainOfNonInvertingOp4()
     test__6levelsDeep__voltageGainOfNonInvertingOp5()
     test__linearEliminationBySubstitution__eq0()
-    test__linearEliminationBySubstitution__eq1() # MINUS_ZERO=>simplication_in_AST#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<something went wrong please check
+    test__linearEliminationBySubstitution__eq1() # MINUS_ZERO=>simplication_in_AST
+    test__bipartiteSolver__simpleParallelCircuit0Vor()
+    test__bipartiteSolver__simpleParallelCircuit0Hin()

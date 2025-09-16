@@ -78,7 +78,8 @@ class DCTwoResistorSeries extends Circuit {
             console.log('list_independentVarStr', list_independentVarStr);
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
-        (new CircuitAnime(this, variableSelect)).play();
+        const simplify = false;
+        (new CircuitAnime('dc_twoResistor_series', this, variableSelect, simplify)).play();
 
 
         return {
