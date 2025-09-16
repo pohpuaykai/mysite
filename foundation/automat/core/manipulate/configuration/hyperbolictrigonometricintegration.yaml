@@ -35,7 +35,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (/ "2" (+ (cosh (* "2" $0) "1"))) (D $0 $1)) $1)'
+    scheme: '(int (* (/ 2 (+ (cosh (* 2 $0) 1))) (D $0 $1)) $1)'
     return: '(+ (tanh $0) $2)'
   minArgs:
     $0: 1
@@ -51,7 +51,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (- "0" (* (tanh $0) (sech $0))) (D $0 $1)) $1)'
+    scheme: '(int (* (- 0 (* (tanh $0) (sech $0))) (D $0 $1)) $1)'
     return: '(+ (sech $0) $2)'
   minArgs:
     $0: 1
@@ -67,7 +67,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (- "0" (* (coth $0) (cosech $0))) (D $0 $1)) $1)'
+    scheme: '(int (* (- 0 (* (coth $0) (cosech $0))) (D $0 $1)) $1)'
     return: '(+ (cosech $0) $2)'
   minArgs:
     $0: 1
@@ -83,7 +83,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (/ "2" (- "1" (sinh (* "2" $0)))) (D $0 $1)) $1)'
+    scheme: '(int (* (/ 2 (- 1 (sinh (* 2 $0)))) (D $0 $1)) $1)'
     return: '(+ (coth $0) $2)'
   minArgs:
     $0: 1

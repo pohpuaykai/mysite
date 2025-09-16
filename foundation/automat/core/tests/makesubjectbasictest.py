@@ -29,9 +29,11 @@ def test__makeSubject2Input__addition0(verbose=False):
         'lastId': 0,
         'resultAST': {   ('-', 2): [('a', 1), ('c', 4)],
                          ('=', 0): [('-', 2), ('b', 3)]},
-        'resultSchemeStr': '(= (- a c) b)'
-    }
-    ]
+        'resultLatexStr': 'a-c=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (- a c) b)',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -86,9 +88,11 @@ def test__makeSubject2Input__addition1(verbose=False):
         'lastId': 0,
         'resultAST': {   ('-', 2): [('a', 1), ('b', 3)],
                          ('=', 0): [('-', 2), ('c', 4)]},
-        'resultSchemeStr': '(= (- a b) c)'
-    }
-    ]
+        'resultLatexStr': 'a-b=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (- a b) c)',
+        'resultVariables': ['a', 'b', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -141,9 +145,11 @@ def test__makeSubject2Input__subtraction0(verbose=False):
         'lastId': 0,
         'resultAST': {   ('+', 2): [('a', 1), ('c', 4)],
                          ('=', 0): [('+', 2), ('b', 3)]},
-        'resultSchemeStr': '(= (+ a c) b)'
-    }
-    ]
+        'resultLatexStr': 'a+c=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (+ a c) b)',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -189,16 +195,17 @@ def test__makeSubject2Input__subtraction1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('-', 2), ('c', 4)], ('-', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 3, 8: 1, 11: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '-',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('-', 2): [('b', 3), ('a', 1)],
                          ('=', 0): [('-', 2), ('c', 4)]},
-        'resultSchemeStr': '(= (- b a) c)'
-    }
-    ]
+        'resultLatexStr': 'b-a=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (- b a) c)',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -244,16 +251,17 @@ def test__makeSubject2Input__multiply0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('/', 2), ('b', 3)], ('/', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 4, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '*',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('/', 2): [('a', 1), ('c', 4)],
                          ('=', 0): [('/', 2), ('b', 3)]},
-        'resultSchemeStr': '(= (/ a c) b)'
-    }
-    ]
+        'resultLatexStr': '\\frac{a}{c}=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (/ a c) b)',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -299,16 +307,17 @@ def test__makeSubject2Input__multiply1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('/', 2), ('c', 4)], ('/', 2): [('a', 1), ('b', 3)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 3, 11: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '*',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('/', 2): [('a', 1), ('b', 3)],
                          ('=', 0): [('/', 2), ('c', 4)]},
-        'resultSchemeStr': '(= (/ a b) c)'
-    }
-    ]
+        'resultLatexStr': '\\frac{a}{b}=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (/ a b) c)',
+        'resultVariables': ['a', 'b', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -354,16 +363,17 @@ def test__makeSubject2Input__divide0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('*', 2), ('b', 3)], ('*', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 4, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '/',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('*', 2): [('a', 1), ('c', 4)],
                          ('=', 0): [('*', 2), ('b', 3)]},
-        'resultSchemeStr': '(= (* a c) b)'
-    }
-    ]
+        'resultLatexStr': 'ac=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (* a c) b)',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -409,16 +419,17 @@ def test__makeSubject2Input__divide1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('/', 2), ('c', 4)], ('/', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 3, 8: 1, 11: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '/',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('/', 2): [('b', 3), ('a', 1)],
                          ('=', 0): [('/', 2), ('c', 4)]},
-        'resultSchemeStr': '(= (/ b a) c)'
-    }
-    ]
+        'resultLatexStr': '\\frac{b}{a}=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (/ b a) c)',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -464,16 +475,17 @@ def test__makeSubject2Input__exponent0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('nroot', 2), ('b', 3)], ('nroot', 2): [('c', 4), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 10: 4, 12: 1, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '^',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('nroot', 2), ('b', 3)],
                          ('nroot', 2): [('c', 4), ('a', 1)]},
-        'resultSchemeStr': '(= (nroot c a) b)'
-    }
-    ]
+        'resultLatexStr': '\\sqrt[c]{a}=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (nroot c a) b)',
+        'resultVariables': ['c', 'a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -519,16 +531,17 @@ def test__makeSubject2Input__exponent1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('log', 2), ('c', 4)], ('log', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 3, 10: 1, 13: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '^',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('log', 2), ('c', 4)],
                          ('log', 2): [('b', 3), ('a', 1)]},
-        'resultSchemeStr': '(= (log b a) c)'
-    }
-    ]
+        'resultLatexStr': '\\log_b(a)=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (log b a) c)',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -574,16 +587,17 @@ def test__makeSubject2Input__nroot0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('log', 2), ('b', 3)], ('log', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 10: 4, 13: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'nroot',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('log', 2), ('b', 3)],
                          ('log', 2): [('a', 1), ('c', 4)]},
-        'resultSchemeStr': '(= (log a c) b)'
-    }
-    ]
+        'resultLatexStr': '\\log_a(c)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (log a c) b)',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -629,16 +643,17 @@ def test__makeSubject2Input__nroot1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('^', 2), ('c', 4)], ('^', 2): [('a', 1), ('b', 3)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 1, 8: 3, 11: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': 'nroot',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('^', 2), ('c', 4)],
                          ('^', 2): [('a', 1), ('b', 3)]},
-        'resultSchemeStr': '(= (^ a b) c)'
-    }
-    ]
+        'resultLatexStr': 'a^b=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (^ a b) c)',
+        'resultVariables': ['a', 'b', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -684,16 +699,17 @@ def test__makeSubject2Input__log0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('nroot', 2), ('b', 3)], ('nroot', 2): [('a', 1), ('c', 4)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 10: 1, 12: 4, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'log',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('nroot', 2), ('b', 3)],
                          ('nroot', 2): [('a', 1), ('c', 4)]},
-        'resultSchemeStr': '(= (nroot a c) b)'
-    }
-    ]
+        'resultLatexStr': '\\sqrt[a]{c}=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (nroot a c) b)',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -739,16 +755,17 @@ def test__makeSubject2Input__log1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('^', 2), ('c', 4)], ('^', 2): [('b', 3), ('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 6: 3, 8: 1, 11: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': 'log',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('^', 2), ('c', 4)],
                          ('^', 2): [('b', 3), ('a', 1)]},
-        'resultSchemeStr': '(= (^ b a) c)'
-    }
-    ]
+        'resultLatexStr': 'b^a=c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (^ b a) c)',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -794,16 +811,17 @@ def test__makeSubject1Input__arccosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cosec', 2), ('b', 3)], ('cosec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 10: 1, 13: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccosec',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('cosec', 2), ('b', 3)],
                          ('cosec', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (cosec a) b)'
-    }
-    ]
+        'resultLatexStr': '\\cosec(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (cosec a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -849,16 +867,17 @@ def test__makeSubject1Input__arccosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cosech', 2), ('b', 3)], ('cosech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccosech',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('cosech', 2), ('b', 3)],
                          ('cosech', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (cosech a) b)'
-    }
-    ]
+        'resultLatexStr': '\\cosech(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (cosech a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -904,15 +923,16 @@ def test__makeSubject1Input__arccos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cos', 2), ('b', 3)], ('cos', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccos',
         'id': 2,
         'lastId': 0,
         'resultAST': {('=', 0): [('cos', 2), ('b', 3)], ('cos', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (cos a) b)'
-    }
-    ]
+        'resultLatexStr': '\\cos(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (cos a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -958,16 +978,17 @@ def test__makeSubject1Input__arccosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cosh', 2), ('b', 3)], ('cosh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccosh',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('cosh', 2), ('b', 3)],
                          ('cosh', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (cosh a) b)'
-    }
-    ]
+        'resultLatexStr': '\\cosh(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (cosh a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1013,15 +1034,16 @@ def test__makeSubject1Input__arccot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('cot', 2), ('b', 3)], ('cot', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccot',
         'id': 2,
         'lastId': 0,
         'resultAST': {('=', 0): [('cot', 2), ('b', 3)], ('cot', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (cot a) b)'
-    }
-    ]
+        'resultLatexStr': '\\cot(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (cot a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1067,16 +1089,17 @@ def test__makeSubject1Input__arccoth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('coth', 2), ('b', 3)], ('coth', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccoth',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('coth', 2), ('b', 3)],
                          ('coth', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (coth a) b)'
-    }
-    ]
+        'resultLatexStr': '\\coth(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (coth a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1122,15 +1145,16 @@ def test__makeSubject1Input__arcsec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sec', 2), ('b', 3)], ('sec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsec',
         'id': 2,
         'lastId': 0,
         'resultAST': {('=', 0): [('sec', 2), ('b', 3)], ('sec', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (sec a) b)'
-    }
-    ]
+        'resultLatexStr': '\\sec(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (sec a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1176,16 +1200,17 @@ def test__makeSubject1Input__arcsech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sech', 2), ('b', 3)], ('sech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsech',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('sech', 2), ('b', 3)],
                          ('sech', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (sech a) b)'
-    }
-    ]
+        'resultLatexStr': '\\sech(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (sech a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1231,15 +1256,16 @@ def test__makeSubject1Input__arcsin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sin', 2), ('b', 3)], ('sin', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsin',
         'id': 2,
         'lastId': 0,
         'resultAST': {('=', 0): [('sin', 2), ('b', 3)], ('sin', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (sin a) b)'
-    }
-    ]
+        'resultLatexStr': '\\sin(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (sin a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1285,16 +1311,17 @@ def test__makeSubject1Input__arcsinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('sinh', 2), ('b', 3)], ('sinh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsinh',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('sinh', 2), ('b', 3)],
                          ('sinh', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (sinh a) b)'
-    }
-    ]
+        'resultLatexStr': '\\sinh(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (sinh a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1340,15 +1367,16 @@ def test__makeSubject1Input__arctan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('tan', 2), ('b', 3)], ('tan', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 8: 1, 11: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arctan',
         'id': 2,
         'lastId': 0,
         'resultAST': {('=', 0): [('tan', 2), ('b', 3)], ('tan', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (tan a) b)'
-    }
-    ]
+        'resultLatexStr': '\\tan(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (tan a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1394,16 +1422,17 @@ def test__makeSubject1Input__arctanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('tanh', 2), ('b', 3)], ('tanh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 9: 1, 12: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arctanh',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('tanh', 2), ('b', 3)],
                          ('tanh', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (tanh a) b)'
-    }
-    ]
+        'resultLatexStr': '\\tanh(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (tanh a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1449,16 +1478,17 @@ def test__makeSubject1Input__cosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccosec', 2), ('b', 3)], ('arccosec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 13: 1, 16: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cosec',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arccosec', 2), ('b', 3)],
                          ('arccosec', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arccosec a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arccosec(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arccosec a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1504,16 +1534,17 @@ def test__makeSubject1Input__cosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccosech', 2), ('b', 3)], ('arccosech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 14: 1, 17: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cosech',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arccosech', 2), ('b', 3)],
                          ('arccosech', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arccosech a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arccosech(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arccosech a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1559,16 +1590,17 @@ def test__makeSubject1Input__cos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccos', 2), ('b', 3)], ('arccos', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cos',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arccos', 2), ('b', 3)],
                          ('arccos', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arccos a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arccos(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arccos a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1614,16 +1646,17 @@ def test__makeSubject1Input__cosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccosh', 2), ('b', 3)], ('arccosh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cosh',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arccosh', 2), ('b', 3)],
                          ('arccosh', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arccosh a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arccosh(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arccosh a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1669,16 +1702,17 @@ def test__makeSubject1Input__cot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccot', 2), ('b', 3)], ('arccot', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cot',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arccot', 2), ('b', 3)],
                          ('arccot', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arccot a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arccot(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arccot a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1724,16 +1758,17 @@ def test__makeSubject1Input__coth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arccoth', 2), ('b', 3)], ('arccoth', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'coth',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arccoth', 2), ('b', 3)],
                          ('arccoth', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arccoth a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arccoth(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arccoth a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1779,16 +1814,17 @@ def test__makeSubject1Input__sec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsec', 2), ('b', 3)], ('arcsec', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sec',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arcsec', 2), ('b', 3)],
                          ('arcsec', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arcsec a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arcsec(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arcsec a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1834,16 +1870,17 @@ def test__makeSubject1Input__sech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsech', 2), ('b', 3)], ('arcsech', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sech',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arcsech', 2), ('b', 3)],
                          ('arcsech', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arcsech a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arcsech(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arcsech a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1889,16 +1926,17 @@ def test__makeSubject1Input__sin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsin', 2), ('b', 3)], ('arcsin', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sin',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arcsin', 2), ('b', 3)],
                          ('arcsin', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arcsin a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arcsin(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arcsin a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1944,16 +1982,17 @@ def test__makeSubject1Input__sinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arcsinh', 2), ('b', 3)], ('arcsinh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sinh',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arcsinh', 2), ('b', 3)],
                          ('arcsinh', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arcsinh a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arcsinh(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arcsinh a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -1999,16 +2038,17 @@ def test__makeSubject1Input__tan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arctan', 2), ('b', 3)], ('arctan', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 11: 1, 14: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'tan',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arctan', 2), ('b', 3)],
                          ('arctan', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arctan a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arctan(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arctan a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2054,16 +2094,17 @@ def test__makeSubject1Input__tanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('arctanh', 2), ('b', 3)], ('arctanh', 2): [('a', 1)]}
     expected__startPos__nodeId = {1: 0, 4: 2, 12: 1, 15: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'tanh',
         'id': 2,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('arctanh', 2), ('b', 3)],
                          ('arctanh', 2): [('a', 1)]},
-        'resultSchemeStr': '(= (arctanh a) b)'
-    }
-    ]
+        'resultLatexStr': '\\arctanh(a)=b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= (arctanh a) b)',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2112,16 +2153,17 @@ def test__leftSide__addition0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('-', 1)], ('-', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '+',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('-', 1): [('c', 2), ('b', 4)],
                          ('=', 0): [('a', 3), ('-', 1)]},
-        'resultSchemeStr': '(= a (- c b))'
-    }
-    ]
+        'resultLatexStr': 'a=c-b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (- c b))',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2167,16 +2209,17 @@ def test__leftSide__addition1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('-', 1)], ('-', 1): [('c', 2), ('a', 3)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 2, 10: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '+',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('-', 1): [('c', 2), ('a', 3)],
                          ('=', 0): [('b', 4), ('-', 1)]},
-        'resultSchemeStr': '(= b (- c a))'
-    }
-    ]
+        'resultLatexStr': 'b=c-a',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (- c a))',
+        'resultVariables': ['b', 'c', 'a'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2222,16 +2265,17 @@ def test__leftSide__subtraction0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('+', 1)], ('+', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '-',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('+', 1): [('c', 2), ('b', 4)],
                          ('=', 0): [('a', 3), ('+', 1)]},
-        'resultSchemeStr': '(= a (+ c b))'
-    }
-    ]
+        'resultLatexStr': 'a=c+b',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (+ c b))',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2277,16 +2321,17 @@ def test__leftSide__subtraction1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('-', 1)], ('-', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 3, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '-',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('-', 1): [('a', 3), ('c', 2)],
                          ('=', 0): [('b', 4), ('-', 1)]},
-        'resultSchemeStr': '(= b (- a c))'
-    }
-    ]
+        'resultLatexStr': 'b=a-c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (- a c))',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2332,16 +2377,17 @@ def test__leftSide__multiply0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('/', 1)], ('/', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '*',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('/', 1): [('c', 2), ('b', 4)],
                          ('=', 0): [('a', 3), ('/', 1)]},
-        'resultSchemeStr': '(= a (/ c b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\frac{c}{b}',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (/ c b))',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2387,16 +2433,17 @@ def test__leftSide__multiply1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('/', 1)], ('/', 1): [('c', 2), ('a', 3)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 2, 10: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '*',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('/', 1): [('c', 2), ('a', 3)],
                          ('=', 0): [('b', 4), ('/', 1)]},
-        'resultSchemeStr': '(= b (/ c a))'
-    }
-    ]
+        'resultLatexStr': 'b=\\frac{c}{a}',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (/ c a))',
+        'resultVariables': ['b', 'c', 'a'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2442,16 +2489,17 @@ def test__leftSide__divide0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('*', 1)], ('*', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 8: 2, 10: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '/',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('*', 1): [('c', 2), ('b', 4)],
                          ('=', 0): [('a', 3), ('*', 1)]},
-        'resultSchemeStr': '(= a (* c b))'
-    }
-    ]
+        'resultLatexStr': 'a=cb',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (* c b))',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2497,16 +2545,17 @@ def test__leftSide__divide1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('/', 1)], ('/', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 3, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '/',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('/', 1): [('a', 3), ('c', 2)],
                          ('=', 0): [('b', 4), ('/', 1)]},
-        'resultSchemeStr': '(= b (/ a c))'
-    }
-    ]
+        'resultLatexStr': 'b=\\frac{a}{c}',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (/ a c))',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2552,16 +2601,17 @@ def test__leftSide__exponent0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('nroot', 1)], ('nroot', 1): [('b', 4), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 12: 4, 14: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': '^',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('nroot', 1)],
                          ('nroot', 1): [('b', 4), ('c', 2)]},
-        'resultSchemeStr': '(= a (nroot b c))'
-    }
-    ]
+        'resultLatexStr': 'a=\\sqrt[b]{c}',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (nroot b c))',
+        'resultVariables': ['a', 'b', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2607,16 +2657,17 @@ def test__leftSide__exponent1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('log', 1)], ('log', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 10: 3, 12: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': '^',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('b', 4), ('log', 1)],
                          ('log', 1): [('a', 3), ('c', 2)]},
-        'resultSchemeStr': '(= b (log a c))'
-    }
-    ]
+        'resultLatexStr': 'b=\\log_a(c)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (log a c))',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2662,16 +2713,17 @@ def test__leftSide__nroot0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('log', 1)], ('log', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2, 12: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'nroot',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('log', 1)],
                          ('log', 1): [('c', 2), ('b', 4)]},
-        'resultSchemeStr': '(= a (log c b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\log_c(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (log c b))',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2717,16 +2769,17 @@ def test__leftSide__nroot1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('^', 1)], ('^', 1): [('c', 2), ('a', 3)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 2, 10: 3}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': 'nroot',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('b', 4), ('^', 1)],
                          ('^', 1): [('c', 2), ('a', 3)]},
-        'resultSchemeStr': '(= b (^ c a))'
-    }
-    ]
+        'resultLatexStr': 'b=c^a',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (^ c a))',
+        'resultVariables': ['b', 'c', 'a'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2772,16 +2825,17 @@ def test__leftSide__log0(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('nroot', 1)], ('nroot', 1): [('c', 2), ('b', 4)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 12: 2, 14: 4}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'log',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('nroot', 1)],
                          ('nroot', 1): [('c', 2), ('b', 4)]},
-        'resultSchemeStr': '(= a (nroot c b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\sqrt[c]{b}',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (nroot c b))',
+        'resultVariables': ['a', 'c', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2827,16 +2881,17 @@ def test__leftSide__log1(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('b', 4), ('^', 1)], ('^', 1): [('a', 3), ('c', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 4, 6: 1, 8: 3, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 1,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 1,
         'functionName': 'log',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('b', 4), ('^', 1)],
                          ('^', 1): [('a', 3), ('c', 2)]},
-        'resultSchemeStr': '(= b (^ a c))'
-    }
-    ]
+        'resultLatexStr': 'b=a^c',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= b (^ a c))',
+        'resultVariables': ['b', 'a', 'c'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2882,16 +2937,17 @@ def test__leftSide__arccosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cosec', 1)], ('cosec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 12: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccosec',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('cosec', 1)],
                          ('cosec', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (cosec b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\cosec(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (cosec b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2937,16 +2993,17 @@ def test__leftSide__arccosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cosech', 1)], ('cosech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccosech',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('cosech', 1)],
                          ('cosech', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (cosech b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\cosech(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (cosech b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -2992,15 +3049,16 @@ def test__leftSide__arccos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cos', 1)], ('cos', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccos',
         'id': 1,
         'lastId': 0,
         'resultAST': {('=', 0): [('a', 3), ('cos', 1)], ('cos', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (cos b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\cos(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (cos b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3046,16 +3104,17 @@ def test__leftSide__arccosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cosh', 1)], ('cosh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccosh',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('cosh', 1)],
                          ('cosh', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (cosh b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\cosh(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (cosh b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3101,15 +3160,16 @@ def test__leftSide__arccot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('cot', 1)], ('cot', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccot',
         'id': 1,
         'lastId': 0,
         'resultAST': {('=', 0): [('a', 3), ('cot', 1)], ('cot', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (cot b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\cot(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (cot b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3155,16 +3215,17 @@ def test__leftSide__arccoth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('coth', 1)], ('coth', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arccoth',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('coth', 1)],
                          ('coth', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (coth b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\coth(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (coth b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3210,15 +3271,16 @@ def test__leftSide__arcsec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sec', 1)], ('sec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsec',
         'id': 1,
         'lastId': 0,
         'resultAST': {('=', 0): [('a', 3), ('sec', 1)], ('sec', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (sec b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\sec(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (sec b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3264,16 +3326,17 @@ def test__leftSide__arcsech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sech', 1)], ('sech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsech',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('sech', 1)],
                          ('sech', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (sech b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\sech(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (sech b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3319,15 +3382,16 @@ def test__leftSide__arcsin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sin', 1)], ('sin', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsin',
         'id': 1,
         'lastId': 0,
         'resultAST': {('=', 0): [('a', 3), ('sin', 1)], ('sin', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (sin b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\sin(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (sin b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3373,16 +3437,17 @@ def test__leftSide__arcsinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('sinh', 1)], ('sinh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arcsinh',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('sinh', 1)],
                          ('sinh', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (sinh b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\sinh(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (sinh b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3428,15 +3493,16 @@ def test__leftSide__arctan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('tan', 1)], ('tan', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 10: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arctan',
         'id': 1,
         'lastId': 0,
         'resultAST': {('=', 0): [('a', 3), ('tan', 1)], ('tan', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (tan b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\tan(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (tan b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3482,16 +3548,17 @@ def test__leftSide__arctanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('tanh', 1)], ('tanh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 11: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'arctanh',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('tanh', 1)],
                          ('tanh', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (tanh b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\tanh(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (tanh b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3537,16 +3604,17 @@ def test__leftSide__cosec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccosec', 1)], ('arccosec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 15: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cosec',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arccosec', 1)],
                          ('arccosec', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arccosec b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arccosec(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arccosec b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3592,16 +3660,17 @@ def test__leftSide__cosech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccosech', 1)], ('arccosech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 16: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cosech',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arccosech', 1)],
                          ('arccosech', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arccosech b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arccosech(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arccosech b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3647,16 +3716,17 @@ def test__leftSide__cos(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccos', 1)], ('arccos', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cos',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arccos', 1)],
                          ('arccos', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arccos b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arccos(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arccos b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3702,16 +3772,17 @@ def test__leftSide__cosh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccosh', 1)], ('arccosh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cosh',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arccosh', 1)],
                          ('arccosh', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arccosh b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arccosh(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arccosh b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3757,16 +3828,17 @@ def test__leftSide__cot(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccot', 1)], ('arccot', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'cot',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arccot', 1)],
                          ('arccot', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arccot b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arccot(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arccot b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3812,16 +3884,17 @@ def test__leftSide__coth(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arccoth', 1)], ('arccoth', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'coth',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arccoth', 1)],
                          ('arccoth', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arccoth b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arccoth(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arccoth b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3867,16 +3940,17 @@ def test__leftSide__sec(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsec', 1)], ('arcsec', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sec',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arcsec', 1)],
                          ('arcsec', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arcsec b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arcsec(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arcsec b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3922,16 +3996,17 @@ def test__leftSide__sech(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsech', 1)], ('arcsech', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sech',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arcsech', 1)],
                          ('arcsech', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arcsech b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arcsech(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arcsech b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -3977,16 +4052,17 @@ def test__leftSide__sin(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsin', 1)], ('arcsin', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sin',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arcsin', 1)],
                          ('arcsin', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arcsin b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arcsin(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arcsin b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -4032,16 +4108,17 @@ def test__leftSide__sinh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arcsinh', 1)], ('arcsinh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'sinh',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arcsinh', 1)],
                          ('arcsinh', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arcsinh b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arcsinh(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arcsinh b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -4087,16 +4164,17 @@ def test__leftSide__tan(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arctan', 1)], ('arctan', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 13: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'tan',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arctan', 1)],
                          ('arctan', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arctan b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arctan(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arctan b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -4142,16 +4220,17 @@ def test__leftSide__tanh(verbose=False):
     #
     expectedModifiedAST = {('=', 0): [('a', 3), ('arctanh', 1)], ('arctanh', 1): [('b', 2)]}
     expected__startPos__nodeId = {1: 0, 3: 3, 6: 1, 14: 2}
-    expected__stepsWithoutSimplify = [
-    {   'argumentIdx': 0,
+    expected__stepsWithoutSimplify = [   {   'argumentIdx': 0,
         'functionName': 'tanh',
         'id': 1,
         'lastId': 0,
         'resultAST': {   ('=', 0): [('a', 3), ('arctanh', 1)],
                          ('arctanh', 1): [('b', 2)]},
-        'resultSchemeStr': '(= a (arctanh b))'
-    }
-    ]
+        'resultLatexStr': 'a=\\arctanh(b)',
+        'resultRootOfTree': ('=', 0),
+        'resultSchemeStr': '(= a (arctanh b))',
+        'resultVariables': ['a', 'b'],
+        'stepType': 'solving'}]
     #
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 

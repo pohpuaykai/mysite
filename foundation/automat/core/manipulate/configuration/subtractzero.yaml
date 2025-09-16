@@ -1,10 +1,10 @@
 ---
-className: "Subtractzero"
-type: "essential"
+className: 'Subtractzero'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(+ "0" $0)'
+      scheme: '(+ 0 $0)'
       return: '$0'
     minArgs:
       $0: 0
@@ -13,9 +13,9 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(+ $0 "0")'
+      scheme: '(+ $0 0)'
       return: '$0'
     minArgs:
       $0: 0
@@ -24,9 +24,9 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(- $0 "0")'
+      scheme: '(- $0 0)'
       return: '$0'
     minArgs:
       $0: 0

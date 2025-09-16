@@ -3,7 +3,7 @@
 --<<Schaum's 3000 Solved Problems In Electric Circuits>>
 -make pretty animations :D
 --try the circuitAnime/basic.js with simplification=True
---try out using priorityQueue&each_step_variable_in_equation_checking_if_meet_independentVariables_requirement_then_terminateSearch with bipartiteSolver, see if steps are more concise
+--try out using priorityQueue[do it with your BinarySearch]&each_step_variable_in_equation_checking_if_meet_independentVariables_requirement_then_terminateSearch with bipartiteSolver, see if steps are more concise
 
 
 
@@ -16,6 +16,7 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 --Use CAS to solve symbolic_equations, return solving_steps and solved_results to 3D, 
 --make pretty animation :D
 --scrap electronic store data & feed to optimiser like simplexTableau for which to buy?
+---symbolic simplex_tableau, and then zero derivative wrt to each controllable_variable => many modal_optimal_solutions....?
 
 
 

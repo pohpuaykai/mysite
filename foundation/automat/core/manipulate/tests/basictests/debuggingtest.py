@@ -48,7 +48,8 @@ def test__makesubjecttest0__linearEliminationBySubstitution_eq1_match(verbose=Fa
     #manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
 
     #we expect no-match...
-    expected = '(= (* I_{R} R) (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}))' # (* $0 (+ $1 $2))
+    expected = None # when no-match, it returns None
+    # expected = '(= (* I_{R} R) (- (* I_{R_{C}} R_{C}) V^{Q1}_{BE}))' # (* $0 (+ $1 $2))
     #expectedAst = Schemeparser(equationStr=expected).ast
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expected == manipulatedSchemeEquation# and manipulatedAst == expectedAst

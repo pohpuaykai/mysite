@@ -1,11 +1,11 @@
 ---
-className: "Multiplyexponential"
-type: "essential"
+className: 'Multiplyexponential'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(* $0 $0)'
-      return: '(^ $0 "2")'
+      return: '(^ $0 2)'
     minArgs:
       $0: 0
     maxArgs:

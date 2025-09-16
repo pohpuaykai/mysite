@@ -1,13 +1,13 @@
 ---
-className: "Trigonometricpowerreduction"
-type: "trigonometric_standard"
+className: 'Trigonometricpowerreduction'
+type: 'trigonometric_standard'
 manipulations:
 
 #sin
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (sin $0) "2")'
-      return: '(/ (- "1" (cos (* "2" $0))) "2")'
+      scheme: '(^ (sin $0) 2)'
+      return: '(/ (- 1 (cos (* 2 $0))) 2)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -15,22 +15,10 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (sin $0) "3")'
-      return: '(/ (- (* "3" (sin $0)) (sin (* "3" $0))) "4")'
-    minArgs: #actually this is a preCond too
-      $0: 0
-    maxArgs:
-      $0: null
-    preCond:
-      $0: null
-
-
-  - type: "regex"
-    vor:
-      scheme: '(^ (sin $0) "4")'
-      return: '(/ (+ (- "3" (* "4" (cos (* "2" $0)))) (cos (* "4" $0))) "8")'
+      scheme: '(^ (sin $0) 3)'
+      return: '(/ (- (* 3 (sin $0)) (sin (* 3 $0))) 4)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -39,10 +27,22 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (sin $0) "5")'
-      return: '(/ (+ (- (* "10" (sin $0)) (* "5" (sin (* "3" $0)))) (sin (* "5" $0))) "16")'
+      scheme: '(^ (sin $0) 4)'
+      return: '(/ (+ (- 3 (* 4 (cos (* 2 $0)))) (cos (* 4 $0))) 8)'
+    minArgs: #actually this is a preCond too
+      $0: 0
+    maxArgs:
+      $0: null
+    preCond:
+      $0: null
+
+
+  - type: 'regex'
+    vor:
+      scheme: '(^ (sin $0) 5)'
+      return: '(/ (+ (- (* 10 (sin $0)) (* 5 (sin (* 3 $0)))) (sin (* 5 $0))) 16)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -51,10 +51,10 @@ manipulations:
       $0: null
 #cos
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (cos $0) "2")'
-      return: '(/ (+ "1" (cos (* "2" $0))) "2")'
+      scheme: '(^ (cos $0) 2)'
+      return: '(/ (+ 1 (cos (* 2 $0))) 2)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -63,10 +63,10 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (cos $0) "3")'
-      return: '(/ (+ (* "3" (cos $0)) (cos (* "3" $0))) "4")'
+      scheme: '(^ (cos $0) 3)'
+      return: '(/ (+ (* 3 (cos $0)) (cos (* 3 $0))) 4)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -75,10 +75,10 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (cos $0) "4")'
-      return: '(/ (+ (+ "3" (* "4" (cos (* "2" $0)))) (cos (* "4" $0))) "8")'
+      scheme: '(^ (cos $0) 4)'
+      return: '(/ (+ (+ 3 (* 4 (cos (* 2 $0)))) (cos (* 4 $0))) 8)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -87,10 +87,10 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (cos $0) "5")'
-      return: '(/ (+ (+ (* "10" (cos $0)) (* "5" (cos $0))) (cos (* "5" $0))) "16")'
+      scheme: '(^ (cos $0) 5)'
+      return: '(/ (+ (+ (* 10 (cos $0)) (* 5 (cos $0))) (cos (* 5 $0))) 16)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -99,10 +99,10 @@ manipulations:
       $0: null
 
 #sin cos
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(* (^ (sin $0) "2") (^ (cos $0) "2"))'
-      return: '(/ (- "1" (cos (* "4" $0))) "8")'
+      scheme: '(* (^ (sin $0) 2) (^ (cos $0) 2))'
+      return: '(/ (- 1 (cos (* 4 $0))) 8)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -111,10 +111,10 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(* (^ (sin $0) "3") (^ (cos $0) "3"))'
-      return: '(/ (- (* "3" (sin (* "2" $0))) (sin (* "6" $0))) "32")'
+      scheme: '(* (^ (sin $0) 3) (^ (cos $0) 3))'
+      return: '(/ (- (* 3 (sin (* 2 $0))) (sin (* 6 $0))) 32)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -123,10 +123,10 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(* (^ (sin $0) "4") (^ (cos $0) "4"))'
-      return: '(/ (+ (- "3" (* "4" (cos (* "4" $0)))) (cos (* "8" $0))) "128")'
+      scheme: '(* (^ (sin $0) 4) (^ (cos $0) 4))'
+      return: '(/ (+ (- 3 (* 4 (cos (* 4 $0)))) (cos (* 8 $0))) 128)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -135,10 +135,10 @@ manipulations:
       $0: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(* (^ (sin $0) "5") (^ (cos $0) "5"))'
-      return: '(/ (+ (- (* "10" (sin (* "2" $0))) (* "5" (sin (* "6" $0)))) (sin (* "10" $0))) "512")'
+      scheme: '(* (^ (sin $0) 5) (^ (cos $0) 5))'
+      return: '(/ (+ (- (* 10 (sin (* 2 $0))) (* 5 (sin (* 6 $0)))) (sin (* 10 $0))) 512)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:

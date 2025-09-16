@@ -1,8 +1,8 @@
 ---
-className: "Trigonometricderivative"
-type: "derivative_trigonometric"
+className: 'Trigonometricderivative'
+type: 'derivative_trigonometric'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (sin $0) $1)'
       return: '(* (cos $0) (D $0 $1))'
@@ -18,10 +18,10 @@ manipulations:
 
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (cos $0) $1)'
-      return: '(* (- "0" (sin $0)) (D $0 $1))'
+      return: '(* (- 0 (sin $0)) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -34,10 +34,10 @@ manipulations:
 
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (tan $0) $1)'
-      return: '(* (^ (sec $0) "2") (D $0 $1))'
+      return: '(* (^ (sec $0) 2) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -50,7 +50,7 @@ manipulations:
 
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (sec $0) $1)'
       return: '(* (* (sec $0) (tan $0)) (D $0 $1))'
@@ -66,10 +66,10 @@ manipulations:
 
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (cosec $0) $1)'
-      return: '(* (- "0" (* (cosec $0) (cot $0))) (D $0 $1))'
+      return: '(* (- 0 (* (cosec $0) (cot $0))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -82,10 +82,10 @@ manipulations:
 
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (cot $0) $1)'
-      return: '(* (- "0" (^ cosec $0) "2") (D $0 $1))'
+      return: '(* (- 0 (^ cosec $0) 2) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable

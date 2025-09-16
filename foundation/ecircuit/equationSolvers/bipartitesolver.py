@@ -9,7 +9,7 @@ class BipartiteSolver:
         self.independentVariableStrs = independentVariableStrs
         self.vertexIdIssuer = VertexIdIssuer()
 
-    def _solve(self):
+    def _solve(self, simplify=False):
         """
 
         """
@@ -126,7 +126,7 @@ class BipartiteSolver:
                     'root':hinEquation.rootOfTree
                 }
                 #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
-                _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable)
+                _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable, simplify=simplify)
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
                 
 

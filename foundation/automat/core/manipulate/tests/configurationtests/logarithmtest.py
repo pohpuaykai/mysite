@@ -252,7 +252,7 @@ def test__vor5__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (log $0 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= a "1")' # "1"
+    expected = '(= a "1")' # 1
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -272,7 +272,7 @@ def test__hin5__configTest(verbose=False):
     idx = 5
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # "1"
+    manipulatedSchemeEquation = ma0.apply() # 1
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (log v_{0} v_{0}))' # (log $0 $0)
@@ -295,10 +295,10 @@ def test__vor6__configTest(verbose=False):
     idx = 6
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (log $0 "1")
+    manipulatedSchemeEquation = ma0.apply() # (log $0 1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= a "0")' # "0"
+    expected = '(= a "0")' # 0
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -318,10 +318,10 @@ def test__hin6__configTest(verbose=False):
     idx = 6
     eq0 = Equation(eqs, eqsType)
     ma0 = Logarithm(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # "0"
+    manipulatedSchemeEquation = ma0.apply() # 0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= a (log v_{0} "1"))' # (log $0 "1")
+    expected = '(= a (log v_{0} "1"))' # (log $0 1)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -335,18 +335,18 @@ def test__hin6__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest() # Not tested yet
-    test__hin0__configTest() # Not tested yet
-    test__vor1__configTest() # Not tested yet
-    test__hin1__configTest() # Not tested yet
-    test__vor2__configTest() # Not tested yet
-    test__hin2__configTest() # Not tested yet
-    test__vor3__configTest() # Not tested yet
-    test__hin3__configTest() # Not tested yet
-    test__vor4__configTest() # Not tested yet
-    test__hin4__configTest() # Not tested yet
-    test__vor5__configTest() # Not tested yet
-    test__hin5__configTest() # Not tested yet
-    test__vor6__configTest() # Not tested yet
-    test__hin6__configTest() # Not tested yet
+    test__vor0__configTest(True) # Not tested yet
+    test__hin0__configTest(True) # Not tested yet
+    test__vor1__configTest(True) # Not tested yet
+    test__hin1__configTest(True) # Not tested yet
+    test__vor2__configTest(True) # Not tested yet
+    test__hin2__configTest(True) # Not tested yet
+    test__vor3__configTest(True) # Not tested yet
+    test__hin3__configTest(True) # Not tested yet
+    test__vor4__configTest(True) # Not tested yet
+    test__hin4__configTest(True) # Not tested yet
+    test__vor5__configTest(True) # Not tested yet
+    test__hin5__configTest(True) # Not tested yet
+    test__vor6__configTest(True) # Not tested yet
+    test__hin6__configTest(True) # Not tested yet
     

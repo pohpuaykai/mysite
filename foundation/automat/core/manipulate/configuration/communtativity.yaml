@@ -1,8 +1,8 @@
 ---
-className: "Communtativity"
-type: "essential"
+className: 'Communtativity'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(+ $0 $1)'
       return: '(+ $1 $0)'
@@ -15,7 +15,7 @@ manipulations:
     preCond:
       $0: null
       $1: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(* $0 $1)'
       return: '(* $1 $0)'
@@ -28,7 +28,7 @@ manipulations:
     preCond:
       $0: null
       $1: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(= $0 $1)'
       return: '(= $1 $0)'

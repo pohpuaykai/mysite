@@ -1,10 +1,10 @@
 ---
-className: "Logarithm"
-type: "essential"
+className: 'Logarithm'
+type: 'essential'
 # https://en.wikipedia.org/wiki/Logarithm#Logarithmic_identities
 manipulations:
   # Product Identity
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(log $0 (* $1 $2))'
       return: '(+ (log $0 $1) (log $0 $2))'
@@ -21,7 +21,7 @@ manipulations:
       $1: null
       $2: null
   # Quotient Identity
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(log $0 (/ $1 $2))'
       return: '(- (log $0 $1) (log $0 $2))'
@@ -38,7 +38,7 @@ manipulations:
       $1: null
       $2: null
   # Power Identity
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(log $0 (^ $1 $2))'
       return: '(* $2 (log $0 $1))'
@@ -55,7 +55,7 @@ manipulations:
       $1: null
       $2: null
   # Root Identity
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(log $0 (nroot $1 $2))'
       return: '(/ (log $0 $2) $1)'
@@ -72,7 +72,7 @@ manipulations:
       $1: null
       $2: null
   # Change of base
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ (log $2 $1) (log $2 $0))'
       return: '(log $0 $1)'
@@ -89,10 +89,10 @@ manipulations:
       $1: null
       $2: null
   # 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(log $0 $0)'
-      return: '"1"'
+      return: '1'
     minArgs:
       $0: 0
     maxArgs:
@@ -100,10 +100,10 @@ manipulations:
     preCond:
       $0: null
   #
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(log $0 "1")'
-      return: '"0"'
+      scheme: '(log $0 1)'
+      return: '0'
     minArgs:
       $0: 0
     maxArgs:

@@ -18,8 +18,8 @@ def test__basic__moveAdditionAndEquate(verbose=False):
     latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'a-c=d-e' # to be filled in 
     expectedFunctions = {'-': 2} # count
-    expectedVariables = {'a': 1, 'c': 1, 'd': 1, 'e': 1} # count
-    expectedPrimitives = {} # count
+    expectedVariables = {'a': 1, 'c': 1, 'd': 1} # count
+    expectedPrimitives = {'e': 1} # count
     expectedTotalNodeCount = 7 # count
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
@@ -57,7 +57,7 @@ def test__hatsukoi__step0(verbose=False):
     ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate)
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
-    expectedLatexStr = 'V_{in} -RI_R=I_{Z_{1}}R_{Z_{1}}' # to be filled in 
+    expectedLatexStr = 'V_{in}-RI_R=I_{Z_{1}}R_{Z_{1}}' # to be filled in 
     expectedFunctions = {'*': 2, '-': 1} # count
     expectedVariables = {'I_R': 1, 'I_{Z_{1}}': 1, 'R': 1, 'R_{Z_{1}}': 1, 'V_{in}': 1} # count
     expectedPrimitives = {} # count

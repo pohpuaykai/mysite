@@ -19,7 +19,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (- "0" (sin $0)) (D $0 $1)) $1)'
+    scheme: '(int (* (- 0 (sin $0)) (D $0 $1)) $1)'
     return: '(+ (cos $0) $2)'
   minArgs:
     $0: 1
@@ -35,7 +35,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (^ (sec $0) "2") (D $0 $1)) $1)'
+    scheme: '(int (* (^ (sec $0) 2) (D $0 $1)) $1)'
     return: '(+ (tan $0) $2)'
   minArgs:
     $0: 1
@@ -67,7 +67,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (- "0" (* (cosec $0) (cot $0))) (D $0 $1)) $1)'
+    scheme: '(int (* (- 0 (* (cosec $0) (cot $0))) (D $0 $1)) $1)'
     return: '(+ (cosec $0) $2)'
   minArgs:
     $0: 1
@@ -83,7 +83,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (- "0" (^ cosec $0) "2") (D $0 $1)) $1)'
+    scheme: '(int (* (- 0 (^ cosec $0) 2) (D $0 $1)) $1)'
     return: '(+ (cot $0) $2)'
   minArgs:
     $0: 1

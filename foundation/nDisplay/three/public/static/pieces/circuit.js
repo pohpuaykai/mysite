@@ -184,7 +184,8 @@ class Circuit extends Piece{
             'list_equationStr':list_equationStr,
             'id__type':self.id__type,
             'dependentVarStr':dependentVarStr,
-            'list_independentVarStr':list_independentVarStr
+            'list_independentVarStr':list_independentVarStr,
+            'simplify':false //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO test
         }));
 
     }

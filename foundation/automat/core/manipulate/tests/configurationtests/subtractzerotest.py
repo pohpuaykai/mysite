@@ -19,7 +19,7 @@ def test__vor0__configTest(verbose=False):
     idx = 0
     eq0 = Equation(eqs, eqsType)
     ma0 = Subtractzero(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ "0" $0)
+    manipulatedSchemeEquation = ma0.apply() # (+ 0 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a b)' # $0
@@ -45,7 +45,7 @@ def test__hin0__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (+ "0" a) (+ "0" a))' # (+ "0" $0)
+    expected = '(= (+ "0" a) (+ "0" a))' # (+ 0 $0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -65,7 +65,7 @@ def test__vor1__configTest(verbose=False):
     idx = 1
     eq0 = Equation(eqs, eqsType)
     ma0 = Subtractzero(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ $0 "0")
+    manipulatedSchemeEquation = ma0.apply() # (+ $0 0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a b)' # $0
@@ -91,7 +91,7 @@ def test__hin1__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (+ a "0") (+ a "0"))' # (+ $0 "0")
+    expected = '(= (+ a "0") (+ a "0"))' # (+ $0 0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -111,7 +111,7 @@ def test__vor2__configTest(verbose=False):
     idx = 2
     eq0 = Equation(eqs, eqsType)
     ma0 = Subtractzero(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- $0 "0")
+    manipulatedSchemeEquation = ma0.apply() # (- $0 0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a b)' # $0
@@ -137,7 +137,7 @@ def test__hin2__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (- a "0") (- a "0"))' # (- $0 "0")
+    expected = '(= (- a "0") (- a "0"))' # (- $0 0)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -151,10 +151,10 @@ def test__hin2__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest() # Not tested yet
-    test__hin0__configTest() # Not tested yet
-    test__vor1__configTest() # Not tested yet
-    test__hin1__configTest() # Not tested yet
-    test__vor2__configTest() # Not tested yet
-    test__hin2__configTest() # Not tested yet
+    test__vor0__configTest(True) # Not tested yet
+    test__hin0__configTest(True) # Not tested yet
+    test__vor1__configTest(True) # Not tested yet
+    test__hin1__configTest(True) # Not tested yet
+    test__vor2__configTest(True) # Not tested yet
+    test__hin2__configTest(True) # Not tested yet
     

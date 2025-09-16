@@ -22,7 +22,7 @@ def test__vor0__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D (arcsin $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= y (* (/ "1" (nroot "2" (- "1" (* x x)))) (D x x)))' # (* (/ "1" (nroot "2" (- "1" (* $0 $0)))) (D $0 $1))
+    expected = '(= y (* (/ "1" (nroot "2" (- "1" (* x x)))) (D x x)))' # (* (/ 1 (nroot 2 (- 1 (* $0 $0)))) (D $0 $1))
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -42,7 +42,7 @@ def test__hin0__configTest(verbose=False):
     idx = 0
     eq0 = Equation(eqs, eqsType)
     ma0 = Arctrigonometricderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (/ "1" (nroot "2" (- "1" (* $0 $0)))) (D $0 $1))
+    manipulatedSchemeEquation = ma0.apply() # (* (/ 1 (nroot 2 (- 1 (* $0 $0)))) (D $0 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (arcsin x) x))' # (D (arcsin $0) $1)
@@ -68,7 +68,7 @@ def test__vor1__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D (arccos $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= y (* (- "0" (/ "1" (nroot "2" (- "1" (* x x))))) (D x x)))' # (* (- "0" (/ "1" (nroot "2" (- "1" (* $0 $0))))) (D $0 $1))
+    expected = '(= y (* (- "0" (/ "1" (nroot "2" (- "1" (* x x))))) (D x x)))' # (* (- 0 (/ 1 (nroot 2 (- 1 (* $0 $0))))) (D $0 $1))
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -88,7 +88,7 @@ def test__hin1__configTest(verbose=False):
     idx = 1
     eq0 = Equation(eqs, eqsType)
     ma0 = Arctrigonometricderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (- "0" (/ "1" (nroot "2" (- "1" (* $0 $0))))) (D $0 $1))
+    manipulatedSchemeEquation = ma0.apply() # (* (- 0 (/ 1 (nroot 2 (- 1 (* $0 $0))))) (D $0 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (arccos x) x))' # (D (arccos $0) $1)
@@ -114,7 +114,7 @@ def test__vor2__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D (arctan $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= y (* (/ "1" (+ "1" (* x x))) (D x x)))' # (* (/ "1" (+ "1" (* $0 $0))) (D $0 $1))
+    expected = '(= y (* (/ "1" (+ "1" (* x x))) (D x x)))' # (* (/ 1 (+ 1 (* $0 $0))) (D $0 $1))
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -134,7 +134,7 @@ def test__hin2__configTest(verbose=False):
     idx = 2
     eq0 = Equation(eqs, eqsType)
     ma0 = Arctrigonometricderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (/ "1" (+ "1" (* $0 $0))) (D $0 $1))
+    manipulatedSchemeEquation = ma0.apply() # (* (/ 1 (+ 1 (* $0 $0))) (D $0 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (arctan x) x))' # (D (arctan $0) $1)
@@ -160,7 +160,7 @@ def test__vor3__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D (arcsec $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= y (* (/ "1" (* x (nroot "2" (- (* x x) "1")))) (D x x)))' # (* (/ "1" (* $0 (nroot "2" (- (* $0 $0) "1")))) (D $0 $1))
+    expected = '(= y (* (/ "1" (* x (nroot "2" (- (* x x) "1")))) (D x x)))' # (* (/ 1 (* $0 (nroot 2 (- (* $0 $0) 1)))) (D $0 $1))
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -180,7 +180,7 @@ def test__hin3__configTest(verbose=False):
     idx = 3
     eq0 = Equation(eqs, eqsType)
     ma0 = Arctrigonometricderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (/ "1" (* $0 (nroot "2" (- (* $0 $0) "1")))) (D $0 $1))
+    manipulatedSchemeEquation = ma0.apply() # (* (/ 1 (* $0 (nroot 2 (- (* $0 $0) 1)))) (D $0 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (arcsec x) x))' # (D (arcsec $0) $1)
@@ -206,7 +206,7 @@ def test__vor4__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D (arccosec $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= y (* (nroot "2" (- (* x x) "1")) (D x x)))' # (* (nroot "2" (- (* $0 $0) "1")) (D $1 $0))
+    expected = '(= y (* (nroot "2" (- (* x x) "1")) (D x x)))' # (* (nroot 2 (- (* $0 $0) 1)) (D $1 $0))
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -226,7 +226,7 @@ def test__hin4__configTest(verbose=False):
     idx = 4
     eq0 = Equation(eqs, eqsType)
     ma0 = Arctrigonometricderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (nroot "2" (- (* $0 $0) "1")) (D $1 $0))
+    manipulatedSchemeEquation = ma0.apply() # (* (nroot 2 (- (* $0 $0) 1)) (D $1 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (arccosec x) x))' # (D (arccosec $0) $1)
@@ -252,7 +252,7 @@ def test__vor5__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # (D (arccot $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= y (* (- "0" (/ "1" (+ "1" (* x x)))) (D x x)))' # (* (- "0" (/ "1" (+ "1" (* $0 $0)))) (D $0 $1))
+    expected = '(= y (* (- "0" (/ "1" (+ "1" (* x x)))) (D x x)))' # (* (- 0 (/ 1 (+ 1 (* $0 $0)))) (D $0 $1))
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -272,7 +272,7 @@ def test__hin5__configTest(verbose=False):
     idx = 5
     eq0 = Equation(eqs, eqsType)
     ma0 = Arctrigonometricderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (- "0" (/ "1" (+ "1" (* $0 $0)))) (D $0 $1))
+    manipulatedSchemeEquation = ma0.apply() # (* (- 0 (/ 1 (+ 1 (* $0 $0)))) (D $0 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (arccot x) x))' # (D (arccot $0) $1)
@@ -289,16 +289,16 @@ def test__hin5__configTest(verbose=False):
 
 
 if __name__=='__main__':
-    test__vor0__configTest() # Not tested yet
-    test__hin0__configTest() # Not tested yet
-    test__vor1__configTest() # Not tested yet
-    test__hin1__configTest() # Not tested yet
-    test__vor2__configTest() # Not tested yet
-    test__hin2__configTest() # Not tested yet
-    test__vor3__configTest() # Not tested yet
-    test__hin3__configTest() # Not tested yet
-    test__vor4__configTest() # Not tested yet
-    test__hin4__configTest() # Not tested yet
-    test__vor5__configTest() # Not tested yet
-    test__hin5__configTest() # Not tested yet
+    test__vor0__configTest(True) # Not tested yet
+    test__hin0__configTest(True) # Not tested yet
+    test__vor1__configTest(True) # Not tested yet
+    test__hin1__configTest(True) # Not tested yet
+    test__vor2__configTest(True) # Not tested yet
+    test__hin2__configTest(True) # Not tested yet
+    test__vor3__configTest(True) # Not tested yet
+    test__hin3__configTest(True) # Not tested yet
+    test__vor4__configTest(True) # Not tested yet
+    test__hin4__configTest(True) # Not tested yet
+    test__vor5__configTest(True) # Not tested yet
+    test__hin5__configTest(True) # Not tested yet
     

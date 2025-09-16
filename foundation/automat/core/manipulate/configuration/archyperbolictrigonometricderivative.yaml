@@ -1,9 +1,9 @@
 ---
-className: "Archyperbolictrigonometricderivative"
-type: "derivative_archyperbolictrigonometric"
+className: 'Archyperbolictrigonometricderivative'
+type: 'derivative_archyperbolictrigonometric'
 manipulations:
 #arcsinh
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arcsinh $0) $1)'
       return: '(* (sech (arcsinh $0)) (D $0 $1))'
@@ -18,7 +18,7 @@ manipulations:
       $1: null
 
 #arccosh
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arccosh $0) $1)'
       return: '(* (cosech (arccosh $0)) (D $0 $1))'
@@ -33,10 +33,10 @@ manipulations:
       $1: null
 
 #arctanh
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arctanh $0) $1)'
-      return: '(* (/ (+ "1" (cosh (* "2" (arctanh $0)))) "2") (D $0 $1))'
+      return: '(* (/ (+ 1 (cosh (* 2 (arctanh $0)))) 2) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -48,10 +48,10 @@ manipulations:
       $1: null
 
 #arcsech
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arcsech $0) $1)'
-      return: '(* (* (- "0" (cosh (arcsech $0))) (coth (arcsech $0))) (D $0 $1))'
+      return: '(* (* (- 0 (cosh (arcsech $0))) (coth (arcsech $0))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -63,10 +63,10 @@ manipulations:
       $1: null
 
 #arccosech
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arccosech $0) $1)'
-      return: '(* (* (- "0" (sinh (arccosech $0)))) (D $0 $1))'
+      return: '(* (* (- 0 (sinh (arccosech $0)))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -78,10 +78,10 @@ manipulations:
       $1: null
 
 #arccoth
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arccoth $0) $1)'
-      return: '(* (/ (- "1" (sinh (arccoth $0))) "2") (D $0 $1))'
+      return: '(* (/ (- 1 (sinh (arccoth $0))) 2) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable

@@ -1,11 +1,11 @@
 ---
-className: "Exponentialderivative"
-type: "essential"
+className: 'Exponentialderivative'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(D (^ "e" $0) $1)'
-      return: '(* (^ "e" $0) (D $0 $1))'
+      scheme: '(D (^ e $0) $1)'
+      return: '(* (^ e $0) (D $0 $1))'
     minArgs:
       $0: 1
       $1: 1
@@ -18,10 +18,10 @@ manipulations:
 #for base is a number<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
 
 #general
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (^ $0 $1) $2)'
-      return: '(* (^ $0 $1) (+ (* (D $1 $2) (log "e" $0)) (* (D $0 $2) (/ $1 $0))))'
+      return: '(* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0))))'
     minArgs:
       $0: 1
       $1: 1

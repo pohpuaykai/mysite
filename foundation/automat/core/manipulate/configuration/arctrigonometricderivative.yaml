@@ -1,13 +1,13 @@
 ---
-className: "Arctrigonometricderivative"
-type: "derivative_trigonometric"
+className: 'Arctrigonometricderivative'
+type: 'derivative_trigonometric'
 manipulations:
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arcsin $0) $1)'
-      return: '(* (/ "1" (nroot "2" (- "1" (* $0 $0)))) (D $0 $1))'
+      return: '(* (/ 1 (nroot 2 (- 1 (* $0 $0)))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -19,10 +19,10 @@ manipulations:
       $1: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arccos $0) $1)'
-      return: '(* (- "0" (/ "1" (nroot "2" (- "1" (* $0 $0))))) (D $0 $1))'
+      return: '(* (- 0 (/ 1 (nroot 2 (- 1 (* $0 $0))))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -34,10 +34,10 @@ manipulations:
       $1: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arctan $0) $1)'
-      return: '(* (/ "1" (+ "1" (* $0 $0))) (D $0 $1))'
+      return: '(* (/ 1 (+ 1 (* $0 $0))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -49,10 +49,10 @@ manipulations:
       $1: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arcsec $0) $1)'
-      return: '(* (/ "1" (* $0 (nroot "2" (- (* $0 $0) "1")))) (D $0 $1))'
+      return: '(* (/ 1 (* $0 (nroot 2 (- (* $0 $0) 1)))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -64,10 +64,10 @@ manipulations:
       $1: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arccosec $0) $1)'
-      return: '(* (nroot "2" (- (* $0 $0) "1")) (D $1 $0))'
+      return: '(* (nroot 2 (- (* $0 $0) 1)) (D $1 $0))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable
@@ -79,10 +79,10 @@ manipulations:
       $1: null
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (arccot $0) $1)'
-      return: '(* (- "0" (/ "1" (+ "1" (* $0 $0)))) (D $0 $1))'
+      return: '(* (- 0 (/ 1 (+ 1 (* $0 $0)))) (D $0 $1))'
     minArgs:
       $0: 1 # variable
       $1: 1 # variable

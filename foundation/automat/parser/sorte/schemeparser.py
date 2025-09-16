@@ -70,7 +70,7 @@ class Schemeparser(Parser):
                 print(f'label: {current.label}, argumentIdx: {current.argumentIdx}, id: {current.id}, tid:{tid}')
             #do the tabulating
             totalNodeCount += 1
-            if isNum(current.label):
+            if isNum(current.label):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<does your isNum at least contain e and i?
                 primitives[current.label] = primitives.get(current.label, 0) + 1
             elif current.label in Schemeparser.FUNC_NAMES: # is a function
                 functionsD[current.label] = functionsD.get(current.label, 0) + 1
@@ -93,8 +93,72 @@ class Schemeparser(Parser):
                 print(f'ast: {ast}, currentNode: {currentNode}, thisNodeId: {thisNodeId}, nodeId__len: {self.nodeId__len}')
             if len(neighbourNodes) > 0: # avoid putting leaves as keys
                 ast[(current.label, tid)] = neighbourNodes
-
+        self.ast=ast
+        self.startPos__nodeId = startPos__nodeId
+        self.functions = functionsD
+        self.variables = variablesD
+        self.primitives = primitives
+        self.totalNodeCount = totalNodeCount
         return ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId
+
+
+    def _getLabelLength(self):
+        """
+        #some parts of schemegrammarparser duplicates this implementation, please remove from schemegrammarparser<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+        """
+        nodeId__labelLen = {}
+        if len(self.ast) == 0 and len(self._eqs) != 0: # this is a single leaf, and the single leaf will not appear on self.ast.
+            nodeId__labelLen[self.rootOfTree[1]] = len(self._eqs)
+        else:
+            for (pLabel, pNodeId), childNodes in self.ast.items():
+                nodeId__labelLen[pNodeId] = len(pLabel)
+                for (cLabel, cNodeId) in childNodes:
+                    nodeId__labelLen[cNodeId] = len(cLabel)
+        # print('_getLabelLength: ', nodeId__labelLen)
+        return nodeId__labelLen
+
+
+
+    def _getLevelingInformation(self):
+        """This requires ast, startPos__nodeId, nodeId__len to have been calculated"""
+        #difference between entity and label, entity is the whole openBracket, while label is the name of the schemeFunction
+        #all the nodeStartPos are entityStartPos, not labelStartPos
+        nodeStartPos__nodeEndPos = {}; level__nodeStartPos = {}; nodeStartPos__level = {} # for quick jumping to nodeEndPos, when matching segments
+        #fill up nodeStartPos__nodeEndPos
+        nodeId__entityStartPos = {}
+        for startPos, nodeId in self.startPos__nodeId.items():
+            if self._eqs[startPos-1] == '(':
+                nodeStartPos__nodeEndPos[startPos-1] = startPos-1 + self.nodeId__len[nodeId]
+                nodeId__entityStartPos[nodeId] = startPos - 1
+            else:
+                nodeStartPos__nodeEndPos[startPos] = startPos + self.nodeId__len[nodeId]
+                nodeId__entityStartPos[nodeId] = startPos
+        #fill up level__nodeStartPos & nodeStartPos__level, by using ast
+        rootId = self.rootOfTree[1]; level__nodeStartPos[0] = [nodeId__entityStartPos[rootId]]; nodeStartPos__level[nodeId__entityStartPos[rootId]] = 0
+        stack = [(self.rootOfTree, 0)]; 
+        while len(stack) > 0:
+            currentNode, currentLevel = stack.pop()
+            childNodes = self.ast.get(currentNode, [])
+            childNodesTaggedWithLevel = list(zip(childNodes, [currentLevel+1]*len(childNodes)))
+            stack += childNodesTaggedWithLevel
+            #
+            for childNode, childLevel in childNodesTaggedWithLevel:
+                childId = childNode[1]
+                #
+                existing = level__nodeStartPos.get(childLevel, [])
+                existing.append(nodeId__entityStartPos[childId]); 
+                level__nodeStartPos[childLevel] = existing
+                #
+                nodeStartPos__level[nodeId__entityStartPos[childId]] = childLevel
+        self.nodeStartPos__nodeEndPos = nodeStartPos__nodeEndPos
+        level__nodeStartPos___sorted = {}
+        for level, list_nodeStartPos in level__nodeStartPos.items():
+            level__nodeStartPos___sorted[level] = sorted(list_nodeStartPos)
+        self.level__nodeStartPos = level__nodeStartPos___sorted
+        self.nodeStartPos__level = nodeStartPos__level
+        self.nodeId__entityStartPos = nodeId__entityStartPos
+        return nodeStartPos__nodeEndPos, level__nodeStartPos___sorted, nodeStartPos__level, nodeId__entityStartPos
 
     def _recursiveParse(self, eqs, level, parentStartPosOffset):
         """
@@ -228,9 +292,10 @@ class Schemeparser(Parser):
         self.primitives = {}
         #find the (=, id)
         if self.rootOfTree is None:
-            self._findEqualTuple()
+            self._findEqualTuple()#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<brauchst du noch diese?
         if self.rootOfTree is None:#noch rootOfTree kann nicht finden
             raise Exception('No equal, Invalid Equation String')
+        # print(self.ast); import pdb;pdb.set_trace()
         returnTup = self._recursiveUnparse(self.ast, self.rootOfTree, 0)
         if '=' in self.functions:
             del self.functions['=']
@@ -275,6 +340,9 @@ class Schemeparser(Parser):
         Then we call the _unparse function of Latex to get the NICESWEETSTRING
         """
         from foundation.automat.parser.sorte.latexparser import Latexparser
+        # print(self.ast); import pdb;pdb.set_trace()
+        if getattr(self, 'ast', None) is None:
+            self._parse()
         if self.verbose:
             import pprint
             pp = pprint.PrettyPrinter(indent=4)

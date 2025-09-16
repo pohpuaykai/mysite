@@ -16,4 +16,5 @@ class Booler:
 
     @classmethod
     def isNum(cls, possibilityNumberString): # OpenAI says this one more efficient... cause no throw Exception.
-        return re.match('[-]*\\d+(?:\\.{1}\\d+)*$', possibilityNumberString) is not None
+        NONNUMERIC_NUMBERS = ['e', 'i', '\\pi']
+        return re.match('[-]*\\d+(?:\\.{1}\\d+)*$', possibilityNumberString) is not None or possibilityNumberString in NONNUMERIC_NUMBERS

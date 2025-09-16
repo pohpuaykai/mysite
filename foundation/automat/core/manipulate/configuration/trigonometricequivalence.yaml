@@ -1,9 +1,9 @@
 ---
-className: "Trigonometricequivalence"
-type: "trigonometric_standard"
+className: 'Trigonometricequivalence'
+type: 'trigonometric_standard'
 #TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ (sin $0) (cos $0))'
       return: '(tan $0)'
@@ -14,7 +14,7 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ (cos $0) (sin $0))'
       return: '(cot $0)'
@@ -25,9 +25,9 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(/ "1" (sin $0))'
+      scheme: '(/ 1 (sin $0))'
       return: '(cosec $0)'
     minArgs: #actually this is a preCond too
       $0: 0
@@ -36,9 +36,9 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(/ "1" (cos $0))'
+      scheme: '(/ 1 (cos $0))'
       return: '(sec $0)'
     minArgs: #actually this is a preCond too
       $0: 0
@@ -47,9 +47,9 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(/ "1" (tan $0))'
+      scheme: '(/ 1 (tan $0))'
       return: '(cot $0)'
     minArgs: #actually this is a preCond too
       $0: 0
@@ -58,9 +58,9 @@ manipulations:
     preCond:
       $0: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(/ "1" (cot $0))'
+      scheme: '(/ 1 (cot $0))'
       return: '(tan $0)'
     minArgs: #actually this is a preCond too
       $0: 0
@@ -70,10 +70,10 @@ manipulations:
       $0: null
 
 #\sin(-x)=-\sin(x)
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(sin (- "0" x))'
-      return: '(- "0" (sin x))'
+      scheme: '(sin (- 0 $0))'
+      return: '(- 0 (sin $0))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -82,10 +82,10 @@ manipulations:
       $0: null
 
 #\cos(-x)=\cos(x)
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(cos (- "0" x))'
-      return: '(cos x)'
+      scheme: '(cos (- 0 $0))'
+      return: '(cos $0)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -94,10 +94,10 @@ manipulations:
       $0: null
 
 #\sin(x) = \frac{e^{i x}-e^{-i x}}{2 i}
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(sin x)'
-      return: '(/ (- (^ "e" (* "i" x)) (^ "e" (- "0" (* "i" x)))) (* "2" "i"))'
+      scheme: '(sin $0)'
+      return: '(/ (- (^ e (* i $0)) (^ e (- 0 (* i $0)))) (* 2 i))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -106,10 +106,10 @@ manipulations:
       $0: null
 
 #\cos(x) = \frac{e^{i x}+e^{-i x}}{2}
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(cos x)'
-      return: '(/ (+ (^ "e" (* "i" x)) (^ "e" (- "0" (* "i" x)))) "2")'
+      scheme: '(cos $0)'
+      return: '(/ (+ (^ e (* i $0)) (^ e (- 0 (* i $0)))) 2)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -118,10 +118,10 @@ manipulations:
       $0: null
 
 #e^{i x}=\cos(x)+ i\sin(x)
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ "e" (* "i" x))'
-      return: '(+ (cos x) (* "i" (sin x)))'
+      scheme: '(^ e (* i $0))'
+      return: '(+ (cos $0) (* i (sin $0)))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:

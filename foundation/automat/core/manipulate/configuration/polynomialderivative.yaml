@@ -1,13 +1,13 @@
 ---
-className: "Polynomialderivative"
-type: "derivative_polynomial"
+className: 'Polynomialderivative'
+type: 'derivative_polynomial'
 manipulations:
 # +, -, *, /, ^, nroot
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D $0 $0)'
-      return: '"1"'
+      return: '1'
     minArgs:
       $0: 0
     maxArgs:
@@ -16,10 +16,10 @@ manipulations:
       $0: null
 
 #ax^n
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (* $0 (^ $1 $2)) $1)'
-      return: '(* $0 (* $2 (^ $1 (- $2 "1"))))'
+      return: '(* $0 (* $2 (^ $1 (- $2 1))))'
     minArgs:
       $0: 0
       $1: 1

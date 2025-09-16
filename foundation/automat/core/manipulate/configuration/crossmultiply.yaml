@@ -1,8 +1,8 @@
 ---
-className: "Crossmultiply"
-type: "essential"
+className: 'Crossmultiply'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(+ (/ $0 $1) (/ $2 $3))'
       return: '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))'

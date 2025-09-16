@@ -1,8 +1,8 @@
 ---
-className: "ToDifferentialOperator"
-type: "essential"
+className: 'ToDifferentialOperator'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(* (/ d (* d $1)) $0)'
       return: '(D $0 $1)'
@@ -16,7 +16,7 @@ manipulations:
       $0: null
       $1: null
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ (* d $0) (* d $1))'
       return: '(D $0 $1)'
@@ -32,14 +32,14 @@ manipulations:
 
 
 
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(* (/ partial (* partial $1)) $0)'
       return: '(D $0 $1)'
     minArgs:
       $0: 1
       $1: 1
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ (* partial $0) (* partial $1))'
       return: '(D $0 $1)'

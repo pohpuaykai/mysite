@@ -132,6 +132,9 @@ def automat_solveEquations(request):
     list_equationStr = equation_details['list_equationStr']
     dependentVarStr = equation_details['dependentVarStr']
     list_independentVarStr = equation_details['list_independentVarStr']
+    simplify = equation_details['simplify']
+    print('simplify')
+    print(simplify)
     print('id__type')
     pp.pprint(id__type)
     print('list_equationStr')
@@ -155,9 +158,7 @@ def automat_solveEquations(request):
 
     from foundation.ecircuit.equationSolvers.bipartitesolver import BipartiteSolver
 
-    # dependentVariableStr = 'X_{total_{6}}'#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
-    # independentVariableStrs = ['V_{R_{1}}', 'V_{R_{0}}', 'V_{DC_{4}}']#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<hard code for now
-    steps = BipartiteSolver(listOfCollectedEquations, dependentVarStr, list_independentVarStr)._solve()
+    steps = BipartiteSolver(listOfCollectedEquations, dependentVarStr, list_independentVarStr, simplify=simplify)._solve#frontend tell me if i should simplify
 
     pp.pprint(steps)
 

@@ -33,7 +33,9 @@ class Manipulate:
                     for cls_name, ocls in inspect.getmembers(module_obj, predicate=inspect.isclass):
                         if cls_name in ['Manipulate']: # skip the parent of all function
                             continue
+                        # print(module_name)
                         cls._PATTERN_FILENAMES__CLASSNAMES[module_name] = cls_name
+        # import pdb;pdb.set_trace()
         return cls._PATTERN_FILENAMES__CLASSNAMES
 
 
@@ -48,22 +50,24 @@ class Manipulate:
         self.grammarParser = None
         self.inputGrammar = self.rawRegexes[idx][direction]['scheme']
         self.outputGrammar = self.rawRegexes[idx][direction]['return']
-        self.variableMinArgs = self.rawRegexes[idx]['minArgs']
+        self.variableMinArgs = self.removeItemIfValueIfNone(self.rawRegexes[idx].get('minArgs', {}))
+        self.variableMaxArgs = self.removeItemIfValueIfNone(self.rawRegexes[idx].get('maxArgs', {}))
 
 
     def initGrammerParser(self):
         #check if inputGrammar has no variables, 
         #if inputGrammar has no variables, then replace the outputGrammar's variables with variable, that is not in eq
-        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, verbose=self.verbose, recordMaking=True, variableMinArgs=self.variableMinArgs)#memoise the grammarParser TODO
+        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, verbose=self.verbose)#memoise the grammarParser TODO
+
 
 
     def outputGrammarHasVariables(self):
         if self.grammarParser is None:
             self.initGrammerParser()
-        return len(self.grammarParser.outVariables) > 0
+        return len(self.grammarParser.oUniqueVariables) > 0
 
 
-    def applicable(self):
+    def applicable(self, startPos__nodeId=None):
         """
         #~ DRAFT ~#
         check if equation is manipulatable with this pattern
@@ -74,11 +78,13 @@ class Manipulate:
         if self.verbose:
             print('self.schemeStr', self.schemeStr)
         #
-        self.grammarParser.buildEnclosureTree(self.schemeStr)
+        # self.grammarParser.buildEnclosureTree(self.schemeStr)
+        self.grammarParser.matchIPattern(self.schemeStr, startPos__nodeId=startPos__nodeId)
+        # print('IS IT NO MATCH??????????????????????????????????????', self.inputGrammar, '|||', self.outputGrammar, self.grammarParser.noMatches, '|||', self.schemeStr)
         return not self.grammarParser.noMatches
 
 
-    def apply(self, toAst=False):
+    def apply(self, startPos__nodeId=None, toAst=False):
         """
         #~ DRAFT ~#
         return manipulated equation
@@ -88,17 +94,21 @@ class Manipulate:
         #         print(f'{self.outputGrammar} has no grammar')
         #     return self.outputGrammar # output does not depend on input variables, no manipulation needed.
         # import pdb;pdb.set_trace()
-        if self.applicable(): # here we have matches
+        if self.applicable(startPos__nodeId): # here we have matches
             existingVariables = list(self.eq.variablesScheme.keys())
-            manipulatedSchemeWord = self.grammarParser.parse(self.schemeStr, existingVariables=existingVariables)
+            # manipulatedSchemeWord = self.grammarParser.parse(self.schemeStr, existingVariables=existingVariables)
+            # print('self.variableMinArgs: ', self.variableMinArgs); print('self.variableMaxArgs: ', self.variableMaxArgs); import pdb;pdb.set_trace()
+            manipulatedSchemeWord = self.grammarParser.parse(nodeIdsToSkip=[], variableMinArgs=self.variableMinArgs, variableMaxArgs=self.variableMaxArgs)
             
+            # return Schemeparser(equationStr=manipulatedSchemeWord)
+
             if toAst: 
 
             # # TODO seems unelegant..., but we should not modify self.eq and it also seems unelegant to instantiate Equation again
             # # TODO perhaps Manipulate should be a object of Equation?
 
-
-                return Schemeparser(equationStr=manipulatedSchemeWord), self.grammarParser.verPosWord, Schemeparser(equationStr=self.inputGrammar), Schemeparser(equationStr=self.outputGrammar)
+                return self.grammarParser, self.TYPE, self.__class__.__name__
+                # return Schemeparser(equationStr=manipulatedSchemeWord), self.grammarParser.schemeNodeChangeLog, Schemeparser(equationStr=self.inputGrammar), Schemeparser(equationStr=self.outputGrammar)
 
             #     print(self.grammarParser.verPosWord)
             #     self.grammarParser.verPosWord 
@@ -116,3 +126,11 @@ class Manipulate:
             return manipulatedSchemeWord
         return None # pattern unapplicable
 
+
+    #HELPER
+    def removeItemIfValueIfNone(self, dictionary):
+        dictionary___NEW = {}
+        for key, value in dictionary.items():
+            if value is not None:
+                dictionary___NEW[key] = value
+        return dictionary___NEW

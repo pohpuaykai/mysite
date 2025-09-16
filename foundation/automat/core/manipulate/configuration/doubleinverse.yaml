@@ -1,8 +1,8 @@
 ---
-className: "Doubleinverse"
-type: "pretty"
+className: 'Doubleinverse'
+type: 'pretty'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ (/ $2 $0) $1)'
       return: '(/ $2 (* $0 $1))'
@@ -18,7 +18,7 @@ manipulations:
       $0: null
       $1: null
       $2: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(/ $0 (/ $2 $1))'
       return: '(/ (* $0 $1) $2)'

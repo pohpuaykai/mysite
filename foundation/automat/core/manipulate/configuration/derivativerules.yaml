@@ -1,9 +1,9 @@
 ---
-className: "Derivativerules"
-type: "essential"
+className: 'Derivativerules'
+type: 'essential'
 manipulations:
 #CHAIN rule VARs need type
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D ($0 $1) $2)' # $0 of $1, and $1 of $2 like $0 is sine.
       return: '(* (D ($0 $1) $1) (D $1 $2))'
@@ -18,7 +18,7 @@ manipulations:
     preCond:
       $0:
 #SUM RULE VARs need type
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (+ $0 $1) $2)'
       return: '(+ (D $0 $2) (D $1 $2))'
@@ -35,7 +35,7 @@ manipulations:
       $1: null
       $2: null
 #PRODUCT RULE VARs need type
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (* $0 $1) $2)'
       return: '(+ (* $0 (D $1 $2)) (* $1 (D $0 $2)))'
@@ -52,7 +52,7 @@ manipulations:
       $1: null
       $2: null
 #QUOTIENT RULE VARs need type
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(D (/ $0 $1) $2)'
       return: '(/ (- (* $1 (D $0 $2)) (* $0 (D $1 $2))) (* $1 $1))'

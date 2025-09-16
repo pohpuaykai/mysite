@@ -35,7 +35,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (/ (+ "1" (cosh (* "2" (arctanh $0)))) "2") (D $0 $1)) $1)'
+    scheme: '(int (* (/ (+ 1 (cosh (* 2 (arctanh $0)))) 2) (D $0 $1)) $1)'
     return: '(+ (arctanh $0) $2)'
   minArgs:
     $0: 1
@@ -51,7 +51,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (* (- "0" (cosh (arcsech $0))) (coth (arcsech $0))) (D $0 $1)) $1)'
+    scheme: '(int (* (* (- 0 (cosh (arcsech $0))) (coth (arcsech $0))) (D $0 $1)) $1)'
     return: '(+ (arcsech $0) $2)'
   minArgs:
     $0: 1
@@ -67,7 +67,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (* (- "0" (sinh (arccosech $0)))) (D $0 $1)) $1)'
+    scheme: '(int (* (* (- 0 (sinh (arccosech $0)))) (D $0 $1)) $1)'
     return: '(+ (arccosech $0) $2)'
   minArgs:
     $0: 1
@@ -83,7 +83,7 @@ manipulations:
     $2: null
 - type: 'regex'
   vor:
-    scheme: '(int (* (/ (- "1" (sinh (arccoth $0))) "2") (D $0 $1)) $1)'
+    scheme: '(int (* (/ (- 1 (sinh (arccoth $0))) 2) (D $0 $1)) $1)'
     return: '(+ (arccoth $0) $2)'
   minArgs:
     $0: 1

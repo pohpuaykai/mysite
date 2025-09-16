@@ -1,13 +1,13 @@
 ---
-className: "Hyperbolictrigonometrichalfangle"
-type: "essential"
+className: 'Hyperbolictrigonometrichalfangle'
+type: 'essential'
 manipulations:
 
   #\sinh(\frac{x}{2})=\frac{\sinh(x)}{\sqrt[2]{2(\cosh(x)+1)}}
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(sinh (/ $0 "2"))'
-      return: '(/ (sinh $0) (nroot "2" (* "2" (+ (cosh $0) "1"))))'
+      scheme: '(sinh (/ $0 2))'
+      return: '(/ (sinh $0) (nroot 2 (* 2 (+ (cosh $0) 1))))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -16,10 +16,10 @@ manipulations:
       $0: null
 
   #\cosh(\frac{x}{2})=\sqrt[2]{\frac{\cosh(x)+1}{2}}
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(cosh (/ $0 "2"))'
-      return: '(nroot "2" (/ (+ (cosh $0) "1") "2"))'
+      scheme: '(cosh (/ $0 2))'
+      return: '(nroot 2 (/ (+ (cosh $0) 1) 2))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -28,10 +28,10 @@ manipulations:
       $0: null
 
   #\tanh(\frac{x}{2})=\frac{\sinh(x)}{\cosh(x)+1}
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(tanh (/ $0 "2"))'
-      return: '(/ (sinh $0) (+ (cosh $0) "1"))'
+      scheme: '(tanh (/ $0 2))'
+      return: '(/ (sinh $0) (+ (cosh $0) 1))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:

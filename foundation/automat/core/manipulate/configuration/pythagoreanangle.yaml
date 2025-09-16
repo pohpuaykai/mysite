@@ -1,13 +1,13 @@
 ---
-className: "Pythagoreanangle"
-type: "trigonometric_standard"
+className: 'Pythagoreanangle'
+type: 'trigonometric_standard'
 #TODO put all these in : https://en.wikipedia.org/wiki/List_of_trigonometric_identities
 manipulations:
 #Elliptic
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(+ (^ (sin $0) "2") (^ (cos $0) "2"))'
-      return: '"1"'
+      scheme: '(+ (^ (sin $0) 2) (^ (cos $0) 2))'
+      return: '1'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -16,10 +16,10 @@ manipulations:
       $0: null
 
 #1+\tan^2(x)=\sec^2(x)
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(+ "1" (^ (tan $0) "2"))'
-      return: '(^ (sec $0) "2")'
+      scheme: '(+ 1 (^ (tan $0) 2))'
+      return: '(^ (sec $0) 2)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -28,10 +28,10 @@ manipulations:
       $0: null
 
 #\cot^2(x)+1=\cosec^2(x)
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(+ (^ (cot $0) "2") "1")'
-      return: '(^ (cosec $0) "2")'
+      scheme: '(+ (^ (cot $0) 2) 1)'
+      return: '(^ (cosec $0) 2)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -41,10 +41,10 @@ manipulations:
 
 #Hyperbolic
 #\cosh^2(x)-\sinh^2(x)=1
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(- (^ (cosh $0) "2") (^ (sinh $0) "2"))'
-      return: '"1"'
+      scheme: '(- (^ (cosh $0) 2) (^ (sinh $0) 2))'
+      return: '1'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -54,10 +54,10 @@ manipulations:
 
 
 #\sech^2(x)=1-\tanh^2(x)
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (sech $0) "2")'
-      return: '(- "1" (^ (tanh $0) "2"))'
+      scheme: '(^ (sech $0) 2)'
+      return: '(- 1 (^ (tanh $0) 2))'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:
@@ -67,10 +67,10 @@ manipulations:
 
 
 #\cosech^2(x)=\coth^2(x)-1
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ (cosech $0) "2")'
-      return: '(- (^ (coth $0) "2") "1")'
+      scheme: '(^ (cosech $0) 2)'
+      return: '(- (^ (coth $0) 2) 1)'
     minArgs: #actually this is a preCond too
       $0: 0
     maxArgs:

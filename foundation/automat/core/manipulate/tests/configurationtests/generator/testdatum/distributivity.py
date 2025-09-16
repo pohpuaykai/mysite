@@ -1,0 +1,17 @@
+TEST_DATUM={
+    ('hin', '0'): {   'expected': '(= a (+ (* b c) (* b d)))',
+                      'input': '(= a (* b (+ c d)))'},
+    ('vor', '0'): {   'expected': '(= a (* b (+ c d)))',
+                      'input': '(= a (+ (* b c) (* b d)))'},
+    ('hin', '1'): {   'expected': '(= a (- (* b c) (* b d)))',
+                      'input': '(= a (* b (- c d)))'},
+    ('vor', '1'): {   'expected': '(= a (* b (- c d)))',
+                      'input': '(= a (- (* b c) (* b d)))'},
+    ('hin', '2'): {   'expected': '(= a (+ (/ b d) (/ c d)))',
+                      'input': '(= a (/ (+ b c) d))'},
+    ('vor', '2'): {   'expected': '(= a (/ (+ b d) c))',
+                      'input': '(= a (+ (/ b c) (/ d c)))'},
+    ('hin', '3'): {   'expected': '(= a (- (/ b d) (/ c d)))',
+                      'input': '(= a (/ (- b c) d))'},
+    ('vor', '3'): {   'expected': '(= a (/ (- b d) c))',
+                      'input': '(= a (- (/ b c) (/ d c)))'}}

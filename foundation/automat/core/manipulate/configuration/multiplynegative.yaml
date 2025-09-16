@@ -1,11 +1,11 @@
 ---
-className: "Multiplynegative"
-type: "essential"
+className: 'Multiplynegative'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(* "-1" $0)'
-      return: '(- "0" $0)'
+      scheme: '(* -1 $0)'
+      return: '(- 0 $0)'
     minArgs:
       $0: 0
     maxArgs:

@@ -1,10 +1,10 @@
 ---
-className: "Trigonometricplusminus"
-type: "trigonometric_standard"
+className: 'Trigonometricplusminus'
+type: 'trigonometric_standard'
 manipulations:
 
 #\sin(x+y)=\sin(x)\cos(y)+\cos(x)\sin(y)
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(sin (+ $0 $1))'
       return: '(+ (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))'
@@ -16,7 +16,7 @@ manipulations:
       $0: null
 
 #\sin(x-y)=\sin(x)\cos(y)-\cos(x)\sin(y)
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(sin (- $0 $1))'
       return: '(- (* (sin $0) (cos $1)) (* (cos $0) (sin $1)))'
@@ -29,7 +29,7 @@ manipulations:
 
 
 #\cos(x+y)=\cos(x)\cos(y)-\sin(x)\sin(y)
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cos (+ $0 $1))'
       return: '(- (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))'
@@ -41,7 +41,7 @@ manipulations:
       $0: null
 
 #\cos(x-y)=\cos(x)\cos(y)+\sin(x)\sin(y)
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cos (- $0 $1))'
       return: '(+ (* (cos $0) (cos $1)) (* (sin $0) (sin $1)))'
@@ -54,10 +54,10 @@ manipulations:
 
 
 #\tan(x+y)=\frac{\tan(x)+\tan(y)}{1-\tan(x)\tan(y)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(tan (+ $0 $1))'
-      return: '(/ (+ (tan $0) (tan $1)) (- "1" (* (tan $0) (tan $1))))'
+      return: '(/ (+ (tan $0) (tan $1)) (- 1 (* (tan $0) (tan $1))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -66,10 +66,10 @@ manipulations:
       $0: null
 
 #\tan(x-y)=\frac{\tan(x)-\tan(y)}{1+\tan(x)\tan(y)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(tan (- $0 $1))'
-      return: '(/ (- (tan $0) (tan $1)) (+ "1" (* (tan $0) (tan $1))))'
+      return: '(/ (- (tan $0) (tan $1)) (+ 1 (* (tan $0) (tan $1))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -79,7 +79,7 @@ manipulations:
 
 
 #\cosec(x+y)=\frac{\sec(x)\sec(y)\cosec(x)\cosec(y)}{\sec(x)\cosec(y)+\cosec(x)\sec(y)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cosec (+ $0 $1))'
       return: '(/ (* (* (* (sec $0) (sec $1)) (cosec $0)) (cosec $1)) (+ (* (sec $0) (cosec $1)) (* (cosec $0) (sec $1))))'
@@ -91,7 +91,7 @@ manipulations:
       $0: null
 
 #\cosec(x-y)=\frac{\sec(x)\sec(y)\cosec(x)\cosec(y)}{\sec(x)\cosec(y)-\cosec(x)\sec(y)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cosec (- $0 $1))'
       return: '(/ (* (* (* (sec $0) (sec $1)) (cosec $0)) (cosec $1)) (- (* (sec $0) (cosec $1)) (* (cosec $0) (sec $1))))'
@@ -104,7 +104,7 @@ manipulations:
 
 
 #\cosec(x+y)=\frac{\sec(x)\sec(y)\cosec(x)\cosec(y)}{\sec(x)\cosec(y)-\cosec(x)\sec(y)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cosec (+ $0 $1))'
       return: '(/ (* (* (* (sec $0) (sec $1)) (cosec $0)) (cosec $1)) (- (* (sec $0) (cosec $1)) (* (cosec $0) (sec $1))))'
@@ -116,7 +116,7 @@ manipulations:
       $0: null
 
 #\cosec(x-y)=\frac{\sec(x)\sec(y)\cosec(x)\cosec(y)}{\sec(x)\cosec(y)+\cosec(x)\sec(y)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cosec (- $0 $1))'
       return: '(/ (* (* (* (sec $0) (sec $1)) (cosec $0)) (cosec $1)) (+ (* (sec $0) (cosec $1)) (* (cosec $0) (sec $1))))'
@@ -129,10 +129,10 @@ manipulations:
 
 
 #\cot(x+y)=\frac{\cot(x)\cot(y)-1}{\cot(y)+\cot(x)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cot (+ $0 $1))'
-      return: '(/ (- (* (cot $0) (cot $1)) "1") (+ (cot $1) (cot $0)))'
+      return: '(/ (- (* (cot $0) (cot $1)) 1) (+ (cot $1) (cot $0)))'
     minArgs:
       $0: 0
     maxArgs:
@@ -141,10 +141,10 @@ manipulations:
       $0: null
 
 #\cot(x-y)=\frac{\cot(x)\cot(y)+1}{\cot(y)-\cot(x)}
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(cot (- $0 $1))'
-      return: '(/ (+ (* (cot $0) (cot $1)) "1") (- (cot $1) (cot $0)))'
+      return: '(/ (+ (* (cot $0) (cot $1)) 1) (- (cot $1) (cot $0)))'
     minArgs:
       $0: 0
     maxArgs:
@@ -154,10 +154,10 @@ manipulations:
 
 
 #\arcsin(x)+\arcsin(y)=\arcsin(x\sqrt[2]{1-y^2}+y\sqrt[2]{1-x^2})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(+ (arcsin $0) (arcsin $1))'
-      return: '(arcsin (+ (* $0 (nroot "2" (- "1" (^ $1 "2")))) (* $1 (nroot "2" (- "1" (^ $0 "2"))))))'
+      return: '(arcsin (+ (* $0 (nroot 2 (- 1 (^ $1 2)))) (* $1 (nroot 2 (- 1 (^ $0 2))))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -166,10 +166,10 @@ manipulations:
       $0: null
 
 #\arcsin(x)-\arcsin(y)=\arcsin(x\sqrt[2]{1-y^2}-y\sqrt[2]{1-x^2})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(- (arcsin $0) (arcsin $1))'
-      return: '(arcsin (- (* $0 (nroot "2" (- "1" (^ $1 "2")))) (* $1 (nroot "2" (- "1" (^ $0 "2"))))))'
+      return: '(arcsin (- (* $0 (nroot 2 (- 1 (^ $1 2)))) (* $1 (nroot 2 (- 1 (^ $0 2))))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -179,10 +179,10 @@ manipulations:
 
 
 #\arccos(x)+\arccos(y)=\arccos(x y-\sqrt[2]{(1-x^2)(1-y^2)})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(+ (arccos $0) (arccos $1))'
-      return: '(arccos (- (* $0 $1) (nroot "2" (* (- "1" (^ $0 "2")) (- "1" (^ $1 "2"))))))'
+      return: '(arccos (- (* $0 $1) (nroot 2 (* (- 1 (^ $0 2)) (- 1 (^ $1 2))))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -191,10 +191,10 @@ manipulations:
       $0: null
 
 #\arccos(x)-\arccos(y)=\arccos(x y+\sqrt[2]{(1-x^2)(1-y^2)})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(- (arccos $0) (arccos $1))'
-      return: '(arccos (+ (* $0 $1) (nroot "2" (* (- "1" (^ $0 "2")) (- "1" (^ $1 "2"))))))'
+      return: '(arccos (+ (* $0 $1) (nroot 2 (* (- 1 (^ $0 2)) (- 1 (^ $1 2))))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -204,10 +204,10 @@ manipulations:
 
 
 #\arctan(x)+\arctan(y)=\arctan(\frac{x+y}{1-x y})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(+ (arctan $0) (arctan $1))'
-      return: '(arctan (/ (+ $0 $1) (- "1" (* $0 $1))))'
+      return: '(arctan (/ (+ $0 $1) (- 1 (* $0 $1))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -216,10 +216,10 @@ manipulations:
       $0: null
 
 #\arctan(x)-\arctan(y)=\arctan(\frac{x-y}{1+x y})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(- (arctan $0) (arctan $1))'
-      return: '(arctan (/ (- $0 $1) (+ "1" (* $0 $1))))'
+      return: '(arctan (/ (- $0 $1) (+ 1 (* $0 $1))))'
     minArgs:
       $0: 0
     maxArgs:
@@ -229,10 +229,10 @@ manipulations:
 
 
 #\arccot(x)+\arccot(y)=\arccot(\frac{x y-1}{y+x})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(+ (arccot $0) (arccot $1))'
-      return: '(arccot (/ (- (* $0 $1) "1") (+ $1 $0)))'
+      return: '(arccot (/ (- (* $0 $1) 1) (+ $1 $0)))'
     minArgs:
       $0: 0
     maxArgs:
@@ -241,10 +241,10 @@ manipulations:
       $0: null
 
 #\arccot(x)-\arccot(y)=\arccot(\frac{x y+1}{y-x})
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(- (arccot $0) (arccot $1))'
-      return: '(arccot (/ (+ (* $0 $1) "1") (- $1 $0)))'
+      return: '(arccot (/ (+ (* $0 $1) 1) (- $1 $0)))'
     minArgs:
       $0: 0
     maxArgs:

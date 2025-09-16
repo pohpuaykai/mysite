@@ -1,0 +1,9 @@
+TEST_DATUM={
+    ('hin', '0'): {   'expected': '(= a (/ (/ b c) d))',
+                      'input': '(= a (/ b (* c d)))'},
+    ('vor', '0'): {   'expected': '(= a (/ b (* c d)))',
+                      'input': '(= a (/ (/ b c) d))'},
+    ('hin', '1'): {   'expected': '(= a (/ b (/ d c)))',
+                      'input': '(= a (/ (* b c) d))'},
+    ('vor', '1'): {   'expected': '(= a (/ (* b d) c))',
+                      'input': '(= a (/ b (/ c d)))'}}

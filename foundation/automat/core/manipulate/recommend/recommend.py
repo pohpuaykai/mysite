@@ -29,7 +29,8 @@ class Recommend:
     PATTERN_FILENAMES__CLASSNAMES = Manipulate.PATTERN_FILENAMES__CLASSNAMES()
 
     def __init__(self, equation, verbose=False):
-        self.verbose=verbose
+        # self.verbose=verbose
+        self.verbose = False
         self.eq = equation
         self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
         self.metaFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'recommend', 'meta')
@@ -61,8 +62,10 @@ class Recommend:
                     if manipulations['type'] == 'regex':
                         typey = manipulations['type']
                         for direction, d in manipulations.items():
-                            if direction in ['type']:
+                            if direction in ['type', 'minArgs', 'maxArgs', 'preCond']:
                                 continue
+                            # print(d); print('config'); print(config)
+                            # import pdb;pdb.set_trace()
                             iAst, iFunctions, iVariables, iPrimitives, iTotalNodeCount, iStartPos__nodeId = Schemeparser(equationStr=d['scheme'])._parse()
                             oAst, oFunctions, oVariables, oPrimitives, oTotalNodeCount, oStartPos__nodeId = Schemeparser(equationStr=d['return'])._parse()
                             # if filename == 'subtractzero.yaml':
@@ -148,6 +151,8 @@ class Recommend:
 
 
     def filterMetaList(self, metaList, searchCol, searchTerms):
+        # print('metaList', metaList); print('searchCol', searchCol); print('searchTerms', searchTerms);
+        # import pdb;pdb.set_trace()
         if isinstance(searchTerms, list): # we assume that searchCol's values are list of str
             def hasOneOfThese(row, terms):
                 return len(terms.intersection(row[searchCol])) > 0
@@ -181,6 +186,11 @@ class Recommend:
 
     def simplify(self, hint=None):
         """
+The smaller the self.equation.astScheme the more simple???<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+
+
+
+
 ###
 Cannot be applied to Differentiation|Integration
 Please see:
@@ -213,16 +223,23 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         :type hint:
         """
 
-        self.simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0')
+        self.simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') #maybe if the number of node count is reduced then it is a simplying step.. but what if we need the number of nodes to increase before we can reduce it?
         # TODO HEURIS: differentiation/integration/functors related configurations should be ignore and filtered out
         
         if self.verbose:
+            #should this be under self.verbose? seems like a pretty decent HEURES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
             relevantManipulations = sorted(self.simplifyingManipulations, key=lambda row: row['oTotalNodeCount']) #TODO refactor to self function. 
+            # import pprint; pp = pprint.PrettyPrinter(indent=4)
+            # print('***************************************')
+            # pp.pprint(relevantManipulations[0])
+            # pp.pprint(list(map(lambda d: d['identity']['filename'], relevantManipulations)))
+
             # import pdb;pdb.set_trace()
 
         if hint is None:
             self.combingSearch()
         elif 'invertedResults' in hint:
+        # elif 'op' in hint: # is this check necessary? break into parts?
             """
             hint['invertedResults'] = {   
             ('-', 6): {'newKey': ('-', 6), 'newValue': (('-', 4), ('0', 10))},
@@ -232,15 +249,17 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
             tupleKey with higher id, is the one being swapped, and we take the funcName of the newKey
             """
             #also if there is - 0, we should try subtractzero first.... but the logic... should not be here. TODO
+            # print('hint: ', hint)
             # import pdb;pdb.set_trace()
-            largestNodeId = -1
-            funcAdded = None
-            for oldFuncName, nodeId in hint['invertedResults'].keys():
-                if largestNodeId < nodeId:
-                    largestNodeId = nodeId
-                    funcAdded = oldFuncName
+            # largestNodeId = -1 # the nodeId is now not according to rootOfTree being first.... so we cannot do it this way
+            # funcAdded = None
+            # for oldFuncName, nodeId in hint['invertedResults'].keys():
+            #     if largestNodeId < nodeId:
+            #         largestNodeId = nodeId
+            #         funcAdded = oldFuncName
 
-            functionNamesJustAdded = [funcAdded]
+            # functionNamesJustAdded = [funcAdded]
+            functionNamesJustAdded = list(map(lambda d: d[0], hint['invertedResults'].keys()))
             if len(functionNamesJustAdded) == 0:
                 if self.verbose:
                     print(f'Could not identify functions just added, hint: {hint}')
@@ -249,7 +268,13 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                 #TODO HEURIS: if no log/sqrt/expo, not need those patterns .... not sure about that
                 if self.verbose:
                     print(functionNamesJustAdded, '<<functionNamesJustAdded')
+                    import pdb;pdb.set_trace()#<<<< some thing wrong with 
                 relevantManipulations = self.filterMetaList(self.simplifyingManipulations, 'iFunctions', functionNamesJustAdded)# should use: self.simplifyingManipulations AS a base
+                if self.verbose:
+                    import pprint; pp = pprint.PrettyPrinter(indent=4)
+                    print('***************************************')
+                    # pp.pprint(relevantManipulations[0])
+                    pp.pprint(list(map(lambda d: d['identity']['filename'], relevantManipulations)))
                 # TODO HEURIS: those with least number of output nodes, should be tried first :)
                 # TODO HEURIS: alot of LCSS matches (prefix/suffix/middlefixes) with pattern and target, should be tried first: https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
                 # NOTE that np.array mess up the sorting_order
@@ -270,125 +295,168 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                     manipulate = manipulateClass(self.eq, idd['direction'], idd['idx'], verbose=self.verbose)
                     if self.verbose:
                         print(f"SIMPLIFYING trying applying {idd['filename']}, {idd['idx']}, {idd['direction']} to {self.eq.ast}")
-                    returnTup = manipulate.apply(toAst=True)
+                    returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)
                     if self.verbose:
                         print(f"SIMPLIFYING tried applying {idd['filename']}, {idd['idx']}, {idd['direction']}, hasResult?: {returnTup is not None}")
 
                     if returnTup is not None: # successfully applied manipulation
-                        manipulatedSchemeWordSchemeParser, verPosWord, iManipulateSchemeParser, oManipulateSchemeParser  = returnTup
-
-                        iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount, iStartPos__nodeId = iManipulateSchemeParser._parse() # this is for the input pattern
-                        oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount, oStartPos__nodeId = oManipulateSchemeParser._parse() # this is for the output pattern
-                        mAst, mFunctionsD, mVariablesD, mPrimitives, mTotalNodeCount, mStartPos__nodeId = manipulatedSchemeWordSchemeParser._parse()
-                        self.eq.startPos__nodeIdScheme
-                        if self.verbose:
-                            info('successful application')
-
-                        # we must know all the things(function/variable/primitive) in the IOpatterns, so that we can iterate through them to look for change in verPosWord
-
-                        #sometimes the remove and addition NET OUT, and we are only interested in the resulting net.
-                        additionRemovalTrackingKeys = ['f', 'v', 'p'] # f=function, v=variable, p=primitive
-                        type__removalNames__nodeIdList = dict(map(lambda k: (k, {}), additionRemovalTrackingKeys))#{'f':{}, 'v':{}, 'p':{}}
-                        type__additioNames__nodeIdList = dict(map(lambda k: (k, {}), additionRemovalTrackingKeys))#{'f':{}, 'v':{}, 'p':{}}
-                        for changeDict in filter(lambda changeDict: changeDict['d'] in ['r', 'a'] and changeDict['t'] in ['p'], verPosWord): # TODO make use of the other changeDict
-                            if changeDict['d'] == 'r': # something was removed from input
-
-                                #
-                                # print(iStartPos__nodeId)
-                                # print('*********', "self.eq.startPos__nodeIdScheme")
-                                # print(self.eq.startPos__nodeIdScheme)
-                                #
-
-                                for function in self.eq.functionsScheme:#iFunctionsD:
-                                    if function in changeDict['w']:
-                                        #find all occurences of function and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
-                                        for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
-                                            absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            # print(changeDict)
-                                            # print(manipulate.schemeStr)#Wrong one this is the OG...
-                                            nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
-                                            existingList = type__removalNames__nodeIdList['f'].get(function, [])
-                                            existingList.append(nodeId)
-                                            type__removalNames__nodeIdList['f'][function] = existingList
-
-                                for variable in self.eq.variablesScheme:#iVariablesD:
-                                    if variable in changeDict['w']:
-                                        #find all occurences of variable and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
-                                        for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
-                                            absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
-                                            existingList = type__removalNames__nodeIdList['v'].get(variable, [])
-                                            existingList.append(nodeId)
-                                            type__removalNames__nodeIdList['v'][variable] = existingList
 
 
-                                for primitive in self.eq.primitivesScheme:#iPrimitives:#iManipulateSchemeParser.primitives:
-                                    if primitive in changeDict['w']:
-                                        #find all occurences of primitive and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
-                                        for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
-                                            absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]#
-                                            existingList = type__removalNames__nodeIdList['p'].get(primitive, [])
-                                            existingList.append(nodeId)
-                                            type__removalNames__nodeIdList['p'][primitive] = existingList
+                        #
+                        #use sgp.schemeId__argCount, and sgp.schemeNodeChangeLog to get function/variable/primitive count? for variable, schemeId__argCount=1, for function, schemeId__argCount>1, for primitive, schemeId__argCount=0
+                        #but the downstream equation.simplify does not need countsOfFunctionVariablePrimitivesRemoved anymore!
+                        #equation.simplify needs, can be reparsed by schemeparser, but those with nodeId, need to be changed to the OLD nodeIds provided by sgp
+                        #or should they be provided by sgp? but it is weird to put latexParser in sgp...?
+                        sgp, manipulateType, manipulateClassName = returnTup
+                        rootOfTree___simplified = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        ast___simplified = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        startPos__nodeId___simplified = sgp.startPos__nodeId___oStr
+                        nodeId__len___simplified = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
+                        schemeStr___simplified = sgp.oStr
+
+                        functions___simplified = sgp.schemeparser___oStr.functions
+                        variables___simplified = sgp.schemeparser___oStr.variables
+                        primitives___simplified = sgp.schemeparser___oStr.primitives
+                        totalNodeCount___simplified = sgp.schemeparser___oStr.totalNodeCount
+                        latexStr___simplified = sgp.schemeparser___oStr._toLatex()
+
+                        iPattern = sgp.iPattern
+                        oPattern = sgp.oPattern
+                        return rootOfTree___simplified, ast___simplified, startPos__nodeId___simplified, nodeId__len___simplified, schemeStr___simplified, functions___simplified, variables___simplified, primitives___simplified, totalNodeCount___simplified, latexStr___simplified, manipulateType, manipulateClassName, iPattern, oPattern
 
 
-                            elif changeDict['a'] == 'a': #something was added to output
 
-                                for function in mFunctionsD:#oManipulateSchemeParser.functions:
-                                    if function in changeDict['w']:
-                                        #find all occurences of function and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
-                                        for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
-                                            absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
-                                            existingList = type__additioNames__nodeIdList['f'].get(function, [])
-                                            existingList.append(nodeId)
-                                            type__additioNames__nodeIdList['f'][function] = existingList
+                        # manipulatedSchemeWordSchemeParser, verPosWord, iManipulateSchemeParser, oManipulateSchemeParser  = returnTup
 
-                                for variable in mVariablesD:#oManipulateSchemeParser.variables:
-                                    if variable in changeDict['w']:
-                                        #find all occurences of variable and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
-                                        for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
-                                            absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
-                                            existingList = type__additioNames__nodeIdList['v'].get(variable, [])
-                                            existingList.append(nodeId)
-                                            type__additioNames__nodeIdList['v'][variable] = existingList
+                        # iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount, iStartPos__nodeId = iManipulateSchemeParser._parse() # this is for the input pattern
+                        # iRootOfTree = iManipulateSchemeParser.rootOfTree
+                        # oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount, oStartPos__nodeId = oManipulateSchemeParser._parse() # this is for the output pattern
+                        # oRootOfTree = oManipulateSchemeParser.rootOfTree
+                        # mAst, mFunctionsD, mVariablesD, mPrimitives, mTotalNodeCount, mStartPos__nodeId = manipulatedSchemeWordSchemeParser._parse()
+                        # mRootOfTree = manipulatedSchemeWordSchemeParser.rootOfTree
+                        # # self.eq.startPos__nodeIdScheme #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<you tried updating it, but it is not updated
+                        # if self.verbose:
+                        #     info('successful application')
+                        #     import pprint; pp = pprint.PrettyPrinter(indent=4)
+                        #     pp.pprint(verPosWord)
+                        #     import pdb;pdb.set_trace()
+
+                        # #sometimes the remove and addition NET OUT, and we are only interested in the resulting net. THIS does not happen here, because this only happens if the "same" schemeNodeLabels have different names between iPattern and oPattern
+                        # #in besides remove_and_addition, there is also swapping, otherwise we cannot put the non_uf node back together
 
 
-                                for primitive in mPrimitives:#oManipulateSchemeParser.primitives:
-                                    if primitive in changeDict['w']:
-                                        #find all occurences of primitive and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
-                                        for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
-                                            absoluteStartPos = changeDict['s'] + relativeStartPos
-                                            nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
-                                            existingList = type__additioNames__nodeIdList['p'].get(primitive, [])
-                                            existingList.append(nodeId)
-                                            type__additioNames__nodeIdList['p'][primitive] = existingList
 
-                        nonNettedaddRem__type__nodeIdList = {'a':dict(map(lambda k: (k, []), additionRemovalTrackingKeys)), 'r':dict(map(lambda k: (k, []), additionRemovalTrackingKeys))}
-                        for gk in additionRemovalTrackingKeys:
-                            removalNames__nodeIdList = type__removalNames__nodeIdList[gk]
-                            additioNames__nodeIdList = type__additioNames__nodeIdList[gk]
-                            #find things that NOT NET OUT
-                            nettedOutNodeNames = []
-                            for commonNodeName in set(removalNames__nodeIdList.keys()).intersection(set(additioNames__nodeIdList.keys())):
-                                if len(removalNames__nodeIdList[commonNodeName]) != len(additioNames__nodeIdList[commonNodeName]):
-                                    nettedOutNodeNames.append(commonNodeName)
 
-                            for nodeName, nodeIdList in removalNames__nodeIdList.items():
-                                if nodeName not in nettedOutNodeNames:
-                                    nonNettedaddRem__type__nodeIdList['r'][gk] += nodeIdList
-                            for nodeName, nodeIdList in additioNames__nodeIdList.items():
-                                if nodeName not in nettedOutNodeNames:
-                                    nonNettedaddRem__type__nodeIdList['a'][gk] += nodeIdList
-                        # import pdb;pdb.set_trace()
-                        return mAst, nonNettedaddRem__type__nodeIdList['r']['p'], nonNettedaddRem__type__nodeIdList['r']['v'], nonNettedaddRem__type__nodeIdList['r']['f']
+
+
+
+                        # additionRemovalTrackingKeys = ['f', 'v', 'p'] # f=function, v=variable, p=primitive
+                        # type__removalNames__nodeIdList = dict(map(lambda k: (k, {}), additionRemovalTrackingKeys))#{'f':{}, 'v':{}, 'p':{}}
+                        # type__additioNames__nodeIdList = dict(map(lambda k: (k, {}), additionRemovalTrackingKeys))#{'f':{}, 'v':{}, 'p':{}}
+
+                        # #NOW verPosWord only has schemeNodeLabels, we do not need rs.lazyPrefixFinder, REFACTOR THIS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+                        # for changeDict in filter(lambda changeDict: changeDict['d'] in ['r', 'a'] and changeDict['t'] in ['static'], verPosWord): # TODO make use of the other changeDict
+                        # # for changeDict in filter(lambda changeDict: changeDict['d'] in ['r', 'a'] and changeDict['t'] in ['p'], verPosWord): # TODO make use of the other changeDict
+                        #     if changeDict['d'] == 'r': # something was removed from input
+
+                        #         #
+                        #         # print(iStartPos__nodeId)
+                        #         # print('*********', "self.eq.startPos__nodeIdScheme")
+                        #         # print(self.eq.startPos__nodeIdScheme)
+                        #         #
+
+                        #         for function in self.eq.functionsScheme:#iFunctionsD:
+                        #             if function in changeDict['w']:
+                        #                 #find all occurences of function and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
+                        #                 for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
+                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
+                        #                     # print(changeDict)
+                        #                     # print(manipulate.schemeStr)#Wrong one this is the OG...
+                        #                     nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
+                        #                     existingList = type__removalNames__nodeIdList['f'].get(function, [])
+                        #                     existingList.append(nodeId)
+                        #                     type__removalNames__nodeIdList['f'][function] = existingList
+
+                        #         for variable in self.eq.variablesScheme:#iVariablesD:
+                        #             if variable in changeDict['w']:
+                        #                 #find all occurences of variable and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
+                        #                 for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
+                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
+                        #                     nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]
+                        #                     existingList = type__removalNames__nodeIdList['v'].get(variable, [])
+                        #                     existingList.append(nodeId)
+                        #                     type__removalNames__nodeIdList['v'][variable] = existingList
+
+
+                        #         for primitive in self.eq.primitivesScheme:#iPrimitives:#iManipulateSchemeParser.primitives:
+                        #             if primitive in changeDict['w']:
+                        #                 #find all occurences of primitive and its startPos, match to nodeId in self.eq.startPos__nodeIdScheme
+                        #                 for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
+                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
+                        #                     nodeId = self.eq.startPos__nodeIdScheme[absoluteStartPos]#iStartPos__nodeId[absoluteStartPos]#
+                        #                     existingList = type__removalNames__nodeIdList['p'].get(primitive, [])
+                        #                     existingList.append(nodeId)
+                        #                     type__removalNames__nodeIdList['p'][primitive] = existingList
+
+
+                        #     elif changeDict['a'] == 'a': #something was added to output
+
+                        #         for function in mFunctionsD:#oManipulateSchemeParser.functions:
+                        #             if function in changeDict['w']:
+                        #                 #find all occurences of function and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
+                        #                 for relativeStartPos in rs.lazyPrefixFinder(function, changeDict['w']):
+                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
+                        #                     nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
+                        #                     existingList = type__additioNames__nodeIdList['f'].get(function, [])
+                        #                     existingList.append(nodeId)
+                        #                     type__additioNames__nodeIdList['f'][function] = existingList
+
+                        #         for variable in mVariablesD:#oManipulateSchemeParser.variables:
+                        #             if variable in changeDict['w']:
+                        #                 #find all occurences of variable and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
+                        #                 for relativeStartPos in rs.lazyPrefixFinder(variable, changeDict['w']):
+                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
+                        #                     nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
+                        #                     existingList = type__additioNames__nodeIdList['v'].get(variable, [])
+                        #                     existingList.append(nodeId)
+                        #                     type__additioNames__nodeIdList['v'][variable] = existingList
+
+
+                        #         for primitive in mPrimitives:#oManipulateSchemeParser.primitives:
+                        #             if primitive in changeDict['w']:
+                        #                 #find all occurences of primitive and its startPos, match to nodeId in manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme
+                        #                 for relativeStartPos in rs.lazyPrefixFinder(primitive, changeDict['w']):
+                        #                     absoluteStartPos = changeDict['s'] + relativeStartPos
+                        #                     nodeId = manipulatedSchemeWordSchemeParser.startPos__nodeIdScheme[absoluteStartPos]#oStartPos__nodeId[absoluteStartPos]#
+                        #                     existingList = type__additioNames__nodeIdList['p'].get(primitive, [])
+                        #                     existingList.append(nodeId)
+                        #                     type__additioNames__nodeIdList['p'][primitive] = existingList
+
+                        # nonNettedaddRem__type__nodeIdList = {'a':dict(map(lambda k: (k, []), additionRemovalTrackingKeys)), 'r':dict(map(lambda k: (k, []), additionRemovalTrackingKeys))}
+                        # for gk in additionRemovalTrackingKeys:
+                        #     removalNames__nodeIdList = type__removalNames__nodeIdList[gk]
+                        #     additioNames__nodeIdList = type__additioNames__nodeIdList[gk]
+                        #     #find things that NOT NET OUT
+                        #     nettedOutNodeNames = []
+                        #     for commonNodeName in set(removalNames__nodeIdList.keys()).intersection(set(additioNames__nodeIdList.keys())):
+                        #         if len(removalNames__nodeIdList[commonNodeName]) != len(additioNames__nodeIdList[commonNodeName]):
+                        #             nettedOutNodeNames.append(commonNodeName)
+
+                        #     for nodeName, nodeIdList in removalNames__nodeIdList.items():
+                        #         if nodeName not in nettedOutNodeNames:
+                        #             nonNettedaddRem__type__nodeIdList['r'][gk] += nodeIdList
+                        #     for nodeName, nodeIdList in additioNames__nodeIdList.items():
+                        #         if nodeName not in nettedOutNodeNames:
+                        #             nonNettedaddRem__type__nodeIdList['a'][gk] += nodeIdList
+                        # # import pdb;pdb.set_trace()
+                        # return mAst, nonNettedaddRem__type__nodeIdList['r']['p'], nonNettedaddRem__type__nodeIdList['r']['v'], nonNettedaddRem__type__nodeIdList['r']['f'], mRootOfTree, manipulatedSchemeWordSchemeParser
 
             #if we reach here this means non of the prioritised-simplifyingManipulations worked.
             if self.verbose:
                 info(f'we cannot find a suitable manipulation based on the hint lastOp: {hint["invertedResults"]}, will combingSearch')
-            #for now we return None #self.combingSearch() # then we comb :)
+            #for now we return None #self.combingSearch() # then we comb :)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
 
 
 
@@ -494,7 +562,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; visited = [maxEquationVertexId];
         maxLength=0; maxLengthChildDict = None
         while len(stack)>0:
-            current___dict = stack.pop()#lastOut,  what if we choose the neighbour, that is in the unwanted_variable set ? will that be a better path?
+            current___dict = stack.pop()#lastOut,  what if we choose the neighbour, that is in the unwanted_variable set ? will that be a better path? PRIORITY_QUEUE, use your binarySearch to implement priority_queue on []<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
             for neighbour in equationVariables_bg[current___dict['current']]:
             # for neighbour in T[current___dict['current']]: # this is the correct one, but does not perform as well
                 if neighbour not in visited:

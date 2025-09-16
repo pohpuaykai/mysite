@@ -1,11 +1,11 @@
 ---
-className: "Multiplydividecancel"
-type: "essential"
+className: 'Multiplydividecancel'
+type: 'essential'
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: "(* (/ $1 $0) $0)"
-      return: "$1"
+      scheme: '(* (/ $1 $0) $0)'
+      return: '$1'
     minArgs:
       $0: 0
       $1: 0
@@ -15,10 +15,10 @@ manipulations:
     preCond:
       $0: null
       $1: null
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: "(/ (* $1 $0) $0)"
-      return: "$1"
+      scheme: '(/ (* $1 $0) $0)'
+      return: '$1'
     minArgs:
       $0: 0
       $1: 0

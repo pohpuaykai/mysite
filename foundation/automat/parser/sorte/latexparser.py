@@ -127,34 +127,32 @@ class Latexparser(Parser):
     # 'artanh', 'tanh', 'arcsch', 'csch', 'arsech', 'sech', 'arcoth', 'coth']
     ######
 
-
-    def getLatexSpecialCases(self, funcName, reverse=False):
+    def generateLatexSpecialCases(self): #<<<<<perhaps this should be a class_function instead of an instance_function
         """
-        True|False is "whether or not this node is optional to output", 
+        # True means optional, this means this node, might or might not be there, but we still match it
+        #the 1 is to say which node gets mapped to where, might be used to get all the startPos__nodeId, in the future..., but now it is not used
 
-        resultTemplate:[
-( ((), ), [ ((), ), ((), ), ...]) # top row to match input row ((funcName, nodeId), True|False, templateId)
-
-]
         """
         def addTrig():
             l = {}
             for trigFuncName in Latexparser.TRIGOFUNCTION:
-                l[trigFuncName] = {
-                    'inputTemplate':( ((trigFuncName, '$0'), False, 0), [ (('$1', '$2'), True, 1), (('$3', '$4'), False, 2)]),
-                    'outputTemplate':[
+                l[trigFuncName] = { # if latex_trig_power is available in inputTemplate, then the scheme_trig_power must be compulsory in outputTemplate ~0
+                #if the scheme_trig_power MUST be the only pattern searched and replaced. ~1
+                    'inputTemplate':( ((trigFuncName, '$0'), False, 0), [ (('$1', '$2'), True, 1), (('$3', '$4'), False, 2)]), #latex
+                    'outputTemplate':[#scheme
                         ( ((trigFuncName, '$0'), False, 0), [ (('$3', '$4'), False, 1)]),
                         ( (('^', '$5'), True, 2), [ ((trigFuncName, '$0'), False, 0), (('$1', '$2'), False, 3)]) # if parentNode is present, then Are_the_children_optional?
                     ],
-                    'insertToEntityStorage':['^'],
+                    'insertToEntityStorage':['^'],#maybe this can be used to implement ~1? so all the labels that are in insertToEntityStorage cannot be optional, but for ~0, the optionality is conditional on the latexInputTemplate? Weird key name?
                     'rootOfResultTemplate': 2,# for parent replacement in childrenList
                     'reverseTag':trigFuncName,
                     'reversePriority':0
                 }
             return l
-        LATEX_SPECIAL_CASES = {
+        self.LATEX_SPECIAL_CASES = {
             'sqrt': {
                 'inputTemplate':( (('sqrt', '$0'), False, 0), [ (('$1', '$2'), True, 1), (('$3', '$4'), False, 2)]),
+                #if the scheme_base is available_and_is_default, then it must be removed from latex inputTemplate ~ it seems that this can be used as a logic because all the cases seems to follow this logic
                 'outputTemplate':[
                     ( (('nroot', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
                 ],
@@ -166,22 +164,24 @@ class Latexparser(Parser):
             },
             'ln':{
                 'inputTemplate':( (('ln', '$0'), False, 0), [ (('$3', '$4'), False, 2)]),
+                #if the scheme_base is available_and_is_default, then it must be removed from latex inputTemplate ~ it seems that this can be used as a logic because all the cases seems to follow this logic
                 'outputTemplate':[
                     ( (('log', '$0'), False, 0), [ (('$1', '$2'), False, 1), (('$3', '$4'), False, 2)]),
                 ],
-                'var__defaults':{'$1':'e'},
+                'var__defaults':{'$1':'e'}, # IN scheme->latex, vars from var__defaults that are not in inputTemplate, must be substituted in outputTemplate, there is no_binaryGen
                 'insertToEntityStorage':[],
                 'rootOfResultTemplate': 0,# for parent replacement in childrenList
                 'reverseTag':'log',
                 'reversePriority':0
 
             },
-            'log':{
-                'inputTemplate':( (('log', '$0'), False, 0), [ (('$1', '$2'), True, 2), (('$3', '$4'), False, 3)]),
-                'outputTemplate':[
+            'log':{#if the latex_base is available, then the scheme_base must be compulsory in outputTemplate
+            #if the scheme_base is available_and_is_default, then it must be removed from latex inputTemplate ~ it seems that this can be used as a logic because all the cases seems to follow this logic
+                'inputTemplate':( (('log', '$0'), False, 0), [ (('$1', '$2'), True, 2), (('$3', '$4'), False, 3)]),#latex
+                'outputTemplate':[#scheme
                     ( (('log', '$0'), False, 0), [ (('$1', '$2'), True, 2), (('$3', '$4'), False, 3)]),
                 ],
-                'var__defaults':{'$1':'10'},
+                'var__defaults':{'$1':'10'},# IN scheme->latex, vars from var__defaults that are in inputTemplate, need binaryGen, and vars substituted in outputTemplate, must be removed from inputTemplate
                 'insertToEntityStorage':[],
                 'rootOfResultTemplate': 0,# for parent replacement in childrenList
                 'reverseTag':'log',
@@ -198,15 +198,36 @@ class Latexparser(Parser):
                 'reversePriority':0
             },
         }
-        LATEX_SPECIAL_CASES.update(addTrig())
+        self.LATEX_SPECIAL_CASES.update(addTrig())
+        self.computeAllTags()
+        self.computeAllReverseTags()
+
+    def computeAllTags(self):
+        self.specialLatexTags = list(self.LATEX_SPECIAL_CASES.keys())
+
+    def computeAllReverseTags(self):
+        self.reverseSpecialLatexTags = []
+        for _, instructions in self.LATEX_SPECIAL_CASES.items():
+            self.reverseSpecialLatexTags.append(instructions['reverseTag'])
+
+
+    def getLatexSpecialCases(self, funcName, reverse=False):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<list of all symbols that needs special_case
+        """
+        True|False is "whether or not this node is optional to output", 
+
+        resultTemplate:[
+( ((), ), [ ((), ), ((), ), ...]) # top row to match input row ((funcName, nodeId), True|False, templateId)
+
+]
+        """
         if reverse:
             list_instructions = []
-            for _, instructions in LATEX_SPECIAL_CASES.items():
+            for _, instructions in self.LATEX_SPECIAL_CASES.items():
                 if instructions['reverseTag'] == funcName:
                     list_instructions.append(instructions)
             return list_instructions
         else:
-            return LATEX_SPECIAL_CASES.get(funcName)
+            return self.LATEX_SPECIAL_CASES.get(funcName)
 
 
 
@@ -364,6 +385,7 @@ class Latexparser(Parser):
         self.verbose=verbose
         self.parserName = 'latex'#VAR:inheritance
 
+        self.generateLatexSpecialCases()
         if ast is None: # parse Mode
             self.ast = None
             self.equationStr = equationStr #processed rawEquationStr
@@ -1947,200 +1969,565 @@ count by EntityType:
 
     def _convertASTToLatexStyleAST(self):
         """
-        DFS, at each current, collect all symbols non duplicated
+        At this stage we have schemeAST & getLatexSpecialCases
+        run through all the symbols in schemeAST and use getLatexSpecialCases to get all the possible instructions, CHECK that once we have all the instructions we stop going through symbols
 
-        for each symbol run list_instructions = self.getLatexSpecialCases(symbol, reverse=True), in order of 'reversePriority'
-            convert(ast->scheme) the BFS_queue to schemeBFS, use schemegrammarparser, 
-                schemeword=schemeBFS, 
-                rawInputPattern=(ast->scheme)(list_instructions['outputTemplate']),  #if var__defaults is not empty, replace var with defaults in list_instructions['outputTemplate']
-                rawOutputPattern=(ast->scheme)(list_instructions['inputTemplate'])   #if var__defaults is not empty, remove the tuple with var as the first entry in list_instructions['inputTemplate']
-            convert the manipulatedSchemeWord back to AST
-
-
-
-
-
-        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        remove FindTreeInTree, does lesser than schemegrammarparser, could do this for _convert_to_schemeStyledAST, so that our configuration will be more flexible (not restricted to 1_node_matching)
-        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        find all outputTemplate(subtree) in input
-        - find root in input
-        - DFS together
+        convert schemeAST to schemeStr
+        convertedSchemeStr = schemeStr
+        for instruction in instructions:
+            convertedSchemeStr = run SGP(convertedSchemeStr, instructions)
+        unparse convertedSchemeStr to latexAST
         """
-
-        def stripOutArgsFromTemplate(templateWithArgs, templateRoot):
-            # need to strip the outputTemplate of all the unnecessary arguments
-            stripStack, outputTemplate = [templateRoot], {}# stripStack, outputTemplate = [outputTemplateRoot], {}
-            while len(stripStack) > 0:
-                tup = stripStack.pop()
-                strippedChildren = []
-                # print(dict(instructions['outputTemplate']));import pdb;pdb.set_trace()
-                # for child in dict(instructions['outputTemplate']).get(tup, []):
-                for child in templateWithArgs.get(tup, []):
-                    strippedChildren.append(child[0])
-                    stripStack.append(child)
-                if len(strippedChildren)>0:
-                    outputTemplate[tup[0]] = strippedChildren
-            outputTemplateRoot = templateRoot[0]
-            # import pdb;pdb.set_trace()
-            return outputTemplate, outputTemplateRoot
-
-
-        def findOutputTemplateRoot(instructions):
-            outputTemplateRoot = None
-            for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
-                # import pdb;pdb.set_trace()
-                if outputTemplateParent[2] == instructions['rootOfResultTemplate']: #only the id
-                    outputTemplateRoot=outputTemplateParent
-                    break
-            return outputTemplateRoot
 
         from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
         from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
+        #HELPER
+        def findRootOfTree(newAST):
+            """All routes lead to ROME"""
+            root___KAMO = list(newAST.keys())[0]
+            isChild = True
+            while isChild:
+                isChild = False
+                for parentNode, childNodes in newAST.items():
+                    for childNode in childNodes:
+                        if childNode == root___KAMO:
+                            root___KAMO = parentNode
+                            isChild = True
+                            break
+            return root___KAMO
 
-        nodeId__symbol___withInstructions = {}
-        stack = [self.rootOfTree]
-        while len(stack) > 0:
-            current = stack.pop()
-            if len(self.getLatexSpecialCases(current[0], reverse=True)) > 0:
-                nodeId__symbol___withInstructions[current[1]] = current[0]
-            kinder = self.ast.get(current, [])
-            stack += kinder
-        #found all symbols of self.ast
-        # print('self.ast', self.ast)
-        theAst = self.ast; theRootOfTree = self.rootOfTree; idxOf_nodeId__symbol___withInstructions = 0; astSchemeStr = None
-        while len(nodeId__symbol___withInstructions) > 0:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< after trying 2 cycles then stop?
-            # print('nodeId__symbol___withInstructions: ', nodeId__symbol___withInstructions)
-            # for symbol in list(all_symbols):
-            # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-            if idxOf_nodeId__symbol___withInstructions >= len(nodeId__symbol___withInstructions):
+        #after all the optionals, filter var__default, then binaryGen the filtered_var__default
+        def generateAllCompulsoryOptionalIOPattern(iTemplateAST, iRoot, oTemplateAST, oRoot, var__defaults, skipOptionals, rootOfResultTemplate):
+            #get all the optionals
+            list_tuple_rowIdx_colIdx___Optionals = []
+            for rowIdx, ((parentNode, optional, _), list_tuple_childNode_optional_) in enumerate(oTemplateAST):
+                parentLabel, parentNodeId = parentNode; colIdx = 0# for parent its rowIdx is 0
+                if parentLabel not in skipOptionals and optional is True:
+                    list_tuple_rowIdx_colIdx___Optionals.append((rowIdx, colIdx))
+                for colIdx, (childNode, optional, _) in enumerate(list_tuple_childNode_optional_):
+                    colIdx += 1 #for child its rowIdx is 1 after the parent
+                    if optional is True:
+                        list_tuple_rowIdx_colIdx___Optionals.append((rowIdx, colIdx))
+
+            #check which var__defaults are in iTemplateAST, then binaryGen
+            
+            allITemplateASTLabels = set()
+            allITemplateASTLabels.add(iTemplateAST[0][0][0])
+            for (childLabel, _), _, _ in iTemplateAST[1]:
+                allITemplateASTLabels.add(childLabel)
+            # print("correct? allITemplateASTLabels", allITemplateASTLabels); import pdb;pdb.set_trace()
+            var__defaults___iTemplateAST = dict(filter(lambda t: t[0] in allITemplateASTLabels, var__defaults.items()))
+            var__defaults___NOTiTemplate = dict(filter(lambda t: t[0] not in allITemplateASTLabels, var__defaults.items()))
+
+            #all possible var__defaults
+            list_var__defaults___iTemplateASTFiltered = []
+            list_tuple_var_defaults___iTemplateAST = list(var__defaults___iTemplateAST.items())
+            if len(list_tuple_var_defaults___iTemplateAST)> 0:
+                noOfDigits___varDefaults = len(list_tuple_var_defaults___iTemplateAST)
+                for combinatorialIdx___varDefaults in range(0, 2**noOfDigits___varDefaults):
+                    var__defaults___iTemplateASTFiltered = {}
+                    for idx, onOff in enumerate((f"{{0:0{noOfDigits___varDefaults}b}}").format(combinatorialIdx___varDefaults)):
+                        # print('idx', idx, 'onOff', onOff)
+                        var, default = list_tuple_var_defaults___iTemplateAST[idx]
+                        if onOff == '1':
+                            var__defaults___iTemplateASTFiltered[var] = default
+                    list_var__defaults___iTemplateASTFiltered.append(var__defaults___iTemplateASTFiltered)
+            #
+
+            #binaryGen list_tuple_rowIdx_colIdx___Optionals without duplicate_of_child_In_parent_when_parent_is_OFF
+            # print('list_tuple_rowIdx_colIdx___Optionals', list_tuple_rowIdx_colIdx___Optionals); import pdb;pdb.set_trace()
+            noOfDigits = len(list_tuple_rowIdx_colIdx___Optionals); list_tuple_iPattern_oPattern = []
+            for combinatorialIdx in range(0, 2**noOfDigits):
+                list_tuple_rowIdx_colIdx_hide = []
+                if len(list_tuple_rowIdx_colIdx___Optionals) > 0:
+                    # print('noOfDigits', noOfDigits)
+                    for idx, onOff in enumerate((f"{{0:0{noOfDigits}b}}").format(combinatorialIdx)):
+                        # print('idx', idx, 'len(list_tuple_rowIdx_colIdx___Optionals)', len(list_tuple_rowIdx_colIdx___Optionals))
+                        rowIdx, colIdx = list_tuple_rowIdx_colIdx___Optionals[idx] # what if there are no optionals to permutate? then there is nothing to hide.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        if onOff == '0':
+                            list_tuple_rowIdx_colIdx_hide.append((rowIdx, colIdx))
+                #make the newITemplateAST based on list_tuple_rowIdx_colIdx_hide
+                newAST_i = {}; rootOfASTNew_i = None
+                for rowIdx, ((parentNode, _, templateIdx), list_tuple_childNode_N_N) in enumerate(oTemplateAST):
+                    if (rowIdx, 0) not in list_tuple_rowIdx_colIdx_hide:
+                        childNodes = []
+                        #
+                        if rootOfResultTemplate == templateIdx:
+                            rootOfASTNew_i = parentNode # note that children cannot be root
+                        #
+                        for colIdx, (childNode, _, _) in enumerate(list_tuple_childNode_N_N):
+                            if (rowIdx, colIdx-1) not in list_tuple_rowIdx_colIdx_hide:
+                                childNodes.append(childNode)
+                        newAST_i[parentNode] = childNodes
+                #if rootOfTree is removed as optional, then rootOfASTNew will be None:
+                if rootOfASTNew_i is None:
+                    rootOfASTNew_i = findRootOfTree(newAST_i)
+                #
+                #convert newAST_i&rootOfASTNew_i to iPattern
+                #
+                #optionals X var__defaults -> allPossibleASTPairs
+                if len(list_var__defaults___iTemplateASTFiltered) > 0:
+                    #
+                    for var__defaults___i in reversed(list_var__defaults___iTemplateASTFiltered): # the most substituted first
+                        #sub var__defaults___i in iTemplateAST, must be removed from oTemplateAST
+                        #update the var__defaults___NOTiTemplate + var__defaults___i
+                        var__defaults___reduced = copy(var__defaults___NOTiTemplate)
+                        var__defaults___reduced.update(var__defaults___i)
+                        patternStr_i = convertASTToSchemeStrPattern(newAST_i, rootOfASTNew_i, var__defaults___reduced)
+                        #remove var__defaults___i from iTemplateAST, which is to make patternStr_o
+                        patternStr_o = convertASTToSchemeStrPattern(convertInputTemplateToAST(iTemplateAST), 
+                        iRoot,#in your syntax, you only allow the first element of instruction['inputTemplate'] to be root
+                        var__defaults___i, removeDefaultVariable=True) # and output is input
+                        if patternStr_i != patternStr_o:
+                            list_tuple_iPattern_oPattern.append((patternStr_i, patternStr_o))
+                    #
+                else:
+                    var__defaults___reduced = copy(var__defaults___NOTiTemplate)
+                    patternStr_i = convertASTToSchemeStrPattern(newAST_i, rootOfASTNew_i, var__defaults___reduced)
+                    patternStr_o = convertASTToSchemeStrPattern(convertInputTemplateToAST(iTemplateAST), 
+                    iRoot,#in your syntax, you only allow the first element of instruction['inputTemplate'] to be root
+                    {}) # and output is input
+                    if patternStr_i != patternStr_o:
+                        list_tuple_iPattern_oPattern.append((patternStr_i, patternStr_o))
+            return list_tuple_iPattern_oPattern
+
+
+
+
+
+
+
+
+
+
+
+
+        # #after running generateAllCompulsoryOptionalPattern, we will have a iList_AST for 1 inputpattern, and a oList_AST for 1 outputpattern{for outputTemplate}
+        # def generateAllCompulsoryOptionalPattern(templateAST, rootOfResultTemplate, var__defaults, skipOptionals):
+        #     """
+        #     #we assume that the templateAST is in outputTemplate format
+        #     #find all the optionals, so that we can binaryGen all the possiblities
+
+        #     if var__defaults is not empty, 
+        #     0. vars from var__defaults that are not in inputTemplate, must be substituted in outputTemplate, there is no_binaryGen [caters to ln]
+        #     1. vars from var__defaults that are in inputTemplate, need binaryGen, and vars substituted in outputTemplate, must be removed from inputTemplate [we do not want defaults to appear in latex, caters to sqrt&log]
+        #     This means that every iPattern should have exactly 1 oPattern, vice_versa
+
+        #     skipOptionals currently only used for trigPowers, so that the optional for trigPowers in output is not optional in unparse.
+        #     And we check that parentLabel is not in skipOptionals[insertToEntityStorage] only... We might want to change it to another flag in the further, if LATEX demands for more states
+        #     so, if there is a non_empty skipOptionals, then only any parentLabel that is in skipOptionals is not skippable.
+        #     """
+        #     # print('templateAST: ', templateAST); import pdb;pdb.set_trace()
+        #     list_tuple_rowIdx_colIdx___Optionals = []#listOfOptionals
+        #     for rowIdx, ((parentNode, optional, _), list_tuple_childNode_optional_) in enumerate(templateAST):
+        #         parentLabel, parentNodeId = parentNode; colIdx = 0 # for parent its rowIdx is 0
+        #         #
+        #         # print('parentLabel: ', parentLabel, 'optional:', optional); import pdb;pdb.set_trace()
+        #         if parentLabel not in skipOptionals and optional is True:
+        #             list_tuple_rowIdx_colIdx___Optionals.append((rowIdx, colIdx))
+        #         #
+        #         for colIdx, (childNode, optional, _) in enumerate(list_tuple_childNode_optional_):
+        #             colIdx += 1 #for child its rowIdx is 1 after the parent
+        #             #
+        #             if optional is True:
+        #                 list_tuple_rowIdx_colIdx___Optionals.append((rowIdx, colIdx))
+        #             #
+        #     #binaryGen list_tuple_rowIdx_colIdx___Optionals without duplicate_of_child_In_parent_when_parent_is_OFF
+        #     # print('list_tuple_rowIdx_colIdx___Optionals', list_tuple_rowIdx_colIdx___Optionals); import pdb;pdb.set_trace()
+        #     allPossibleASTs = []
+        #     noOfDigits = len(list_tuple_rowIdx_colIdx___Optionals)
+        #     for combinatorialIdx in range(0, 2**noOfDigits):
+        #         list_tuple_rowIdx_colIdx_hide = []
+        #         if len(list_tuple_rowIdx_colIdx___Optionals) > 0:
+        #             # print('noOfDigits', noOfDigits)
+        #             for idx, onOff in enumerate((f"{{0:0{noOfDigits}b}}").format(combinatorialIdx)):
+        #                 # print('idx', idx, 'len(list_tuple_rowIdx_colIdx___Optionals)', len(list_tuple_rowIdx_colIdx___Optionals))
+        #                 rowIdx, colIdx = list_tuple_rowIdx_colIdx___Optionals[idx] # what if there are no optionals to permutate? then there is nothing to hide.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #                 if onOff == '0':
+        #                     list_tuple_rowIdx_colIdx_hide.append((rowIdx, colIdx))
+        #         #
+        #         newAST = {}; rootOfASTNew = None
+        #         # print('~~~~~~~')
+        #         for rowIdx, ((parentNode, _, templateIdx), list_tuple_childNode_N_N) in enumerate(templateAST):
+        #             if (rowIdx, 0) not in list_tuple_rowIdx_colIdx_hide:
+        #                 childNodes = []
+        #                 #
+        #                 # print("rootOfResultTemplate", rootOfResultTemplate, "templateIdx", templateIdx)
+        #                 if rootOfResultTemplate == templateIdx:
+        #                     rootOfASTNew = parentNode # note that children cannot be root
+        #                 #
+        #                 for colIdx, (childNode, _, _) in enumerate(list_tuple_childNode_N_N):
+        #                     if (rowIdx, colIdx-1) not in list_tuple_rowIdx_colIdx_hide:
+        #                         childNodes.append(childNode)
+        #                 newAST[parentNode] = childNodes
+        #         #if rootOfTree is removed as optional, then rootOfASTNew will be None:
+        #         if rootOfASTNew is None:
+        #             rootOfASTNew = findRootOfTree(newAST)
+        #         # print('onOff: ', onOff, 'newAST: ', newAST, 'rootOfASTNew', rootOfASTNew); import pdb;pdb.set_trace()
+        #         allPossibleASTs.append((newAST, rootOfASTNew)) # will there be duplicates? YES. If rootOfTree is removed as optional, then rootOfASTNew will not be there...
+
+        #         #
+        #     #convert each allPossibleASTs to schemeStr (oPattern)
+        #     list_patternStrs = []
+        #     for newAST, rootOfASTNew in allPossibleASTs:
+        #         # print('newAST: ', newAST, 'rootOfASTNew: ', rootOfASTNew)
+        #         #need to binaryGen all the var__defaults..., starting with the most restrictive first~pattern with most substituted<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #         if len(var__defaults)>0:
+        #             list_tuple_var_default = list(var__defaults.items())
+        #             noOfDigits = len(list_tuple_var_default)
+        #             for combinatorialIdx in reversed(range(0, 2**noOfDigits)): # reversed so that the most restrictive get processed first.......<<< actually what about the same number of substitutes?
+        #                 var__defaults___reduced = {}
+        #                 for idx, onOff in enumerate((f"{{0:0{noOfDigits}b}}").format(combinatorialIdx)):
+        #                     if onOff == '1':
+        #                         var, default = list_tuple_var_default[idx]
+        #                         var__defaults___reduced[var] = default
+        #                 patternStr = convertASTToSchemeStrPattern(newAST, rootOfASTNew, var__defaults___reduced)
+        #                 list_patternStrs.append(patternStr)
+        #         else:
+        #             patternStr = convertASTToSchemeStrPattern(newAST, rootOfASTNew, var__defaults)
+        #             list_patternStrs.append(patternStr)
+
+        #     return list_patternStrs
+
+        def convertASTToSchemeStrPattern(ast, rootOfTree, var__defaults, removeDefaultVariable=False):
+            # print('ast', ast, 'rootOfTree: ', rootOfTree); import pdb;pdb.set_trace()
+            schemeparser = Schemeparser(ast=ast, rootOfTree=rootOfTree)
+            patternStr = schemeparser._unparse()
+            if var__defaults:
+                for var, default in var__defaults.items():
+                    if removeDefaultVariable:
+                        patternStr = patternStr.replace(f' {var}', '')
+                    else:
+                        patternStr = patternStr.replace(var, default)
+            return patternStr
+        def convertInputTemplateToAST(inputTemplate):
+            return {inputTemplate[0][0]:list(map(lambda t: t[0], inputTemplate[1]))}
+        def findRootOfTemplateGivenId(template, rootId):
+            root = None
+            for (node, _, nodeId), _ in template:
+                if nodeId ==rootId:
+                    root = node
+                    break
+            return root
+        #
+        #get all_instructions
+        # print('self.reverseSpecialLatexTags', self.reverseSpecialLatexTags)
+        missingReverseSpecialLatexTags = copy(self.reverseSpecialLatexTags); allReverseSpecialLatexTags = []; foundAll = False
+        # print('missingReverseSpecialLatexTags', missingReverseSpecialLatexTags)
+        for parentNode, childNodes in self.ast.items():
+            reverseSpecialLatexTag___KAMO = parentNode[0]
+            if reverseSpecialLatexTag___KAMO in missingReverseSpecialLatexTags:
+                missingReverseSpecialLatexTags.remove(reverseSpecialLatexTag___KAMO)
+                allReverseSpecialLatexTags.append(reverseSpecialLatexTag___KAMO)
+                if len(missingReverseSpecialLatexTags) == 0:
+                    foundAll = True; break
+            for childNode in childNodes:
+                reverseSpecialLatexTag___KAMO = childNode[0]
+                if reverseSpecialLatexTag___KAMO in missingReverseSpecialLatexTags:
+                    missingReverseSpecialLatexTags.remove(reverseSpecialLatexTag___KAMO)
+                    allReverseSpecialLatexTags.append(reverseSpecialLatexTag___KAMO)
+                    if len(missingReverseSpecialLatexTags) == 0:
+                        foundAll = True; break
+            if foundAll:
                 break
-            nodeId, symbol = list(nodeId__symbol___withInstructions.items())[idxOf_nodeId__symbol___withInstructions];idxOf_nodeId__symbol___withInstructions+=1
-            list_instructions = self.getLatexSpecialCases(symbol, reverse=True)
-            # print('list_instructions: ', list_instructions)
-            # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-            # print('len(list_instructions): ', len(list_instructions))
-            # if len(list_instructions) > 0:
-            for instructionsIdx, instructions in enumerate(sorted(list_instructions, key=lambda dic: dic['reversePriority'], reverse=False)): # sort instructions by 'reversePriority'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        # print('allReverseSpecialLatexTags', allReverseSpecialLatexTags)
+        instructions = []
+        for symbol in allReverseSpecialLatexTags:
+            sortedList_instruction = sorted(self.getLatexSpecialCases(symbol, reverse=True), key=lambda dic: dic['reversePriority'], reverse=False)
+            #
+            # print('symbol: ', symbol); print(sortedList_instruction); import pdb;pdb.set_trace()
+            #
+            for instruction in sortedList_instruction: 
+                #<<<<<<<convert instruction to inputPattern and outputPattern
+                # print(instruction, 'var__defaults' in instruction)
+                var__defaults = instruction['var__defaults'] if 'var__defaults' in instruction else {}
+                iRoot = instruction['inputTemplate'][0][0] # in your syntax iRoot is always the first(and only) parent
+                list_tuple_iPattern_oPattern = generateAllCompulsoryOptionalIOPattern(
+                    instruction['inputTemplate'], iRoot, 
+                    instruction['outputTemplate'], findRootOfTemplateGivenId(instruction['outputTemplate'], instruction['rootOfResultTemplate']), 
+                    var__defaults, 
+                    instruction['insertToEntityStorage'],
+                    instruction['rootOfResultTemplate']
+                )
+                instructions += list_tuple_iPattern_oPattern
+
+
+
+
+
+                # list_iPattern = generateAllCompulsoryOptionalPattern(
+                # instruction['outputTemplate'], 
+                # instruction['rootOfResultTemplate'], 
+                # var__defaults, 
+                # instruction['insertToEntityStorage']
+                # ) # we are reversing, so input is output
+                # # print("convertInputTemplateToAST(instruction['inputTemplate'])", convertInputTemplateToAST(instruction['inputTemplate'])); import pdb;pdb.set_trace()
+                # # print("instruction['inputTemplate'][0][0]", instruction['inputTemplate'][0][0]); import pdb;pdb.set_trace()
+                # #sqrt might still need radical=3, but sqrt radical=2 need removal of radical <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                # #each list_iPattern has its own oPattern? Does list_iPattern need to be a list?
+                # #no.. every substitute in iPattern , should be the same substitue in oPattern.
+                # # so generateAllCompulsoryOptionPattern should be done in pairs?
+                # oPattern = convertASTToSchemeStrPattern(convertInputTemplateToAST(instruction['inputTemplate']), 
+                # instruction['inputTemplate'][0][0],#in your syntax, you only allow the first element of instruction['inputTemplate'] to be root
+                # var__defaults, removeDefaultVariable=True) # and output is input
                 
-                og_schemeparser = Schemeparser(ast=theAst, rootOfTree=theRootOfTree)
-                astSchemeStr = og_schemeparser._unparse()
-                # nodeId__startPos = dict(map(lambda t: (t[1], t[0]), og_schemeparser.startPos__nodeId.items()))
-                # print('beginning: ', astSchemeStr, 'startPos__nodeId:', og_schemeparser.startPos__nodeId)#, 'nodeId__startPos: ', nodeId__startPos)
+                # # print('oPattern', oPattern); import
+                # instructions.append((list(set(list_iPattern)), oPattern)) #remove duplicate patterns
+        #
+        # print('instructions', instructions); import pdb;pdb.set_trace()
+        schemeparser = Schemeparser(ast=self.ast, rootOfTree=self.rootOfTree)
+        theAst = self.ast; theRootOfTree = self.rootOfTree
+        convertedSchemeStr = schemeparser._unparse()
+        for iPattern, oPattern in instructions:
+            sgparser = SchemeGrammarParser(iPattern, oPattern, verbose=self.verbose)
+            sgparser.matchIPattern(convertedSchemeStr, startPos__nodeId=schemeparser.startPos__nodeId)
+            # print('convertedSchemeStr', convertedSchemeStr, 'iPattern', iPattern, 'oPattern', oPattern)
+            # print('sgparser.noMatches', sgparser.noMatches); import pdb;pdb.set_trace()
+            if not sgparser.noMatches:
+                convertedSchemeStr = sgparser.parse(nodeIdsToSkip=[], variableMinArgs={}, variableMaxArgs={})
+                schemeparser = Schemeparser(equationStr=convertedSchemeStr)
+                theAst, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
+                theRootOfTree = schemeparser.rootOfTree
+        self.latexAST = theAst
+        self.rootOfTree = theRootOfTree
+
+
+
+        # print('instructions', instructions); import pdb;pdb.set_trace()
+        # schemeparser = Schemeparser(ast=self.ast, rootOfTree=self.rootOfTree)
+        # theAst = self.ast; theRootOfTree = self.rootOfTree
+        # convertedSchemeStr = schemeparser._unparse()
+        # # print('convertedSchemeStr OG', '|'+convertedSchemeStr+'|', 'schemeparser.startPos__nodeId', schemeparser.startPos__nodeId); import pdb;pdb.set_trace()
+        # for list_iPattern, oPattern in instructions:
+        #     for iPattern in list_iPattern:
+        #         # print('B:iPattern: ', '|'+iPattern+'|', 'oPattern: ', '|'+oPattern+'|', 'convertedSchemeStr', '|'+convertedSchemeStr+'|'); import pdb; pdb.set_trace()
+        #         sgparser = SchemeGrammarParser(iPattern, oPattern, verbose=self.verbose)
+        #         sgparser.matchIPattern(convertedSchemeStr, startPos__nodeId=schemeparser.startPos__nodeId)
+        #         # print('sgparser.noMatches', sgparser.noMatches); import pdb;pdb.set_trace()
+        #         if not sgparser.noMatches:
+        #             convertedSchemeStr = sgparser.parse(nodeIdsToSkip=[], variableMinArgs={}, variableMaxArgs={})
+        #             schemeparser = Schemeparser(equationStr=convertedSchemeStr)
+        #             theAst, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
+        #             theRootOfTree = schemeparser.rootOfTree
+        #         # print('A:iPattern: ', iPattern, 'oPattern: ', oPattern, 'convertedSchemeStr', convertedSchemeStr); import pdb; pdb.set_trace()
+        # #unparse convertedSchemeStr to latexAST
+        # # theLastSchemeParser = Schemeparser(equationStr=convertedSchemeStr)
+        # # theAst, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = theLastSchemeParser._parse()
+        # #we want the nodeIds of the original... as much as possible...? TODO not needed for now<<<<<<<<<<<<<<<<<
+        # self.latexAST = theAst
+        # self.rootOfTree = theRootOfTree
+
+
+
+
+
+
+    # def _convertASTToLatexStyleAST(self):
+    #     """
+    #     DFS, at each current, collect all symbols non duplicated
+
+    #     for each symbol run list_instructions = self.getLatexSpecialCases(symbol, reverse=True), in order of 'reversePriority'
+    #         convert(ast->scheme) the BFS_queue to schemeBFS, use schemegrammarparser, 
+    #             schemeword=schemeBFS, 
+    #             rawInputPattern=(ast->scheme)(list_instructions['outputTemplate']),  #if var__defaults is not empty, replace var with defaults in list_instructions['outputTemplate']
+    #             rawOutputPattern=(ast->scheme)(list_instructions['inputTemplate'])   #if var__defaults is not empty, remove the tuple with var as the first entry in list_instructions['inputTemplate']
+    #         convert the manipulatedSchemeWord back to AST
+
+
+
+
+
+    #     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    #     remove FindTreeInTree, does lesser than schemegrammarparser, could do this for _convert_to_schemeStyledAST, so that our configuration will be more flexible (not restricted to 1_node_matching)
+    #     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    #     find all outputTemplate(subtree) in input
+    #     - find root in input
+    #     - DFS together
+    #     """
+
+    #     def stripOutArgsFromTemplate(templateWithArgs, templateRoot):
+    #         # need to strip the outputTemplate of all the unnecessary arguments
+    #         stripStack, outputTemplate = [templateRoot], {}# stripStack, outputTemplate = [outputTemplateRoot], {}
+    #         while len(stripStack) > 0:
+    #             tup = stripStack.pop()
+    #             strippedChildren = []
+    #             # print(dict(instructions['outputTemplate']));import pdb;pdb.set_trace()
+    #             # for child in dict(instructions['outputTemplate']).get(tup, []):
+    #             for child in templateWithArgs.get(tup, []):
+    #                 strippedChildren.append(child[0])
+    #                 stripStack.append(child)
+    #             if len(strippedChildren)>0:
+    #                 outputTemplate[tup[0]] = strippedChildren
+    #         outputTemplateRoot = templateRoot[0]
+    #         # import pdb;pdb.set_trace()
+    #         return outputTemplate, outputTemplateRoot
+
+
+    #     def findOutputTemplateRoot(instructions):
+    #         outputTemplateRoot = None
+    #         for outputTemplateParent, outputTemplateChildren in instructions['outputTemplate']:
+    #             # import pdb;pdb.set_trace()
+    #             if outputTemplateParent[2] == instructions['rootOfResultTemplate']: #only the id
+    #                 outputTemplateRoot=outputTemplateParent
+    #                 break
+    #         return outputTemplateRoot
+
+    #     from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
+    #     from foundation.automat.parser.sorte.schemeparser import Schemeparser
+
+
+    #     nodeId__symbol___withInstructions = {}
+    #     stack = [self.rootOfTree]
+    #     while len(stack) > 0:
+    #         current = stack.pop()
+    #         if len(self.getLatexSpecialCases(current[0], reverse=True)) > 0:
+    #             nodeId__symbol___withInstructions[current[1]] = current[0]
+    #         kinder = self.ast.get(current, [])
+    #         stack += kinder
+    #     #found all symbols of self.ast
+    #     # print('self.ast', self.ast)
+    #     theAst = self.ast; theRootOfTree = self.rootOfTree; idxOf_nodeId__symbol___withInstructions = 0; astSchemeStr = None
+    #     while len(nodeId__symbol___withInstructions) > 0:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< after trying 2 cycles then stop?
+    #         # print('nodeId__symbol___withInstructions: ', nodeId__symbol___withInstructions)
+    #         # for symbol in list(all_symbols):
+    #         # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #         if idxOf_nodeId__symbol___withInstructions >= len(nodeId__symbol___withInstructions):
+    #             break
+    #         nodeId, symbol = list(nodeId__symbol___withInstructions.items())[idxOf_nodeId__symbol___withInstructions];idxOf_nodeId__symbol___withInstructions+=1
+    #         list_instructions = self.getLatexSpecialCases(symbol, reverse=True)
+    #         # print('list_instructions: ', list_instructions)
+    #         # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #         # print('len(list_instructions): ', len(list_instructions))
+    #         # if len(list_instructions) > 0:
+    #         for instructionsIdx, instructions in enumerate(sorted(list_instructions, key=lambda dic: dic['reversePriority'], reverse=False)): # sort instructions by 'reversePriority'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 
-                # print('outputTemplate:')
-                # print(instructions['outputTemplate'])
-                # print('inputTemplate:')
-                # print(instructions['inputTemplate'])
-                #instructions['outputTemplate']
-                outputTemplate, outputTemplateRoot = stripOutArgsFromTemplate(dict(instructions['outputTemplate']), findOutputTemplateRoot(instructions))
-                OG_outputTemplate, OG_outputTemplateRoot = outputTemplate, outputTemplateRoot
-                # print('outputTemplate: ', outputTemplate, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                # print('outputTemplateRoot: ', outputTemplateRoot)
-                # print(rawInputPattern)
-                #instructions['inputTemplate']
-                inputTemplate, inputTemplateRoot = stripOutArgsFromTemplate(dict([instructions['inputTemplate']]), instructions['inputTemplate'][0])
-                OG_inputTemplate, OG_inputTemplateRoot = inputTemplate, inputTemplateRoot
-                # print('inputTemplate: ', inputTemplate, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                # print('inputTemplateRoot: ', inputTemplateRoot); 
-                # import pdb;pdb.set_trace()
-                if 'var__defaults' in instructions and len(instructions['var__defaults']) > 0:
-                    newOutputTemplate = {}
-                    for parent, children in outputTemplate.items():
-                        # we assume var__defaults are never in parents
-                        newChildren = []
-                        for child in children:
-                            if child[0] in instructions['var__defaults']:
-                                newChildren.append((instructions['var__defaults'][child[0]], child[1]))
-                            else:
-                                newChildren.append(child)
-                        newOutputTemplate[parent] = newChildren
-                    outputTemplate = newOutputTemplate
-                    #take out all tuples from inputTemplate that has first item in var__defaults.keys()
-                    newInputTemplate = {}
-                    for parent, children in inputTemplate.items():
-                        # we assume var__defaults are never in parents
-                        newChildren = []
-                        for child in children:
-                            if child[0] not in instructions['var__defaults']:
-                                newChildren.append(child)
-                        newInputTemplate[parent] = newChildren
-                    inputTemplate = newInputTemplate
-                    # print('var__defaults sub**************************************************')
-                    # print('outputTemplate:', outputTemplate)
-                    # print('inputTemplate:', inputTemplate)
-                rawInputPattern = Schemeparser(ast=outputTemplate, rootOfTree=outputTemplateRoot)._unparse()
-                rawOutputPattern = Schemeparser(ast=inputTemplate, rootOfTree=inputTemplateRoot)._unparse()
-                # print("rawInputPattern", rawInputPattern)
-                # print("rawOutputPattern", rawOutputPattern)
-                sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=self.verbose, recordMaking=True) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
-                manipulatedAstSchemeStr = sgparser.parse(astSchemeStr)
-                # print('matchedWtihDefaults? ', rawInputPattern, not sgparser.noMatches, rawOutputPattern)
-                if sgparser.noMatches and instructionsIdx==len(list_instructions)-1:#  # should try all the defaults first, then try all the non-defaults, we do that by only trying non-defaults on the last instruction (we assume that all the defaults are the same across list_instructions)
-                    rawInputPattern = Schemeparser(ast=OG_outputTemplate, rootOfTree=OG_outputTemplateRoot)._unparse()
-                    rawOutputPattern = Schemeparser(ast=OG_inputTemplate, rootOfTree=OG_inputTemplateRoot)._unparse()
-                    sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=True, recordMaking=True) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
-                    # print('OG: ', rawInputPattern, rawOutputPattern, 'astSchemeStr:', astSchemeStr)
-                    manipulatedAstSchemeStr = sgparser.parse(astSchemeStr)
-                    # print('@@@@@tried OG', rawInputPattern, 'matchedOG?:', not sgparser.noMatches, rawOutputPattern)
-                if not sgparser.noMatches:
-                    astSchemeStr = manipulatedAstSchemeStr
-                    # import pprint; pp = pprint.PrettyPrinter(indent=4)
-                    # pp.pprint(sgparser.verPosWord)
-                    # matches = list(filter(lambda row: row['d']=='r' and row['v'] is not None, sgparser.verPosWord))
-                    # print('matches: ')
-                    # pp.pprint(matches)
-                    ############
-                    # pp.pprint(sgparser.matches)
-                    ############
-                    nodeIdToRemove = []
-                    for match in sgparser.matches: # could contain argument matches also.
-                        try:
-                            nodeIdToRemove.append(og_schemeparser.startPos__nodeId[match['s']+len('(')])#len('(') assumes that we always replace only schemeFunctions and never schemePrimitives
-                        except:
-                            pass # skip argument matches
-                    beforeLeftOverLen = len(nodeId__symbol___withInstructions)
-                    nodeId__symbol___withInstructions = dict(filter(lambda t: t[0] not in nodeIdToRemove, nodeId__symbol___withInstructions.items()))
-                    afterLeftOverLen = len(nodeId__symbol___withInstructions)
-                    schemeparser = Schemeparser(equationStr=astSchemeStr)
-                    theAst, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse() 
-                    theRootOfTree = schemeparser.rootOfTree
-                    if afterLeftOverLen < beforeLeftOverLen: # there could be matches but no decrease
-                        idxOf_nodeId__symbol___withInstructions = 0; #reset 
-                    # print('matches: ', matches);
-                    # import pprint; pp = pprint.PrettyPrinter(indent=4)
-                    # pp.pprint(sgparser.verPosWord)
-                    # import pdb;pdb.set_trace()
-                    #nodeId will change?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                    # import pdb;pdb.set_trace()
-                # print('newSchemeStr: ', astSchemeStr)
-                # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                # print('LEFTOVERs: ')
-                # import pprint; pp = pprint.PrettyPrinter(indent=4)
-                # pp.pprint(nodeId__symbol___withInstructions)
-                # print('idxOf_nodeId__symbol___withInstructions: ', idxOf_nodeId__symbol___withInstructions)
-                # if len(nodeId__symbol___withInstructions) <=0:
-                #     break
-                # if not sgparser.noMatches:##### cannot just try one, there might be other matches of other types somewhere else in the string. But if try all, then 
-                #     break # we just want one match for each list_instructions, according to the reversePriority
-                # HANDLE var__defaults
-        #convert astSchemeStr back to ast
-        if astSchemeStr is not None:
-            schemeparser = Schemeparser(equationStr=astSchemeStr)
-            ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
-            self.latexAST = ast; self.rootOfTree = schemeparser.rootOfTree
-            # print('latexAST:')
-            # print(self.latexAST);
-            # print('self.rootOfTree:');
-            # print(self.rootOfTree)
-        else:
-            self.latexAST = theAst
-            self.rootOfTree = theRootOfTree
-            # print('%^&&^%&^%&^%?')
+    #             og_schemeparser = Schemeparser(ast=theAst, rootOfTree=theRootOfTree)
+    #             astSchemeStr = og_schemeparser._unparse()
+    #             # nodeId__startPos = dict(map(lambda t: (t[1], t[0]), og_schemeparser.startPos__nodeId.items()))
+    #             # print('beginning: ', astSchemeStr, 'startPos__nodeId:', og_schemeparser.startPos__nodeId)#, 'nodeId__startPos: ', nodeId__startPos)
+                
+    #             # print('outputTemplate:')
+    #             # print(instructions['outputTemplate'])
+    #             # print('inputTemplate:')
+    #             # print(instructions['inputTemplate'])
+    #             #instructions['outputTemplate']
+    #             outputTemplate, outputTemplateRoot = stripOutArgsFromTemplate(dict(instructions['outputTemplate']), findOutputTemplateRoot(instructions))
+    #             OG_outputTemplate, OG_outputTemplateRoot = outputTemplate, outputTemplateRoot
+    #             # print('outputTemplate: ', outputTemplate, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #             # print('outputTemplateRoot: ', outputTemplateRoot)
+    #             # print(rawInputPattern)
+    #             #instructions['inputTemplate']
+    #             inputTemplate, inputTemplateRoot = stripOutArgsFromTemplate(dict([instructions['inputTemplate']]), instructions['inputTemplate'][0])
+    #             OG_inputTemplate, OG_inputTemplateRoot = inputTemplate, inputTemplateRoot
+    #             # print('inputTemplate: ', inputTemplate, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #             # print('inputTemplateRoot: ', inputTemplateRoot); 
+    #             # import pdb;pdb.set_trace()
+    #             if 'var__defaults' in instructions and len(instructions['var__defaults']) > 0:
+    #                 newOutputTemplate = {}
+    #                 for parent, children in outputTemplate.items():
+    #                     # we assume var__defaults are never in parents
+    #                     newChildren = []
+    #                     for child in children:
+    #                         if child[0] in instructions['var__defaults']:
+    #                             newChildren.append((instructions['var__defaults'][child[0]], child[1]))
+    #                         else:
+    #                             newChildren.append(child)
+    #                     newOutputTemplate[parent] = newChildren
+    #                 outputTemplate = newOutputTemplate
+    #                 #take out all tuples from inputTemplate that has first item in var__defaults.keys()
+    #                 newInputTemplate = {}
+    #                 for parent, children in inputTemplate.items():
+    #                     # we assume var__defaults are never in parents
+    #                     newChildren = []
+    #                     for child in children:
+    #                         if child[0] not in instructions['var__defaults']:
+    #                             newChildren.append(child)
+    #                     newInputTemplate[parent] = newChildren
+    #                 inputTemplate = newInputTemplate
+    #                 # print('var__defaults sub**************************************************')
+    #                 # print('outputTemplate:', outputTemplate)
+    #                 # print('inputTemplate:', inputTemplate)
+    #             rawInputPattern = Schemeparser(ast=outputTemplate, rootOfTree=outputTemplateRoot)._unparse()
+    #             rawOutputPattern = Schemeparser(ast=inputTemplate, rootOfTree=inputTemplateRoot)._unparse()
+    #             # print("rawInputPattern", rawInputPattern)
+    #             # print("rawOutputPattern", rawOutputPattern)
+    #             sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=self.verbose) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
+    #             #
+    #             print('startPos__nodeId:')
+    #             print(og_schemeparser.startPos__nodeId); import pdb;pdb.set_trace()
+    #             #
+    #             sgparser.matchIPattern(astSchemeStr)#, startPos__nodeId=self.startPos__nodeId)
+    #             manipulatedAstSchemeStr = sgparser.parse()
+    #             # print('matchedWtihDefaults? ', rawInputPattern, not sgparser.noMatches, rawOutputPattern)
+    #             if sgparser.noMatches and instructionsIdx==len(list_instructions)-1:#  # should try all the defaults first, then try all the non-defaults, we do that by only trying non-defaults on the last instruction (we assume that all the defaults are the same across list_instructions)
+    #                 rawInputPattern = Schemeparser(ast=OG_outputTemplate, rootOfTree=OG_outputTemplateRoot)._unparse()
+    #                 rawOutputPattern = Schemeparser(ast=OG_inputTemplate, rootOfTree=OG_inputTemplateRoot)._unparse()
+    #                 sgparser = SchemeGrammarParser(rawInputPattern, rawOutputPattern, verbose=True)#, recordMaking=True) # this will go through the whole tree, so might as well, go through every thing from getLatexSpecialCases?
+    #                 sgparser.matchIPattern(astSchemeStr)
+    #                 # print('OG: ', rawInputPattern, rawOutputPattern, 'astSchemeStr:', astSchemeStr)
+    #                 manipulatedAstSchemeStr = sgparser.parse()
+    #                 # print('@@@@@tried OG', rawInputPattern, 'matchedOG?:', not sgparser.noMatches, rawOutputPattern)
+    #             if not sgparser.noMatches:
+    #                 astSchemeStr = manipulatedAstSchemeStr
+    #                 # import pprint; pp = pprint.PrettyPrinter(indent=4)
+    #                 # pp.pprint(sgparser.verPosWord)
+    #                 # matches = list(filter(lambda row: row['d']=='r' and row['v'] is not None, sgparser.verPosWord))
+    #                 # print('matches: ')
+    #                 # pp.pprint(matches)
+    #                 ############
+    #                 # pp.pprint(sgparser.matches)
+    #                 ############
+
+                    
+
+    #                 nodeIdToRemove = []
+    #                 for match in sgparser.matches: # could contain argument matches also.
+    #                     try:
+    #                         nodeIdToRemove.append(og_schemeparser.startPos__nodeId[match['s']+len('(')])#len('(') assumes that we always replace only schemeFunctions and never schemePrimitives
+    #                     except:
+    #                         pass # skip argument matches
+    #                 beforeLeftOverLen = len(nodeId__symbol___withInstructions)
+    #                 nodeId__symbol___withInstructions = dict(filter(lambda t: t[0] not in nodeIdToRemove, nodeId__symbol___withInstructions.items()))
+    #                 afterLeftOverLen = len(nodeId__symbol___withInstructions)
+    #                 schemeparser = Schemeparser(equationStr=astSchemeStr)
+    #                 theAst, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse() 
+    #                 theRootOfTree = schemeparser.rootOfTree
+    #                 if afterLeftOverLen < beforeLeftOverLen: # there could be matches but no decrease
+    #                     idxOf_nodeId__symbol___withInstructions = 0; #reset 
+    #                 # print('matches: ', matches);
+    #                 # import pprint; pp = pprint.PrettyPrinter(indent=4)
+    #                 # pp.pprint(sgparser.verPosWord)
+    #                 # import pdb;pdb.set_trace()
+    #                 #nodeId will change?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    #                 # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #                 # import pdb;pdb.set_trace()
+    #             # print('newSchemeStr: ', astSchemeStr)
+    #             # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #             # print(len(nodeId__symbol___withInstructions), '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TERM<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    #             # print('LEFTOVERs: ')
+    #             # import pprint; pp = pprint.PrettyPrinter(indent=4)
+    #             # pp.pprint(nodeId__symbol___withInstructions)
+    #             # print('idxOf_nodeId__symbol___withInstructions: ', idxOf_nodeId__symbol___withInstructions)
+    #             # if len(nodeId__symbol___withInstructions) <=0:
+    #             #     break
+    #             # if not sgparser.noMatches:##### cannot just try one, there might be other matches of other types somewhere else in the string. But if try all, then 
+    #             #     break # we just want one match for each list_instructions, according to the reversePriority
+    #             # HANDLE var__defaults
+    #     #convert astSchemeStr back to ast
+    #     if astSchemeStr is not None:
+    #         schemeparser = Schemeparser(equationStr=astSchemeStr)
+    #         ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
+    #         self.latexAST = ast; self.rootOfTree = schemeparser.rootOfTree
+    #         # print('latexAST:')
+    #         # print(self.latexAST);
+    #         # print('self.rootOfTree:');
+    #         # print(self.rootOfTree)
+    #     else:
+    #         self.latexAST = theAst
+    #         self.rootOfTree = theRootOfTree
+    #         # print('%^&&^%&^%&^%?')
 
 
 

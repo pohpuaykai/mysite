@@ -1,9 +1,9 @@
 ---
-className: "Exponential"
-type: "essential"
+className: 'Exponential'
+type: 'essential'
 # https://en.wikipedia.org/wiki/Exponentiation#Integer_exponents
 manipulations:
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(^ $0 0)'
       return: '1'
@@ -13,7 +13,7 @@ manipulations:
       $0: 0
     preCond:
       $0: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(^ $0 1)'
       return: '$0'
@@ -23,7 +23,7 @@ manipulations:
       $0: 0
     preCond:
       $0: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(^ $0 (+ $1 $2))'
       return: '(* (^ $0 $1) (^ $0 $2))'
@@ -39,7 +39,7 @@ manipulations:
       $0: null
       $1: null
       $2: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(^ (^ $0 $1) $2)'
       return: '(^ $0 (* $1 $2))'
@@ -55,7 +55,7 @@ manipulations:
       $0: null
       $1: null
       $2: null
-  - type: "regex"
+  - type: 'regex'
     vor:
       scheme: '(* (^ $1 $0) (^ $2 $0))'
       return: '(^ (* $1 $2) $0)'
@@ -71,10 +71,10 @@ manipulations:
       $0: null
       $1: null
       $2: null
-  - type: "regex"
+  - type: 'regex'
     vor:
-      scheme: '(^ $0 (- "0" $1))'
-      return: '(/ "1" (^ $0 $1))'
+      scheme: '(^ $0 (- 0 $1))'
+      return: '(/ 1 (^ $0 $1))'
     minArgs:
       $0: 0
       $1: 0

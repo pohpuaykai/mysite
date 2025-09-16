@@ -1,189 +1,183 @@
-from foundation.automat.common.regexshorts import Regexshorts as rs
-from foundation.automat.common.longestcommonsubsequence import LongestCommonSubsequence
-from foundation.automat.log import info
+import sys
+
 
 class SchemeGrammarParser:
+    """There are 3 MODEs
+    MODE0: iPattern has no variables
+
+    MODE1: iPattern has no statics, only variables and spaces. there must be no space before and after iPattern, each variable must be delimited from the next variable by exactly 1 space
+
+    MODE2: iPattern has both statics and variables
+
+    """
 
 
-    def __init__(self, inputPattern, outputPattern, verbose=False, recordMaking=False, variableMinArgs={}):
+    def __init__(self, iPattern, oPattern, verbose=False):
         """
-        A parser, that will try to match inputPattern with (variables that begin with $ and end with a number).
-        and then places the values of those matched variables, into the outputPattern, that also has
-        the same variables.
-        `Equation` class ignorant
-        
-        #TODO would it have been also good, if it was done with a dict__list (tree) structure, instead of string-based?
+        This method is supposed to 
+        0. get information about iPattern (what MODE is it?)
+        1. get information about iPattern, and oPattern (how many variables, positions of the variables in pattern)
+        2. get information about iPattern, and oPattern (static positions in pattern)
+        3. match iPattern and oPattern (variables, for generating oStr)
+        4. match iPattern and oPattern (statics = LCSS)
 
-        :param inputPattern:
-        :type inputPattern: str
-        :param outputPattern:
-        :type outputPattern: str
-        :param verbose:
-        :type verbose: bool
+
+        :param iPattern:
+        :type iPattern:
+        :param oPattern:
+        :type oPattern:
         """
-        self.verbose=False
-        self.rawOutputPattern = outputPattern
-        self.rawInputPattern = inputPattern
-        self.inputPattern, self.variables, self.inVariablesAndPos, self.inVariablesPosSansVarnumList, self.inStaticsStartEnd = self.prepareRawPattern(self.rawInputPattern)
-        self.outputPattern, self.outVariables, self.outVariablesAndPos, self.outVariablesPosSansVarnumList, self.outStaticsStartEnd = self.prepareRawPattern(self.rawOutputPattern)
-        self.calledBuildEnclosure = False
-        self.variableMinArgs = variableMinArgs# for patterns like differentiation|antiderivative, where variables with different arguments are handled differently
-        # self.subsitutedOutputGrammar = self.outputPattern
-        self.additionalReplacementStrForVariablesDict = {}
-
-        self.allTakenNums = None # for when output has less variables than input, and we need to create
-
-        # self.recordMaking = recordMaking
-        self.patternChanges()
+        self.verbose = verbose
         import pprint
         self.pp = pprint.PrettyPrinter(indent=4)
+        self.variableStartMarker = '$'#'"Why did you choose $ as mark?", asked Winnie_the_Pooh. "Because this will never have anything to do with money, so, i will never have any variable collision"'
+        self.newEnclosureNodeCounter = -1
+        self.allTakenNums = None # for when output has less variables than input, and we need to create
+
+        self.iPattern = iPattern
+        self.oPattern = oPattern
+        #0
+        self.getMode()
+        #1
+        self.oPatternSansNum, self.oUniqueVariables, self.oSortedVariablesAndPosition, self.oSortedVariablesAndPositionSansNum = self.getVariablesAndPosition(self.oPattern)
+        self.iPatternSansNum, self.iUniqueVariables, self.iSortedVariablesAndPosition, self.iSortedVariablesAndPositionSansNum = self.getVariablesAndPosition(self.iPattern) #need for prepValsForExtraOVarsForEachMatch
+        self.oStaticPatternStartEndPositionSansNum = self.getStatics(self.oSortedVariablesAndPositionSansNum, self.oPatternSansNum) # can you check if this is correct for MODE 1?
+        self.iStaticPatternStartEndPositionSansNum = self.getStatics(self.iSortedVariablesAndPositionSansNum, self.iPatternSansNum)
+
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import
+        # self.iSchemeparser = Schemeparser(equationStr=self.iPattern)
+        self.iSchemeparser = Schemeparser(equationStr=self.iPatternSansNum)
+        self.ast___ip, self.functionsD___ip, self.variablesD___ip, self.primitives___ip, self.totalNodeCount___ip, self.startPos__nodeId___ip = self.iSchemeparser._parse() # if this raises, then it is not a valid MODE2
+        
+        # self.oSchemeparser = Schemeparser(equationStr=self.oPattern)
+        self.oSchemeparser = Schemeparser(equationStr=self.oPatternSansNum)
+        self.ast___op, self.functionsD___op, self.variablesD___op, self.primitives___op, self.totalNodeCount___op, self.startPos__nodeId___op = self.oSchemeparser._parse()
+        
+        # if self.mode in [1, 2]:
+            #2
+            #3
+        if self.mode in [2]:
+            self.nodeStartPos__nodeEndPos___ip, self.level__nodeStartPos___sorted___ip, self.nodeStartPos__level___ip, self.nodeId__entityStartPos___ip = self.iSchemeparser._getLevelingInformation()
+            # print('self.nodeStartPos__level___ip'); print(self.nodeStartPos__level___ip)
+            #4
+        self.matchIOPatterns()
 
 
-    def buildEnclosureTree(self, schemeword):
-        self.schemeword = schemeword
-        self.onlyVariablesAndSpace = not any(map(lambda p: len(p.strip())>0, self.inputPattern.split('$')))
-        if self.onlyVariablesAndSpace:
-            self.id__data, self.enclosureTree = self.findAll_OnlyVariablesAndSpace(self.inputPattern, self.schemeword)
-        else:
-            self.id__data, self.enclosureTree = self.findAll(self.inputPattern, self.schemeword)
-            
-        self.countArgsOfEachVariable()
-        self.calledBuildEnclosure = True
-        # this inputPattern is not applicable to this schemeword. Note that, if there are no variables in inputPattern, it might still be a match
+    def getMode(self):
+        if self.variableStartMarker not in self.iPattern:
+            self.mode = 0
+        else:#check for MODE1
+            #after splitting by $ should only contain space and numbers
+            MODE1 = True
+            from foundation.automat.common.checker import Booler
+            for part in self.iPattern.split(self.variableStartMarker):
+                if len(part) >0 and not Booler.isNum(part):
+                    MODE1 = False
+                    break
+            if MODE1:
+                #check for bad MODE1, 
+                #no space before or after iPattern
+                if self.iPattern.startswith(' '):
+                    raise Exception('There must be no space at the start of iPattern')
+                if self.iPattern.endswith(' '):
+                    raise Exception('There must be no space at the end of iPattern')
+                #exactly 1 space between each variable
+                partsBySpace = self.iPattern.split(' ')#hardcoding?
+                numberOfSpaces = len(list(filter(lambda part: len(part)==0, partsBySpace)))
+                numberOfVariables = len(list(filter(lambda part: len(part)>0, partsBySpace)))
+                if numberOfVariables-1!=numberOfSpaces:
+                    raise Exception("There must be 1 space between each variable")
+                self.mode = 1
+            else:#check for mode2, must be able to be passed by schemeParser
+                self.mode = 2
+
+    def getVariablesAndPosition(self, rawPattern):
+        """
+        patternSansNum
+
+        :returns:
+            - patternSansNum -
+            - uniqueVariables -
+            - sortedVariablesAndPosition -
+            - sortedVariablesAndPositionSansNum - 
+        :rtype:
+        """
+        import re
+        import bisect # TODO repeated imports REFACTOR?
+        variables = []
+        variablesAndPos = []
+        for m in re.finditer('(\$\d+)', rawPattern):
+            t = (m.group(), m.start())
+            posToInsert = bisect.bisect_left(variablesAndPos, t[1], key=lambda x: x[1]) # to insert in order of startPosition
+            variablesAndPos.insert(posToInsert, t)
+        variables = list(map(lambda t: t[0], variablesAndPos))
         # import pdb;pdb.set_trace()
-        self.noMatches = (len(self.id__data) == 2) and (self.id__data[0]['w']==self.id__data[1]['w'])
-        self.matches = [] # all the not0 and notLeaves(if not variables==0)
-        if not self.noMatches:
-            if len(self.variables) == 0: # children_of_0(leaves) are matches
-                for parentId, data in filter(lambda t: t[0]!=0, self.id__data.items()):
-                    self.matches.append({'s':data['s'], 'e':data['e'], 'w':data['w']})
-            else: #leaves are not matches
-                for parentId, data in filter(lambda t: t[0]!=0 and t[0] in self.enclosureTree, self.id__data.items()):
-                    self.matches.append({'s':data['s'], 'e':data['e'], 'w':data['w']})
+        pattern = re.sub(r'\$\d+', '$', rawPattern) # remove the numbers
+        variablesPosSansVarnumList = []
+        for m in re.finditer('(\$)', pattern):
+            variablesPosSansVarnumList.append(m.start())
+        variablesPosSansVarnumList = list(zip(variables, variablesPosSansVarnumList))
 
+        return pattern, sorted(list(set(variables))), variablesAndPos, variablesPosSansVarnumList
 
-    def findAll_OnlyVariablesAndSpace(self, pattern, schemeword):
+    def getStatics(self, variablesPosSansVarnumList, pattern):
+        startPos = 0; staticsStartEnd = []; #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        for _, pos in variablesPosSansVarnumList:
+            staticsStartEnd.append((startPos, pos))
+            startPos = pos + len('$')
+        staticsStartEnd.append((startPos, len(pattern)))
+        return staticsStartEnd
+
+    def mapIOVariables(self):
         """
-        calls schemeparser.parse on schemeword to get ast, map startEndPos and substrings from schemeword to the nodeId of ast
-        then make slidingWindow of length=len(#_of_variables_of_pattern), on ast, to produce enclosureTree (matches), if there are not enough args on ast, then its no match
+        Gets iVarPos__oVarPos [used for schemeNodeChangeLog, for checking if there are variables from iPattern that are being removed] & 
+        oVarPos__iVarPos, used for generateOStr
         """
-        def makeSlidingWindowMatches(childNodes, windowLen):
-            matches = []
-            for offset in range(0, len(childNodes)-windowLen+1):
-                matches.append(childNodes[offset:offset+windowLen])
-            return matches
-        noOfVariables = pattern.count('$')
-        from foundation.automat.parser.sorte.schemeparser import Schemeparser
-        schemeparser = Schemeparser(equationStr=schemeword)
-        ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
-        nodeId__name = {}; astParent = {}
-        for (parentName, parentNodeId), childNodes in ast.items():
-            nodeId__name[parentNodeId] = parentName
-            for childName, childNodeId in childNodes:
-                nodeId__name[childNodeId] = childName
-                astParent[childNodeId] = parentNodeId
-        # print(nodeId__name); print(startPos__nodeId)
-        nodeId__startPos = dict(map(lambda t: (t[1], t[0]-1 if nodeId__name[t[1]] == '=' or nodeId__name[t[1]] in functionsD else t[0]), startPos__nodeId.items()))
-        enclosureTree = {}; id__data = {}; currentId = 0; astNodeId__enclosureTreeNodeId = {}
-        nodeId__len = schemeparser.nodeId__len
-        #with schemeparser.nodeId__len and startPos__nodeId
-        stack = [schemeparser.rootOfTree]; self.extraGeneratedInputValueForMissingVariables = []
-        while len(stack) > 0:
-            (parentName, parentNodeId) = stack.pop()
-            childNodes = ast.get((parentName, parentNodeId), [])
-            stack += childNodes
-            if len(childNodes) < noOfVariables:#no match
-                continue
-            if len(astNodeId__enclosureTreeNodeId) == 0: # first match
-                subRootId = currentId
-                id__data[subRootId] = {
-                    's':nodeId__startPos[parentNodeId],
-                    'e':nodeId__startPos[parentNodeId]+nodeId__len[parentNodeId],
-                    'w':schemeword[nodeId__startPos[parentNodeId]:nodeId__startPos[parentNodeId]+nodeId__len[parentNodeId]],
-                    'id':subRootId,
-                    'pid':None,
-                    'matchIdx':0
-                }
-                staticStartPos = 0; staticEndPos = len(schemeword)
-            else:#find parent=subRootId of parentNodeId in enclosureTree, might need to skip a few parents in ast
-                subRootId = parentNodeId
-                staticStartPos = nodeId__startPos[subRootId]; staticEndPos = nodeId__startPos[subRootId]+nodeId__len[subRootId]
-                while subRootId not in astNodeId__enclosureTreeNodeId:#collect the inbetween StartEndPosition for statics
-                    subRootId = astParent[subRootId]
-                    staticStartPos = min(staticStartPos, nodeId__startPos[subRootId]); staticEndPos = max(staticEndPos, nodeId__startPos[subRootId]+nodeId__len[subRootId])
-            enclosureTreeChildIds = []
-            matches = makeSlidingWindowMatches(childNodes, noOfVariables)
-            # print(self.inVariablesAndPos); print(matches); import pdb;pdb.set_trace()
-            inVars = []; inStatics = []; currentStaticStart = staticStartPos; prevId = currentId
-            for matchIdx, match in enumerate(matches):
-                #make missing variables
-                outValues = []; variable__val = {}
-                if len(self.outVariables) > len(self.variables):
-                    # outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables))-len(set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
-                    outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)-set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
-                    variable__val = dict(zip(sorted(list(set(self.outVariables) - set(self.variables))), outValues))
-                #
-                currentId += 1
-                # print('outValues', outValues); import pdb;pdb.set_trace()
-                inVarList = []; template__actual___inStatic = {}; templateStaticStart = 0; vor = None
-                for (var, varPos), (astNodeName, astNodeId) in zip(self.inVariablesAndPos, match):
-                    # print('self.outputPattern', self.outputPattern); import pdb;pdb.set_trace();self.rawOutputPattern
-                    inVarList.append(((var, nodeId__startPos[astNodeId]), nodeId__startPos[astNodeId], nodeId__startPos[astNodeId]+nodeId__len[astNodeId], currentId))
-                    template__actual___inStatic[(templateStaticStart, varPos)] = (currentStaticStart, nodeId__startPos[astNodeId])
-                    vor = schemeword[currentStaticStart:nodeId__startPos[astNodeId]]
-                    # print(template__actual___inStatic);print(vor); import pdb;pdb.set_trace()
-                    templateStaticStart = varPos+len(var)
-                    currentStaticStart = nodeId__startPos[astNodeId]+nodeId__len[astNodeId]
-                    variable__val[var] = schemeword[nodeId__startPos[astNodeId]:nodeId__startPos[astNodeId]+nodeId__len[astNodeId]]
-                #make w
-                op = self.rawOutputPattern
-                for outVariable, outPos in reversed(self.outVariablesAndPos):
-                    outValue = variable__val[outVariable]
-                    op = rs.replaceAtPos(op, outPos, outPos+len(outVariable), outValue)
-                #
+        from copy import deepcopy
 
-                id__data[currentId] = {
-                    's':nodeId__startPos[astNodeId],
-                    'e':nodeId__startPos[astNodeId]+nodeId__len[astNodeId],
-                    # 'w':schemeword[nodeId__startPos[astNodeId]:nodeId__startPos[astNodeId]+nodeId__len[astNodeId]],
-                    #w is the replacementStr, so we have to use the outPattern
-                    'w':op,
-                    'inVar':(var, nodeId__startPos[astNodeId]),
-                    'id':currentId,
-                    'pid':subRootId,
-                    'positionInParent':{
-                        'inVariable': var,
-                        'matchIdx': matchIdx,
-                        'templatePos': varPos
-                    },
-                    # 'matchIdx':matchIdx,
-                    'matchIdx':0,
-                    'vor':vor,
-                    'hin':'',
-                    'outVars':[]
-                }
-                if prevId != subRootId:
-                    id__data[prevId]['hin'] = vor
-                prevId = currentId
-                enclosureTreeChildIds.append(currentId)
-                inVars.append(inVarList); 
-            template__actual___inStatic[(templateStaticStart, len(pattern))] = (currentStaticStart, staticEndPos)
-            id__data[currentId]['hin'] = schemeword[currentStaticStart:staticEndPos]
-            # print('inStatics', template__actual___inStatic)
-            inStatics.append(template__actual___inStatic); #import pdb;pdb.set_trace()
-            id__data[subRootId]['inVars'] = [list(map(lambda l: l[0], inVars))] # flatten 1 level
-            id__data[subRootId]['inStatics'] = inStatics#format
-            enclosureTree[subRootId] = enclosureTreeChildIds
-            astNodeId__enclosureTreeNodeId[parentNodeId] = subRootId
-        # print('***')
-        # self.pp.pprint(id__data);
-        # self.pp.pprint(enclosureTree)
-        return id__data, enclosureTree
+        ioUniqueVariables = set(self.iUniqueVariables).intersection(set(self.oUniqueVariables)) #intersection because if there are variables either not in iVars or not in oVars, then they cannot be mapped across IO
+        iVar__list_iVarPos = {}
+        for (iVar, iPos) in self.iSortedVariablesAndPositionSansNum:
+            existing = iVar__list_iVarPos.get(iVar, [])
+            existing.append((iVar, iPos))
+            iVar__list_iVarPos[iVar] = existing
+        oVar__list_oVarPos = {}
+        for (oVar, oPos) in self.oSortedVariablesAndPositionSansNum:
+            existing = oVar__list_oVarPos.get(oVar, [])
+            existing.append((oVar, oPos))
+            oVar__list_oVarPos[oVar] = existing
+        for variable in ioUniqueVariables:
+            list_iVarPos = sorted(iVar__list_iVarPos.get(variable), key=lambda t: t[1])#sort by position
+            list_oVarPos = sorted(oVar__list_oVarPos.get(variable), key=lambda t: t[1])#sort by position
+            list_oVarPos_noRepeats = deepcopy(list_oVarPos)
+            if list_iVarPos is not None and list_oVarPos is not None:
+                if len(list_iVarPos) > len(list_oVarPos):
+                    repetitions = (len(list_iVarPos)+len(list_oVarPos)-1)//len(list_oVarPos)
+                    list_oVarPos = (list_oVarPos * repetitions)[:len(list_iVarPos)]
+                elif len(list_iVarPos) < len(list_oVarPos):
+                    repetitions = (len(list_oVarPos)+len(list_iVarPos)-1)//len(list_iVarPos)
+                    list_iVarPos = (list_iVarPos * repetitions)[:len(list_oVarPos)]
+                # print('zip(list(list_iVarPos), list(list_oVarPos))', list(zip(list(list_iVarPos), list(list_oVarPos)))); import pdb;pdb.set_trace()
 
+                for iVarPos, oVarPos in zip(list(list_iVarPos), list(list_oVarPos)):
+                    if oVarPos not in self.oVarPos__iVarPos:
+                        self.oVarPos__iVarPos[oVarPos] = iVarPos
+                for iVarPos, oVarPos in zip(list(list_iVarPos), list(list_oVarPos_noRepeats)):
+                    if iVarPos not in self.iVarPos__oVarPos:
+                        self.iVarPos__oVarPos[iVarPos] = oVarPos
+                # print('self.oVarPos__iVarPos', self.oVarPos__iVarPos); print('self.iVarPos__oVarPos', self.iVarPos__oVarPos); import pdb;pdb.set_trace()
 
-
-    def patternChanges(self):
+    def matchIOPatterns(self): # this is patternChanges in old norse
+        # from foundation.automat.common.longestcommonsubsequence import LongestCommonSubsequence
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import
         """
+        This is to track static changes between iPattern and oPattern
+
+        it should output
+        staticRanges__list_startPosInioPattern for addition, removal, edition
+        this only use the counts for each schemeLabel
+        if there is more schemeLabel in iPattern than in oPattern, match the nearest of the same schemeLabel (edition), then those that are left in iPattern, are removed
+        if there is more schemeLabel in oPattern than in iPattern, match the nearest of the same schemeLabel (edition), then those that are left in oPattern, are 
 
         calculates 
         self.iUnmatchedFrags and self.oUnmatchedFrags
@@ -198,1102 +192,1834 @@ class SchemeGrammarParser:
 
         Both lists are sorted by start position
         """
-        # self.iMatchedFrags, self.oMatchedFrags = LongestCommonSubsequence.lcss(self.rawInputPattern, self.rawOutputPattern) # if put raw pattern, the $ number might confuse lcss, when there is same number as a pattern like (- $0 0)
-        #TODO try out StringCompare.damerauLevenshtein, for an upgrade? static that swap place, are current detected as an addition and a deletion, not very effective.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        self.iMatchedFrags, self.oMatchedFrags, self.iUnmatchedFrags, self.oUnmatchedFrags, self.rejoinedIFrags, self.rejoinedOFrags = LongestCommonSubsequence.lcssWithUnmatchedRejoined(self.inputPattern, self.outputPattern)
+        # self.iStaticIdx__sortedList_tuple_labelStartPos_labelEndPos_type = dict(map(lambda staticIdx: (staticIdx, []), range(0, len(self.iSortedVariablesAndPositionSansNum))))
+        # self.oStaticIdx__sortedList_tuple_labelStartPos_labelEndPos_type = dict(map(lambda staticIdx: (staticIdx, []), range(0, len(self.oSortedVariablesAndPositionSansNum))))
+
+        # self.iStaticIdx__sortedList_tuple_labelStartPos_labelEndPos_type = {}#used by the defeckted verPosWord, remove and change to iTuple_patternLabelStartEndPos__oTuple_patternLabelStartEndPos
+        # self.oStaticIdx__sortedList_tuple_labelStartPos_labelEndPos_type = {}#used by the defeckted verPosWord, remove and change to oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos
+        #those with no matches in iPattern or oPattern, not needed here, ...
+        self.iTuple_patternLabelStartEndPos__oTuple_patternLabelStartEndPos_oStaticIdx = {}#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+        self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx = {}#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+
+        def compareCountDict(iLabel__count, oLabel__count, iLabel__sortedList_tuple_startPos_endPos_nodeId, oLabel__sortedList_tuple_startPos_endPos_nodeId):
+            """
+            also need the startEndPos of each segment of static of iPattern and oPattern
+            iLabel__count is the number
+            """
+            iLabels___set = set(iLabel__count.keys()); oLabels___set = set(oLabel__count.keys())
+            commonLabels___set = iLabels___set.intersection(oLabels___set)
+            commonLabel__oMinusICount = dict(map(lambda commonLabel: (commonLabel, oLabel__count[commonLabel]-iLabel__count[commonLabel]), commonLabels___set))
+
+            for commonLabel, oMinusICount in commonLabel__oMinusICount.items():
+                oZipList = oLabel__sortedList_tuple_startPos_endPos_nodeId[commonLabel]
+                iZipList = iLabel__sortedList_tuple_startPos_endPos_nodeId[commonLabel]
+                if oMinusICount > 0:#more O than I
+                    oZipList = oZipList[:oMinusICount]
+                elif oMinusICount < 0: #more I than O
+                    iZipList = iZipList[:-oMinusICount]
 
 
+                def zipStaticRegionsAndCommonLabels(commonLabels, staticRegions):
+                    result = []
+                    commonLabelsIdx = 0; staticRegionsIdx = 0
+                    while commonLabelsIdx < len(commonLabels) and staticRegionsIdx < len(staticRegions):
+                        labelStartPos, labelEndPos, nodeId = commonLabels[min(commonLabelsIdx, len(commonLabels)-1)]
+                        staticIdx = min(staticRegionsIdx, len(staticRegions)-1)
+                        staticPatternStartPos, staticPatternEndPos = staticRegions[staticIdx]
+                        if staticPatternStartPos <= labelStartPos and labelEndPos <= staticPatternEndPos:
+                            # result.append((labelStartPos, labelEndPos, nodeId, staticIdx))
+                            result.append((labelStartPos, labelEndPos, staticIdx))
+                            commonLabelsIdx += 1
+                        elif staticPatternEndPos <= labelEndPos:
+                            staticRegionsIdx += 1
+                        elif labelEndPos <= staticPatternEndPos:
+                            commonLabelsIdx += 1
+                        else:#this should not happend
+                            raise Exception("")
+                    return result
+
+                oZipListWithOStaticIdx = zipStaticRegionsAndCommonLabels(oZipList, self.oStaticPatternStartEndPositionSansNum)
+                iZipListWithIStaticIdx = zipStaticRegionsAndCommonLabels(iZipList, self.iStaticPatternStartEndPositionSansNum)
+
+                self.iTuple_patternLabelStartEndPos__oTuple_patternLabelStartEndPos_oStaticIdx.update(dict(zip(
+                    list(map(lambda t: (t[0], t[1]), iZipList)), 
+                    oZipListWithOStaticIdx
+                )))
+                self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx.update(dict(zip(
+                    list(map(lambda t: (t[0], t[1]), oZipList)), 
+                    iZipListWithIStaticIdx
+                )))
+                
+                
 
 
-    def parse(self, schemeword, nodeIdsToSkip=None, existingVariables=None):
-        """
-        parse the schemeword (Scheme-styled string), with the inputPattern, and try to find the variables
-        in the inputPattern. 
-        Then it wil fit the values of the variables in found from schemeword, into the variables of the
-        outputPattern.
+        def getLabel__sortedList_tuple_startPos_endPos_nodeId(startPos__nodeId, nodeId__len, theStr):
+            label__list_tuple_startPos_endPos_nodeId = {}
+            for startPos, nodeId in startPos__nodeId.items():
+                leng = nodeId__len[nodeId]
+                label = theStr[startPos: startPos+leng]
+                existing = label__list_tuple_startPos_endPos_nodeId.get(label, [])
+                existing.append((startPos, startPos+leng, nodeId))
+                label__list_tuple_startPos_endPos_nodeId[label] = existing
+                # print('label__list_tuple_startPos_endPos_nodeId', label__list_tuple_startPos_endPos_nodeId); import pdb;pdb.set_trace()
+            label__sortedList_tuple_startPos_endPos_nodeId = dict(map(lambda s: (s, []), label__list_tuple_startPos_endPos_nodeId.keys()))
+            for label, list_tuple_startPos_endPos_nodeId in label__list_tuple_startPos_endPos_nodeId.items():
+                label__sortedList_tuple_startPos_endPos_nodeId[label] = sorted(list_tuple_startPos_endPos_nodeId, key=lambda t: t[0])
+            return label__sortedList_tuple_startPos_endPos_nodeId
 
-        :param schemeword:
-        :type schemeword:
-        :param nodeIdsToSkip:
-        :type nodeIdsToSkip:
-        """
-        if nodeIdsToSkip is None:
-            nodeIdsToSkip = []
-        self.schemeword = schemeword
-        self.nodeIdsToSkip = nodeIdsToSkip
-        if not self.calledBuildEnclosure:
-            self.buildEnclosureTree(self.schemeword)
-        if self.verbose:
-            info('you may skip these ids, and not change it to outputPattern: ')
-            self.pp.pprint(id__data)
-        self.manipulatedSchemeWord = self.manipulate(
-            self.schemeword,
-            self.variables,
-            self.rawOutputPattern,
-            self.rawInputPattern,
-            self.id__data,
-            self.enclosureTree,
-            self.nodeIdsToSkip,
-            existingVariables
+
+        allLabel__count___ip = {}
+        allLabel__count___ip.update(self.functionsD___ip);
+        allLabel__count___ip.update(self.variablesD___ip);
+        allLabel__count___ip.update(self.primitives___ip)#are these all the labels?
+
+        allLabel__count___op = {}
+        allLabel__count___op.update(self.functionsD___op);
+        allLabel__count___op.update(self.variablesD___op);
+        allLabel__count___op.update(self.primitives___op)#are these all the labels?
+
+        iNodeId__labelLen = self.iSchemeparser._getLabelLength()
+        oNodeId__labelLen = self.oSchemeparser._getLabelLength()
+        # print('self.startPos__nodeId___ip', self.startPos__nodeId___ip)
+        # print('iNodeId__labelLen', iNodeId__labelLen)
+        # print('self.iPatternSansNum', self.iPatternSansNum); import pdb;pdb.set_trace()
+        iLabel__sortedList_tuple_startPos_endPos_nodeId = getLabel__sortedList_tuple_startPos_endPos_nodeId(self.startPos__nodeId___ip, iNodeId__labelLen, self.iPatternSansNum)
+        
+        # print('self.startPos__nodeId___op', self.startPos__nodeId___op)
+        # print('oNodeId__labelLen', oNodeId__labelLen)
+        # print('self.oPatternSansNum', self.oPatternSansNum); import pdb;pdb.set_trace()
+        oLabel__sortedList_tuple_startPos_endPos_nodeId = getLabel__sortedList_tuple_startPos_endPos_nodeId(self.startPos__nodeId___op, oNodeId__labelLen, self.oPatternSansNum)
+        # print('iLabel__sortedList_tuple_startPos_endPos_nodeId')
+        # print(iLabel__sortedList_tuple_startPos_endPos_nodeId)
+        # print('oLabel__sortedList_tuple_startPos_endPos_nodeId')
+        # print(oLabel__sortedList_tuple_startPos_endPos_nodeId)
+        compareCountDict(
+            allLabel__count___ip, 
+            allLabel__count___op, 
+            iLabel__sortedList_tuple_startPos_endPos_nodeId, 
+            oLabel__sortedList_tuple_startPos_endPos_nodeId
         )
-        return self.manipulatedSchemeWord
 
 
 
 
-
-
-
-
-    def findFirstSameLevel(self, pattern, schemeword, chopped=0):
+    #make a "buildEnclosureTree" wrapper for this<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< also need to change Recommend.py & Manipulate.py
+    def matchIPattern(self, iStr, startPos__nodeId={}):#this is equivalent to buildEnclosureTree, iStr is equivalent to schemeword
         """
-        
-        :param pattern: SchemeGrammar-styled pattern
-        all variables, start with $, and then have a integer that does not
-        start with 0, (except 0 itself, so we can have $0)
+        gets all the schemeInformation about iStr. Mainly for skipNode because skipNode needs it, and all 3 MODEs use skipNode
+        MODE0 does not use anymore information from schemeInformation
+        MODE1 uses 0.ast___iStr 1.nodeId__len___iStr 2. startPos portion of startPos__nodeId
+        MODE2 uses 0.nodeId__len___iStr 1.getLevelingInformation
 
-        only returns FIRST sub-schemeword, that match pattern, on the TOP-level (i.e. widest)
-        example, schemeword: '(= (+ a b) (+ c d))'
-        will return: 
-        1. (+ a b)
-        ONLY
+        generate vals for variables in oPattern but not in iPattern (for generating oStr)
 
-        example, schemeword: '(= (+ a b) (+ (+ c d) e))'
-        will return:
-        1. (+ a b)
-        ONLY
+        :param iStr: string to do the matching with iPattern
+        :type iStr:
 
-        :type pattern: str
-        :param schemeword:
-        :type schemeword: str
-        :param chopped:
-        for the iterator(findAllSameLevel) to correct the position, of matched-string-that-was-chopped
+        :param startPos__nodeId: user_given_mapping_of_startPos_to_nodeId
+        :type startPos__nodeId:
 
-        :type chopped: int
+        :param nodeIdsToSkip: list of nodeIds (according to the user_given_mapping_of_startPos_to_nodeId, so if there is no user_given_mapping_of_startPos_to_nodeId), then this does not work.
+        Usecase for this is, when some parts of the Equation matches iPattern, but we do not want to apply the oPattern, because it does not help with solving
+        :type nodeIdsToSkip:
 
-        :return:
-        :rtype:
+        :param variableMinArgs: variable_to_minNumberOfArgs matching
+        matched variable must have minNumberOfArgs, in order for the replacement with outputPattern to happen
+        constants - without brackets, are 0NumberOfArgs
+        any variables with brackets (a schemeFunction) - just count the number of arguments
+        :type variableMinArgs: dict
+
+        :param variableMaxArgs: variable_to_maxNumberOfArgs matching
+        matched variable must have maxNumberOfArgs, in order for the replacement with outputPattern to happen
+        :type variableMaxArgs: dict
         """
-        matchingBrackets = {}
-        def getNextBalancedPos(beginPos): # innerClass, for memoisation of matchingBrackets
-            #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<change this after findAllEntity
-            #beginPos = (   ALWAYS
-            if beginPos in matchingBrackets:
-                return matchingBrackets[beginPos]
-            else: # compute matchingBrackets
-                #we assume that schemeword[beginPos] is a (
-                stack = [beginPos]
-                for i, c in enumerate(schemeword[beginPos+1:]):
-                    if len(stack) == 0: # we balanced the brackets
-                        return beginPos + i
-                    if c == '(':
-                        stack.append(beginPos + i)
-                    elif c == ')':
-                        openPos = stack.pop()
-                        matchingBrackets[openPos] = beginPos + i # memoize
-                return matchingBrackets[beginPos]#returns the next balanced_close_brackets after beginPos
-        patternSegmentedByDollar = pattern.split('$')
-        # if len(patternSegmentedByDollar) == 1: # there are no $ in pattern <==> no variables in pattern
-        # is this pattern possible: '$0 $1'?
-        # if so, then it can only match scheme strings with 2-variables?
-        firstPre = patternSegmentedByDollar[0]
-        ###########
-        # print(schemeword, 'schemeword<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< chopped: ', chopped)
-        # info('pattern', pattern)
-        # info('firstPre', firstPre)
-        ###########
-        for sPos in rs.lazyPrefixFinder(firstPre, schemeword):
-            dollarPoss = []
-            start = sPos
-            suf = pattern # for the case when there are no variables in pattern
-            for i in range(0, len(patternSegmentedByDollar) -1):
-                pre = patternSegmentedByDollar[i]
-                suf = patternSegmentedByDollar[i+1]
-                #########
-                # print('pre|', pre, '|suf|', suf, '|start+len(pre)|', start+len(pre), '|schemeword[start+len(pre)]|', schemeword[start+len(pre)])
-                # print('(start+len(pre)) < len(schemeword)', (start+len(pre)) < len(schemeword))
-                # print("schemeword[start+len(pre)] == '('", schemeword[start+len(pre)] == '(')
-                # import pdb;pdb.set_trace()
-                #########
-                if (start+len(pre)) < len(schemeword) and schemeword[start+len(pre)] == '(':
-                    ##########
-                    # info('0!', i, start, pre)
-                    ##########
-                    #
-                    nextPos = getNextBalancedPos(start+len(pre)) + 1 # return None if cannot find
-                    ##########
-                    # print('0!nextPos', nextPos, i, start, pre)
-                    ##########
-                    # if 
-                else:#variable, find next place(ENTITY) that starts with suf<<<<<<<<<<<<<<<<<<find nexy Entity instead of place(position)
-                    #if suf==' ', do you get all the space, and then next?
-                    ##########
-                    # info('1!', i, start, pre)
-
-                    ##########
-                    try:
-                        subStart = start+len(pre)
-                        # subEnd = schemeword[start+len(pre):].index(suf) + (start+len(pre))
-                        subEnd = len(schemeword)
-                        openBra__count___others = {'{':0, '[':0}; closeBra__openBra = {'}':'{', ']':'['} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
-                        for j in range(subStart, subEnd+1):
-                            if schemeword[j] in openBra__count___others:
-                                openBra__count___others[schemeword[j]] += 1
-                            elif schemeword[j] in closeBra__openBra:
-                                openBra__count___others[closeBra__openBra[schemeword[j]]] -= 1
-                            # print(j);import pdb; pdb.set_trace()
-                            if not any(map(lambda count: count!=0, openBra__count___others.values())) and ((schemeword[j].isspace()) or (schemeword[j] in ['(', ')'])): # do bracket accounting here for {} and []
-                            # if (schemeword[j].isspace()) or (schemeword[j] in ['(', ')']): # do bracket accounting here for {} and []
-                            
-                                nextPos = j
-                                break
-                        if nextPos == subStart:
-                            nextPos = None # empty string
-
-                    ##########
-                        # print('1!nextPos', nextPos, i, start, pre)
-
-                    ##########
-                    except:
-                        nextPos = None
-                if nextPos is None: # cannot continue with this sPos
-                    break # try the next sPos
-                else:
-                    dollarPoss.append((start+len(pre)+chopped, nextPos+chopped))
-                    start = nextPos
-                # print('********************************************************************')
-            #here we need to match the suf, the last thing
-            if len(dollarPoss) > 0:
-                schemewordSufStart = dollarPoss[-1][1]-chopped # -chopped because we don't have the complete schemeword
-                schemewordSufEnd = len(schemeword) # otherwise we could have +chopped here
-                schemewordSuf = schemeword[schemewordSufStart:schemewordSufEnd]
-                # info('!0!', schemewordSuf, schemewordSufStart, schemewordSufEnd)
-                # info('!0!', dollarPoss)
-                # import pdb;pdb.set_trace()
-                schemewordSufToMatch = schemewordSuf[:len(suf)]
-            else:
-                schemewordSufToMatch = suf
-            # info(schemewordSufToMatch, '<<schemewordSufToMatch', suf)
-            if schemewordSufToMatch == suf and len(dollarPoss) == len(patternSegmentedByDollar) - 1: # we got all the dollarPoss
-                ######
-                # info('returning: ', (sPos+chopped, start+len(suf)+chopped, dollarPoss), '*****')
-                ######
-                return sPos+chopped, start+len(suf)+chopped, dollarPoss
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import
+        self.iStr = iStr;
+        self.schemeparser___iStr = Schemeparser(equationStr=self.iStr)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the others so we do not call schemeparser on iStr again
+        self.ast___iStr, functionsD___iStr, variablesD___iStr, primitives___iStr, totalNodeCount___iStr, self.startPos__nodeId___iStr = self.schemeparser___iStr._parse()
+        self.nodeId__len___iStr = self.schemeparser___iStr.nodeId__len
+        self.nodeStartPos__nodeEndPos___iStr, self.level__nodeStartPos___iStr, self.nodeStartPos__level___iStr, self.nodeId__entityStartPos___iStr = self.schemeparser___iStr._getLevelingInformation()
+        self.userProvided_startPos__nodeId = False
+        if startPos__nodeId: # user provided startPos__nodeId, will be named startPos__nodeId__iStr to reduce confusion and we do not need our own startPos__nodeId if user already provided it
+            self.startPos__nodeId___iStr___OLD = self.startPos__nodeId___iStr
+            self.startPos__nodeId___iStr = startPos__nodeId; 
+            #needs to remap the : to userNodeIds in startPos__nodeId
+            #0. ast___iStr
+            #1. nodeId__len___iStr
+            #BUT for now non of the functions need it so we just keep the old startPos__nodeIde___iStr for future use here
+            self.nodeId__entityStartPos___iStr = self.renameUserGivenSchemeNodeId(self.nodeId__entityStartPos___iStr)
+            #
+            self.userProvided_startPos__nodeId = True#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<this flag was never used????
+        self.newNodeCounter = max(map(lambda t: t[1], self.startPos__nodeId___iStr.items())) # iSchemeparser is the iPattern, not iStr
 
 
-    def findAllSameLevel(self, pattern, schemeword):
-        """
-        1.calls findFirstSameLevel, gets match
-        2.if there is a match, 
-        3.  chops match from schemeword
-        4.  repeat Step 1 with new-chopped-schemeword
-        5.else
-        6.  return all the matches
-
-
-        :param pattern: SchemeGrammar-styled pattern
-        all variables, start with $, and then have a integer that does not
-        start with 0, (except 0 itself, so we can have $0)
-
-        only returns all sub-schemeword, that match pattern, on the TOP-level (i.e. widest)
-        example, schemeword: '(= (+ a b) (+ c d))'
-        will return: 
-        1. (+ a b)
-        2. (+ c d)
-        ONLY
-
-        example, schemeword: '(= (+ a b) (+ (+ c d) e))'
-        will return:
-        1. (+ a b)
-        2. (+ (+ c d) e)
-        ONLY
-
-        :type pattern: str
-        :param schemeword:
-        :type schemeword: str
-
-        :return:
-        :rtype:
-        """
-        import copy
-        # if pattern contains only variables and spaces
-        if not any(map(lambda p: len(p.strip())>0, pattern.split('$'))):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<move this to prepareRawPattern? then use SchemeParser to handle, treat resultant AST as 'enclosureTree'?
-            #TODO refactor to its own function, but must be called here, because there is still going to be bracket-leveling, which is handled by findAll
-            # self.patternOnlyVariablesAndSpaces = True
-            numberOfVariables = pattern.count('$')
-            answers = [] # tuples (startPos, endPos, listOfDollarPoss)
-            if schemeword.startswith('('):#can include the inVarPos in dollarPoss<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                dollarPoss = [] # position of arguments of this level (might be enclosed by brackets or not), also the $ variables
-                #do bracket-matching
-                openBracketPosStack = [0]
-                for i in range(1, len(schemeword)):
-                    c = schemeword[i]
-                    if c == '(':
-                        openBracketPosStack.append(i)
-                    elif c == ')':
-                        matchingOpenBracketPos = openBracketPosStack.pop()
-                        if len(openBracketPosStack) == 1: #we are on direct child level of root bracket
-                            vIdx = len(dollarPoss)
-                            dollarPoss.append((matchingOpenBracketPos, i+1)) # inclusive of closeBracket
-                if len(dollarPoss) == 0: # schemeword has no inner brackets (arguments has no inner brackets)
-                    #variables are delimited by space only.
-                    #but we have to take care to remove the opening/closing brackets
-                    variables = list(filter(lambda x: len(x)>0, schemeword[1:-1].split(' ')))[1:] # [1:] to remove the functionName
-                    vIdx = 0
-                    sPos = 0
-                    ts = copy.deepcopy(schemeword)#its a string, copy will do.......TODO
-                    chopped = 0
-                    while vIdx < len(variables): # getting the positions of arguments(variables) in schemeword (IS schemeword INPUT or OUTPUT)
-                        sPos = ts.index(variables[vIdx])
-                        ePos = sPos + len(variables[vIdx])
-                        vIdx += 1
-                        dollarPoss.append((sPos+chopped, ePos+chopped))
-                        ts = ts[ePos:]
-                        chopped += ePos
-
-                startPos = len(schemeword)
-                endPos = 0
-                #find startPos and endPos
-                for s, e in dollarPoss:
-                    startPos = min(startPos, s)
-                    endPos = max(endPos, e)
-
-                answers = [(startPos, endPos, dollarPoss)]
-            else: #the whole schemeword is a variable/number
-                if numberOfVariables == 1: #there is a match, depends on whether $ is a function or a argument(variable|number?)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<typing REQUIRED
-                    answers = [(0, len(schemeword), [])] # should not consider itself as an argument
-        else:# a pattern with other characters than variables and spaces#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<remove not used
-            # self.patternOnlyVariablesAndSpaces = False
-            answers = []
-            tup = self.findFirstSameLevel(pattern, schemeword)
-            chopped = 0
-            while tup is not None:
-                # import pdb;pdb.set_trace()
-                answers.append(tup)
-                chopped = tup[1]
-                tup = self.findFirstSameLevel(pattern, schemeword[tup[1]:], chopped)
-
-        # info(schemeword)
-        # info(answers)
-        # import pdb;pdb.set_trace()
-        # print('***************findAllSameLevel:')
-        # print(schemeword)
-        # print(answers)
-        # for s, e, seMatches in answers:
-        #     print('matched: ', schemeword[s:e], list(map(lambda t: (t[0], t[1], schemeword[t[0]:t[1]]), seMatches)))
-        # print('********************************')
-        return answers
-
-
-    def findAll(self, pattern, schemeword):
-        """
-        calls findAllSameLevel in a Depth-First-Search Fashion
-
-        1.calls findAllSameLevel, to get all TOP-level-matches
-        2.puts all TOP-level-matches into stack for DFS
-        3.if no more matches from findAllSameLevel for all things remaining in stack, then return collected-matches
-
-        Also, has a #DATA-MASSAGING portion
-        calculates an EnclosureTree, a dict, where
-        key: parentId
-        value: list of childId, belong to parentId, and in the order of appearance of variables in pattern
-
-
-        w: string that matched inputPattern
-        s: start position of matched on OUTPUT string
-        e: end position of matched on OUTPUT string
-        ms: start position of matched relative to parent_matched_str on (OUTPUT?INPUT?) string
-        me: end position of matched relative to parent_matched_str on (OUTPUT?INPUT?) string
-
-        :param pattern: inputPattern
-        :type pattern:
-        :param schemeword: original schemeword (input)
-        :type schemeword:
-
-        :return:
-        :rtype:
-        """
-
-        id__data = {}
-        nodeId = 0
-        current = {
-            'w':schemeword, 'id':nodeId, 'pid':None, 'cms':0, 'cme':len(schemeword), 'ms':0, 'me':len(schemeword), 
-            'matchIdx':None,
-            #'inVar':{}, 'inStatic':{}, 
-            'outVars':[], #'outStatic':{}
-            #default
-            'hin':'', 'vor':''
-        }
-        stack = [current]
-        id__data[nodeId] = current; child__parent = {}
-        while len(stack) > 0:
-            current = stack.pop()
-            word = current['w']
-            parentStart = id__data.get(current['id'], {'cms':0})['cms']
-            matches = self.findAllSameLevel(pattern, word)
-            if current['id'] == 0:
-                current['matchIdx'] = 0 if len(matches) > 0 else None
-            self.extraGeneratedInputValueForMissingVariables = []; matchIdx=0
-            # print('current', current, 'matches', matches, 'parentStart', parentStart); import pdb;pdb.set_trace()
-            # print('id: ', current['id'], '#ofMatches:', len(matches))
-            if matches: # with leaves
-                inVars = []; inputStatics = []
-                for matchIdx, (mStart, mEnd, argPoss) in enumerate(matches):
-                    # if matchIdx == 0:
-                    #     print('nodeId', nodeId, '<<<<<')
-                    #     matchedId = nodeId
-                    inVarPosition = []
-                    # nodeId += 1
-                    inVariables = {}; startOfInputStatic = parentStart+current['ms']+mStart; inputStatic = [] # startEndTuples of absolutePosition of inputTemplate excluding substitutedVariables
-                    for argIdx, ((inVariable, templatePos), argPos) in enumerate(zip(self.inVariablesAndPos, argPoss)): # this is the inputVariables, we assume argPoss was sorted by argPos[0]
-                        #also get the static parts of the inputTemplate
-                        # print(mStart, mEnd, '~~~~', inVariable, argPos); import pdb;pdb.set_trace()
-                        nodeId += 1;
-                        # print('matchIdx:', matchIdx, 'argIdx', argIdx, 'nodeId: ', nodeId)
-                        # print('pid: ', current['id'], 'cid: ', nodeId, ' w: ', word[argPos[0]:argPos[1]], ' <<<<<<<<MATCH')
-                        if matchIdx == 0 and argIdx == 0:
-                            matchedId = nodeId;# mmStart=parentStart+current['ms']+matches[0][0];mmEnd=parentStart+current['ms']+matches[-1][1]
-                        dat = {
-                            'w':word[argPos[0]:argPos[1]],
-                            'id':nodeId,
-                            'pid':current['id'],
-                            'ms':argPos[0],
-                            'me':argPos[1],
-                        }
-                        stack.append(dat)
-                        dat.update({
-                            'cms':parentStart+current['ms']+argPos[0], # this is the matched startposition
-                            'cme':parentStart+current['ms']+argPos[1]  # this is the matched endposition
-                        })
-                        inVarPosition.append(((inVariable, templatePos), dat['cms'], dat['cme'], nodeId))
-                        inVariables[(inVariable, templatePos)] = dat #==nodeId__rootNonMatches_childId__listOfTupStartPosOffset_i <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO remove
-                        inputStatic.append((startOfInputStatic, parentStart+current['ms']+argPos[0]))
-                        startOfInputStatic = parentStart+current['ms']+argPos[1]
-                        id__data[nodeId] = {
-                            # 'w':word[mStart:mEnd],
-                            'w':word[argPos[0]:argPos[1]],
-                            'ms':mStart, 
-                            'me':mEnd, 
-                            'id':nodeId, 
-                            'pid':current['id'],
-                            'cms':parentStart+current['ms'],
-                            'cme':parentStart+current['me'],
-                            'matchIdx':matchIdx,
-                            'inVar':(inVariable, templatePos),
-                            'positionInParent':{'matchIdx':matchIdx, 'inVariable':inVariable, 'templatePos':templatePos},
-                            #
-                            # 'inVar':inVariables,
-
-                            # 'inStatic':dict(zip(self.inStaticsStartEnd, inputStatic)), # tuples from mStart to mEnd, excluding argPoss
-                            'outVars':[],
-                            # 'outStatic':{}
-                        }
-                        # child__parent[nodeId] = current['id']
-                    if len(argPoss) == 0:# there was a match, but no argument matches => there are no arguments in the inputPattern
-                    # if len(self.outVariables) > len(self.variables):
-                        nodeId += 1
-                        if matchIdx == 0:
-                            matchedId = nodeId;
-                        # outValues = self.giveMeNVariableNotInThisList(len(self.outVariables)-len(self.variables), varList=self.extraGeneratedInputValueForMissingVariables)
-                        outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)), varList=self.extraGeneratedInputValueForMissingVariables)
-                        outVariablePos__outVal = {}
-                        # print('self.outVariables', self.outVariables)
-                        for outValue, missingVar in zip(outValues, sorted(list(set(self.outVariables)))):
-                            for outVarPos in list(filter(lambda t: t[0] == missingVar, self.outVariablesAndPos)):
-                                outVariablePos__outVal[outVarPos] = outValue
-
-                        # print(outVariablePos__outVal)
-                        # op = self.outputPattern
-                        op = self.rawOutputPattern
-                        # for outValue, (outVariable, outPos) in reversed(list(zip(outValues, sorted(self.outVariablesAndPos, key=lambda outVarPos: outVarPos[1])))):
-                        for (outVariable, outPos) in reversed(sorted(self.outVariablesAndPos, key=lambda outVarPos: outVarPos[1])):
-                            # op = rs.replaceAtPos(op, outPos, outPos+len(outVariable)-1, outValue)
-                            outValue = outVariablePos__outVal[(outVariable, outPos)]
-                            op = rs.replaceAtPos(op, outPos, outPos+len(outVariable), outValue)
-                            # import pdb;pdb.set_trace()
-                        id__data[nodeId] = {
-                            'w':op,
-                            'ms':mStart,
-                            'me':mEnd,
-                            'id': nodeId,
-                            'pid':current['id'],
-                            'cms':mStart,
-                            'cme':mEnd,
-                            'matchIdx':0,# all same template
-                            'inVar':(self.schemeword[mStart:mEnd], mStart),
-                            # 'inStatic':{},
-                            'outVars':[],
-                            # 'outStatic':{}
-                        }
-                        inVarPosition.append(((self.schemeword[mStart:mEnd], mStart), mStart, mEnd, nodeId))
-                        inVars.append(inVarPosition)
-                        startOfInputStatic = 0 if matchIdx == 0 else matches[matchIdx-1][1]
-                        inputStatic.append((startOfInputStatic, mStart))
-                        # startOfInputStatic = mEnd
-                        inputStatics.append(inputStatic)
-                        #if last match, then add it in
-                        if matchIdx == len(matches)-1:
-                            inputStatics.append([(mEnd, len(self.schemeword))])
-                    else:
-                        inputStatic.append((startOfInputStatic, parentStart+current['ms']+mEnd))
-                        inputStatics.append(dict(zip(self.inStaticsStartEnd, inputStatic)))
-                        inVars.append(inVarPosition)
-                #for calculatePositions
-                id__data[id__data[matchedId]['pid']]['inVars'] = inVars
-                # inStatics = []; start = mmStart#id__data[id__data[matchedId]['pid']]['cms']
-                # print(inVars)
-                # for group in inVars:
-                #     for inVar, absoluteVarStart, absoluteVarEnd in group:
-                #         inStatics.append((start, absoluteVarStart))
-                #         start = absoluteVarEnd
-                # inStatics.append((start, mmEnd))#id__data[id__data[matchedId]['pid']]['cme']))
-                # id__data[id__data[matchedId]['pid']]['inStatics'] = inStatics
-                id__data[id__data[matchedId]['pid']]['inStatics'] = inputStatics
-                #for calculatePositions
-            else:
-                nodeId += 1
-                # print('pid: ', current['id'], 'cid: ', nodeId, ' w: ', word, ' <<<<<<<<NOMATCH')
-                id__data[nodeId] = {
-                    'w':word, 
-                    'ms':current['ms'], 
-                    'me':current['me'], 
-                    'id':nodeId, 
-                    'pid':current['id'],
-                    'cms':parentStart+current['ms'],
-                    'cme':parentStart+current['me'],
-                    'matchIdx':None,
-                    'inVar':(),
-                    # 'inStatic':{},
-                    'outVars':[],
-                    # 'outStatic':{}
-                }
-            # print('******')
-            # print(matchedId)
-            # print('******')
-            #####put in the inVars and inStatics
-            # id__data[id__data[matchedId]['pid']]['inVars'] = inVars
-            # info(stack, '<<<stack')
-            # import pdb;pdb.set_trace()
-                
-        #TODO i jumbled the ms and cms..., please fix, future-me
-        #but quick-fix for now. we know that the absolute-position, will always be the s!=0
-        #DATA-MASSAGING
-        for k, v in id__data.items():
-            takes = 'cms'
-            takee = 'cme'
-            if v[takes] == 0:
-                takes = 'ms'
-                takee = 'me'
-            v.update({
-                's':v[takes],
-                'e':v[takee]
-            })
-            ##########
-            # print('##########')
-            # print('parentId: ', v['pid'])
-            # print(v['cms'], v['cme'], v['ms'], v['me'], (v['cme']-v['cms']), (v['me']-v['ms']))
-            # print('id: ', k, ' s: ', v['s'], ' e: ', v['e'], self.schemeword[v['s']:v['e']], '||| w: ', v['w'], ' same length? ', len(self.schemeword[v['s']:v['e']])==len(v['w']), ' another same length: ', (v['cme']-v['cms'])==(v['me']-v['ms'])); 
-            # import pdb;pdb.set_trace()
-            # print('##########')
-            ##########
-
-        ########################################################
-        enclosureTree = {0:[]}
-        import bisect
-        sortKey = 's'
-        for nodeId, data in id__data.items():
-            if data['pid'] is not None:
-                childIds = enclosureTree.get(data['pid'], [])
-                sortList = list(map(lambda idd: id__data[idd][sortKey], childIds))
-                sortValue = data[sortKey]
-                positionToInsert = bisect.bisect_right(sortList, sortValue)
-                childIds.insert(positionToInsert, nodeId)
-                enclosureTree[data['pid']] = childIds
-                child__parent[nodeId] = data['pid']
-
-        if len(self.variables) == 0:
-            # self.pp.pprint(id__data); import pdb;pdb.set_trace()
-            for nodeIdx, (nodeId, data) in enumerate(sorted(filter(lambda t: t[0] in child__parent, id__data.items()), key=lambda t: t[0])):
-                if nodeId in child__parent:
-                    parentId = child__parent[nodeId]
-                    vorTuple = id__data[parentId]['inStatics'][nodeIdx][0]
-                    id__data[nodeId]['vor'] = self.schemeword[vorTuple[0]:vorTuple[1]]
-                    hinTuple = id__data[parentId]['inStatics'][nodeIdx+1][0]
-                    id__data[nodeId]['hin'] = self.schemeword[hinTuple[0]:hinTuple[1]]
-                    # print('nodeIdx', nodeIdx, 'vorTuple', vorTuple, 'hinTuple', hinTuple);import pdb;pdb.set_trace()
+        if self.mode == 0:
+            self.matchIPattern___MODE0()
+        elif self.mode == 1:
+            self.matchIPattern___MODE1()
+        elif self.mode == 2:
+            self.matchIPattern___MODE2()
         else:
-            for nodeId, data in id__data.items():
+            raise Exception('undefined mode: '+str(self.mode))
 
-                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                # if ((data['cme']-data['cms'])!=(data['me']-data['ms'])): # for pid==0, there will always be vor:"(=";  hin:")"
-                if data['matchIdx'] is not None:
-                    allSiblings = enclosureTree[child__parent[nodeId]] if nodeId in child__parent else [nodeId]
-                    #capture the before_match and after_match here, in manipulate, attach it back
-                    #if there is more than 1 match?, need to take into account the other matches(allSiblings) on the same level<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    #vor: 
-                    positionInSiblingList = allSiblings.index(nodeId)
-                    vorNodeId = allSiblings[positionInSiblingList - 1] if positionInSiblingList > 0 else None
-                    hinNodeId = allSiblings[positionInSiblingList + 1] if positionInSiblingList < len(allSiblings)-1 else None
-                    
-                    wholeChildStr = self.schemeword[data['cms']:data['cme']]#including unmatched parts, only vor and hin
-                    vorNodeData = id__data.get(vorNodeId, {'me':0}); hinNodeData = id__data.get(hinNodeId, {'ms':len(wholeChildStr)})
-                    # print('|', wholeChildStr[vorNodeData['me']:data['ms']], '|'); print('|', wholeChildStr[data['me']:hinNodeData['ms']], '|')
-                    data.update({
-                        'vor':wholeChildStr[vorNodeData['me']:data['ms']], 
-                        'hin':wholeChildStr[data['me']:hinNodeData['ms']]
-                    })
-                    # v.update({
-                    #     'vor':wholeChildStr[:data['ms']], 'hin':wholeChildStr[data['me']:]
-                    # })
-                else:
-                    data.update({
-                        'vor':'', 'hin':''
-                    })
-        ########################################################
+        # print('self.iEnclosureTree', self.iEnclosureTree); import pdb;pdb.set_trace()
+        # if len(self.iEnclosureTree) == 0: # there are no matches#<<<<<<<<<<<<<<<<<<<<<<<<<this criteria is bad for detecting no match. perhaps each MODE should have its own noMatch<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        noOfMatches = self.iId__data[0]['noOfMatches'] # we assume rootId is always 0
+        # print('are there matches?', noOfMatches); import pdb;pdb.set_trace()
+        if noOfMatches == 0:
+            self.oStr = self.iStr
+            self.startPos__nodeId___oStr = self.startPos__nodeId___iStr
+            self.schemeNodeChangeLog = []
+            self.noMatches = True
+        else:
+            # print('noOfMatches', noOfMatches, '')
+            self.mapBetweenEnclosureAndScheme()#should map between enclosureId and schemeId, so that user can use both mapping happily, also give make_startPos__argsCount : self.entityStartPos__schemeEntityNodeId
+            self.make_startPos__argsCount() # this make data for self.skipNode, the data is startPos__argsCount, where we map each iVar to the number of args it contains
+            
+            self.noMatches = False
 
-        # info(id__data)
-        # info(enclosureTree)
-        # import pdb;pdb.set_trace()
-        # print('findAll*****************************************************************')
-        # print(enclosureTree)
-        # self.pp.pprint(id__data); import pdb;pdb.set_trace()
-        return id__data, enclosureTree
-
-
-    def countArgsOfEachVariable(self):
+    def matchIPattern___MODE0(self):
         """
-        we have some matched variable in self.id__data, 
-        some patterns, like derivative|antiderivative acts differently for variables of different argLen
-        so here, we count the argLen of each captured_variable in self.id__data
+        take the rawInputPattern, and search for positions using REGEX,
+        replace the rawOutputPattern's variables with newly created variables, call it filledOutputPattern
+        replace with positions with rawInputPattern with filledOutputPattern
 
-        if the self.variableMinArgs are not satisfied by this count, then we do not substitute and do not add the change to verPosWord
-        
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<anything in "" should be treated as argLen=0, else it is a variable with argLen=1, functions_that_take_at_least_1_arg and above should have argLen>1
+        iStatics are the iPattern matches -  for verWordPos easy calculation
+        there are no iVars...
+        iVors and iHins are those unmatched parts. Mental image:
+
+        vor|iPattern|hin=vor|iPattern|hin=vor|iPattern|hin
+            ~match~~         ~match~~         ~match~~    
+
+        since there are no variables in iPattern, the enclosureTree will only have 2 levels, the first match, and then its regex children (which are considered the iVars for later calculations)
+
+        This method should only produce enclosureTree and id__data [should only contain iVars iStatics(empty) iVors iHins for root. 's', 'e', 'w']
+
         """
-        # self.pp.pprint(self.id__data)
-        for nodeId, data in filter(lambda t: 'inVars' in t[1], self.id__data.items()):
-            for matchGroup in data['inVars']:
-                for (var, templatePos), matchStart, matchEnd, matchNodeId in matchGroup:
-                    variableVal = self.id__data[matchNodeId]['w']
-                    if variableVal.startswith('"') and variableVal.endswith('"'):
-                        argLen = 0 # primitive
-                    elif not variableVal.startswith('(') and not variableVal.endswith(')'): # not a scheme, argLen=0
-                        argLen = 1 # variable #takes a primitive as input
-                    else:# do otherBracketAccounting to count number of variables
-                        argLen = 1 # if there are (), then it must have at least 1 arg
-                        openBra__count___others = {'{':0, '[':0, '"':0}; closeBra__openBra = {'}':'{', ']':'[', '"':'"'} # this is for test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1, where there are compound variables
-                        for idx, c in enumerate(variableVal):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<do bracket_accounting here
-                            #
-                            if c in openBra__count___others.keys():
-                                openBra__count___others[c] += 1
-                            elif c in closeBra__openBra.keys():
-                                openBra__count___others[closeBra__openBra[c]] -= 1
-                            #
-                            if not any(map(lambda count: count!=0, openBra__count___others.values())) and \
-                            (c == ' '): #first part is to allow anything within {} and [] to be counted as 1 entity is a space...
-                                argLen += 1
-                                break
-                    self.id__data[matchNodeId]['argLen'] = argLen
-        # self.pp.pprint(self.id__data)
-
-
-    def prepareRawPattern(self, rawPattern):
-        """
-        We expect users to input scheme-styled rawPattern, with $\d+ as variables.
-        But our program expects only $ as variables. so...
-        Here, we convert $\d+ to $ in the rawPattern, and make a record.
-
-
-        :param rawPattern:
-        :type rawPattern:
-
-        :return:
-        :rtype:
-        """
+        # self.iEnclosureTree = {0:[]};
+        self.iEnclosureTree = {}
+        iStatics = []; iVors = []; iHins = []
         import re
-        import bisect # TODO repeated imports REFACTOR?
-        variables = []
-        # rawVariablesPosList = []
-        variablesAndPos = []
-        for m in re.finditer('(\$\d+)', rawPattern):
-            #rawVariablesPosList.append((m.start(), m.end(), m.group()))
-            # variables.append(m.group())
-            t = (m.group(), m.start())
-            posToInsert = bisect.bisect_left(variablesAndPos, t[1], key=lambda x: x[1])
-            variablesAndPos.insert(posToInsert, t)
-        variables = list(map(lambda t: t[0], variablesAndPos))
-        # import pdb;pdb.set_trace()
-        pattern = re.sub(r'\$\d+', '$', rawPattern) # remove the numbers
-        variablesPosSansVarnumList = []
-        for m in re.finditer('(\$)', pattern):
-            variablesPosSansVarnumList.append(m.start())
-        #rawVariables__variables = dict(zip(rawVariablesPosList, variablesPosList)) # attach to self, if we need this
-        #variables__rawVariables = dict(zip(variablesPosList, rawVariablesPosList)) # attach to self, if we need this
-
-        # print(variablesPosSansVarnumList)
-        #get the (start, end) of pattern(without numbers) without variables, 
-        startPos = 0; staticsStartEnd = []; #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        for pos in variablesPosSansVarnumList:
-            staticsStartEnd.append((startPos, pos))
-            startPos = pos + len('$')
-        staticsStartEnd.append((startPos, len(pattern)))
-        # print('*******************************')#TODO use this map to actual positions
-        # print(staticsStartEnd)
-        # print('*******************************')
-
-        return pattern, variables, variablesAndPos, variablesPosSansVarnumList, staticsStartEnd
-
-
-    def _manipulationPrep(self):
-        """
-
-        1. count each variable in inputPattern and outputPattern
-
-        3. match inVarPos to outVarPos
-        """
-        #actually these only appears in patterns not(self.patternOnlyVariablesAndSpaces), so might be a bit inefficient... but for readability?
-        self.iVars__count = {}
-        for var, pos in self.inVariablesAndPos:
-            self.iVars__count[var] = self.iVars__count.get(var, 0) + 1
-        self.oVars__count = {}
-        for var, pos in self.outVariablesAndPos:
-            self.oVars__count[var] = self.oVars__count.get(var, 0) + 1
-        self.allUniqueVars = set(map(lambda t: t[0], self.inVariablesAndPos)).union(map(lambda t: t[0], self.outVariablesAndPos))
-
-        #3
-        # if len(self.variables) == 0:
-        if len(self.variables) == 0 or self.onlyVariablesAndSpace:
-            # self.inVarPos__outVarPos = dict(zip(sorted(self.inVariablesAndPos, key=lambda t: (t[0], t[1])), sorted(self.outVariablesAndPos, key=lambda t: (t[0], t[1]))))
-            self.outVarPos__inVarPos = {}; self.inVarPos__outVarPos = {}
-        #match same variables to same variables, sorted by position. If less, repeat the original list of variables
-        else:
-            inVar__list_inVarPos = {}
-            for (inVar, inPos) in self.inVariablesAndPos:
-                existing = inVar__list_inVarPos.get(inVar, [])
-                existing.append((inVar, inPos))
-                inVar__list_inVarPos[inVar] = existing
-            outVar__list_outVarPos = {}
-            for (outVar, outPos) in self.outVariablesAndPos:
-                existing = outVar__list_outVarPos.get(outVar, [])
-                existing.append((outVar, outPos))
-                outVar__list_outVarPos[outVar] = existing
-            # print('inVar__list_inVarPos', inVar__list_inVarPos)
-            # print('outVar__list_outVarPos', outVar__list_outVarPos)
-            self.outVarPos__inVarPos = {}; self.inVarPos__outVarPos = {}
-            for variable in self.allUniqueVars:
-                list_inVarPos = inVar__list_inVarPos.get(variable)
-                list_outVarPos = outVar__list_outVarPos.get(variable)
-                if list_inVarPos is not None and list_outVarPos is not None:
-                    if len(list_inVarPos) > len(list_outVarPos):#
-                        repetitions = (len(list_inVarPos)+len(list_outVarPos)-1)//len(list_outVarPos)
-                        list_outVarPos = (list_outVarPos * repetitions)[:len(list_inVarPos)]
-                    elif len(list_inVarPos) < len(list_outVarPos):#
-                        repetitions = (len(list_outVarPos)+len(list_inVarPos)-1)//len(list_inVarPos)
-                        list_inVarPos = (list_inVarPos * repetitions)[:len(list_outVarPos)]
-                    for inVarPos, outVarPos in zip(list(list_inVarPos), list(list_outVarPos)):
-                        if outVarPos not in self.outVarPos__inVarPos: # these matched means that are not removed nor added, only swapped. And we want to swap those that are nearer to the start of the patterns, and remove|add those excess that are further from the patterns
-                            self.outVarPos__inVarPos[outVarPos] = inVarPos
-                            self.inVarPos__outVarPos[inVarPos] = outVarPos
-
-
-    def _getGroupIndices(self, nodeId):
-        return sorted(list(set(map(lambda childId: self.id__data[childId]['matchIdx'], self.enclosureTree[nodeId]))))
-
-    def _nodeIsMatchedNode(self, nodeId):
-        return self._getGroupIndices(nodeId) != [None]
-
-    def manipulate(self, oWord, variables, outputPattern, inputPattern, id__data, enclosureTree, nodeIdsToSkip, existingVariables=None):
-        """
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<summarise this in a few words please
-        BaseCase: 
-            if id__data[nodeId]['matchIdx'] is None:
-                return id__data[nodeId]['w']
-        RecursiveCase:
-            group childIds(nodeId) by id__data[childId]['matchIdx'] -> groups
-            totalStr = '''
-            for each groupIdx, group in groups
-                if childIdx == 0
-                    totalStr = vor+match(replaceStrs(childIds), outputTemplate)+hin
-                else
-                    totalStr += match(replaceStrs(childIds), outputTemplate)+hin
-            return totalStr
-        """
-        # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        # self.pp.pprint(id__data)
-        self.extraGeneratedInputValueForMissingVariables = []
-        self._manipulationPrep();#positionalParent = {}; #relationship where we skip the intermediate_match(variable_node), linking the non-match to match directly
-        parent = {};
-        def _manipulateRecursive(nodeId):#, parentId):
-            #
-            # id__data[nodeId]['es'] = 0; id__data[nodeId]['ee'] = None
-            #
-            #BaseCase # (0) or (1), (0) is normal_case, (1) is inputPattern has no variables
-            if id__data[nodeId]['matchIdx'] is None or nodeId not in enclosureTree:
-                # print(nodeId, 'BC: ', id__data[nodeId]['w'])
-                return id__data[nodeId]['w']
-            #RecursiveCase:
-            groupIndices = self._getGroupIndices(nodeId)
-            # print(groupIndices, '<<<<<<groupIndices')
-            #for calculatePositionsOfChanges
-            # if parentId is not None:
-            #     positionalParent[enclosureTree[nodeId][0]] = parentId
-
-            #for calculatePositionsOfChanges
-            if groupIndices == [None]: #_nodeIsMatchedNode
-                
-                return _manipulateRecursive(enclosureTree[nodeId][0])#, nodeId)#we cannot have more than 1 children with noMatch????
-            totalStr = ''; groupOffset = 0; substitutedPatternTotalLen = 0; outVarPositions = []; outputStatics = []
-            for groupIdx, groupId in enumerate(groupIndices):#matches in this level
-                # print('~~~~~~~~~~~~~~~~~~~~groupId: ', groupId)
-                sortedGroupChildIds = sorted(filter(lambda childId: id__data[childId]['matchIdx']==groupId, enclosureTree[nodeId]), key=lambda childId: id__data[childId]['s'])
-                inVarPos__replaceStr = {}
-                # groupOffset += len(id__data[sortedGroupChildIds[0]]['vor']) if groupIdx == 0 else 0;tempGroupOffset = groupOffset;
-                #groupOutVarPositions = []
-                # print('nodeId: ', nodeId, 'sortedGroupChildIds:', sortedGroupChildIds)
-                for inVarPosIdx, childId in enumerate(sortedGroupChildIds):
-                    parent[childId] = nodeId
-                    replaceStr = _manipulateRecursive(childId)#, nodeId)
-                    # print('pid: ', nodeId, 'cid: ', childId, 'inVar: ', id__data[childId]['inVar'], ' replaceStr: ', replaceStr)
-                    inVarPos = id__data[childId]['inVar']
-                    inVarPos__replaceStr[inVarPos] = replaceStr
-                    if self.onlyVariablesAndSpace:
-                        inVarPos__replaceStr[inVarPos] = replaceStr + id__data[childId]['hin']
-
-                    #for calculatePositionsOfChanges
-                    # outVarPos = self.inVarPos__outVarPos[inVarPos]
-                    # # id__data[childId]['outVar'] = outVarPos
-                    # print('before, adding es ee to ', enclosureTree[childId][0], ' @ ', nodeId);# import pdb;pdb.set_trace()
-                    # startPos = tempGroupOffset+outVarPos[1]; endPos = startPos+len(replaceStr)#needs to be stored in the child of childId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    # id__data[enclosureTree[childId][0]]['es'] = startPos; id__data[enclosureTree[childId][0]]['ee'] = endPos#PLEASE REMOVE NOT NEEDED<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    # #groupOutVarPositions.append((childId, startPos, endPos))
-                    # print('adding es ee to ', enclosureTree[childId][0])
-                    # tempGroupOffset += len(replaceStr) - len(outVarPos[0])
-                    #for calculatePositionsOfChanges
-                #outVarPositions.append(groupOutVarPositions)
-                replacement = outputPattern if len(self.inVariablesAndPos) > 0 else self.schemeword
-                if self.onlyVariablesAndSpace:
-                    replacement = self.schemeword
-                replacementListVariableAndPos = list(reversed(self.outVariablesAndPos)) if len(self.inVariablesAndPos) > 0 else list(reversed(sorted(map(lambda childId: id__data[childId]['inVar'], enclosureTree[nodeId]), key=lambda t: t[1])))
-                if self.onlyVariablesAndSpace:
-                    replacementListVariableAndPos = list(reversed(sorted(map(lambda childId: id__data[childId]['inVar'], enclosureTree[nodeId]), key=lambda t: t[1])))
-                # print('nodeId: ', nodeId)
-                # print('minArgs:', self.variablesMinArgs[self.id__data[nodeId]['inVar'][0]], 'argLen:', self.id__data[nodeId]['argLen'])import pdb;pdb.set_trace()
-                if nodeId in nodeIdsToSkip or \
-                ('argLen' in self.id__data[nodeId] and 'inVar' in self.id__data[nodeId] and self.id__data[nodeId]['argLen'] < self.variableMinArgs.get(self.id__data[nodeId]['inVar'][0], 0)):
-                    replacement = inputPattern; replacementListVariableAndPos = list(reversed(self.inVariablesAndPos))
-
-                # print('before*********************************')
-                # print('replacement: ', replacement)
-                # print('inVarPos__replaceStr', inVarPos__replaceStr)
-                # print('replacementListVariableAndPos', list(replacementListVariableAndPos))
-                #adding 
-                # if len(self.variables) > 0 and len(set(self.outVariables)) > len(set(self.variables)): # (len(self.variables)==0) is handled in findAll
-                if len(self.variables) > 0 and len(set(self.outVariables)-set(self.variables)) > 0:
-                    # outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)) - len(set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
-                    outValues = self.giveMeNVariableNotInThisList(len(set(self.outVariables)-set(self.variables)), varList=self.extraGeneratedInputValueForMissingVariables)
-                    outValues = sorted(outValues)
-                    # print('outValues: ', outValues)
-                    for outValue, missingVar in zip(outValues, sorted(list(set(self.outVariables)-set(self.variables)))):
-                        for outVarPos in list(filter(lambda t: t[0] == missingVar, replacementListVariableAndPos)):
-                            inVarPos__replaceStr[outVarPos] = outValue
-                            # id__data[nodeId]['inVars'][groupIdx].append((outVarPos, ))
-                            d = id__data[nodeId].get('addedOutVals', {})
-                            d[outVarPos] = outValue
-                            id__data[nodeId]['addedOutVals'] = d
-                    #add to id__data[nodeId]['addedOutVars'] for calculatePosition later...
-
-                
-                # print('after*********************************')
-                # print('replacement: ', replacement)
-                # print('inVarPos__replaceStr', inVarPos__replaceStr)
-                # print('replacementListVariableAndPos', list(replacementListVariableAndPos))
-                # import pdb;pdb.set_trace()
-                for outVarPos in replacementListVariableAndPos:#outVar can only be calculated here.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    # print('outVarPos', outVarPos); import pdb;pdb.set_trace()
-                    replaceStr = inVarPos__replaceStr[self.outVarPos__inVarPos.get(outVarPos, outVarPos)]# the default case is when the inputPattern has no variables
-                    # print('replacing at: ', outVarPos[1], outVarPos[1]+len(outVarPos[0]), ' with ', replaceStr);
-                    replacement = rs.replaceAtPos(replacement, outVarPos[1], outVarPos[1]+len(outVarPos[0]), replaceStr)
-                    # import pdb;pdb.set_trace()
-                    #for calculatePositionsOfChanges
-                    # startPos = tempGroupOffset+outVarPos[1]; endPos = startPos+len(replaceStr)#needs to be stored in the child of childId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    # groupOutVarPositions.append((outVarPos, startPos, endPos))
-                    # tempGroupOffset += len(replaceStr) - len(outVarPos[0])
-
-                    #for calculatePositionsOfChanges
-                    #need to capture the new position of the variables in outputPattern
-                    # print('replaced String: ', '|'+replacement+'|')
-                #for calculatePositionsOfChanges
-                # print('list(reversed(replacementListVariableAndPos))', list(reversed(replacementListVariableAndPos)))
-                groupOffset += len(id__data[sortedGroupChildIds[0]]['vor']) if groupIdx == 0 else 0;tempGroupOffset = groupOffset;
-                # if groupIdx == 0:
-                #     id__data[nodeId]['es'] = groupOffset # relativeStart
-                groupOutVarPositions = []; outputStatic = []; staticStart = tempGroupOffset if len(variables) > 0 and not self.onlyVariablesAndSpace else 0
-                # print('init~~~~ staticStart:', staticStart)
-                for sortedGroupChildId, outVarPos in enumerate(reversed(replacementListVariableAndPos), 1):
-                    replaceStr = inVarPos__replaceStr[self.outVarPos__inVarPos.get(outVarPos, outVarPos)]# the default case is when the inputPattern has no variables
-                    
-                    startPos = tempGroupOffset+outVarPos[1] if len(variables) >0 and not self.onlyVariablesAndSpace else tempGroupOffset
-                    endPos = startPos+len(replaceStr)
-                    outputStatic.append((staticStart, startPos)); staticStart = endPos
-                    groupOutVarPositions.append((outVarPos, startPos, endPos))
-                    # print('***');import pdb;pdb.set_trace()
-                    if self.onlyVariablesAndSpace:
-                        tempGroupOffset += len(replaceStr) # replaceStr already contains id__data[sortedGroupChildId]['hin']
-                    else:
-                        tempGroupOffset += len(replaceStr) - len(outVarPos[0]) if len(variables) >0 else len(replaceStr) + len(id__data[sortedGroupChildId]['hin'])
-                outVarPositions.append(groupOutVarPositions)
-                # outputStatic.append((staticStart, tempGroupOffset))
-                # outputStatics.append(outputStatic)
-                # id__data[nodeId]['ee'] = tempGroupOffset
-                ####
-                # substitutedPatternTotalLen += len(replacement)
-                # groupOffset += substitutedPatternTotalLen;#substitutedPatternTotalLen = 0
-
-                groupOffset += len(replacement)
-                ####
-                if len(variables) > 0 and not self.onlyVariablesAndSpace:
-                    outputStatic.append((staticStart, groupOffset))
-                    outputStatics.append(dict(zip(self.outStaticsStartEnd, outputStatic)))
-                else:
-                    pass
-                # print('matchId:', groupIdx, outputStatic); import pdb;pdb.set_trace()
-                #for calculatePositionsOfChanges
-                if groupIdx == 0:
-                    replacement = id__data[sortedGroupChildIds[0]]['vor']+replacement+id__data[sortedGroupChildIds[-1]]['hin'] if len(self.inVariablesAndPos) > 0 and not self.onlyVariablesAndSpace else replacement
-                    # id__data[nodeId]['ee'] = groupOffset
-                else:
-                    replacement = replacement+id__data[sortedGroupChildIds[-1]]['hin'] if len(self.inVariablesAndPos) > 0 and not self.onlyVariablesAndSpace else replacement
-                #for calculatePositionsOfChanges
-                groupOffset += len(id__data[sortedGroupChildIds[-1]]['hin'])
-                #for calculatePositionsOfChanges
-                totalStr += replacement
-                if len(variables) == 0:
-                    outputStatic.append((staticStart, len(totalStr)))
-                    outputStatics.append(outputStatic)
-                # print('resulting outoutStatics: ', outputStatic); import pdb;pdb.set_trace()
-            id__data[nodeId]['outVars'] = outVarPositions
-            id__data[nodeId]['outStatics'] = outputStatics
-            return totalStr
-        outputStr = _manipulateRecursive(0)#, None)
+        escapedInputPattern = re.escape(self.iPattern)
+        #list_tuple_startPos_endPos___sorted are all the matches|iStatics|enclosureChildren, and will be stored and used later as such
+        list_tuple_startPos_endPos___sorted = sorted(list(map(lambda m: (m.start(), m.end(), m.group()), re.finditer(escapedInputPattern, self.iStr))), key=lambda t: t[0])
         
-        #outVars already in relativePosition, even wrt to group(matches)
-        #adding whatever is infront of it in the parent as outVars+self.vor
-        for nodeId, data in sorted(filter(lambda t: len(t[1]['outVars']) > 0, id__data.items()), key=lambda t: t[0]):# we assume the bigger the nodeId, the higher in the enclosureTree, a pseudo-DFS
-            parentId = parent.get(nodeId)
-            if parentId is not None:
-                thisOutVarPos = self.inVarPos__outVarPos[data['inVar']]; thePOutVarIdx = None;# thisMatchIdx = data['matchIdx'];
-                for pOutVarIdx, ((outVar, outPos), _, _) in enumerate(id__data[parentId]['outVars'][data['matchIdx']]):
-                    if thisOutVarPos == (outVar, outPos):
-                        thePOutVarIdx = pOutVarIdx
-                        break
-                #add up everything before id__data[parentId]['outVars'][:data['matchIdx']] and id__data[parentId]['outVars'][data['matchIdx']][:thePOutVarIdx]#this excludes thePOutVarIdx
-                offset = id__data[parentId]['outVars'][data['matchIdx']][thePOutVarIdx][1]
-                outVar___new = []
-                for matchId, group in enumerate(data['outVars']):
-                    newGroup = []
-                    for (var, outPatternPos), relativeStartPos, relativeEndPos in group:
-                        #################################################################
-                        # print('adding offset: ', offset, ' shiftOffset: ', shiftOffset, ' totalOffset: ', (offset+shiftOffset), 'to nodeId ', nodeId, ' outVar: ', (var, outPatternPos), 'relativeStartPos', relativeStartPos, 'relativeEndPos', relativeEndPos, '=========')
-                        # newGroup.append(((var, outPatternPos), shiftOffset+offset+relativeStartPos, shiftOffset+offset+relativeEndPos))
-                        newGroup.append(((var, outPatternPos), offset+relativeStartPos, offset+relativeEndPos))
-                        # newGroup.append(((var, outPatternPos), shiftOffset+relativeStartPos, shiftOffset+relativeEndPos))
-                    outVar___new.append(newGroup)
-                id__data[nodeId]['outVars'] = outVar___new
-                #outStatics
-                outStatics___new = []
-                for matchId, group in enumerate(data['outStatics']):
-                    newGroup = []
-                    for sStart, sEnd in group.values():
-                        newGroup.append((offset+sStart, offset+sEnd))
-                    outStatics___new.append(dict(zip(self.outStaticsStartEnd, newGroup)))
-                id__data[nodeId]['outStatics'] = outStatics___new
+        self.iId__data = {0:{'noOfMatches':len(list_tuple_startPos_endPos___sorted), 'matchIdx':0, 's':0, 'e':len(self.iStr), 'vars':[]}}
+        # iVors.append([(0, list_tuple_startPos_endPos___sorted[0][0])]); prevHinVorStart = list_tuple_startPos_endPos___sorted[0][1]
+        if len(list_tuple_startPos_endPos___sorted) > 0:
+            self.iEnclosureTree = {0:[]};
+        # else:#<<<<<<<<noMatch<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        for idx, (startPos, endPos, group) in enumerate(list_tuple_startPos_endPos___sorted):
+            nodeId = idx+1
+            self.iEnclosureTree[0].append(nodeId)
+            iStatics.append([(startPos, endPos)]) # each match is 1 static
+            if idx == 0:
+                iVors.append((0, startPos))
+            else:
+                prevIdx = idx-1; prevEndPos = list_tuple_startPos_endPos___sorted[prevIdx][1]
+                iVors.append((prevEndPos, startPos))
+                iHins.append((prevEndPos, startPos))
+            self.iId__data[nodeId] = {'noOfMatches':0, 's':startPos, 'e':endPos, 'w':self.iPattern, 'id':nodeId, 'matchIdx':idx}
+        #capture the straggler
+        iHins.append((list_tuple_startPos_endPos___sorted[-1][1], len(self.iStr)))
+        self.iId__data[0]['statics'] = iStatics
+        self.iId__data[0]['vors'] = iVors
+        self.iId__data[0]['hins'] = iHins
 
-        #special case for len(variables) == 0
-        if len(variables) == 0:
-            """
-            flatten inVars
-            """
-            new___inVars = []
-            for inVarDataList in self.id__data[0]['inVars']:
-                new___inVars.append(inVarDataList[0])
-            self.id__data[0]['inVars'] = [new___inVars]
-            #
-            # self.outVarPos__inVarPos = dict(zip(
-            #     list(map(lambda l: (l[1], l[2]), self.id__data[0]['outVars'][0])),
-            #     list(map(lambda l: (l[1], l[2]), self.id__data[0]['inVars'][0]))
-            # ))
-            # self.pp.pprint(self.id__data)
-            # self.pp.pprint(self.outVarPos__inVarPos)
-            # import pdb;pdb.set_trace()
+
+    def matchIPattern___MODE1(self):
+        # print('MODE1********************************')
+        """ mental image:
+        There should be no static except for the space between variables, because static is defined as nonvariables in the inputPattern and outputPattern
+        This is for 1 enclosureId:
+        vor|$0 $0 $1 $2 $0 $0 $1 $2 $0 $0 $1 $2|hin=vor
+            ~~~match~~~ ~~~match~~~ ~~~match~~~
+        The vor and hin are delimited by s___parent and e___parent, meaning that there can be a lot of schemeNodes in the vor and hin, but there is at least one schemeNode
+        validNonOverlappingMatches are sorted (by schemeStartPosition children), 
 
 
 
+        calls schemeparser.parse on schemeword to get ast, map startEndPos and substrings from schemeword to the nodeId of ast
+        then make slidingWindow of length=len(#_of_variables_of_pattern), on ast, to produce enclosureTree (matches), if there are not enough args on ast, then its no match
+        
+        after matching, we should check_for_consistency_of_variables, so in the match all $0 should be equals, ...
+        inputPattern: '$0 $0 $1 $1', so in the sliding window the first2 matches must be equals, and the last2 matches must be equals
 
+        after check_for_consistency_of_variables
 
-        # positionalEnclosureTree = {}
-        # for child, parent in positionalParent.items():
-        #     existing = positionalEnclosureTree.get(parent, [])
-        #     existing.append(child)
-        #     positionalEnclosureTree[parent] = existing
-        #####
-        # import pprint; pp = pprint.PrettyPrinter(indent=4)
-        # print('positionalParent*****')
-        # pp.pprint(positionalParent)
-        # pp.pprint(positionalEnclosureTree)
-        # print('positionalParent*****')
-        #####
+        regarding inVars:
+        because there is only 1 variable in inputPattern, so each match in this nodeId, should only have 1 tuple in each list, and each match is in a list.
+        so, if there are 2 variables in inputPattern, there will be 2 tuples in each match|list
+        in general, if there are n variables in inputPattern, there will be n tuples in each match|list
 
-        # for parent, children in sorted(positionalEnclosureTree.items(), key=lambda t: t[0]):# we assume the bigger the nodeId, the higher in the enclosureTree, a pseudo-DFS
-        #     for childId in children:
-        #         id__data[childId]['es'] += id__data[enclosureTree[parent][0]]['es']
-        #         id__data[childId]['ee'] += id__data[enclosureTree[parent][0]]['es']
-        #         print('adding ', id__data[enclosureTree[parent][0]]['es'], ' to nodeId: ', childId, id__data[childId]['es'], id__data[childId]['ee'], '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
-        self.getPositionsOfChanges()
-
-        return outputStr
-
-
-    def getPositionsOfChanges(self):
+        regarding inStatics:
+        if inputPattern has only 1 variable, then there should only have 2Statics, in general if there are n variables in inputPattern, then there should be (n+1)Statics for each match in this nodeId
         """
-# a nodeId is matched only if all its children have matchId, children_of_enclosureTree are inputVariables, we can get a corresponding set of outputVariables
+        #make the enclosureTree from schemeTree first, so that it is easier to reason with
+        #some schemeTree arguments might not fit the inputPattern, or has less arguments than there are variables in inputPattern
+        #so we need to do those 2 filters on the schemeTree to get the enclosureTree.
+        def makeSlidingWindowMatches(childNodes, windowLen):
+            matches = []
+            for offset in range(0, len(childNodes)-windowLen+1):
+                matches.append(childNodes[offset:offset+windowLen])
+            return matches
+        # self.schemeparser___iStr = Schemeparser(equationStr=self.iStr)
+        # ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = self.schemeparser___iStr._parse()
+        nodeId__startPos = dict(map(lambda t: (t[1], t[0]), self.startPos__nodeId___iStr.items()))
+        def getStartPosition(nodeId):
+            sp = nodeId__startPos[nodeId]
+            if sp>0 and self.iStr[sp-1]=='(':
+                return sp-len('(')
+            return sp
+        # nodeId__len = self.schemeparser___iStr.nodeId__len # is len the entire length? for schemeFunctions, is it inclusive of brackets
+        #
+        # print('nodeId__startPos:', nodeId__startPos);
+        # print('nodeId__len: ', nodeId__len);
+        # import pdb;pdb.set_trace()
+        #
+        enclosureTreeId = self.getEnclosureNodeId(); self.iEnclosureTree = {enclosureTreeId:[]}; self.iId__data = {enclosureTreeId:{}}
+        queue = [{'schemeNode':self.schemeparser___iStr.rootOfTree, 'enclosureId':enclosureTreeId}]; enclosureTreeId += 1
+        noOfVariables = self.iPattern.count('$')
+        # self.noMatches = True #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<then if found any valid matches, then set to false
+        while len(queue) > 0:
+            cN = queue.pop(0)
+            (parentSchemeLabel, parentSchemeId) = cN['schemeNode']; parentEnclosureId = cN['enclosureId']
+            children = self.ast___iStr.get((parentSchemeLabel, parentSchemeId), []) # get need (parentSchemeLabel, parentSchemeId)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            # print(children)
+            children = sorted(children, key=lambda child: getStartPosition(child[1]))
+            # print('children: ', children)
+            # print('len(children) >= noOfVariables', len(children) >= noOfVariables); import pdb;pdb.set_trace()
+            if len(children) >= noOfVariables:# we can do a match#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                matches = makeSlidingWindowMatches(children, noOfVariables)
+                #need to do var__val matching, to check for inconsistency before we can declare this as a enclosureTreeNodeId?
+                # validMatches = [];
+                #along the way, we get the inVar and inStatic
+                # inVars = []; inStatics = [];
+                validMatchesWithPos = []
+                for matchIdx, match in enumerate(matches):
+                    firstSchemeNodeId = match[0][1];
+                    schemeStartPos = getStartPosition(firstSchemeNodeId);
+                    # inVar = []; inStatic = []; # is it better to capture the inVar and inStatic after the overlapping check?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    var__val = {}; consistent = True
+                    zipped = list(zip(self.iSortedVariablesAndPosition, match)); zipped__len = len(zipped)
+                    matchWithPos = []
+                    for idx, (inVarPos, (schemeLabel, schemeNodeId)) in enumerate(zipped):#match is a list of schemeNodeId
+                        var_i, patternInVarStartPos = inVarPos; 
+                        schemeStartPos = getStartPosition(schemeNodeId); schemeEndPos = schemeStartPos+self.nodeId__len___iStr[schemeNodeId]# if nodeId__startPos maps schemeFunction like () to the position_of_openRoundBracket, then it is right, if nodeId__startPos maps schemeFunction like () to the position_of_openRoundBracket+1, then it is wrong
+                        matchWithPos.append({'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId})
+                        #for consistency matching
+                        if var_i in var__val:
+                            matchedVal = schemeword[schemeStartPos:schemeEndPos]
+                            if matchedVal != var__val[var_i]:
+                                consistent = False
+                                break
+                            var__val[var_i] = matchedVal
+                        #
+                        # for capturing statics
+                        if idx != zipped__len-1:#we add a static after each variable (which is just a space), except for the last variable, after which there is no space
+                            (_, patternInVarStartPos___next), (_, schemeNodeId___next) = zipped[idx+1]
+                            # inStatic[(patternInVarStartPos+len(var_i), patternInVarStartPos___next)] = (schemeEndPos, getStartPosition(schemeNodeId___next))
+                            # inStatic.append((schemeEndPos, getStartPosition(schemeNodeId___next)))
 
+                        # for capturing inVars
+                        # inVar.append((inVarPos, schemeStartPos, schemeEndPos, None))#here we need to put in the enclosureNodeId, but it is not created yet until we get to nonOverlapping
+                        #
+                    if consistent: #then we keep this match, its inStatic and inVar in validMatches
+                        validMatchesWithPos.append(matchWithPos)
+                        # validMatches.append(match); 
+                        # inVars.append(inVar); inStatics.append(inStatic)
+                #
+                # print('validMatchesWithPos', validMatchesWithPos); import pdb;pdb.set_trace()
+                
+                # if len(validMatches) > 0:
+                if len(validMatchesWithPos) > 0:#this method is just a filter
+                    #only get the most number of validMatches that are nonOverlapping
+                    lastEndPos = -1#for checking overlap, since we are doing GreedyParadigm, we will always take the first validMatches
+                    # validNonOverlappingMatches = []; 
+                    # inVars___nonOverlapping = []; inStatics___nonOverlapping = [];
+                    validNonOverlappingMatchesWithPos = [];
+                    # for matchIdx, match in enumerate(validMatches):
+                    for matchIdx, match in enumerate(validMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
+                        schemeStartPos = match[0]['schemeStartPos']
+                        # print('0 match: ', match); import pdb;pdb.set_trace()
+                        # schemeStartPos = getStartPosition(match[0][1]) # match[0] is schemeNode, [1] is the nodeId
+                        if lastEndPos <= schemeStartPos:
+                            #capture
+                            validNonOverlappingMatchesWithPos.append(match)
+                            # validNonOverlappingMatches.append(match);
+                            # inVars___nonOverlapping.append(inVars[matchIdx]); inStatics___nonOverlapping.append(inStatics[matchIdx])
+                            # print('inVars__nonOverlapping, capture: ', inVars___nonOverlapping); import pdb;pdb.set_trace()
+                            #
+                            #update lastEndPos
+                            # schemeEndPos = getStartPosition(match[-1][1])+self.nodeId__len___iStr[match[-1][1]]
+                            schemeEndPos = match[-1]['schemeEndPos']
+                            lastEndPos = schemeEndPos
+                    #
+                    # print('validNonOverlappingMatchesWithPos', validNonOverlappingMatchesWithPos); import pdb;pdb.set_trace()
+                    # if len(validNonOverlappingMatches) > 0:
+                    if len(validNonOverlappingMatchesWithPos) > 0:
+                        # self.noMatches = False #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<then if found any valid matches, then set to false
+                        """ mental image:
+                        There should be no static except for the space between variables, because static is defined as nonvariables in the inputPattern and outputPattern
+                        This is for 1 enclosureId:
+                        vor|$0 $0 $1 $2 $0 $0 $1 $2 $0 $0 $1 $2|hin=vor
+                            ~~~match~~~ ~~~match~~~ ~~~match~~~
+                        The vor and hin are delimited by s___parent and e___parent, meaning that there can be a lot of schemeNodes in the vor and hin, but there is at least one schemeNode
+                        validNonOverlappingMatches are sorted (by schemeStartPosition children), 
+                        """
+                        #here each match is a new enclosureTreeId
+                        s___parent = getStartPosition(parentSchemeId); e___parent = s___parent+self.nodeId__len___iStr[parentSchemeId]; # also used to get vorhin 
+                        list_existingChild = self.iEnclosureTree.get(parentEnclosureId, []); 
+                        #getting the vor
+                        # print('validNonOverlappingMatchesWithPos', validNonOverlappingMatchesWithPos); import pdb;pdb.set_trace()
+                        vorStartPos = s___parent; vorEndPos = validNonOverlappingMatchesWithPos[0][0]['schemeStartPos']#getStartPosition(validNonOverlappingMatches[0][0][1]); # firstSchemeNodeIdOfFirstMatch
+                        # lastSchemeNodeIdOfLastMatch = validNonOverlappingMatches[-1][-1][1]
+                        # hinStartPos = getStartPosition(lastSchemeNodeIdOfLastMatch)+self.nodeId__len___iStr[lastSchemeNodeIdOfLastMatch]; 
 
-        1. if the inputTemplate has no variables, then the whole inputTemplate will be removed, and replaced by the whole outputTemplate
+                        # hinEndPos = e___parent
+                        hinStartPos = validNonOverlappingMatchesWithPos[-1][-1]['schemeEndPos'];hinEndPos = e___parent
+                        iVars = []; iStatics = []; iVors = []; iHins = [];
+                        iVors.append((vorStartPos, vorEndPos))
+                        # for matchIdx, match in enumerate(validNonOverlappingMatches): # each match is a enclosureTreeId
+                        for matchIdx, match in enumerate(validNonOverlappingMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
+                            enclosureTreeId = self.getEnclosureNodeId()
+                            #maybe this should be recorded in the self.iId__data also? at least the inVars, what else can be recorded here? surely only the in not the out...?<<<<<<<<<<
+                            list_existingChild.append(enclosureTreeId)
+                            #also capture the iVar & iStatic
+                            iVar = []; iStatic = []; staticStartPos = vorEndPos
+                            #need to put children_attached_with_enclosureTreeId back into the queue
+                            for varIdx, d in enumerate(match): # each d is a variable in the iPattern
+                                # print('d',d); import pdb;pdb.set_trace()
+                                queue.append({'schemeNode':(d['schemeLabel'], d['schemeNodeId']), 'enclosureId':enclosureTreeId}) # there will not be a childSchemeId with 2 different enclosureTreeId, because matches are nonOverlapping.
+                                iVar.append((d['schemeStartPos'], d['schemeEndPos']))
+                                if varIdx != len(match)-1:#static are not at the start&end of iPattern, so we take the end of each var to the start of each var as the static, which should be a single space
+                                    nextD = match[varIdx-1]
+                                    iStatic.append((d['schemeEndPos'], nextD['schemeStartPos']))
+                            iVars.append(iVar); iStatics.append(iStatic)
 
+                            # for i, _ in enumerate(inVars___nonOverlapping[matchIdx]):
+                            #     toList = list(inVars___nonOverlapping[matchIdx][i]) # convert to a list so that tuple can be modified
+                            #     toList[-1] = enclosureTreeId
+                                # inVars___nonOverlapping[matchIdx][i] = tuple(toList)
 
-        2. VARIABLE CHANGES
-            0. more|less of a variable when comparing inputPattern to outputPattern
-                for each match_node
-            1. positional shifts of a variable when comparing inputPattern to outputPattern
+                            #fill up the inVars
+                            # print('match:', match, "s:", schemeStartPos, "e:", schemeEndPos); import pdb;pdb.set_trace()
+                            #
+                            #update self.iId__data for child
+                            # print('inVars___nonOverlapping', inVars___nonOverlapping); print('matchIdx', matchIdx); import pdb;pdb.set_trace()
+                            s = iVars[matchIdx][0][0]; #s is the start of inVars
+                            e = iVars[matchIdx][-1][-1]; # e is the end of inVars
+                            if enclosureTreeId in self.iId__data:# might be a parent too so has some answers
+                                self.iId__data[enclosureTreeId].update({
+                                    # 'id':enclosureTreeId,
+                                    's':s,
+                                    'e':e,
+                                    'w':self.iStr[s:e],
+                                    'matchIdx':matchIdx,
+                                    'pid':parentEnclosureId
+                                })
+                                # print('0enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
+                            else:#this is totally new
+                                self.iId__data[enclosureTreeId] = {
+                                    # 'id':enclosureTreeId,
+                                    'noOfMatches':0,
+                                    's':s,
+                                    'e':e,
+                                    'w':self.iStr[s:e],
+                                    'matchIdx':matchIdx,
+                                    'pid':parentEnclosureId
+                                }
+                                # print('1enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
+                            # enclosureTreeId += 1
+                        iHins.append((hinStartPos, hinEndPos))
+                        self.iEnclosureTree[parentEnclosureId] = list_existingChild
+                        #parentSchemeId's start and end position without all the matches, are the hin and vor?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        
+                        self.iId__data[parentEnclosureId] = {
+                            # 'id':parentEnclosureId,
+                            'noOfMatches':len(validNonOverlappingMatchesWithPos),
+                            'statics':iStatics, # this should contain all the spaces between each variable in the inputPattern
+                            'vars':iVars,
+                            'hins':iHins,
+                            'vors':iVors,
+                            's':s___parent,
+                            'e':e___parent,
+                            'w':self.iStr[s:e],
+                            # 'vor':self.iStr[vorStartPos:vorEndPos],
+                            # 'hin':self.iStr[hinStartPos:hinEndPos]
+                        }
+                        #
+                        #update self.iId__data too
+                    else:# all valid matches, overlap, i am not sure how this can happen?
+                        for (childSchemeLabel, childSchemeId) in children:
+                            queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
 
-        3. NON_VARIABLE CHANGES # could be done in prepareRawPattern?
+                else:# only have inconsistent matches, all matches have some variables that disagree on values matched
+                    for (childSchemeLabel, childSchemeId) in children:
+                        queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
+
+            else:#not enough schemeArgs to match inputPatternVariables
+                for (childSchemeLabel, childSchemeId) in children:
+                    queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
+
+        # print('***')
+        # self.pp.pprint(self.iId__data);
+        # self.pp.pprint(self.iEnclosureTree);
+        # import pdb;pdb.set_trace()
+        #calculate__startPos__nodeId can be done here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        return self.iId__data, self.iEnclosureTree # TODO do not have to return here
+
+    def matchIPattern___MODE2(self):
         """
-        self.verPosWord = []
-        #1
-        # if len(self.variables) == 0:
-        #     self.pp.pprint(self.id__data)
-        #     import pdb;pdb.set_trace()
+        The mental image is like this:
+
+        #vor inStatic $0 inStatic $1...inStatic hin=vor inStatic $0 inStatic $1...inStatic hin=vor... inStatic $0 inStatic $1... inStatic hin
+             ~~~~~~~~~~~~~~MATCH~~~~~~~~~~~~~~~         ~~~~~~~~~~~~~~~MATCH~~~~~~~~~~~~~~            ~~~~~~~~~~~~~~~~MATCH~~~~~~~~~~~~~~
+        
+        0. parse the iStr with SchemeParser
+
+        1. segment the iPattern by variables.
+        2. use index to find each segment, in order, and according to schemeStartPositions
+        3. between each matched_segment is the variable (so that each variable is schemeCompliant)
+        4. for each variable, goto 0
+        """
+        # self.schemeparser___iStr = Schemeparser(equationStr=self.iStr)
+
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<check skipNode for code_duplication, it seems that nodeStartPos__nodeEndPos is also needed for skipNode
+        # ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = self.schemeparser___iStr._parse()
+        # nodeId__len = self.schemeparser___iStr.nodeId__len
+        # nodeStartPos__nodeEndPos, level__nodeStartPos, nodeStartPos__level, _ = self.schemeparser___iStr._getLevelingInformation()
+        #
+        def getAllSchemeLevelCompliantPositionAfter(currentPosition, currentLevel):
+            return list(filter(lambda startPos: startPos>=currentPosition, self.level__nodeStartPos___iStr[currentLevel]))
 
 
-        #2
-        allVariablePossRemoved = []; allVariablePossAdded = []
-        for variable in self.allUniqueVars:
-            inxCount = self.iVars__count.get(variable, 0); outCount = self.oVars__count.get(variable, 0)
-            # print('~~~~~~~~~~~~~~~~~~~~~ inxCount: ', inxCount, ' outCount: ', outCount)
-            if inxCount > outCount: #0.0.1|0.1, we assume that the last variable were removed
-                variablesRemoved = sorted(filter(lambda t: t[0]==variable, self.inVariablesAndPos), key=lambda t: t[1])[outCount-inxCount:]
-                allVariablePossRemoved+=variablesRemoved
-                #need the relative_position_of_id_data; lengths of its previousArguments_of_inputPattern, to get its actual position 
-            elif outCount > inxCount: #0.0.0|0.2, we assume that the last variable was added
-                variablesAdded = sorted(filter(lambda t: t[0]==variable, self.outVariablesAndPos), key=lambda t: t[1])[inxCount-outCount:]
-                allVariablePossAdded+=variablesAdded
-        matchedNodeIds = sorted(list(filter(lambda nodeId: self._nodeIsMatchedNode(nodeId), self.enclosureTree.keys())))#we assume that larger the nodeId the larger
-        # print('allVariablePossRemoved', allVariablePossRemoved); print('self.inVariablesAndPos', self.inVariablesAndPos)
-        # print('allVariablePossAdded', allVariablePossAdded); print('self.outVariablesAndPos', self.outVariablesAndPos)
-        # print('matchedNodeIds', matchedNodeIds)
+        # self.noMatches = True #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<then if found any valid matches, then set to false
+        self.iId__data = {}; self.iEnclosureTree = {}
+        def recursiveMatch(absoluteStartPos, absoluteEndPos, parentNodeId): # recursiveMatch is called on each matchedVariable and also the initial_string
+            noMatch = False
+            iPatternSegments = self.iPatternSansNum.split(self.variableStartMarker); currentPointerPosition = absoluteStartPos;
+            iVars = []; iStatics = []; iHins = []; iVors = []; noOfMatches = 0
+            while not noMatch and currentPointerPosition < len(self.iStr):#there might be more than 1 matches on s
+                iVar = []; iStatic = [];
+                matchedSchemeLevel = None; #all matches on this enclosureNode, might not be on the same schemeLevel, so we have to None matchedSchemeLevel on every match
+                for segmentIdx, ips in enumerate(iPatternSegments):
+                    if segmentIdx == 0:
+                        try:
+                            staticStartPos = currentPointerPosition+self.iStr[currentPointerPosition:absoluteEndPos].index(ips)#s already chopped, no need to chop again
+                        except:
+                            noMatch = True
+                            break
+                        #vorHin Capture
+                        vorHin = (currentPointerPosition, staticStartPos)
+                        if len(iVors) == 0:
+                            iVors.append(vorHin)
+                        else: # middle vorHin, add to both
+                            iVors.append(vorHin); iHins.append(vorHin)
+                        iStatic.append((staticStartPos, staticStartPos+len(ips))) #capture
+                        currentPointerPosition = staticStartPos + len(ips) # also =startOfIVar
+                        matchedSchemeLevel = self.nodeStartPos__level___iStr[staticStartPos]#this is schemeLevel=0 in iPattern
+                    else: # we have to find the next scheme_level_compliant position, that also matches ips, because ONLY variables must be scheme_level_compliant, and in this MODE2, segments do not have to be scheme_level_compliant
+                        foundSegmentMatch = False
+                        iVarIdxInISortedVariablesAndPosition = len(iVar)
+                        # var___i, iPos = self.iSortedVariablesAndPosition[iVarIdxInISortedVariablesAndPosition]
+                        var___i, iPos = self.iSortedVariablesAndPositionSansNum[iVarIdxInISortedVariablesAndPosition]
+                        # print('self.iSortedVariablesAndPositionSansNum', self.iSortedVariablesAndPositionSansNum); import pdb;pdb.set_trace()
+                        iVarLevel = self.nodeStartPos__level___ip[iPos] # level in iPattern, need to convert iPatternSchemeLevel to iStrSchemeLevel
+                        list_schemeLevelCompliantStartPos = getAllSchemeLevelCompliantPositionAfter(currentPointerPosition, matchedSchemeLevel+iVarLevel)# matchedSchemeLevel=schemeLevel_in_iStr=schemeLevel0_in_iPattern, iVarLevel=schemeLevel_in_iPattern_of_iVar, so to get the schemeLevel_of_iVar_in_iStr=matchedSchemeLevel+(iVarLevel-0)
+                        # print('currentPointerPosition: ', currentPointerPosition)
+                        # print('currentLevel: ', matchedSchemeLevel+iVarLevel)
+                        # print('ips', ips)
+                        # print('list_schemeLevelCompliantStartPos', list_schemeLevelCompliantStartPos); import pdb;pdb.set_trace()
+                        for schemeStartPos in list_schemeLevelCompliantStartPos:
+                            schemeEndPos = self.nodeStartPos__nodeEndPos___iStr[schemeStartPos]
+                            if self.iStr[schemeEndPos:schemeEndPos+len(ips)] == ips:#this ensure ips_matching, using schemeEndPos instead of schemeStartPos, because schemeStartPos marks beginning_of_variable
+                                foundSegmentMatch = True
+                                staticStartPos = schemeStartPos
+                                iVar.append((schemeStartPos, schemeEndPos)) # capture
+                                iStatic.append((schemeEndPos, schemeEndPos+len(ips))) # capture
+                                currentPointerPosition = schemeEndPos + len(ips)
+                                # print('ips match found'); import pdb;pdb.set_trace()
+                                break
+                        if not foundSegmentMatch: #even if there is one segment that does not match
+                            # print('foundSegmentMatch'); import pdb;pdb.set_trace()
+                            noMatch = True
+                # if len(iVar) > 0:#, but might not be a complete match... has to be a complete match<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                if len(iVar) == len(self.iSortedVariablesAndPositionSansNum):
+                    iVars.append(iVar); iStatics.append(iStatic)
+                    # print('captureing iStatic: ', iStatic); import pdb;pdb.set_trace()
+                    noOfMatches += 1
 
-        #2.0
-        for nodeId, data in filter(lambda t: t[0] in matchedNodeIds, self.id__data.items()):
-            # print(nodeId)
-            #
-            for group in data['inVars']:
-                for inVarPos, absStart, absEnd, cNodeId in group:
-                    if inVarPos in allVariablePossRemoved and cNodeId not in self.nodeIdsToSkip:
-                        self.verPosWord.append({#could have included information on which variable of the outputTemplate
-                        'd': 'r', 'e': absEnd, 'n': cNodeId, 's': absStart, 't': 'n', 'v': inVarPos[0], 'w': self.id__data[self.enclosureTree[nodeId][0]]['w']
-                        })
-            #
-            for group in data['outVars']:
-                for outVarPos, absStart, absEnd in group:
-                    if outVarPos in allVariablePossAdded and nodeId not in self.nodeIdsToSkip:
-                        if outVarPos[0] not in self.variables: # for the case where (len(self.outVariables)>len(self.variables))
-                            w = self.id__data[nodeId]['addedOutVals'][outVarPos];
+
+            if len(iVars) > 0: # something was captured
+                #store the parent in id__data
+                self.iId__data[parentNodeId] = {
+                    's': absoluteStartPos, 'e': absoluteEndPos, 'w': self.iStr[absoluteStartPos:absoluteEndPos],
+                    'vars':iVars, 'statics':iStatics, 'vors':iVors, 'hins':iHins, 'noOfMatches':noOfMatches
+                }
+
+                #capture the stragglering Hin
+                lastMatchedStaticEndPos = iStatics[-1][-1][-1]
+                iHins.append((lastMatchedStaticEndPos, absoluteEndPos))
+                #
+                #recurse on each variable
+                self.iEnclosureTree[parentNodeId] = []
+                # print('iVars: ', iVars); import pdb;pdb.set_trace()
+                for iVar in iVars:
+                    for varStartPos, varEndPos in iVar:
+                        varNodeId = self.getEnclosureNodeId()
+                        self.iEnclosureTree[parentNodeId].append(varNodeId)
+                        recursiveMatch(varStartPos, varEndPos, varNodeId)
+                #
+            else:
+                self.iId__data[parentNodeId] = {
+                    'w':self.iStr[absoluteStartPos:absoluteEndPos],
+                    's':absoluteStartPos,
+                    'e':absoluteEndPos, 'noOfMatches':noOfMatches
+                }
+
+        recursiveMatch(0, len(self.iStr), self.getEnclosureNodeId())# 0:absoluteStartPos
+        # print('id__data:')
+        # self.pp.pprint(self.iId__data)
+        # print('enclosureTree:')
+        # self.pp.pprint(self.iEnclosureTree)
+        # import pdb;pdb.set_trace()
+
+
+
+    def mapBetweenEnclosureAndScheme(self):#This is only for iId__data... do it for oId__data too please<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+        """
+        map from (enclosureId,MatchId)->root_of_iPattern
+        mainly used for checking user provided skip node in scheme
+        If it is MODE1, then the root_of_iPattern will be the schemeNodeId of the first $ that was matched
+
+        SO user must only provide the schemeId of the root_of_iPattern that they wish to skip, we will not DFS for them... for now
+
+
+        """
+        self.tuple_enclosureId_matchId__schemeIdRootOfIPattern = {}
+        if self.mode == 0 or self.mode == 2:
+            rootOfIPatternSchemeId = self.iSchemeparser.rootOfTree[1]
+            startPos_rootOfIPatternSchemeId = list(filter(lambda t: t[1]==rootOfIPatternSchemeId, self.startPos__nodeId___ip.items()))[0][0]
+            for matchedEnclosureId in self.iEnclosureTree.keys():#only the keys of iEnclosureTree are matches
+                for matchId, staticMatch in enumerate(self.iId__data[matchedEnclosureId]['statics']):
+                    absoluteStartPosOfMatch = staticMatch[0][0]
+                    absoluteStartPosRootOfIPattern = absoluteStartPosOfMatch + startPos_rootOfIPatternSchemeId
+                    schemeIdRootOfIPattern = self.startPos__nodeId___iStr[absoluteStartPosRootOfIPattern]
+                    self.tuple_enclosureId_matchId__schemeIdRootOfIPattern[(matchedEnclosureId, matchId)] = schemeIdRootOfIPattern
+                    # print('check'); import pdb;pdb.set_trace()
+        else: # self.mode == 1
+
+            for matchedEnclosureId in self.iEnclosureTree.keys():
+                for matchId, variableMatch in enumerate(self.iId__data[matchedEnclosureId]['vars']):
+                    absoluteStartPosOfMatch = variableMatch[0][0]
+                    #for scheme, the start of any scheme_str is always ( or a single schemeNode
+                    #if it is (, then the startPos of its root is always after (
+                    #else, it is the startPos of the single schemeNode
+                    if self.iStr[absoluteStartPosOfMatch] == '(':
+                        absoluteStartPosMatchRoot = absoluteStartPosOfMatch+len('(')
+                    else: # single schemeNode
+                        absoluteStartPosMatchRoot = absoluteStartPosOfMatch
+                    #
+                    schemeIdRootOfIPattern = self.startPos__nodeId___iStr[absoluteStartPosMatchRoot]
+                    self.tuple_enclosureId_matchId__schemeIdRootOfIPattern[(matchedEnclosureId, matchId)] = schemeIdRootOfIPattern
+
+
+
+
+        self.tuple_enclosureId_matchId__iVarPos__schemeIdRoot = {} # this only applies to MODE1 or MODE2
+        if self.mode == 1 or self.mode == 2:
+            for matchedEnclosureId in self.iEnclosureTree.keys():
+                for matchId, variableMatch in enumerate(self.iId__data[matchedEnclosureId]['vars']):
+                    iVarPos__schemeIdRoot = {}
+                    for iVarPos, (absoluteVarStartPos, absoluteVarEndPos) in zip(self.iSortedVariablesAndPosition, variableMatch):
+                        if self.iStr[absoluteVarStartPos] == '(':
+                            absoluteStartPosMatchRoot = absoluteVarStartPos+len('(')
                         else:
-                            w = self.id__data[self.enclosureTree[nodeId][0]]['w'] # default
-                        self.verPosWord.append({#could have included information on which variable of the inputTemplate
-                        'd': 'a', 'e': absEnd, 'n': nodeId, #added nodeId is from the outputString, which is not directly on the enclosureTree
-                        's': absStart, 't': 'n', 'v': outVarPos[0], 'w': w
+                            absoluteStartPosMatchRoot = absoluteVarStartPos
+                        schemeIdRootOfIPattern = self.startPos__nodeId___iStr[absoluteStartPosMatchRoot]
+                        iVarPos__schemeIdRoot[iVarPos] = schemeIdRootOfIPattern
+                    self.tuple_enclosureId_matchId__iVarPos__schemeIdRoot[(matchedEnclosureId, matchId)] = iVarPos__schemeIdRoot
+
+
+
+    def parse(self, nodeIdsToSkip=[], variableMinArgs={}, variableMaxArgs={}):
+        """
+
+        after the startPos__nodeId done in buildEnclosureTree, the user can choose, what nodeIdsToSkip, or they can use the enclosureTree to choose (but not user friendly because need extra mapping from user)
+
+        :
+        """
+        if getattr(self, 'iEnclosureTree', None) is None or self.iEnclosureTree is None: # make the user call it, so that they can plan what nodeIdsToSkip to use
+            raise Exception('please call buildEnclosureTree first')
+
+        # if len(self.iEnclosureTree) == 0: # there are no matches
+        if self.noMatches:
+            return self.oStr
+
+        self.newOEnclosureNodeCounter = -1
+
+        self.nodeIdsToSkip = nodeIdsToSkip; self.variableMinArgs = variableMinArgs; self.variableMaxArgs = variableMaxArgs
+
+        self.iEnclosureTreeId__oEnclosureTreeId = {}
+        self.oEnclosureTreeId__iEnclosureTreeId = {}
+
+        self.oVarPos__iVarPos = {}; self.iVarPos__oVarPos = {}
+
+        self.list_oEnclosureIdSkipped = []
+        self.list_iEnclosureIdSkipped = []
+
+        if self.mode == 0:
+            # self.mapIOVariables()#no iVar, not needed
+            self.prepValsForExtraOVarsForEachMatch()
+            self.generateOStr___MODE0()
+            self.oEnclosureTreeId__iEnclosureTreeId = dict(map(lambda t: (t[1], t[0]), self.iEnclosureTreeId__oEnclosureTreeId.items()))
+            self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
+            if self.userProvided_startPos__nodeId:
+                self.calculate__startPos__nodeId()
+        elif self.mode == 1:
+            self.mapIOVariables()
+            self.prepValsForExtraOVarsForEachMatch()
+            self.generateOStr___MODE1()
+            self.oEnclosureTreeId__iEnclosureTreeId = dict(map(lambda t: (t[1], t[0]), self.iEnclosureTreeId__oEnclosureTreeId.items()))
+            self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
+            if self.userProvided_startPos__nodeId:
+                self.calculate__startPos__nodeId()
+        elif self.mode == 2:
+            self.mapIOVariables()
+            self.prepValsForExtraOVarsForEachMatch()
+            self.generateOStr___MODE2()
+            self.oEnclosureTreeId__iEnclosureTreeId = dict(map(lambda t: (t[1], t[0]), self.iEnclosureTreeId__oEnclosureTreeId.items()))
+            self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
+            if self.userProvided_startPos__nodeId:
+                self.calculate__startPos__nodeId()
+
+        return self.oStr
+
+    def prepValsForExtraOVarsForEachMatch(self):
+        self.list_extraVars = list(set(self.oUniqueVariables) - set(self.iUniqueVariables))
+        self.nodeId__matchIdx__outVarPos__outVal = {}; usedVariables = []
+        # print('self.iId__data: '); self.pp.pprint(self.iId__data)
+        for nodeId, data in self.iId__data.items():
+            if 'statics' in data: #this node is a match
+                self.nodeId__matchIdx__outVarPos__outVal[nodeId] = {}
+                for matchIdx, match in enumerate(data.get('statics', [])): # not using inVars as a matchIdx, because MODE0 does not have inVars, but has inStatics
+                    self.nodeId__matchIdx__outVarPos__outVal[nodeId][matchIdx] = {}
+                    # print('self.list_extraVars', self.list_extraVars); import pdb;pdb.set_trace()
+                    #generate extra outVarPos
+                    if len(self.list_extraVars) > 0:
+                        for oVarExtra in self.list_extraVars:
+                            val = self.giveMeNVariableNotInThisList(1, usedVariables)
+                            usedVariables += val
+                            for outVarPos in filter(lambda outVarPos: outVarPos[0] == oVarExtra, self.oSortedVariablesAndPositionSansNum):
+                                self.nodeId__matchIdx__outVarPos__outVal[nodeId][matchIdx].update({outVarPos:val[0]})
+
+    def generateOStr___MODE0(self):
+        """Mental Image (there will only be 1 match node which is nodeId=0, because this is just regex match:
+
+        vor|iPattern|hin=vor|iPattern|hin=vor|iPattern|hin
+            ~match~~         ~match~~         ~match~~    
+
+
+        Any variables in oPattern are filled with giveMeNVariableNotInThisList, and then each match|iPattern in iStr are replaced with the filled_oPattern
+
+        vor|outStatic oVarVal outStatic oVarVal outStatic|hin=vor|outStatic oVarVal outStatic oVarVal outStatic|hin=vor|outStatic oVarVal outStatic oVarVal outStatic|hin
+            ~~~~~~~~~~~~~~~~~~~~~~match~~~~~~~~~~~~~~~~~~         ~~~~~~~~~~~~~~~~~~match~~~~~~~~~~~~~~~~~~~~~~         ~~~~~~~~~~~~~~~~~~match~~~~~~~~~~~~~~~~~~~~~~
+        
+        +vor
+        for matchIdx in self.iId__data[0]['inStatics']:
+            +filled_oPattern
+            +hin
+
+        """
+
+        # print('self.iId__data')
+        # self.pp.pprint(self.iId__data); 
+        # import pdb;pdb.set_trace()
+
+        oEnclosureTreeId = self.getOEnclosureNodeId()
+        self.iEnclosureTreeId__oEnclosureTreeId[0]=oEnclosureTreeId
+        self.oId__data = {}; self.oEnclosureTree = {oEnclosureTreeId:[]};#should each oVar have its oEnclosureId, just like the other 2 MODEs?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        oStr = ''
+        oVors = []; oHins = []; oStatics = []; oVars = []
+        parentId = 0
+        matchIdx__outVarPos__outVal = self.nodeId__matchIdx__outVarPos__outVal[parentId]
+        # print("self.iId__data[parentId]['iVors']"); self.pp.pprint(self.iId__data[parentId]['iVors']); import pdb;pdb.set_trace()
+        iVorStartPos, iVorEndPos = self.iId__data[parentId]['vors'][0]
+        oVorStartPos = len(oStr)
+        oStr = self.iStr[iVorStartPos:iVorEndPos]
+        # print('0 oStr: ', '|'+oStr+'|'); import pdb;pdb.set_trace()
+        oVorEndPos = len(oStr)
+        oVors.append((oVorStartPos, oVorEndPos))
+        
+        for matchIdx, enclosureChildId in enumerate(self.iEnclosureTree[parentId]):
+            oStatic = [];oVar = []; 
+            skipThisNodeMatch = self.skipNode(parentId, matchIdx)
+            # print('skipThisNodeMatch', skipThisNodeMatch, 'enclosureChildId', enclosureChildId, 'matchIdx', matchIdx)
+            if skipThisNodeMatch:
+                oStaticStartPos = len(oStr)
+                oStr += self.iPatternSansNum # putting it back
+                oStaticEndPos = len(oStr)
+                oStatic.append((oStaticStartPos, oStaticEndPos))
+                #
+                oEnclosureId = self.getOEnclosureNodeId()
+                self.oEnclosureTree[oEnclosureTreeId].append(oEnclosureId)
+                self.iEnclosureTreeId__oEnclosureTreeId[enclosureChildId]=oEnclosureTreeId
+                self.oId__data[oEnclosureId] = {'s':oStaticStartPos, 'e':oStaticEndPos, 'w':val, 'noOfMatches':0}
+                #
+                self.list_oEnclosureIdSkipped.append(oEnclosureId)
+                self.list_iEnclosureIdSkipped.append(enclosureChildId)
+            else: # put in the oPattern
+                
+                for staticIdx, oVarPos in enumerate(self.oSortedVariablesAndPositionSansNum):
+                    oPatternStaticStartPos, oPatternStaticEndPos = self.oStaticPatternStartEndPositionSansNum[staticIdx]
+                    static = self.oPatternSansNum[oPatternStaticStartPos:oPatternStaticEndPos]
+                    oStaticStartPos = len(oStr)
+                    oStr += static
+                    oStaticEndPos = len(oStr)
+                    oStatic.append((oStaticStartPos, oStaticEndPos))
+                    #
+                    oVarStartPos = len(oStr)
+                    val = matchIdx__outVarPos__outVal[matchIdx][oVarPos]
+                    oStr += val
+                    oVarEndPos = len(oStr)
+                    #
+                    oEnclosureId = self.getOEnclosureNodeId()
+                    self.oEnclosureTree[oEnclosureTreeId].append(oEnclosureId)
+                    self.iEnclosureTreeId__oEnclosureTreeId[enclosureChildId]=oEnclosureTreeId
+                    self.oId__data[oEnclosureId] = {'s':oVarStartPos, 'e':oVarEndPos, 'w':val, 'noOfMatches':0}
+                    #
+                    oVar.append((oVarStartPos, oVarEndPos))
+                oPatternStaticStartPos, oPatternStaticEndPos = self.oStaticPatternStartEndPositionSansNum[-1]
+                static = self.oPatternSansNum[oPatternStaticStartPos:oPatternStaticEndPos]
+                oStaticStartPos = len(oStr)
+                oStr += static
+                oStaticEndPos = len(oStr)
+                oStatic.append((oStaticStartPos, oStaticEndPos))
+                
+            #
+            oVars.append(oVar)
+            oStatics.append(oStatic); 
+            #
+            iHinStartPos, iHinEndPos = self.iId__data[parentId]['hins'][matchIdx]
+            # print('iHinStartPos: ', iHinStartPos, 'iHinEndPos:', iHinEndPos)
+            hin = self.iStr[iHinStartPos:iHinEndPos]
+            oVorHinStartPos = len(oStr)
+            oStr += hin
+            # print('2 oStr: ', '|'+oStr+'|'); import pdb;pdb.set_trace()
+            oVorHinEndPos = len(oStr)
+            oHins.append((oVorHinStartPos, oVorHinEndPos))
+            if matchIdx != len(self.iEnclosureTree[parentId])-1: # not the last
+                oVors.append((oVorHinStartPos, oVorHinEndPos))
+        self.oId__data[oEnclosureTreeId] = {
+            's':0, 'e':len(oStr), 'w':oStr,
+            'vors':oVors, 'hins':oHins, 'statics':oStatics, 'vars':oVars, 'noOfMatches':len(self.iEnclosureTree[parentId])
+        }
+        self.oStr = oStr
+        # print('oStr:', self.oStr)
+        ####
+        # print('self.iId__data')
+        # self.pp.pprint(self.iId__data); 
+        # print('self.oId__data')
+        # self.pp.pprint(self.oId__data); 
+        # import pdb;pdb.set_trace()
+
+        return self.oStr
+
+    def generateOStr___MODE1(self):
+        """
+
+        mental image:
+        There should be no static except for the space between variables, because static is defined as nonvariables in the inputPattern and outputPattern
+        This is for 1 enclosureId:
+        vor|$0 $0 $1 $2 $0 $0 $1 $2 $0 $0 $1 $2|hin
+            ~~~match~~~ ~~~match~~~ ~~~match~~~
+        The vor and hin are delimited by s___parent and e___parent, meaning that there can be a lot of schemeNodes in the vor and hin, but there is at least one schemeNode
+        validNonOverlappingMatches are sorted (by schemeStartPosition children), 
+
+
+        need to find outputStr [mental image]:
+
+        This is for 1 enclosureId:
+        vor|outStatic$0outStatic$2outStatic outStatic$0outStatic$2outStatic outStatic$0outStatic$2outStatic|hin
+            ~~~~~~~~~~~~~match~~~~~~~~~~~~~ ~~~~~~~~~~~~~match~~~~~~~~~~~~~ ~~~~~~~~~~~~~match~~~~~~~~~~~~~
+
+
+        vor + [from parentNodeData]
+        for each match
+          for childId|var in match
+            + static [from parentNodeData]
+            + base_case_will_get_the_variable_match
+          + static [from parentNodeData]
+          +[space_between_matches_that_is_not_captured_in_id__data]
+        + hin [from parentNodeData]
+
+        
+
+        """
+        oRootEnclosureId = self.getOEnclosureNodeId()
+        self.oId__data = {}; self.oEnclosureTree = {}
+        # parent = {}; # this is the inverted self.iEnclosureTree
+        def recursiveGenerate(nodeId, oNodeId):#change nodeId to iNodeId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            # print('nodeId: ', nodeId, nodeId not in self.iEnclosureTree); import pdb;pdb.set_trace()
+            self.iEnclosureTreeId__oEnclosureTreeId[nodeId] = oNodeId
+            if 'vars' not in self.iId__data[nodeId]: # is not a Match node
+                # print('nodeId: ', nodeId, 'returning', self.iId__data[nodeId]['w'])
+                # print('returned! nodeId:', nodeId)
+                return self.iId__data[nodeId]['w']
+            # print('did not return: ', nodeId)
+            matchIdx__outVarPosExtra__outVal = self.nodeId__matchIdx__outVarPos__outVal[nodeId]
+            list_replacement = []; 
+            oVars = []; oStatics = []; oVors = []; oHins = []
+            # outVorRelativeStartPos = 
+            # print('self.iId__data["nodeId"]["iVors"]', self.iId__data[nodeId]['iVors']); import pdb;pdb.set_trace()
+            vorStartPos, vorEndPos = self.iId__data[nodeId]['vors'][0]
+            matchRelativeStartPos = vorEndPos - vorStartPos; 
+
+            self.oEnclosureTree[oNodeId] = []
+            # skipThisNode = self.skipNode(nodeId)
+            oStr = ''
+            oVorStartPos = len(oStr)
+            oStr += self.iStr[vorStartPos:vorEndPos];
+            oVorEndPos = len(oStr)
+            oVors.append((oVorStartPos, oVorEndPos))
+            relativeStaticStartPos = 0
+            matches = self.iId__data[nodeId].get('vars', [])
+            for matchIdx, match in enumerate(matches):
+                skipThisNodeMatch = self.skipNode(nodeId, matchIdx)
+                if skipThisNodeMatch:
+                    sortedVariablesAndPosition = self.iSortedVariablesAndPositionSansNum
+                    staticPatternStartEndPosition = self.iStaticPatternStartEndPositionSansNum#iMatch is done SanPosition, so here with have to use SanPosition
+                    pattern = self.iPatternSansNum
+                else:
+                    sortedVariablesAndPosition = self.oSortedVariablesAndPositionSansNum
+                    staticPatternStartEndPosition = self.oStaticPatternStartEndPositionSansNum
+                    pattern = self.oPatternSansNum
+                # print('staticPatternStartEndPosition: ', staticPatternStartEndPosition); import pdb;pdb.set_trace()
+                oStatic = []; oVar = [];
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<after this please also correct MODE1
+                for varIdx, varPos in enumerate(sortedVariablesAndPosition):
+                    #static # in MODE1, this will be outside the varForLoop
+                    patternStaticStartPos, patternStaticEndPos = staticPatternStartEndPosition[varIdx] # the static at the front of varPos
+                    staticFrag = pattern[patternStaticStartPos:patternStaticEndPos]
+                    staticRelativeStartPos = len(oStr)
+                    oStr += staticFrag
+                    staticRelativeEndPos = len(oStr)
+                    oStatic.append((staticRelativeStartPos, staticRelativeEndPos))
+                    #
+                    #variable
+                    oChildEnclosureId = self.getOEnclosureNodeId()
+                    self.oEnclosureTree[oNodeId].append(oChildEnclosureId)
+                    if skipThisNodeMatch:#use iVarPos
+                        childIdxInEnclosureTree = matchIdx * len(self.iSortedVariablesAndPositionSansNum) + varIdx
+                        childNodeId = self.iEnclosureTree[nodeId][childIdxInEnclosureTree]
+                        val = recursiveGenerate(childNodeId, oChildEnclosureId)
+                        self.list_oEnclosureIdSkipped.append(oNodeId)
+                        self.list_iEnclosureIdSkipped.append(nodeId)
+                    else:#use oVarPos, need to map back to iVarPos to get childNodeId, 
+                        if varPos in self.oVarPos__iVarPos:
+                            iVarPos = self.oVarPos__iVarPos[varPos]
+                            iVarIdx = self.iSortedVariablesAndPositionSansNum.index(iVarPos)
+                            childIdxInEnclosureTree = matchIdx * len(self.iSortedVariablesAndPositionSansNum) + iVarIdx
+                            childNodeId = self.iEnclosureTree[nodeId][childIdxInEnclosureTree]
+                            val = recursiveGenerate(childNodeId, oChildEnclosureId)
+                        else:#if unable to map back, then get from generatedExtraVals
+                            # print('varPos:', varPos)
+                            # print('matchIdx__outVarPosExtra__outVal[matchIdx]', matchIdx__outVarPosExtra__outVal[matchIdx]); import pdb;pdb.set_trace()
+                            val = matchIdx__outVarPosExtra__outVal[matchIdx][varPos]
+                    staticVariableStartPos = len(oStr)
+                    oStr += val
+                    staticVariableEndPos = len(oStr)
+                    if oChildEnclosureId in self.oId__data:
+                        self.oId__data[oChildEnclosureId].update({
+                            's':0, 'e': len(val), 'w':val
                         })
+                    else:
+                        self.oId__data[oChildEnclosureId] = {
+                            's':0, 'e': len(val), 'w':val, 'noOfMatches':0
+                        }
+                    oVar.append((staticVariableStartPos, staticVariableEndPos))
+                    #
+                oPatternStaticStartPos, oPatternStaticEndPos = self.oStaticPatternStartEndPositionSansNum[-1]
+                staticFrag = pattern[oPatternStaticStartPos:oPatternStaticEndPos]
+                staticRelativeStartPos = len(oStr)
+                oStr += staticFrag
+                staticRelativeEndPos = len(oStr)
+                oStatic.append((staticRelativeStartPos, staticRelativeEndPos))
+                oStatics.append(oStatic); oVars.append(oVar)
+                #the space that was not captured, between non_overlapping_matches
+                if matchIdx != len(matches) - 1:# do not add a space to the last match
+                    oStr += ' '
+
+                #
+            iHinStartPos, iHinEndPos = self.iId__data[nodeId]['hins'][-1]
+            hin = self.iStr[iHinStartPos:iHinEndPos] # hin String
+            oHinStartPos = len(oStr)
+            oStr += hin
+            oHinEndPos = len(oStr)
+            oHins.append((oHinStartPos, oHinEndPos))
+            self.oId__data[oNodeId] = {
+                'vors':oVors, 'statics':oStatics, 'vars':oVars, 'hins':oHins,
+                's':0,# currently in relative position
+                'e':len(oStr),# currently in relative position
+                'w':oStr, 'noOfMatches':len(matches)
+            }
+
+            return oStr
+            #calculatePositionsOfChange relative to this nodeId
+
+            #
+
+        self.oStr = recursiveGenerate(0, oRootEnclosureId)# assume the enclosureTreeId is always 1
+        # print('****************************')
+        # print('self.oStr: ', self.oStr)
+        # self.pp.pprint(self.oEnclosureTree); self.pp.pprint(self.oId__data)
+        """
+
+        vor|outStatic$0outStatic$2outStatic outStatic$0outStatic$2outStatic outStatic$0outStatic$2outStatic|hin
+            ~~~~~~~~~~~~~match~~~~~~~~~~~~~ ~~~~~~~~~~~~~match~~~~~~~~~~~~~ ~~~~~~~~~~~~~match~~~~~~~~~~~~~
+
+        
+        if a child is it's parent's matchIdx and variableIdx
+        for each [vor|static|variable|hin] THING, we only have to add the THING immediately before it in its parent's match
+
+        each match come from the parent's variable, and in MODE1, the THING before the parent's variable is always static
+        so we just have to add static to everyTHING in the child
 
 
-        #2.1
+        to all the child's oDatum
+        """
+        queue = [0]
+        while len(queue) > 0:
+            parentEnclosureId = queue.pop(0)
+            childEnclosureIds = self.oEnclosureTree.get(parentEnclosureId, [])
+            queue += childEnclosureIds
+            #pointer
+            parentDatum = self.oId__data[parentEnclosureId]
+            #
+            for oMatchIdxTimesVarIdx, childEnclosureId in enumerate(childEnclosureIds):
+                #
+                oMatchIdxInParent = oMatchIdxTimesVarIdx // len(self.oSortedVariablesAndPosition);
+                oVarIdxInParent = oMatchIdxTimesVarIdx % len(self.oSortedVariablesAndPosition)
+                #
+                # print('parentEnclosureId', parentEnclosureId, 'parentDatum', parentDatum)
+                # import pdb;pdb.set_trace()
+                offset__byParentStatic = parentDatum['statics'][oMatchIdxInParent][oVarIdxInParent][-1]#endPos of static in the parent, just before the variable=thisChild, this is inclusive of the offset__vor
+                self.oId__data[childEnclosureId]['s'] += offset__byParentStatic#child is a variableInParent, the immediateTHINGbeforeChildInParent is the static
+                #offset children oVors
+                oVors___new = []
+                for oVorStartPos, oVorEndPos in self.oId__data[childEnclosureId].get('vors', []):
+                    oVors___new.append((oVorStartPos+offset__byParentStatic, oVorEndPos+offset__byParentStatic))
+                if len(oVors___new) > 0:
+                    self.oId__data[childEnclosureId]['vors'] = oVors___new
+                #offset children oStatic
+                oStatics___new = []
+                for oStatic in self.oId__data[childEnclosureId].get('statics', []):
+                    oStatic___new = []
+                    for oStaticStartPos, oStaticEndPos in oStatic:
+                        oStatic___new.append((oStaticStartPos+offset__byParentStatic, oStaticEndPos+offset__byParentStatic))
+                    oStatics___new.append(oStatic___new)
+                if len(oStatics___new) > 0:
+                    self.oId__data[childEnclosureId]['statics'] = oStatics___new
+                #offset children oVars
+                oVars___new = []
+                for oVar in self.oId__data[childEnclosureId].get('vars', []):
+                    oVar___new = []
+                    for oVarStartPos, oVarEndPos in oVar:
+                        oVar___new.append((oVarStartPos+offset__byParentStatic, oVarEndPos+offset__byParentStatic))
+                    oVars___new.append(oVar___new)
+                if len(oVars___new) > 0:
+                    self.oId__data[childEnclosureId]['vars'] = oVars___new
+                #offset children oHins
+                oHins___new = []
+                for oHinStartPos, oHinEndPos in self.oId__data[childEnclosureId].get('hins', []):
+                    oHins___new.append((oHinStartPos+offset__byParentStatic, oHinEndPos+offset__byParentStatic))
+                if len(oHins___new) > 0:
+                    self.oId__data[childEnclosureId]['hins'] = oHins___new
+                #
+                self.oId__data[childEnclosureId]['e'] += offset__byParentStatic
+
+        # self.pp.pprint(self.oId__data); import pdb;pdb.set_trace()
+        # print('****************************')
+        # print('self.oStr: ', self.oStr)
+        # self.pp.pprint(self.oEnclosureTree); self.pp.pprint(self.oId__data); import pdb;pdb.set_trace()
+        return self.oStr
+
+    def generateOStr___MODE2(self):
+        """
+        Mental image for each matched enclosureId (in this example there are 2 matches of the inputPattern):
+        vor|inStatic$0inStatic$1inStatic$2inStatic|hin=vor|inStatic$0inStatic$1inStatic$2inStatic|hin
+            ~~~~~~~~~~~~~match~~~~~~~~~~~~~~~~~~~~         ~~~~~~~~~~~~~~~~match~~~~~~~~~~~~~~~~~    
+
+
+        There are the same number of matches for outputStr, and everything in the match can change including the outStatic. But, the vor|hin must remain the same as the schemeword
+        vor|outStatic$0outStatic|hin=vor|outStatic$0outStatic|hin
+            ~~~~~~match~~~~~~~~~         ~~~~~~~~match~~~~~~~
+
+        for each match
+          vor + [from parentNodeData]
+          for childId|var in match
+            + static [from parentNodeData]
+            + base_case_will_get_the_variable_match
+          + static [from parentNodeData]
+          + hin [from parentNodeData]
+
+        """
+        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<should there be a map from iEnclosureId__oEnclosureId & oEnclosureId__iEnclosureId?
+        self.oEnclosureTree = {}; self.oId__data = {}#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<rename to avoid confusion iId__data
+        def recursiveGenerate(nodeId, oNodeId):
+            # print('start: generateOStr___MODE2'); import pdb; pdb.set_trace()
+            self.iEnclosureTreeId__oEnclosureTreeId[nodeId] = oNodeId
+            if 'vars' not in self.iId__data[nodeId]: # is not a Match node
+                # print('nodeId: ', nodeId, 'returning', self.iId__data[nodeId]['w'])
+                return self.iId__data[nodeId]['w']
+            # print('nodeId: ', nodeId)
+            #take out the extraVals
+            matchIdx__outVarPosExtra__outVal = self.nodeId__matchIdx__outVarPos__outVal[nodeId]
+            #is a match node
+            oStr = ''; oVars = []; oStatics = []; oVors= []; oHins = []
+            # skipThisNode = self.skipNode(nodeId)
+            # print('nodeId: ', nodeId, 'skipThisNode? ', skipThisNode); import pdb;pdb.set_trace()
+            #for each match
+            self.oEnclosureTree[oNodeId] = []
+            matches = self.iId__data[nodeId]['vars']
+            for matchIdx, _ in enumerate(matches):
+                #take out the extraVals
+                vorStartPos, vorEndPos = self.iId__data[nodeId]['vors'][matchIdx]
+                vor = self.iStr[vorStartPos:vorEndPos]#vor String
+                vorRelativeStartPos = len(oStr)
+                oStr += vor
+                vorRelativeEndPos = len(oStr)
+                oVors.append((vorRelativeStartPos, vorRelativeEndPos))
+
+                if matchIdx != 0: # not the first match
+                    oHins.append((vorRelativeStartPos, vorRelativeEndPos))
+                skipThisNodeMatch = self.skipNode(nodeId, matchIdx)
+                # skipThisNodeMatch = False#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cange this back for testing
+                if skipThisNodeMatch:
+                    sortedVariablesAndPosition = self.iSortedVariablesAndPositionSansNum
+                    staticPatternStartEndPosition = self.iStaticPatternStartEndPositionSansNum#iMatch is done SanPosition, so here with have to use SanPosition
+                    pattern = self.iPatternSansNum
+                    self.list_oEnclosureIdSkipped.append(oNodeId)
+                    self.list_iEnclosureIdSkipped.append(nodeId)
+                else:
+                    sortedVariablesAndPosition = self.oSortedVariablesAndPositionSansNum
+                    staticPatternStartEndPosition = self.oStaticPatternStartEndPositionSansNum
+                    pattern = self.oPatternSansNum
+                # print('skipThisNodeMatch', skipThisNodeMatch)
+                # print('sortedVariablesAndPosition: ', sortedVariablesAndPosition)
+                # print('staticPatternStartEndPosition: ', staticPatternStartEndPosition); 
+                # print('pattern', pattern)
+                # import pdb;pdb.set_trace()
+                oStatic = []; oVar = [];
+                for varIdx, varPos in enumerate(sortedVariablesAndPosition):
+                    oPatternStaticStartPos, oPatternStaticEndPos = staticPatternStartEndPosition[varIdx]
+                    staticFrag = pattern[oPatternStaticStartPos:oPatternStaticEndPos]
+                    staticRelativeStartPos = len(oStr)
+                    oStr += staticFrag
+                    staticRelativeEndPos = len(oStr)
+                    # print('staticRelativeStartPos: ', staticRelativeStartPos, 'staticRelativeEndPos:', staticRelativeEndPos)
+                    # print('oPatternStaticStartPos: ', oPatternStaticStartPos, 'oPatternStaticEndPos:', oPatternStaticEndPos, 'staticFrag:', staticFrag); import pdb;pdb.set_trace()
+                    oStatic.append((staticRelativeStartPos, staticRelativeEndPos))
+
+                    #variable
+                    oChildEnclosureId = self.getOEnclosureNodeId()
+                    self.oEnclosureTree[oNodeId].append(oChildEnclosureId)
+                    if skipThisNodeMatch:#use iVarPos
+                        childIdxInEnclosureTree = matchIdx * len(self.iSortedVariablesAndPositionSansNum) + varIdx
+                        childNodeId = self.iEnclosureTree[nodeId][childIdxInEnclosureTree]
+                        val = recursiveGenerate(childNodeId, oChildEnclosureId)
+                    else:#use oVarPos, need to map back to iVarPos to get childNodeId
+                        if varPos in self.oVarPos__iVarPos:
+                            iVarPos = self.oVarPos__iVarPos[varPos]
+                            iVarIdx = self.iSortedVariablesAndPositionSansNum.index(iVarPos)
+                            childIdxInEnclosureTree = matchIdx * len(self.iSortedVariablesAndPositionSansNum) + iVarIdx
+                            childNodeId = self.iEnclosureTree[nodeId][childIdxInEnclosureTree]
+                            val = recursiveGenerate(childNodeId, oChildEnclosureId)
+                        else:#if unable to map back, then get from generatedExtraVals
+                            val = matchIdx__outVarPosExtra__outVal[matchIdx][varPos]
+                    #
+                    varRelativeStartPos = len(oStr)
+                    oStr += val 
+                    varRelativeEndPos = len(oStr)
+                    if oChildEnclosureId in self.oId__data:
+                        self.oId__data[oChildEnclosureId].update({
+                            's':0, 'e': len(val), 'w':val
+                        })
+                    else:
+                        self.oId__data[oChildEnclosureId] = {
+                            's':0, 'e': len(val), 'w':val, 'noOfMatches':0
+                        }
+                    oVar.append((varRelativeStartPos, varRelativeEndPos))
+                oPatternStaticStartPos, oPatternStaticEndPos = staticPatternStartEndPosition[-1]
+                staticFrag = pattern[oPatternStaticStartPos:oPatternStaticEndPos]
+                # print('staticFrag: ', staticFrag); import pdb;pdb.set_trace()
+                staticRelativeStartPos = len(oStr)
+                oStr += staticFrag
+                staticRelativeEndPos = len(oStr)
+                oStatic.append((staticRelativeStartPos, staticRelativeEndPos))
+                oStatics.append(oStatic); oVars.append(oVar)
+                #
+            iHinStartPos, iHinEndPos = self.iId__data[nodeId]['hins'][-1]
+            hin = self.iStr[iHinStartPos:iHinEndPos] # hin String
+            oHinStartPos = len(oStr)
+            oStr += hin
+            oHinEndPos = len(oStr)
+            oHins.append((oHinStartPos, oHinEndPos))
+            self.oId__data[oNodeId] = {
+                'vors':oVors, 'statics':oStatics, 'vars':oVars, 'hins':oHins,
+                's':0,# currently in relative position
+                'e':len(oStr),# currently in relative position
+                'w':oStr, 'noOfMatches':len(matches)
+            }
+            # print('oStr: ', oStr); import pdb;pdb.set_trace()
+            return oStr
+        self.oStr = recursiveGenerate(0, self.getOEnclosureNodeId())# 0 is the iEnclosureRootId
+
+        # print('****************************')
+        # print('self.oStr: ', self.oStr)
+        # self.pp.pprint(self.oEnclosureTree); self.pp.pprint(self.oId__data)
+        # self.pp.pprint(self.iId__data); import pdb;pdb.set_trace()
+        """
+        vor|outStatic$0outStatic|hin=vor|outStatic$0outStatic|hin
+            ~~~~~~match~~~~~~~~~         ~~~~~~~~match~~~~~~~
+
+
+        DFS so we convert each oDatum using the absolute position of its parents' oDatum. The root of enclosureTree is always already in absolutePosition
+        if a child is it's parent's matchIdx and variableIdx
+        for each [vor|static|variable|hin] THING, we only have to add the THING immediately before it in its parent's match
+
+        each match come from the parent's variable, and in MODE2, the THING before the parent's variable is always static
+        so we just have to add static to everyTHING in the child
+
+        to all the child's oDatum
+        """
+        # print('self.oEnclosureTree')
+        # self.pp.pprint(self.oEnclosureTree)
+
+        queue = [0]
+        while len(queue) > 0:
+            parentEnclosureId = queue.pop(0)
+            childEnclosureIds = self.oEnclosureTree.get(parentEnclosureId, [])
+            queue += childEnclosureIds
+            #pointer
+            parentDatum = self.oId__data[parentEnclosureId]
+            #
+            for oMatchIdxTimesVarIdx, childEnclosureId in enumerate(childEnclosureIds):
+                #
+                oMatchIdxInParent = oMatchIdxTimesVarIdx // len(self.oSortedVariablesAndPosition);
+                oVarIdxInParent = oMatchIdxTimesVarIdx % len(self.oSortedVariablesAndPosition)
+                #
+                offset__byParentStatic = parentDatum['statics'][oMatchIdxInParent][oVarIdxInParent][-1]#endPos of static in the parent, just before the variable=thisChild, this is inclusive of the offset__vor
+                # print('childEnclosureId', childEnclosureId)
+                # print('oMatchIdxInParent', oMatchIdxInParent); print('oVarIdxInParent', oVarIdxInParent)
+                # print('offset__byParentStatic', offset__byParentStatic)
+                # import pdb;pdb.set_trace()
+                self.oId__data[childEnclosureId]['s'] += offset__byParentStatic#child is a variableInParent, the immediateTHINGbeforeChildInParent is the static
+                #offset children oVors
+                oVors___new = []
+                for oVorStartPos, oVorEndPos in self.oId__data[childEnclosureId].get('vors', []):
+                    oVors___new.append((oVorStartPos+offset__byParentStatic, oVorEndPos+offset__byParentStatic))
+                if len(oVors___new) > 0:
+                    self.oId__data[childEnclosureId]['vors'] = oVors___new
+                #offset children oStatic
+                oStatics___new = []
+                for oStatic in self.oId__data[childEnclosureId].get('statics', []):
+                    oStatic___new = []
+                    for oStaticStartPos, oStaticEndPos in oStatic:
+                        oStatic___new.append((oStaticStartPos+offset__byParentStatic, oStaticEndPos+offset__byParentStatic))
+                    oStatics___new.append(oStatic___new)
+                if len(oStatics___new) > 0:
+                    self.oId__data[childEnclosureId]['statics'] = oStatics___new
+                #offset children oVars
+                oVars___new = []
+                for oVar in self.oId__data[childEnclosureId].get('vars', []):
+                    oVar___new = []
+                    for oVarStartPos, oVarEndPos in oVar:
+                        oVar___new.append((oVarStartPos+offset__byParentStatic, oVarEndPos+offset__byParentStatic))
+                    oVars___new.append(oVar___new)
+                if len(oVars___new) > 0:
+                    self.oId__data[childEnclosureId]['vars'] = oVars___new
+                #offset children oHins
+                oHins___new = []
+                for oHinStartPos, oHinEndPos in self.oId__data[childEnclosureId].get('hins', []):
+                    oHins___new.append((oHinStartPos+offset__byParentStatic, oHinEndPos+offset__byParentStatic))
+                if len(oHins___new) > 0:
+                    self.oId__data[childEnclosureId]['hins'] = oHins___new
+                #
+                self.oId__data[childEnclosureId]['e'] += offset__byParentStatic
+
+        # print('self.oStr: ', self.oStr)
+        # self.pp.pprint(self.oEnclosureTree); self.pp.pprint(self.oId__data)
+        # print('self.iId__data')
+        # self.pp.pprint(self.iId__data); 
+        # print('self.oId__data')
+        # self.pp.pprint(self.oId__data); 
+        # import pdb;pdb.set_trace()
+        return self.oStr
+
+
+
+    def changesBetweenIStrVOStrForAllSchemeNodes(self):
+        """
+        we can use iId__data and oId__data to match Between startPos__nodeId___iStr & startPos__nodeId___oStr
+        for each (startPos, nodeId), we have a list of
+        0. enclosureIdx
+        1. matchIdx
+        2. Type
+          0. vorhin - if the schemeNode is here, there will only be 1 tuple
+          1. static - position in the matchedPattern(IO) - if the schemeNode is here, there will only be 1 tuple
+            0. {patternPosition} - {self.oStaticIdx__sortedList_tuple_labelStartPos_labelEndPos_type} -  for getting idxInStr
+            1. {absolutePosition} - {self.oId__data[oNodeId]['statics'][matchIdx][staticIdx]}
+          2. var - position in the matchedPattern(IO) - if the schemeNode is here, there might be a long list
+            0. {patternPosition} - {self.oSortedVariablesAndPositionSansNum}
+            1. {absolutePosition} - {self.oId__data[oNodeId]['vars'][matchIdx][varIdx]} -  for getting idxInStr
+        This is also an identifier for the (startPos, nodeId) = @
+
+        for (startPos, nodeId) in startPos__nodeId___iStr 
+            we try to find the corresponding @ in startPos__nodeId___oStr
+            if we can find the corresponding @, 
+                we do not process that (startPos, nodeId) again for startPos__nodeId___oStr later_loop <>
+                keep it as an {edit[this is also a mapping between startPos__nodeId___iStr and startPos__nodeId___oStr, that we can use later to get the real startPos__nodeId___oStr]}
+            else
+                keep it as a {remove}
+
+        for (startPos, nodeId) in startPos__nodeId___oStr
+            if (startPos, nodeId) in <> {already processed as edit}: continue
+                
+            keep it as an {addition[we can use later to get the real startPos__nodeId___oStr]}
+        """
+        # print('iStr: ')
+        # print(self.iStr)
+        # print('oStr: ')
+        # print(self.oStr)
+        # print('self.iEnclosureTree:')
+        # print(self.iEnclosureTree)
+        # print('self.oEnclosureTree:')
+        # print(self.oEnclosureTree)
         #
         # import pprint; pp = pprint.PrettyPrinter(indent=4)
-        # print('self.outVarPos__inVarPos')
-        # pp.pprint(self.outVarPos__inVarPos)
+        # print('self.iId__data')
+        # pp.pprint(self.iId__data);
+        # print('self.oId__data')
+        # pp.pprint(self.oId__data)
+        # import pdb;pdb.set_trace()
+
         #
 
-        for nodeId, data in filter(lambda t: t[0] in matchedNodeIds, self.id__data.items()):
-            #
-            tuple_inVarPos_groupIdx__absIn = {}
-            for groupIdx, group in enumerate(data['inVars']):
-                # print('')
-                for inVarPos, absInStart, absInEnd, cNodeId in group:
-                    # if cNodeId in self.nodeIdsToSkip:# this part is just to calculate the tuple_inVarPos_groupIdx__absIn, SO CANNOT SKIP!
-                    #     continue
-                    # print('$$$ cNodeId ', cNodeId)
-                    tuple_inVarPos_groupIdx__absIn[(inVarPos, groupIdx)] = {'absInStart':absInStart, 'absInEnd':absInEnd, 'cNodeId':cNodeId, 'w':self.id__data[cNodeId]['w']}
-            #
-            #
-            # self.pp.pprint(tuple_inVarPos_groupIdx__absIn); 
+
+        from copy import copy
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import
+        self.schemeparser___oStr = Schemeparser(equationStr=self.oStr)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the others so we do not call schemeparser on iStr again
+        self.ast___oStr, functionsD___oStr, variablesD___oStr, primitives___oStr, totalNodeCount___oStr, self.startPos__nodeId___oStr = self.schemeparser___oStr._parse()
+        self.nodeId__labelLen___oStr = self.schemeparser___oStr._getLabelLength()
+        self.nodeId__labelLen___iStr = self.schemeparser___iStr._getLabelLength()
+        #remapping nodeId__labelLen___iStr to user given nodeIds
+        if self.userProvided_startPos__nodeId:
+            self.nodeId__labelLen___iStr = self.renameUserGivenSchemeNodeId(self.nodeId__labelLen___iStr)
+            self.ast___oStr = None # will need to be recalculated
+        #
+        #if user has given startPos__nodeId___iStr, then we must remap nodeId__labelLen___iStr<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #get the startPos__nodeId___iStr_NEW, zip with startPos__nodeId___iStr<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
-            #
-            for groupIdx, group in enumerate(data['outVars']):
-                for outVarPos, absOutStart, absOutEnd in group:
-                    if nodeId in self.nodeIdsToSkip:
-                        continue
-                    inVarPos = self.outVarPos__inVarPos.get(outVarPos, outVarPos)
-                    absIn = tuple_inVarPos_groupIdx__absIn.get((inVarPos, groupIdx))
-                    #
-                    # print('in: ', (inVarPos, groupIdx))
-                    # print('out: ', (outVarPos, groupIdx))
-                    # print('getting ', (inVarPos, groupIdx), ' from map, got: ', absIn)
+        startPos__nodeId___iStr = copy(self.startPos__nodeId___iStr) # for getting the leftover, after removing the positions of static and variable, so that we can compute vorhin more easily
+        startPos__nodeId___oStr = copy(self.startPos__nodeId___oStr) # for getting the leftover, after removing the positions of static and variable, so that we can compute vorhin more easily
 
+
+        #
+        # print('self.oEnclosureTreeId__iEnclosureTreeId', self.oEnclosureTreeId__iEnclosureTreeId)
+        # print('self.oEnclosureTree', self.oEnclosureTree)
+        # print('self.iEnclosureTree', self.iEnclosureTree)
+        #
+
+
+
+        def constructNonOverlappingRangesTOid(id__data, enclosureTree, noOfVariables, typ):
+            from copy import deepcopy
+            sortedList_tuple_startEndPosRange_id = []
+            def recursive(enclosureId, accumulatedCallerIds):
+                """Go by per match, and go in order of all the types of each match"""
+                if id__data[enclosureId]['noOfMatches'] == 0:
+                    data = id__data[enclosureId]; startPos = data['s']; endPos = data['e']
                     # import pdb;pdb.set_trace()
+                    sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds))
+
+                #     accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                #     accumulatedCallerIds___copy.append(('var', enclosureId, matchIdx, staticVarIdx))
+                
+                data = id__data[enclosureId]#what if len(iVar)==0? like for MODE0? use static, so far, for these modes, they are never 0
+                for matchIdx in range(0, id__data[enclosureId]['noOfMatches']): # is it ok to keep the number of matches, so you don't have to recount, are there any other places that use this information?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    #vor if any
+                    if 'vors' in id__data[enclosureId] and len(id__data[enclosureId]['vors']) > matchIdx: # matchIdx-1 because MODE1 only has 1 vor in front of all the matches for 1 enclosureId
+                        # print("len(id__data[enclosureId]['vors'])", len(id__data[enclosureId]['vors']), 'matchIdx-1', matchIdx)
+                        accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                        accumulatedCallerIds___copy.append(('vor', enclosureId, matchIdx))
+                        startPos, endPos = id__data[enclosureId]['vors'][matchIdx]
+                        sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+
+                    #MODE1, there are only empty space (static) between variables
+                    if self.mode == 1 and typ == 'i':
+                        childEnclosureIds = enclosureTree[enclosureId][matchIdx*noOfVariables:(matchIdx+1)*noOfVariables]
+                        for staticVarIdx, childEnclosureId in enumerate(childEnclosureIds):
+                            #var
+                            accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                            accumulatedCallerIds___copy.append(('var', enclosureId, matchIdx, staticVarIdx))
+                            recursive(childEnclosureId, accumulatedCallerIds___copy) # this will write to sortedList_tuple_startEndPosRange_id
+                            # startPos, endPos = id__data[enclosureId]['vars'][matchIdx][staticVarIdx]
+                            # sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+
+                            if staticVarIdx != len(childEnclosureIds) - 1: # if not last variable, then there is a blank that is the static.
+                                accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                                accumulatedCallerIds___copy.append(('static', enclosureId, matchIdx, staticVarIdx))
+                                startPos, endPos = id__data[enclosureId]['statics'][matchIdx][staticVarIdx]
+                                sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+
+
+                    else:#MODE2, there is always a static, in front of the variable. If MODE0, where there is no variables, there is exactly 1 static only
+                        childEnclosureIds = enclosureTree[enclosureId][matchIdx*noOfVariables:(matchIdx+1)*noOfVariables]
+                        for staticVarIdx, childEnclosureId in enumerate(childEnclosureIds):
+                            accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                            accumulatedCallerIds___copy.append(('static', enclosureId, matchIdx, staticVarIdx))
+                            #static, the front of every childEnclosureId, is a static... except iMODE1
+                            # print('enclosureId', enclosureId, "id__data[enclosureId]['statics']", id__data[enclosureId]['statics'], 'matchIdx', matchIdx, 'typ: ', typ); import pdb;pdb.set_trace()
+                            startPos, endPos = id__data[enclosureId]['statics'][matchIdx][staticVarIdx]
+                            if startPos != endPos: #for MODE1 o
+                                sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+
+                            #var (with recursive_call) if any
+                            if len(id__data[enclosureId]['vars'])>0 and len(id__data[enclosureId]['vars'][matchIdx]) > 0:
+                                accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                                accumulatedCallerIds___copy.append(('var', enclosureId, matchIdx, staticVarIdx))
+                                recursive(childEnclosureId, accumulatedCallerIds___copy) # this will write to sortedList_tuple_startEndPosRange_id
+                                # startPos, endPos = id__data[enclosureId]['vars'][matchIdx][staticVarIdx]
+                                # sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+
+                        #static if any [the ending of the match] # not available for MODE0SKIP {len(id__data[enclosureId]['statics']) > matchIdx and}
+                        # print("matchIdx", matchIdx, "id__data[enclosureId]['statics']", id__data[enclosureId]['statics']); import pdb;pdb.set_trace()
+                        if len(id__data[enclosureId]['statics']) > matchIdx and len(id__data[enclosureId]['statics'][matchIdx]) > 1:
+                            accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                            accumulatedCallerIds___copy.append(('static', enclosureId, matchIdx, staticVarIdx)) 
+                            startPos, endPos = id__data[enclosureId]['statics'][matchIdx][-1]
+                            # print(startPos, endPos, 'static')
+                            if startPos != endPos:#for MODE1 o
+                                sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+                                # print('added'); import pdb;pdb.set_trace()
+
+                #hin if any
+                if 'hins' in id__data[enclosureId] and len(id__data[enclosureId]['hins']) > 0:#we only want the last one to prevent overlap with middle vors
+                    accumulatedCallerIds___copy = deepcopy(accumulatedCallerIds)
+                    # accumulatedCallerIds___copy.append(('hin', enclosureId, matchIdx))
+                    accumulatedCallerIds___copy.append(('hin', enclosureId, len(id__data[enclosureId]['hins'])))
+                    # startPos, endPos = id__data[enclosureId]['hins'][matchIdx]
+                    startPos, endPos = id__data[enclosureId]['hins'][-1]
+                    sortedList_tuple_startEndPosRange_id.append((startPos, endPos, accumulatedCallerIds___copy))
+
+            recursive(0, [])
+            return sortedList_tuple_startEndPosRange_id
+
+        if self.mode == 0:
+            numberOfVariables = 1
+        else:
+            numberOfVariables = len(self.iSortedVariablesAndPositionSansNum)
+
+        # print('self.iId__data:')
+        # self.pp.pprint(self.iId__data)
+        # print('self.oId__data:')
+        # self.pp.pprint(self.oId__data); import pdb;pdb.set_trace()
+
+
+        iSortedList_tuple_startEndPosRange_id = constructNonOverlappingRangesTOid(self.iId__data, self.iEnclosureTree, numberOfVariables, 'i') # this did not consider that the nodeId might be skipped<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        # print('done with iSortedList_tuple_startEndPosRange_id'); import pdb;pdb.set_trace()
+        oSortedList_tuple_startEndPosRange_id = constructNonOverlappingRangesTOid(self.oId__data, self.oEnclosureTree, len(self.oSortedVariablesAndPositionSansNum), 'o')
+
+        # print('iSortedList_tuple_startEndPosRange_id', iSortedList_tuple_startEndPosRange_id)
+        # print('oSortedList_tuple_startEndPosRange_id', oSortedList_tuple_startEndPosRange_id); import pdb;pdb.set_trace()
+
+        def zipTogether(sortedList_tuple_startEndPosRange_id, sortedList_tuple_startPos_endPos_nodeId):
+            madeUpIdIdx = 0; schemeIdIdx = 0; results = []
+            while madeUpIdIdx < len(sortedList_tuple_startEndPosRange_id) and schemeIdIdx < len(sortedList_tuple_startPos_endPos_nodeId):
+                (segmentStartPos, segmentEndPos, theIds) = sortedList_tuple_startEndPosRange_id[min(madeUpIdIdx, len(sortedList_tuple_startEndPosRange_id)-1)]
+                (labelStartPos, labelEndPos, schemeNodeId) = sortedList_tuple_startPos_endPos_nodeId[min(schemeIdIdx, len(sortedList_tuple_startPos_endPos_nodeId)-1)]
+                if segmentStartPos <= labelStartPos and labelEndPos <= segmentEndPos:
+                    results.append((labelStartPos, labelEndPos, schemeNodeId, theIds))
+                    schemeIdIdx+=1
+                elif labelStartPos <= segmentStartPos:
+                    schemeIdIdx+=1
+                elif segmentEndPos <= labelEndPos:
+                    madeUpIdIdx+=1
+            return results
+
+        # print('self.nodeId__labelLen___iStr', self.nodeId__labelLen___iStr); import pdb;pdb.set_trace()
+        iSortedList_tuple_labelPosRangeSchemeIdTheIds = zipTogether(iSortedList_tuple_startEndPosRange_id, 
+            list(map(lambda t: (t[0], t[0]+self.nodeId__labelLen___iStr[t[1]], t[1]), sorted(self.startPos__nodeId___iStr.items(), key=lambda t: t[0])))
+        )
+        oSortedList_tuple_labelPosRangeSchemeIdTheIds = zipTogether(oSortedList_tuple_startEndPosRange_id, 
+            list(map(lambda t: (t[0], t[0]+self.nodeId__labelLen___oStr[t[1]], t[1]), sorted(self.startPos__nodeId___oStr.items(), key=lambda t: t[0])))
+        )
+
+        # print('iSortedList_tuple_labelPosRangeSchemeIdTheIds', iSortedList_tuple_labelPosRangeSchemeIdTheIds)
+        # print('oSortedList_tuple_labelPosRangeSchemeIdTheIds', oSortedList_tuple_labelPosRangeSchemeIdTheIds); import pdb;pdb.set_trace()
+
+
+        schemeNodeChangeLog = []; 
+        #
+        mappedINodeId = set() # for the same theIds{bucket_for_vorhin_var_static}, there might be many iNodeId{for that oNodeId},  and it should not be repeated
+        currentVorHinId = None # the mappedISchemeNodeIdInVorHin will be cleared for every currentVorHinId#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not used yet
+        #
+        iTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId = {}
+        for iStartPos, iEndPos, iNodeId, theIds in iSortedList_tuple_labelPosRangeSchemeIdTheIds:
+            theId = theIds[-1] # the last one is the leaf, most specific
+            #
+            tuple_type_enclosureId_matchId = theId
+            existing = iTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId.get(tuple_type_enclosureId_matchId, [])
+            existing.append((iStartPos, iEndPos, iNodeId))
+            iTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId[tuple_type_enclosureId_matchId] = existing
+            #
+        # print('iTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId')
+        # print(iTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId); import pdb;pdb.set_trace()
+
+        oTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId = {} # this is used to find removed on the second pass of startPos__nodeId___oStr
+        for oStartPos, oEndPos, oNodeId, theIds in oSortedList_tuple_labelPosRangeSchemeIdTheIds:
+            # theId = theIds[-1] # the last one is the leaf, most specific
+            ow = self.oStr[oStartPos:oEndPos]
+            theId = theIds[-1] # the last one is the leaf, most specific
+            oEnclosureParentId = theId[1]; matchIdx = theId[2]; iEnclosureParentId = self.oEnclosureTreeId__iEnclosureTreeId[oEnclosureParentId]
+
+            iTuple_type_enclosureId_matchId = None; var = None
+            # print(oStartPos, oEndPos, oNodeId, theIds); import pdb;pdb.set_trace()
+            if theId[0] == 'var':
+                oVarIdx = theId[3] % len(self.oSortedVariablesAndPositionSansNum)
+                oVarPos = self.oSortedVariablesAndPositionSansNum[oVarIdx]
+                oEnclosureId = self.oEnclosureTree[oEnclosureParentId][theId[3]]
+                tuple_type_enclosureId_matchId = theId#weird<<<<<<<<<
+                #
+                # print(oStartPos, oEndPos, oNodeId, 'oEnclosureId: ', oEnclosureId, oEnclosureId in self.oEnclosureTreeId__iEnclosureTreeId)
+                # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<check'); import pdb;pdb.set_trace()
+                if oEnclosureId in self.oEnclosureTreeId__iEnclosureTreeId:# only to check if oVarPos was an extra
+                    iEnclosureId = self.oEnclosureTreeId__iEnclosureTreeId[oEnclosureId]
+                    iParentEnclosureId = self.oEnclosureTreeId__iEnclosureTreeId[oEnclosureParentId]
+                    iVarIdx = self.iEnclosureTree[iParentEnclosureId].index(iEnclosureId)
+                    # iTuple_type_enclosureId_matchId = (theId[0], iEnclosureId, matchIdx, iVarPos)
+                    iTuple_type_enclosureId_matchId = (theId[0], iEnclosureParentId, matchIdx, iVarIdx)
+                    iVarPos = self.iSortedVariablesAndPositionSansNum[iVarIdx%len(self.iSortedVariablesAndPositionSansNum)]
+                    var = iVarPos[0]
+                else:#added
+                    var = oVarPos[0] #  since it is added, it will not be in iVar, and can only be found in oVar
+
+            elif theId[0] == 'static':
+                #
+                tuple_type_enclosureId_matchId = (theId[0], theId[1], theId[2], theId[3])
+                #
+                #convert to patternLabelStartEndPos
+                oStaticIdx = theId[3]
+                oPatternStaticStartPos, _ = self.oStaticPatternStartEndPositionSansNum[oStaticIdx]
+
+                # oEnclosureId = self.oEnclosureTree[oEnclosureParentId][theId[3]] # this method to check for skipped will not work for MODE1i <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<keep a list of skipped Nodes? [takes up more space, but simplifies logic... not cannot be used for vars]
+
+                # oAbsoluteStaticStartPos, _ = self.oId__data[oEnclosureId]['statics'][matchIdx][oStaticIdx]
+                oAbsoluteStaticStartPos, _ = self.oId__data[oEnclosureParentId]['statics'][matchIdx][oStaticIdx]
+                oPatternLabelStartPos = oPatternStaticStartPos + oStartPos - oAbsoluteStaticStartPos 
+                oSchemeLabelLen = self.nodeId__labelLen___oStr[oNodeId]
+                key = (oPatternLabelStartPos, oPatternLabelStartPos+oSchemeLabelLen)# schemeLabelLen might not be the same in oStr?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                # print('key: ', key, 'in', self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx)
+                #if this is skipped, then this criterion is wrong<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                # if key in self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx:#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<this should also handle skipNodes
+                
+                if self.mode == 0:
+                    skipCriterion = self.oEnclosureTree[oEnclosureParentId][matchIdx] in self.list_oEnclosureIdSkipped or (key in self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx)
+                elif self.mode == 1:
+                    skipCriterion = False #for MODE1, static is always added (never edit), because we don't care about blankspace and iPattern does not have static
+                else:
+                    skipCriterion = oEnclosureParentId in self.list_oEnclosureIdSkipped or (key in self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx)
+                # print('oEnclosureParentId: ', oEnclosureParentId, 'in', self.list_oEnclosureIdSkipped, skipCriterion); import pdb;pdb.set_trace()
+
+                #seems like this is for MODE2 only?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                
+                if skipCriterion: #its edit, 
+                    if key in self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx:
+                        _, _, iStaticIdx = self.oTuple_patternLabelStartEndPos__iTuple_patternLabelStartEndPos_iStaticIdx[key]
+                    else: #oEnclosureParentId in self.list_oEnclosureIdSkipped
+                        iStaticIdx = oStaticIdx # if skipped static was also not changed
+                    # iTuple_type_enclosureId_matchId = (theId[0], iEnclosureId, matchIdx, iStaticIdx)
+                    if self.mode == 0:
+                        iEnclosureParentId = 0#in MODE0 there is only 1 parent.
+                    iTuple_type_enclosureId_matchId = (theId[0], iEnclosureParentId, matchIdx, iStaticIdx)
+
+                # else:# added...
+            else:#vor hin
+                #
+                tuple_type_enclosureId_matchId = (theId[0], theId[1], matchIdx)
+                #
+                if self.mode == 0:
+                    iEnclosureParentId = 0#in MODE0 there is only 1 parent.
+                iTuple_type_enclosureId_matchId = (theId[0], iEnclosureParentId, matchIdx)#should not use parent, but its own id<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            #
+            existing = oTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId.get(tuple_type_enclosureId_matchId, [])
+            existing.append((oStartPos, oEndPos, oNodeId))
+            oTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId[tuple_type_enclosureId_matchId] = existing
+            #
+            if iTuple_type_enclosureId_matchId is not None: # edited
+
+                sortedList_tuple_startPos_endPos_nodeId = iTuple_type_enclosureId_matchId__sortedList_tuple_startPos_endPos_nodeId[iTuple_type_enclosureId_matchId]
+
+#sortedList_tuple_startPos_endPos_nodeId contains the absolutePos, but we should also have the patternPos...
+                for iStartPos, iEndPos, iNodeId in sortedList_tuple_startPos_endPos_nodeId:
+                    iw = self.iStr[iStartPos:iEndPos]
+                    if ow == iw and iNodeId not in mappedINodeId: #mappedINodeId, should also be cleared for every change in nodeId
+                        mappedINodeId.add(iNodeId)
+
+                        schemeNodeChangeLog.append({'d':'e', 't':theId[0], 'in':iNodeId, 'on':oNodeId, 'm':theId[2], 'v':var, 's':iStartPos, 'e':oStartPos, 'iw':iw, 'ow':ow})# now the nodeId 'n' is in scheme
+
+                        break#there is only supposed to be one iSchemeNode for 1 oSchemeNode
+                        #for testing please remove
+                        # if theId[0] == 'vor' and oStartPos == 17:
+                        #     print('please check'); import pdb;pdb.set_trace()
+                        #
+
+                #for testing please remove
+                # if theId[0] == 'vor' and oStartPos == 17:
+                #     print('please check'); import pdb;pdb.set_trace()
+                #
+
+            else:
+                schemeNodeChangeLog.append({'d':'a', 't':theId[0], 'in':None, 'on':oNodeId, 'm':theId[2], 'v':var, 's':oStartPos, 'e':oEndPos, 'iw':None, 'ow':ow})# now the nodeId 'n' is in scheme
+
+        #for finding removed
+        for iStartPos, iEndPos, iNodeId, theIds in iSortedList_tuple_labelPosRangeSchemeIdTheIds:
+            theId = theIds[-1] # the last one is the leaf, most specific
+            iEnclosureId = theId[1]; matchIdx = theId[2]; oEnclosureId = self.iEnclosureTreeId__oEnclosureTreeId[iEnclosureId];
+            oTuple_type_enclosureId_matchId = None#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<this is not used?
+            iw = self.iStr[iStartPos:iEndPos]
+            if theId[0] == 'var':
+                iVarPos = self.iSortedVariablesAndPositionSansNum[theId[3]%len(self.iSortedVariablesAndPositionSansNum)]
+                # print('look for b12 ($0, 14)', iVarPos); import pdb;pdb.set_trace()
+                # print('iEnclosureId', iEnclosureId, self.list_iEnclosureIdSkipped); import pdb;pdb.set_trace()
+                if iEnclosureId not in self.list_iEnclosureIdSkipped and iVarPos not in self.iVarPos__oVarPos: # removed<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wrong way to check, assume no skipNode
                     #
-                    #if (len(self.outVariables)>len(self.inVariables)), variables are added not edited, so we do not add it here
-                    if absIn is not None:
-                        self.verPosWord.append({
-                            'd': 'e', 'e': absOutStart, 'n': absIn['cNodeId'], 's': absIn['absInStart'], 't': 'p', 'v': inVarPos[0], 
-                            'w': absIn['w'] # should be the same as outDatum['w']
-                            })
+                    var = iVarPos[0]
+                    schemeNodeChangeLog.append({'d':'r', 't':theId[0], 'in':iNodeId, 'on':None, 'm':theId[2], 'v':var, 's':iStartPos, 'e':iEndPos, 'iw':iw, 'ow':None})# now the nodeId 'n' is in scheme
 
-        #3
-        # print('self.iUnmatchedFrags', self.iUnmatchedFrags)
-        # print('self.oUnmatchedFrags', self.oUnmatchedFrags)
-        # self.pp.pprint(self.id__data)
-        def findOffsetInRangeDictionary(point, rangeDictionary):
-            for (oStart, oEnd), (eStart, eEnd) in rangeDictionary.items():
-                if oStart <= point and point <= oEnd:
-                    return eStart - oStart
-        if len(self.variables) > 0 and not self.onlyVariablesAndSpace:
-            for nodeId, data in filter(lambda t: t[0] in matchedNodeIds and t[0] not in self.nodeIdsToSkip, self.id__data.items()):
-                for unmatchedInfo in self.iUnmatchedFrags:
-                    if unmatchedInfo['w'].strip() == '$':
-                        continue
-                    for rangeDictionary in data['inStatics']:
-                        # print(rangeDictionary)
-                        offset = findOffsetInRangeDictionary(unmatchedInfo['s'], rangeDictionary)
-                        self.verPosWord.append({
-                            'd': 'r', 'e': offset+unmatchedInfo['e'], 'n': nodeId, 's': offset+unmatchedInfo['s'], 't': 's', 'v': None, 'w': unmatchedInfo['w']
-                        })
-
-                for unmatchedInfo in self.oUnmatchedFrags:
-                    if unmatchedInfo['w'].strip() == '$':
-                        continue
-                    for rangeDictionary in data['outStatics']:
-                        # print(rangeDictionary, '<<<<<<<<<<<rangeDictionary')
-                        # print(unmatchedInfo['s'], "<<<<<<<<<<<<<<<<<<<<<<unmatchedInfo['s']")
-                        offset = findOffsetInRangeDictionary(unmatchedInfo['s'], rangeDictionary)
-                        self.verPosWord.append({
-                            'd': 'a', 'e': offset+unmatchedInfo['e'], 'n': nodeId, 's': offset+unmatchedInfo['s'], 't': 's', 'v': None, 'w': unmatchedInfo['w']
-                        })
+            elif theId[0] == 'static':
+                #convert to patternLabelStartEndPos
+                iStaticIdx = theId[3]
+                iPatternStaticStartPos, _ = self.iStaticPatternStartEndPositionSansNum[iStaticIdx]
+                iAbsoluteStaticStartPos, _ = self.iId__data[iEnclosureId]['statics'][matchIdx][iStaticIdx]
+                iPatternLabelStartPos = iPatternStaticStartPos + iStartPos - iAbsoluteStaticStartPos 
+                # iSchemeLabelLen = self.nodeId__labelLen___iStr[oNodeId]
+                iSchemeLabelLen = self.nodeId__labelLen___iStr[iNodeId]
+                key = (iPatternLabelStartPos, iPatternLabelStartPos+iSchemeLabelLen)
 
 
+                if self.mode == 0:
+                    skipCriterion = self.oEnclosureTree[iEnclosureId][matchIdx] not in self.list_iEnclosureIdSkipped and key not in self.iTuple_patternLabelStartEndPos__oTuple_patternLabelStartEndPos_oStaticIdx
+                elif self.mode == 1: #in mode1, static cannot be removed, because there is not static in iPattern
+                    skipCriterion = False
+                else:
+                    skipCriterion = iEnclosureId not in self.list_iEnclosureIdSkipped and key not in self.iTuple_patternLabelStartEndPos__oTuple_patternLabelStartEndPos_oStaticIdx
+                # print('iw', iw)
+                # print('iStartPos', iStartPos)
+                # print('iPatternStaticStartPos', iPatternStaticStartPos);
+                # print('iAbsoluteStaticStartPos', iAbsoluteStaticStartPos)
+                # print('iPatternLabelStartPos', iPatternLabelStartPos);
+                # print('iSchemeLabelLen', iSchemeLabelLen)
+                # # if key not in self.iTuple_patternLabelStartEndPos__oTuple_patternLabelStartEndPos_oStaticIdx:# removed
+                # print('iEnclosureId', iEnclosureId, 'not in ', self.list_iEnclosureIdSkipped, ' ', iEnclosureId not in self.list_iEnclosureIdSkipped); import pdb;pdb.set_trace()
+                # if self.mode==0:#change to childEnclosureId
+                #     iEnclosureId = self.iEnclosureTree[iEnclosureId][matchIdx]
+                if skipCriterion:
+                    #
+                    s = iStartPos; e = iStartPos+ iSchemeLabelLen
+                    schemeNodeChangeLog.append({'d':'r', 't':theId[0], 'in':iNodeId, 'on':None, 'm':theId[2], 'v':None, 's':s, 'e':e, 'iw':iw, 'ow':None})# now the nodeId 'n' is in scheme
+                    # print(schemeNodeChangeLog); import pdb;pdb.set_trace()
+
+                # print('check<<<<<<<<<<<', iEnclosureId in self.list_iEnclosureIdSkipped); import pdb;pdb.set_trace()
+                # elif self.mode == 0 and iEnclosureId in self.list_iEnclosureIdSkipped: # for skipped MODE0
+                #     s = iStartPos
+                #     e = oStartPos
+                #     on = 
+                #     ow = 
+                #     schemeNodeChangeLog.append({'d':'e', 't':theId[0], 'in':iNodeId, 'on':on, 'm':theId[2], 'v':None, 's':s, 'e':e, 'iw':iw, 'ow':ow})# now the nodeId 'n' is in scheme
 
 
+        self.schemeNodeChangeLog = schemeNodeChangeLog
+        #
+        # print('self.iStr')
+        # print(self.iStr)
+        # print('self.oStr')
+        # print(self.oStr)
+        # import pprint; pp = pprint.PrettyPrinter(indent=4)
+        # print('schemeNodeChangeLog')
+        # pp.pprint(self.schemeNodeChangeLog)
+        #
+            #
+            #
+
+
+
+    def calculate__startPos__nodeId(self):
+        """
+        go through each row of schemeNodeChangeLog
+        include all the 
+        0. d:'e' ~ e
+        1. d:'a' ~ s
+        """
+        maxId = -1
+        for _, iNodeId in self.startPos__nodeId___iStr.items():
+            # print(iNodeId)
+            maxId = max(maxId, iNodeId)
+        # print('maxId', maxId); import pdb;pdb.set_trace()
+        startPos__nodeId___oStr_new = {}
+        for data in self.schemeNodeChangeLog:
+            if data['d'] == 'e':
+                startPos__nodeId___oStr_new[data['e']] = data['in']
+                # maxId = max(maxId, data['in'])
+        for data in self.schemeNodeChangeLog:
+            if data['d'] == 'a':#need to change data['on'] to a new ID
+                maxId += 1
+                startPos__nodeId___oStr_new[data['s']] = maxId
+        #
+        self.OLDSchemeNodeId__NEWSchemeNodeId___oStr = {} # map old to new first for future uses
+        for startPos, nodeId___OLD in self.schemeparser___oStr.startPos__nodeId.items():
+            nodeId___NEW = startPos__nodeId___oStr_new[startPos]
+            self.OLDSchemeNodeId__NEWSchemeNodeId___oStr[nodeId___OLD] = nodeId___NEW
+        #
+        self.startPos__nodeId___oStr = startPos__nodeId___oStr_new
+
+    def getNodeId__len___oStr(self):
+        if getattr(self, 'nodeId__len___oStr', None) is None:
+            #renaming nodeId because recommend.py needs it.
+            nodeId__SCHMCK = self.schemeparser___oStr.nodeId__len
+            nodeId__SCHMCK___NEW = {}
+            for nodeId___OLD, SCHMCK in nodeId__SCHMCK.items():
+                nodeId___NEW = self.OLDSchemeNodeId__NEWSchemeNodeId___oStr[nodeId___OLD]
+                nodeId__SCHMCK___NEW[nodeId___NEW] = SCHMCK
+            self.nodeId__len___oStr = nodeId__SCHMCK___NEW
+        return self.nodeId__len___oStr
+
+    def getAST___oStr(self):
+        if getattr(self, 'ast___oStr', None) is None:
+            #renaming nodeId because recommend.py needs it.
+            self.ast___oStr = {}
+            stack = [self.schemeparser___oStr.rootOfTree]
+            while len(stack) > 0:
+                cLabel, cNodeId = stack.pop()
+                childNodes = self.schemeparser___oStr.ast.get((cLabel, cNodeId), [])
+                stack += childNodes
+                childNodes___NEW = []
+                for childLabel, childNodeId in childNodes:
+                    childNodes___NEW.append((childLabel, self.OLDSchemeNodeId__NEWSchemeNodeId___oStr[childNodeId]))
+                if len(childNodes___NEW) > 0:
+                    self.ast___oStr[(cLabel, self.OLDSchemeNodeId__NEWSchemeNodeId___oStr[cNodeId])] = childNodes___NEW
+                # print('sTEPPTPEPT: ', self.ast___oStr); import pdb;pdb.set_trace()
+        # print('self.ast___oStr', self.ast___oStr); import pdb;pdb.set_trace()
+        return self.ast___oStr
+
+    def getRootOfTree___oStr(self):
+        if getattr(self, 'rootOfTree___oStr', None) is None:
+            #renaming nodeId because recommend.py needs it.
+            rLabel, rNodeId = self.schemeparser___oStr.rootOfTree
+            self.rootOfTree___oStr = (rLabel, self.OLDSchemeNodeId__NEWSchemeNodeId___oStr[rNodeId])
+
+        return self.rootOfTree___oStr
+
+
+
+    def make_startPos__argsCount(self): 
+        from foundation.automat.common import isNum
+        #going to do a simple bracket_accounting, because there is no need to call Schemeparser for this simple task... TODO also done in a lot of places... REFACTOR?
+        def countArgsOfSchemeFunction(schemefunctionStr):
+            #also takes care of compound_variables like V_{ R_{ 1 } }
+            argumentCount = 0
+            openBracket__count = {'(':0, '{':0, '[':0}; closeBracket__openBracket = {')':'(', ']':'[', '}':'{'}
+            for c in schemefunctionStr:
+                if c in openBracket__count:
+                    openBracket__count[c] +=1
+                elif c in closeBracket__openBracket:
+                    openBracket__count[closeBracket__openBracket[c]] -= 1
+                if c == ' ' and (not any(map(lambda t: t[1]!=0, openBracket__count.items()))):#NOT(any count not equals 0?)==(all counts are 0)
+                    argumentCount += 1
+            return argumentCount
+
+        self.schemeId__argCount = {}
+        for schemeNodeId, schemeNodeStartPos in self.nodeId__entityStartPos___iStr.items():
+            schemeNodeEndPos = self.nodeStartPos__nodeEndPos___iStr[schemeNodeStartPos]
+            w = self.iStr[schemeNodeStartPos:schemeNodeEndPos]
+            if w[0] == '(':#a function argLen is at least 2? inclusive of it self? the function name?
+                #the [1:-1] takes out the startOpenBracket and the endOpenBracket
+                self.schemeId__argCount[schemeNodeId] = countArgsOfSchemeFunction(w[1:-1]) + 1 # +1 is the name of the function itself? also differentiates this from variables
+            else: #might be a number or variable
+                if isNum(w): # argLen is 0 (constant)
+                    self.schemeId__argCount[schemeNodeId] = 0
+                else: # argLen is 1 (variable)
+                    self.schemeId__argCount[schemeNodeId] = 1
+
+
+    ######################################
+    #HELPER FUNCTION
+    ######################################
+    def renameUserGivenSchemeNodeId(self, nodeId__SCHMCK):
+        if getattr(self, 'nodeId__startPos___iStr___OLD', None) is None: # caching
+            self.nodeId__startPos___iStr___OLD = dict(map(lambda t: (t[1], t[0]) ,self.startPos__nodeId___iStr___OLD.items()))
+        nodeId__SCHMCK___NEW = {}
+        for nodeId___OLD, SCHMCK in nodeId__SCHMCK.items():
+            startPos___NEW = self.nodeId__startPos___iStr___OLD[nodeId___OLD]
+            nodeId__SCHMCK___NEW[self.startPos__nodeId___iStr[startPos___NEW]] = SCHMCK
+        return nodeId__SCHMCK___NEW
+
+
+    def skipNode(self, nodeIdToCheck, matchIdx):
+        """
+
+
+        MODE0 has no iVar, so var will also be None
+        for MODE1 and MODE2, the nodeIdToCheck is also some enclosureTreeId, which we need to convert to schemeNodeId first
+
+
+        Check if nodeIdToCheck [this is in schemeNodeId]
+        0. nodeIdToCheck are in the nodeIdsToSkip [user_provided, as in self.startPos__nodeId, if user did not provide self.startPos__nodeId, there should have been a schemeparser.parse and startPos__nodeId should be stored in self]
+        1. statisfy minVarArgs [user_provided]
+        2. statisfy maxVarArgs [user_provided]
+        """
+        schemeIdRootOfIPattern = self.tuple_enclosureId_matchId__schemeIdRootOfIPattern.get((nodeIdToCheck, matchIdx))
+        userWishToSkip = schemeIdRootOfIPattern in self.nodeIdsToSkip
+        # print('checking enclosureId: ', nodeIdToCheck, 'matchIdx', matchIdx, 'schemeIdRootOfIPattern', schemeIdRootOfIPattern, self.nodeIdsToSkip, 'userWishToSkip: ', userWishToSkip)
+        if userWishToSkip:
+            return userWishToSkip
+
+
+        if self.mode == 0:
+            didNotStatisfyMaxVarArgs = False; didNotStatisfyMinVarArgs = False; #since there are no variables, there is no MaxMinVarArgs to check....
+        else:
+            numberOfArgs = len(self.iSortedVariablesAndPosition)
+            for matchIdx in range(0, len(self.iId__data[nodeIdToCheck]['vars'])):#check every childId of nodeIdToCheck, nodeIdToCheck is the parent
+                enclosureChildIds = self.iEnclosureTree[nodeIdToCheck][matchIdx*numberOfArgs: (matchIdx+1)*numberOfArgs]
+                for (iVar, iPos), enclosureChildId in zip(self.iSortedVariablesAndPosition, enclosureChildIds):
+                    schemeIdRootOfIPattern = self.tuple_enclosureId_matchId__iVarPos__schemeIdRoot[(nodeIdToCheck, matchIdx)][(iVar, iPos)]
+                    numberOfArgs = self.schemeId__argCount[schemeIdRootOfIPattern]
+
+                    didNotStatisfyMinVarArgs = self.variableMinArgs.get(iVar, -sys.maxsize -1) > numberOfArgs # get numberOfArgs sys.maxsize because user might not define it, in which case, we take it as user allows it, also neater for the user's configuration.
+                    didNotStatisfyMaxVarArgs = self.variableMaxArgs.get(iVar, sys.maxsize) < numberOfArgs # get numberOfArgs
+                    if didNotStatisfyMinVarArgs or didNotStatisfyMaxVarArgs:
+                        break
+                if didNotStatisfyMinVarArgs or didNotStatisfyMaxVarArgs:
+                    break
+
+
+        return didNotStatisfyMinVarArgs or didNotStatisfyMaxVarArgs # then you skip this node
+
+    def getEnclosureNodeId(self):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<rename to getIEnclosureNodeId
+        self.newEnclosureNodeCounter += 1
+        return self.newEnclosureNodeCounter#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<rename self.newIEnclosureNodeCounter
+
+    def getOEnclosureNodeId(self):
+        self.newOEnclosureNodeCounter += 1
+        return self.newOEnclosureNodeCounter
+
+
+    def getNewNodeId(self):# this is schemeNodeId, not EnclosureID
+        self.newNodeCounter += 1
+        return self.newNodeCounter
 
 
     def giveMeNVariableNotInThisList(self, n, varList=None): # how do you know which is var, which is primitive?
