@@ -75,9 +75,8 @@ class BipartiteSolver:
             # listOfCollectedEquations.append(equation)
 
         vertexId__equationVariableId = self.vertexIdIssuer.vertexId__equationVariableId
-        # dependentVariableId = 2#'X_{ total_{ 6 } }'
-        # list_independentVariablesIds = [6, 7, 8]#['V_{ R_{ 1 } }', 'V_{ R_{ 0 } }', 'V_{ DC_{ 4 } }']
         list_independentVariablesIds = sorted(list(list_independentVariablesIds))
+        print('listOfVariables', listOfVariables)
         print(dependentVariableId, 'dependentVariableId')
         print(list_independentVariablesIds, 'list_independentVariablesIds')
         print('equationVariables_g', equationVariables_g)
@@ -96,6 +95,7 @@ class BipartiteSolver:
             dependentVariableId, 
             list_independentVariablesIds
         )
+        print('substitutionPath: ', substitutionPath)
         broadSteps = []
 
         #incorporate for displaying_of_latex

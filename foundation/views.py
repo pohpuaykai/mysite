@@ -131,7 +131,7 @@ def automat_solveEquations(request):
     id__type = dict(map(lambda t: (int(t[0]), t[1]), equation_details['id__type'].items()))
     list_equationStr = equation_details['list_equationStr']
     dependentVarStr = equation_details['dependentVarStr']
-    list_independentVarStr = list(filter(lambda varStr: varStr is not None, equation_details['list_independentVarStr']))
+    list_independentVarStr = list(set((filter(lambda varStr: varStr is not None, equation_details['list_independentVarStr']))))
     simplify = equation_details['simplify']
     print('simplify')
     print(simplify)

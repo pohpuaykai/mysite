@@ -56,7 +56,7 @@ class Q2_3_5_aMoreComplexCircuit__P84 extends Circuit {
         console.log('c', c);
 
 
-        const d = this.createComponent({componentName:'wire', position:{'x': resistor2.position.x, 'y': -resistor1.position.y+10, 'z':50}, additionalInfo:{'radius': 0.644/2}})
+        const d = this.createComponent({componentName:'wire', position:{'x': resistor2.position.x, 'y': -resistor1.position.y, 'z':50}, additionalInfo:{'radius': 0.644/2}})
         this.enter(d.uuid);
         // this.scene.add(d);
         d.setAllTouchingBoxVisibility(false);
@@ -89,7 +89,7 @@ class Q2_3_5_aMoreComplexCircuit__P84 extends Circuit {
         const wire_resistor3_resistor4 = this.wire(resistor3, resistor4, 0.644/2, 0, 0);
         wire_resistor3_resistor4.setAllTouchingBoxVisibility(false);
 
-        const wire_resistor4_d = this.wire(resistor4, d, 0.644/2, 1);
+        const wire_resistor4_d = this.wire(resistor4, d, 0.644/2, 1, 0, '124');
         wire_resistor4_d.setAllTouchingBoxVisibility(false);
 
         return {

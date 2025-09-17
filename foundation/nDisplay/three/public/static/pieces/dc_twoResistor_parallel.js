@@ -62,28 +62,39 @@ class DCTwoResistorParallel extends Circuit {
 
 
         //get Equations and solving steps:
-        const dependentUUID = resistor0.uuid;
-        const list_independentUUID = [battery0.uuid, resistor1.uuid];
-        const dependentVarType = 'current';
-        const list_independentVarType = ['current', 'current'];
+        const dependentUUID = battery0.uuid;
+        const list_independentUUID = [resistor0.uuid, resistor1.uuid];
+        const dependentVarType = 'resistance';
+        const list_independentVarType = ['resistance', 'resistance'];
 
         function variableSelect(self) {
             function onlySubString(s, subString){return s.includes(subString)}
-            const list_equationLatexStr = []; let dependentVarStr; const list_independentVarStr = [];
+            const list_equationLatexStr = []; let dependentVarStr=undefined; const list_independentVarStr = [];
             self.list_equationNetworkInfoDict.forEach(equationNetworkInfoDict => {
                 list_equationLatexStr.push(equationNetworkInfoDict['equation']);
                 Object.entries(equationNetworkInfoDict['variableInfos']).forEach(([nodeId, list_variableStr]) => {
-                    //capture the dependentVarStr: voltage of resistor0
-                    if(parseInt(nodeId) == self.uuid__id[resistor0.uuid]) {
-                        dependentVarStr = list_variableStr.filter(function(s){return onlySubString(s, 'V')})[0];//TODO some hard coding here....
+                    //capture the dependentVarStr: resistance of resistor0
+                    if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {//we only want to set dependentVarStr once
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
+                        console.log('varString: ', varString, 'dependentVarStr')
+                        // if (varString !== undefined) {
+                            dependentVarStr = varString;
+                        // }
                     }
                     //capture the first element of list_independentVarStr
-                    if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {
-                        list_independentVarStr.push(list_variableStr.filter(function(s){return onlySubString(s, 'V')})[0]); //TODO some hard coding here...
+                    if(parseInt(nodeId) == self.uuid__id[resistor0.uuid]) {
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{R')})[0];
+                        if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
+                            list_independentVarStr.push(varString)
+                        }
+                        // list_independentVarStr.push(); //TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
                     }
                     //capture the first element of list_independentVarStr
                     if(parseInt(nodeId) == self.uuid__id[resistor1.uuid]) {
-                        list_independentVarStr.push(list_variableStr.filter(function(s){return onlySubString(s, 'V')})[0]); //TODO some hard coding here...
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{R')})[0];
+                        if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
+                            list_independentVarStr.push(varString)
+                        }
                     }
                 });
             });

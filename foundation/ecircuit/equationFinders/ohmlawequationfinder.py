@@ -12,7 +12,7 @@ class OhmlawEquationFinder(EquationFinder):
         All components that are not wire|source, will have OhmsLaw
         """
         for componentId, componentType in self.id__type.items():
-            if componentType not in ['wire', 'AC_signal_generator', 'battery']:
+            if componentType not in ['wire']:#, 'AC_signal_generator', 'battery']: # power_sources also obey ohms law
                 resistanceVariable = EquationFinder.getVariable('resistance', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, resistanceVariable)
                 voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)

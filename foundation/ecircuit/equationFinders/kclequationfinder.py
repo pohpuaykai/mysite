@@ -74,13 +74,20 @@ class KCLEquationFinder(EquationFinder):
 
         list_equationVars = []; 
         # visitedUndirected = set()
+        visitedUndirectedSuperNodes = set()
         #kirchoff_current_law components on directedEdges going into the startSuperNodeId are positive_variable, components on directedEdges that are going out of the startSuperNodeId are negative_variable
         for startSuperNodeId in self.superNodeIds:
             #find components
             #
             associatedComponentIdList = []
             list_vars = []
+            # print('self.superNodeUndirectedGraph: ', self.superNodeUndirectedGraph); import pdb;pdb.set_trace()
             for endSuperNodeId in self.superNodeUndirectedGraph[startSuperNodeId]:
+                if (startSuperNodeId, endSuperNodeId) in visitedUndirectedSuperNodes:
+                    continue
+                else:
+                    visitedUndirectedSuperNodes.add((startSuperNodeId, endSuperNodeId))
+                    visitedUndirectedSuperNodes.add((endSuperNodeId, startSuperNodeId))
                 list_directedPath = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId)))
                 for directedPath in list_directedPath: #all the components on this directedPath are ALL_positive or ALL_negative
                     # import pdb;pdb.set_trace()
@@ -99,57 +106,4 @@ class KCLEquationFinder(EquationFinder):
                         self.addVariableToComponentIdx(componentId, variable)
             if len(list_vars) > 0:
                 self.sumOfPositiveNegativeToLatexAndScheme(list_vars, {'varStr':'0', 'positive':True}, associatedComponentIdList)
-
-
-
-
-
-
-
-
-        # for startSuperNodeId in self.superNodeIds:
-        #     startComponentType = self.id__type[startSuperNodeId]
-        #     list_vars = []
-        #     for endSuperNodeId in self.superNodeUndirectedGraph[startSuperNodeId]:
-        #         #
-        #         # if (startSuperNodeId, endSuperNodeId) in visitedUndirected:
-        #         #     continue
-        #         # visitedUndirected.add((startSuperNodeId, endSuperNodeId));visitedUndirected.add((endSuperNodeId, startSuperNodeId))
-        #         #
-        #         endComponentType = self.id__type[endSuperNodeId]
-        #         list_directedPath = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId)))
-        #         for directedPath in list_directedPath:
-        #             #find first non_wire_component
-        #             selectedComponentId = None; selectedComponentType = None; prevSelectedComponentId = startSuperNodeId; prevSelectedComponentType = self.id__type[startSuperNodeId]
-        #             for componentId in directedPath:
-        #                 componentType = self.id__type[componentId]
-        #                 if componentType not in ['wire']:
-        #                     selectedComponentId = componentId; selectedComponentType = componentType
-        #                     break
-        #                 prevSelectedComponentId = componentId # this is to find the direction for positiveLeadsDirection
-        #                 prevSelectedComponentType = componentType
-        #             if selectedComponentId is not None:# and prevSelectedComponentType not in ['wire'] and selectedComponentType not in ['wire']:
-        #                 directedEdge = (prevSelectedComponentId, selectedComponentId)
-        #                 variable = EquationFinder.getVariable('current', selectedComponentType, selectedComponentId)
-        #                 # print('@@@@@@@@@@@@@@@@@@@@variable', variable)
-        #                 #componentDirectionPositive <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<independent of polarity of component?
-        #                 # list_vars.append({'varStr':variable, 'positive':self.directedEdgeIsPositive(directedEdge)})#add positive Voltage variable
-        #                 list_vars.append({'varStr':variable, 'positive':self.componentDirectionPositive(directedEdge)})#add positive Voltage variable
-                        
-        #                 self.addVariableToComponentIdx(selectedComponentId, variable)
-        #                 # if directedEdge in self.id__positiveLeadsDirections[prevSelectedComponentId]:
-        #                 #     list_vars.append({'varStr':variable, 'positive':True})#add positive Voltage variable
-        #                 #     self.addVariableToComponentIdx(selectedComponentId, variable)
-        #                 # else:
-        #                 #     list_vars.append({'varStr':variable, 'positive':False})#add negative Voltage variable
-        #                 #     self.addVariableToComponentIdx(selectedComponentId, variable)
-        #     if len(list_vars) > 0:
-        #         list_equationVars.append(list_vars)
-        # #convert equationVars to list_equations and store in parent
-        # for list_vars in list_equationVars:
-        #     self.sumOfPositiveNegativeToLatexAndScheme(list_vars, {'varStr':'0', 'positive':True})
-
-
-        #     #find path in this: tuple_startSuperNodeId_endSuperNodeId__list_path
-        #     #take first non-wire component in path, check its +ve direction and add to equation
         return self.list_equations
