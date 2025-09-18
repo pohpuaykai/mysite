@@ -89,6 +89,7 @@ class BipartiteSolver:
             equationVariables_g, 
             vertexId__equationVariableId, 
             equationId__vertexId, 
+            variableId__vertexId,
             type__list_vertexIds, 
             equationKey, 
             variableKey, 

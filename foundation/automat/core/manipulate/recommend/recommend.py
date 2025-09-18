@@ -195,13 +195,13 @@ The smaller the self.equation.astScheme the more simple???<<<<<<<<<<<<<<<<<<<<<<
 Cannot be applied to Differentiation|Integration
 Please see:
 hi Sir, i just found something irritating in a computer algebra system(CAS)... i will write in latex
-Suppose we are to solve $\frac{d}{dx} \log_a(B(x))$, where a is any number
+Suppose we are to solve $\frac{d}{dx} \\log_a(B(x))$, where a is any number
 If the CAS took the wrong route and went:
-$\frac{d}{dx} \ln(e^{\log_a(B(x))})$
+$\frac{d}{dx} \\ln(e^{\\log_a(B(x))})$
 it would have gotten:
-$\frac{(\log_a(B(x)))(e^{\log_a(B(x)))}}{e^{\log_a(B(x))}}$
+$\frac{(\\log_a(B(x)))(e^{\\log_a(B(x)))}}{e^{\\log_a(B(x))}}$
 and after simplifying it would have gotten:
-$\log_a(B(x))$
+$\\log_a(B(x))$
 Which is wrong, but all the rules applied are valid... is there some kind of hiearchy_of_rules or some rules that are omitted?
 ###
 
@@ -365,6 +365,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         equationVariables_bg, 
         vertexId__equationVariableId, 
         equationId__vertexId, 
+        variableId__vertexId,
         type__list_vertexIds, 
         equationKey, 
         variableKey, 
@@ -389,78 +390,110 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
 
         Then either plop in the values(simple calculation), or plot a graph with the equation(understand effects of circuit), or use equation for optimization(what to buy)
 
+        Count_Tree_まま
+        When we try to derive parallelSumOfResistors of 2_resistor_in_parallel_circuit, the bipartite_path_is_blocked on V_{DC}-V_{R_3}=0, because the next required step of elimination requires a equation that is not on the bipartiteGraph
+        as we do linearEliminationBySubstitution, new Equations (set of variables) are produced, and some of them might have extra_variables_that_can_be_cancelled_out.
+        If we could simplify equations, so that they do not have extra_variables_that_can_be_cancelled_out, the_set_of_variables_ignoring_position_in_equation, can be used as id for the equation
+        If we have the_set_of_variables_ignoring_position_in_equation as id for equation, we can add newly created variables to the bipartite_graph {the underlying graph changes as we traverse it}
+        And then that path becomes explorable_and_obtainable.
+        This means:
+        - WE HAVE TO WORK ON SIMPLIFY(finding the shortest_possible_standard_representation_of_an_equation) for id_of_equation
+        - and then the update the bipartite_graph as we traverse it
+
+        Also our current_method_of_substitution does not allow SchemeFunctions to be substituted away, if this was possible other paths to derive the parallel_sum_of_resistance might be possible... {ELEGANCE}
+
+
+
         :param dependentVariableId: is a vertexId, (not from list_equations nor list_variables)
         :param list_independentVariableIds: are vertexIds (not from list_equations nor list_variables)
         :param type__list_vertexIds: type is either (0)equationKey or (1)variableKey (the partite of each vertexId), values are a list of vertexIds of its key's partite
         """
         #[TODO optimization possible, if the bipartite graph equationVariables_bg is disconnected, only take the connected part that is related to dependent|indepedentVariables]
-        # from foundation.automat.common.spanningtree import SpanningTree
-        # vertexIterable = sorted(list(equationVariables_bg))
-        # def isEquation(parentId):
-        #     return parentId < len(list_equations)
-        # edgeIterableSortable = []; edgeWeight = {}#assign edges incident to variables that we want to get rid of, lower weights
-        # HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; #[TODO many optimizations possible here]
-        # for parentId, neighbours in equationVariables_bg.items():
-        #     parentKeep = isEquation(parentId) or (parentId in [dependentVariableId]+list_independentVariableIds) # equation=KEEP, dependent|independentVariable=KEEP
-        #     for neighbourId in neighbours:
-        #         neighbourKeep = isEquation(neighbourId) or (neighbourId in [dependentVariableId]+list_independentVariableIds)
-        #         directedEdge = (parentId, neighbourId)
-        #         edgeIterableSortable.append(directedEdge)
-        #         if parentKeep and neighbourKeep:# both nodes of directedEdge are either (0)Equation OR (1)dependent|independentVariables, assign HIGH_WEIGHTS to keep
-        #             edgeWeight[directedEdge] = HIGH_WEIGHTS
-        #         else: # either nodes of directedEdge is NOT Equation NOR dependent|independentVariables, assign LOW_WEIGHTS to form subsitutionPath to be eliminated
-        #             edgeWeight[directedEdge] = LOW_WEIGHTS
-        # T, R = SpanningTree.minimumSpanningTreeKruskal(vertexIterable, edgeIterableSortable, edgeWeight)
-        # print('T:', T); print('R: ', R, '<<<<<<<<<<')
-        #find equationNode in T, that has dependentVariableId as start of DFS#[TODO many optimizations possible here, to get a Path that substitutes away all the unwanted variables]
-        #since T is spanning, we can just look in list_equations, for ANY equation that has_most_number_of_dependentVariableId_and_list_independentVariableIds[heuristic][TODO many optimizations possible here, on which starting point to pick] Ou est vers origin, ja?
-        print(dependentVariableId, 'dependentVariableId'); print('list_independentVariableIds', list_independentVariableIds)
+
         from foundation.automat.common.priorityqueue import PriorityQueue
+        #since we are finding all possible paths, what about save_points? (each save_point is [priority_queue, list_of_next_explored, index_of_visited_to_back_track]), everytime, we finish the PQ, but we cannot find an answer that gets all the unwantedVariables, we popOff a savePoint, but if we popOff more than 1 savePoint, savePoint0 and then savePoint1, we have to make sure we do not go back to the same savePoint0 again when we explore savePoint1... not sure how to do that
+        allVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], range(0, len(list_variables))))
+        wantedVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], [dependentVariableId]+list_independentVariableIds))
+        unwantedVariableVertexIds = list(set(allVariableVertexIds) - set(wantedVariableVertexIds))
+        allEquationVertexIds = list(map(lambda equationId: equationId__vertexId[equationId], range(0, len(list_equations))))
+        #remove wantedVariableVertexIds
+        equationVariables_bg___noWantedVariableVertexIds = {}
+        for parentVertexId, childVertexIds in equationVariables_bg.items():
+            if parentVertexId not in wantedVariableVertexIds:
+                filteredChildVertexIds = []
+                for childVertexId in childVertexIds:
+                    if childVertexId not in wantedVariableVertexIds:
+                        filteredChildVertexIds.append(childVertexId)
+                equationVariables_bg___noWantedVariableVertexIds[parentVertexId] = filteredChildVertexIds
+        equationVariables_bg = equationVariables_bg___noWantedVariableVertexIds
+
+        #finding a startNode
+        maxEquationVertexId = None;maxTotalCount = -1
         wantedVariables = []
         for wantedVariableId in [dependentVariableId]+list_independentVariableIds:
             wantedVariables.append(list_variables[wantedVariableId])
-        maxTotalCount = -1; maxEquationVertexId = None;
         for equationId, equation in enumerate(list_equations):
             variables__count = equation.variablesScheme; totalWantedVariableCount = 0
             for wantedVariable in set(variables__count.keys()).intersection(set(wantedVariables)):
                 totalWantedVariableCount += variables__count[wantedVariable]
             if totalWantedVariableCount > maxTotalCount:
                 maxTotalCount = totalWantedVariableCount; maxEquationVertexId = equationId__vertexId[equationId]
+
+
+
         #check if all the variables to be substituted away are in our path
         #or we can start from a variable, then add the appropriate equation to the beginning of the resulting path
-        unwantedVariableIds = list(set(type__list_vertexIds[variableKey])-set([dependentVariableId]+list_independentVariableIds)) # any variable that is not dependent|independentVariable
-        # dependentVariable = list_variables[dependentVariableId]
-        # stack = [{'current':dependentVariableId, 'path':[dependentVariableId]}]; visited = [dependentVariableId]; 
         #maxEquationVertexId might be None... then for now just get a random one...
-        if maxEquationVertexId is None:#[TODO many optimizations possible here]
-            maxEquationVertexId = list(equationId__vertexId.values())[0]
-        # stack = [{'current':maxEquationVertexId, 'path':[maxEquationVertexId]}]; 
-        print('unwantedVariableIds', unwantedVariableIds); print('wantedVariables', wantedVariables)
-        priorityQueue = PriorityQueue(); priorityQueue.insert({'current':maxEquationVertexId, 'path':[maxEquationVertexId]}, -1)
-        visited = [maxEquationVertexId];
-        maxLength=0; maxLengthChildDict = None
-        HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; #[TODO many optimizations possible here]
+        if maxEquationVertexId is None:#[TODO many optimizations possible here] Ou est vers origin, ja?
+            maxEquationVertexId = allEquationVertexIds[0] # startNode
+        # print('unwantedVariableVertexIds', unwantedVariableVertexIds); print('wantedVariableVertexIds', wantedVariableVertexIds)
+        # print('startNode: ', maxEquationVertexId)
+        priorityQueue = PriorityQueue(); 
+        priorityQueue.insert({
+            'current':maxEquationVertexId, 
+            'path':[maxEquationVertexId],
+            'visited':[]
+        }, -1)
+        maxLength=0; maxLengthPaths = []
+        HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; WANTEDVARIABLE_PENALTY = -2* HIGH_WEIGHTS#[TODO many optimizations possible here]
+        PATHLENGTH_FACTOR = 10
+        visitedPaths = [] # paths that have been explored before
         # while len(stack)>0:
         while len(priorityQueue)>0:
-            # current___dict = stack.pop()#lastOut,  what if we choose the neighbour, that is in the unwanted_variable set ? will that be a better path? PRIORITY_QUEUE, use your binarySearch to implement priority_queue on []<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
             current___dict = priorityQueue.popMax()
-            for neighbour in equationVariables_bg[current___dict['current']]:
-            # for neighbour in T[current___dict['current']]: # this is the correct one, but does not perform as well
-                if neighbour not in visited:
-                    visited.append(neighbour)
-                    childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour]}
+            current = current___dict['current']
+
+            current___dict['visited'].append(current)
+                    
+            for orderOfExploration, neighbour in enumerate(sorted(equationVariables_bg[current], key=lambda vertexId: LOW_WEIGHTS if vertexId in unwantedVariableVertexIds or vertexId in allEquationVertexIds else HIGH_WEIGHTS)):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
+                if neighbour not in current___dict['visited']:
+                    childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour], 'visited':current___dict['visited']+[neighbour]}
                     if len(childDict['path']) > maxLength:
-                        maxLength = len(childDict['path']); maxLengthChildDict = childDict
-                    # stack.append(childDict)
+                        maxLength = len(childDict['path'])
+                        maxLengthPaths = [] # only store longest path, this will not work if the #OfNodes(equationVariables_bg) increases as we process equationVariables_bg <Heuristic>
+                    if len(childDict['path']) == maxLength:#there might be many paths with same maxLength, if we have a choice, HOW TO CHOOSE<<<<<<<<<<<<<<<<<<<<<<<TODO?
+                        maxLengthPaths.append(childDict['path'])
+                    #Priority Heuristic
+                    childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
+                    childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
+                    childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path
+                    childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0
+                    priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #
-                    childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableIds else LOW_WEIGHTS
-                    priorityQueue.insert(childDict, childDictPriority)
-                    #
-        #             print('******')
-        #             print('current: ', current___dict['current'], ' child: ', childDict['current'], ' path: ', childDict['path'])
-        #             print('******')
+                    # print('******')
+                    # print('neighbour', neighbour, 'priority: ', childDictPriority-orderOfExploration)
+                    # print('current: ', current, ' child: ', childDict['current'], 'currentPath: ', current___dict['path'], ' childPath: ', childDict['path'])
+                    # print('priorityQueue')
+                    # print(priorityQueue)
+                    # print('visited:', current___dict['visited'])
+                    # print('******')
         # print('returning substitutionPath:', maxLengthChildDict['path'])
-        return maxLengthChildDict['path']
+        #pick your favourite path from maxLengthPaths?
+        # print('maxLengthPaths:')
+        # print(maxLengthPaths)
+        # print('********')
+        favouritePath = maxLengthPaths[0] # [TODO many optimisations possible here]
+        return favouritePath
 
 
     def combingSearch(self):

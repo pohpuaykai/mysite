@@ -20,3 +20,6 @@ class PriorityQueue:#UNIT_TEST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
 
     def __len__(self):
         return len(self.sortedList)
+
+    def __str__(self):
+        return str(self.sortedList)
