@@ -583,7 +583,6 @@ class SchemeGrammarParser:
                         # for matchIdx, match in enumerate(validNonOverlappingMatches): # each match is a enclosureTreeId
                         for matchIdx, match in enumerate(validNonOverlappingMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
                             enclosureTreeId = self.getEnclosureNodeId()
-                            #maybe this should be recorded in the self.iId__data also? at least the inVars, what else can be recorded here? surely only the in not the out...?<<<<<<<<<<
                             list_existingChild.append(enclosureTreeId)
                             #also capture the iVar & iStatic
                             iVar = []; iStatic = []; staticStartPos = vorEndPos
@@ -595,49 +594,42 @@ class SchemeGrammarParser:
                                 if varIdx != len(match)-1:#static are not at the start&end of iPattern, so we take the end of each var to the start of each var as the static, which should be a single space
                                     nextD = match[varIdx-1]
                                     iStatic.append((d['schemeEndPos'], nextD['schemeStartPos']))
-                            iVars.append(iVar); iStatics.append(iStatic)
 
-                            # for i, _ in enumerate(inVars___nonOverlapping[matchIdx]):
-                            #     toList = list(inVars___nonOverlapping[matchIdx][i]) # convert to a list so that tuple can be modified
-                            #     toList[-1] = enclosureTreeId
-                                # inVars___nonOverlapping[matchIdx][i] = tuple(toList)
 
-                            #fill up the inVars
-                            # print('match:', match, "s:", schemeStartPos, "e:", schemeEndPos); import pdb;pdb.set_trace()
-                            #
-                            #update self.iId__data for child
-                            # print('inVars___nonOverlapping', inVars___nonOverlapping); print('matchIdx', matchIdx); import pdb;pdb.set_trace()
-                            s = iVars[matchIdx][0][0]; #s is the start of inVars
-                            e = iVars[matchIdx][-1][-1]; # e is the end of inVars
-                            if enclosureTreeId in self.iId__data:# might be a parent too so has some answers
-                                self.iId__data[enclosureTreeId].update({
-                                    # 'id':enclosureTreeId,
-                                    's':s,
-                                    'e':e,
-                                    'w':self.iStr[s:e],
-                                    'matchIdx':matchIdx,
-                                    'pid':parentEnclosureId
-                                })
-                                # print('0enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
-                            else:#this is totally new
-                                self.iId__data[enclosureTreeId] = {
-                                    # 'id':enclosureTreeId,
-                                    'noOfMatches':0,
-                                    's':s,
-                                    'e':e,
-                                    'w':self.iStr[s:e],
-                                    'matchIdx':matchIdx,
-                                    'pid':parentEnclosureId
-                                }
-                                # print('1enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
-                            # enclosureTreeId += 1
+
+                            #if iVars is not consistent, iStatic cannot be appended also<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                            if self.variablesConsistent(iVar):
+                                iVars.append(iVar); iStatics.append(iStatic)
+
+                                s = iVars[matchIdx][0][0]; #s is the start of inVars
+                                e = iVars[matchIdx][-1][-1]; # e is the end of inVars
+                                if enclosureTreeId in self.iId__data:# might be a parent too so has some answers
+                                    self.iId__data[enclosureTreeId].update({
+                                        # 'id':enclosureTreeId,
+                                        's':s,
+                                        'e':e,
+                                        'w':self.iStr[s:e],
+                                        'matchIdx':matchIdx,
+                                        'pid':parentEnclosureId
+                                    })
+                                    # print('0enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
+                                else:#this is totally new
+                                    self.iId__data[enclosureTreeId] = {
+                                        # 'id':enclosureTreeId,
+                                        'noOfMatches':0,
+                                        's':s,
+                                        'e':e,
+                                        'w':self.iStr[s:e],
+                                        'matchIdx':matchIdx,
+                                        'pid':parentEnclosureId
+                                    }
+                                    # print('1enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
                         iHins.append((hinStartPos, hinEndPos))
                         self.iEnclosureTree[parentEnclosureId] = list_existingChild
-                        #parentSchemeId's start and end position without all the matches, are the hin and vor?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        
+
                         self.iId__data[parentEnclosureId] = {
                             # 'id':parentEnclosureId,
-                            'noOfMatches':len(validNonOverlappingMatchesWithPos),
+                            'noOfMatches':len(iVars),
                             'statics':iStatics, # this should contain all the spaces between each variable in the inputPattern
                             'vars':iVars,
                             'hins':iHins,
@@ -745,28 +737,29 @@ class SchemeGrammarParser:
                             # print('foundSegmentMatch'); import pdb;pdb.set_trace()
                             noMatch = True
                 # if len(iVar) > 0:#, but might not be a complete match... has to be a complete match<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                if len(iVar) == len(self.iSortedVariablesAndPositionSansNum):
+                if len(iVar) == len(self.iSortedVariablesAndPositionSansNum) and self.variablesConsistent(iVar):
                     iVars.append(iVar); iStatics.append(iStatic)
                     # print('captureing iStatic: ', iStatic); import pdb;pdb.set_trace()
                     noOfMatches += 1
 
 
             if len(iVars) > 0: # something was captured
+                #capture the stragglering Hin
+                lastMatchedStaticEndPos = iStatics[-1][-1][-1]
+                iHins.append((lastMatchedStaticEndPos, absoluteEndPos))
+                #
                 #store the parent in id__data
                 self.iId__data[parentNodeId] = {
                     's': absoluteStartPos, 'e': absoluteEndPos, 'w': self.iStr[absoluteStartPos:absoluteEndPos],
                     'vars':iVars, 'statics':iStatics, 'vors':iVors, 'hins':iHins, 'noOfMatches':noOfMatches
                 }
 
-                #capture the stragglering Hin
-                lastMatchedStaticEndPos = iStatics[-1][-1][-1]
-                iHins.append((lastMatchedStaticEndPos, absoluteEndPos))
-                #
-                #recurse on each variable
+
+                #recurse on each variable, no matter if the variablesConsistent or NOT
                 self.iEnclosureTree[parentNodeId] = []
                 # print('iVars: ', iVars); import pdb;pdb.set_trace()
-                for iVar in iVars:
-                    for varStartPos, varEndPos in iVar:
+                for matchIdx, iVar in enumerate(iVars):
+                    for iVarIdx, (varStartPos, varEndPos) in enumerate(iVar):
                         varNodeId = self.getEnclosureNodeId()
                         self.iEnclosureTree[parentNodeId].append(varNodeId)
                         recursiveMatch(varStartPos, varEndPos, varNodeId)
@@ -1958,6 +1951,20 @@ class SchemeGrammarParser:
     ######################################
     #HELPER FUNCTION
     ######################################
+    def variablesConsistent(self, iVar): # there is no need to check for variableConsistency in oVar
+        iVar__val = {}
+        for iVarPos, (absoluteStartPos, absoluteEndPos) in zip(self.iSortedVariablesAndPosition, iVar):
+            iVar = iVarPos[0]
+            existingVal = iVar__val.get(iVar, None)
+            actualWord = self.iStr[absoluteStartPos:absoluteEndPos]
+            if existingVal is not None and actualWord != existingVal:
+                return False
+            if existingVal is None:
+                iVar__val[iVar] = actualWord
+        return True
+
+
+
     def renameUserGivenSchemeNodeId(self, nodeId__SCHMCK):
         if getattr(self, 'nodeId__startPos___iStr___OLD', None) is None: # caching
             self.nodeId__startPos___iStr___OLD = dict(map(lambda t: (t[1], t[0]) ,self.startPos__nodeId___iStr___OLD.items()))

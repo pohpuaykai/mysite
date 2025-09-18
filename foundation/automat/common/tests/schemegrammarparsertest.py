@@ -665,8 +665,8 @@ def test__functionCountChanges__subtractZero(verbose=False):
         print(schemeword)
         print('result:')
         print(manipulatedSchemeword)
-        # print('id__data:')
-        # pp.pprint(sgparser.id__data)
+        print('iId__data:')
+        pp.pprint(sgparser.iId__data)
         print('schemeNodeChangeLog(positional changes):')
         pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
         print('expected_startPos__nodeId: ')
@@ -1938,18 +1938,56 @@ def test__latexParserUnparse__Trig1(verbose=False):
         expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
         )
 
+def test__simpleParallel2ResistorSimplication__MultiplydividecancelVARIABLECONSISTENT(verbose=False): #<<<<<<<<<<<<<TODO make a test for MODE1
+    """"""
+    inputPattern = '(/ (* $1 $0) $0)'
+    outputPattern = '$1'
+    schemeword = '(= (/ (* R_{R_{0}} I_{R_{0}}) R_{R_{3}}) I_{R_{3}})'
+    parser = Schemeparser(equationStr=schemeword)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    nodeIdsToSkip = []
+    variableMinArgs = {}
+    variableMaxArgs = {}
+    sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
+    sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+    manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
+    expected = '(= (/ (* R_{R_{0}} I_{R_{0}}) R_{R_{3}}) I_{R_{3}})'
+    expected_schemeNodeChangeLog = []
+    expected_startPos__nodeId = {1: 0, 4: 1, 7: 3, 9: 5, 19: 6, 30: 4, 41: 2}
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('schemeNodeChangeLog(positional changes):')
+        pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
+        print('expected_startPos__nodeId: ')
+        pp.pprint(sgparser.startPos__nodeId___oStr)
+        print('OG startPos__nodeId: ')
+        pp.pprint(startPos__nodeId)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword 
+        and \
+        expected_schemeNodeChangeLog == sgparser.schemeNodeChangeLog #sgparser.schemeNodeChangeLog keeps swapping order... TODO why?
+        and \
+        expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
+        )
+
 # def test__latexParserUnparse__(verbose=False):
 #     """"""
 #     inputPattern = None
 #     outputPattern = None
 #     schemeword = None
 #     parser = Schemeparser(equationStr=schemeword)
-#     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
 #     nodeIdsToSkip = []
-#     sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose, recordMaking=True)
-#     manipulatedSchemeword = sgparser.parse(schemeword, nodeIdsToSkip)
+#     variableMinArgs = {}
+#     variableMaxArgs = {}
+#     sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
+#     sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+#     manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
 #     expected = None
 #     expected_schemeNodeChangeLog = None
+#     expected_startPos__nodeId = {}
 #     if verbose:
 #         print('OG:')
 #         print(schemeword)
@@ -1957,12 +1995,16 @@ def test__latexParserUnparse__Trig1(verbose=False):
 #         print(manipulatedSchemeword)
 #         print('schemeNodeChangeLog(positional changes):')
 #         pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
+#         print('expected_startPos__nodeId: ')
+#         pp.pprint(sgparser.startPos__nodeId___oStr)
+#         print('OG startPos__nodeId: ')
+#         pp.pprint(startPos__nodeId)
 #     print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
 #         expected == manipulatedSchemeword 
 #         and \
 #         expected_schemeNodeChangeLog == sgparser.schemeNodeChangeLog #sgparser.schemeNodeChangeLog keeps swapping order... TODO why?
 #         and \
-#         expected_startPos__nodeId == sgparser.startPos__nodeId___outputStr
+#         expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
 #         )
 
 
@@ -1998,4 +2040,5 @@ if __name__=='__main__':
     test__differentiation__simple()#MODE2 duplicated_iVar_in_oStr 
     test__differentiation__doesNotMeetvariableMinArgsCriteria()
     test__latexParserUnparse__Trig1()
+    test__simpleParallel2ResistorSimplication__MultiplydividecancelVARIABLECONSISTENT()
     #after this test latexUnparse, equation.Manipulate again

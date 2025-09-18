@@ -192,16 +192,16 @@ def test__bipartiteSolverSimpleParallelCircuit__step0(verbose=False): # TODO MUl
     eq0 = Equation(eqs0, 'scheme', verbose=verbose)
     eq1 = Equation(eqs1, 'scheme', verbose=verbose)
     variableToEliminate = 'V_{DC_{8}}'
-    simplify = False
+    simplify = True
     ast, functions, variables, primitives, totalNodeCount, stepsWithoutSimplify___self, stepsWithoutSimplify___eq = eq0.linearEliminationBySubstitution(eq1, variableToEliminate, simplify=simplify)
-    print('eq0.schemeStr: ', eq0.schemeStr, 'simplify: ', simplify); import pdb;pdb.set_trace()
+    # print('eq0.schemeStr: ', eq0.schemeStr, 'simplify: ', simplify); import pdb;pdb.set_trace()
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
-    expectedLatexStr = None # to be filled in 
-    expectedFunctions = None
-    expectedVariables = None
-    expectedPrimitives = None
-    expectedTotalNodeCount = None
+    expectedLatexStr = 'V_{R_{0}}=V_{R_{3}}' # to be filled in 
+    expectedFunctions = {}
+    expectedVariables = {'V_{R_{0}}': 1, 'V_{R_{3}}': 1}
+    expectedPrimitives = {}
+    expectedTotalNodeCount = 5
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
         expectedLatexStr == latexStr and 
         expectedFunctions == eq0.functionsScheme and 

@@ -271,7 +271,7 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                 if self.verbose:
                     print('hint: ', hint)
                     print(functionNamesJustAdded, '<<functionNamesJustAdded')
-                    import pdb;pdb.set_trace()#<<<< some thing wrong with 
+                    # import pdb;pdb.set_trace()#<<<< some thing wrong with 
                 relevantManipulations = self.filterMetaList(self.simplifyingManipulations, 'iFunctions', functionNamesJustAdded)# should use: self.simplifyingManipulations AS a base
                 if self.verbose:
                     import pprint; pp = pprint.PrettyPrinter(indent=4)
