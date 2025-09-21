@@ -198,7 +198,7 @@ def test__bipartiteSolverSimpleParallelCircuit__step0(verbose=False): # TODO MUl
     from foundation.automat.parser.sorte.latexparser import Latexparser
     latexStr = Latexparser(ast=ast, rootOfTree=eq0.rootOfTree)._unparse()
     expectedLatexStr = 'V_{R_{0}}=V_{R_{3}}' # to be filled in 
-    expectedFunctions = {}
+    expectedFunctions = {'=': 1}
     expectedVariables = {'V_{R_{0}}': 1, 'V_{R_{3}}': 1}
     expectedPrimitives = {}
     expectedTotalNodeCount = 5
@@ -233,4 +233,4 @@ if __name__=='__main__':
     # test__hatsukoi__step0()
     # test__hatsukoi__step1() # TODO SAME_DIVISOR=> simplication_in_AST
     # test__hatsukoi__step2() # TODO MUlTIPLY_DIVIDE_CANCEL_OUT => simplication_in_AST
-    test__bipartiteSolverSimpleParallelCircuit__step0(True)
+    test__bipartiteSolverSimpleParallelCircuit__step0()

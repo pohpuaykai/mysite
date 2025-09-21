@@ -70,12 +70,23 @@ class Schemeparser(Parser):
                 print(f'label: {current.label}, argumentIdx: {current.argumentIdx}, id: {current.id}, tid:{tid}')
             #do the tabulating
             totalNodeCount += 1
-            if isNum(current.label):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<does your isNum at least contain e and i?
-                primitives[current.label] = primitives.get(current.label, 0) + 1
-            elif current.label in Schemeparser.FUNC_NAMES: # is a function
+            #
+            # if isNum(current.label):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<does your isNum at least contain e and i?
+            #     primitives[current.label] = primitives.get(current.label, 0) + 1
+            # elif current.label in Schemeparser.FUNC_NAMES: # is a function
+            #     functionsD[current.label] = functionsD.get(current.label, 0) + 1
+            # elif current.label != '=': # is a variable
+            #     variablesD[current.label] = variablesD.get(current.label, 0) + 1
+            #
+            #
+            if len(current.neighbours) > 0: # it is a function
                 functionsD[current.label] = functionsD.get(current.label, 0) + 1
-            elif current.label != '=': # is a variable
+            elif isNum(current.label): # is a primitive
+                primitives[current.label] = primitives.get(current.label, 0) + 1
+            else:
                 variablesD[current.label] = variablesD.get(current.label, 0) + 1
+
+            #
             #end of tabulating
             #node = (current.label, id)
             #ast[node] = ast.get(node, []) + current.neighbours
@@ -101,22 +112,82 @@ class Schemeparser(Parser):
         self.totalNodeCount = totalNodeCount
         return ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId
 
+    def getASTDepth(self):
+        """"""
+        if getattr(self, 'depth', None) is None:
+            self.depth = len(self.ast) + 1 if len(self.startPos__nodeId) > 0 else 0# +1 is for the leaves
+        return self.depth
+
+    def getASTWidth(self):
+        """
+        Use leveling information to get the width
+        all the nodes on the same level is the width of the level
+        so if leveling information is not available it needs to be calculated
+        #there is code overlap with _getLevelingInformation, so refactor?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        """
+        if getattr(self, 'width', None) is None:
+            self.width = max(map(lambda list_nodeId: len(list_nodeId), self.getLevelToNodeIds().values()))
+        return self.width
+
+    def getLevelToNodeIds(self):
+        if getattr(self, 'level__list_nodeIds', None) is None:
+            self.level__list_nodeIds = {}
+            stack = [(self.rootOfTree, 0)]
+            while len(stack) > 0:
+                currentNode, currentLevel = stack.pop()
+                #collect
+                existingList = self.level__list_nodeIds.get(currentLevel, [])
+                existingList.append(currentNode)
+                self.level__list_nodeIds[currentLevel] = existingList
+                #
+                childNodes = self.ast.get(currentNode, [])
+                childNodesTaggedWithLevel = list(zip(childNodes, [currentLevel+1]*len(childNodes)))
+                stack += childNodesTaggedWithLevel
+        return self.level__list_nodeIds
+
+
+    def getLabelsInOrderOfStartPos(self):
+        if getattr(self, 'labelsInOrderOfStartPos', None) is None:
+            #the schemeparser might have been initiated from ast
+            if getattr(self, '_eqs', None) is None:
+                self._eqs = self._unparse()
+            self.labelsInOrderOfStartPos = []; nodeId__labelLen = self._getLabelLength()
+            for startPos, nodeId in sorted(self.startPos__nodeId.items(), key=lambda t: t[0]):
+                self.labelsInOrderOfStartPos.append(self._eqs[startPos:startPos+nodeId__labelLen[nodeId]])
+        return self.labelsInOrderOfStartPos
+
+    def getListWithoutLabels(self):
+        if getattr(self, 'listWithoutLabels', None) is None:
+            delimiterThatCannotBeUsedInSchemeStr = ')(' # because any )(, must have a space in between
+            from copy import copy
+            stringWithoutLabels = copy(self._eqs)
+            for label, _ in self.functions.items():
+                stringWithoutLabels = stringWithoutLabels.replace(label, delimiterThatCannotBeUsedInSchemeStr)
+            for label, _ in self.variables.items():
+                stringWithoutLabels = stringWithoutLabels.replace(label, delimiterThatCannotBeUsedInSchemeStr)
+            for label, _ in self.primitives.items():
+                stringWithoutLabels = stringWithoutLabels.replace(label, delimiterThatCannotBeUsedInSchemeStr)
+            self.listWithoutLabels = stringWithoutLabels.split(delimiterThatCannotBeUsedInSchemeStr)
+            # print('self.listWithoutLabels', self.listWithoutLabels); import pdb;pdb.set_trace()
+        return self.listWithoutLabels
+
 
     def _getLabelLength(self):
         """
         #some parts of schemegrammarparser duplicates this implementation, please remove from schemegrammarparser<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         """
-        nodeId__labelLen = {}
-        if len(self.ast) == 0 and len(self._eqs) != 0: # this is a single leaf, and the single leaf will not appear on self.ast.
-            nodeId__labelLen[self.rootOfTree[1]] = len(self._eqs)
-        else:
-            for (pLabel, pNodeId), childNodes in self.ast.items():
-                nodeId__labelLen[pNodeId] = len(pLabel)
-                for (cLabel, cNodeId) in childNodes:
-                    nodeId__labelLen[cNodeId] = len(cLabel)
-        # print('_getLabelLength: ', nodeId__labelLen)
-        return nodeId__labelLen
+        if getattr(self, 'nodeId__labelLen', None) is None:
+            self.nodeId__labelLen = {}
+            if len(self.ast) == 0 and len(self._eqs) != 0: # this is a single leaf, and the single leaf will not appear on self.ast.
+                self.nodeId__labelLen[self.rootOfTree[1]] = len(self._eqs)
+            else:
+                for (pLabel, pNodeId), childNodes in self.ast.items():
+                    self.nodeId__labelLen[pNodeId] = len(pLabel)
+                    for (cLabel, cNodeId) in childNodes:
+                        self.nodeId__labelLen[cNodeId] = len(cLabel)
+            # print('_getLabelLength: ', nodeId__labelLen)
+        return self.nodeId__labelLen
 
 
 
@@ -297,8 +368,8 @@ class Schemeparser(Parser):
             raise Exception('No equal, Invalid Equation String')
         # print(self.ast); import pdb;pdb.set_trace()
         returnTup = self._recursiveUnparse(self.ast, self.rootOfTree, 0)
-        if '=' in self.functions:
-            del self.functions['=']
+        # if '=' in self.functions:
+        #     del self.functions['=']
         return returnTup
 
     def _recursiveUnparse(self, subAST, keyTuple, startPos):

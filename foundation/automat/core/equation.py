@@ -245,7 +245,7 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
             print('ops', ops)
         if simplify:
             from foundation.automat.core.manipulate.recommend.recommend import Recommend
-            recommend = Recommend(self, verbose=self.verbose)
+            recommend = Recommend(verbose=self.verbose)
         #apply the reverses
         from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
         simplifyDone = False
@@ -275,6 +275,10 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
             subStepSchemeParser = Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)
             # self.schemeStr = Schemeparser(ast=self.astScheme, rootOfTree=self.rootOfTree)._unparse()
             self.schemeStr = subStepSchemeParser._unparse()
+            self.schemeparser = subStepSchemeParser
+            self.primitivesScheme = subStepSchemeParser.primitives
+            self.functionsScheme = subStepSchemeParser.functions
+            self.variablesScheme = subStepSchemeParser.variables
             #subSteps collection START
             solvingResultingSchemeStrs.insert(0, self.schemeStr); solvingResultingAsts.insert(0, invertedAst); 
             solvingResultingAstRootOfTree.insert(0, self.rootOfTree); 
@@ -288,7 +292,7 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
                 print('AFTER startPos__nodeIdScheme', self.startPos__nodeIdScheme)
             if simplify:
                 simplifyDone = False
-                returnTup = recommend.simplify(hint={'invertedResults':invertedResults, 'lastOp':op, 'startPos__nodeId':self.startPos__nodeIdScheme}) # part of solving steps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                returnTup = recommend.simplify(self, hint={'invertedResults':invertedResults, 'lastOp':op, 'startPos__nodeId':self.startPos__nodeIdScheme}) # part of solving steps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 if self.verbose:
                     print('found a simplification: ', returnTup is not None)
                     # import pdb;pdb.set_trace()
@@ -524,7 +528,9 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
             print('before makeSubject eq.astScheme primitivesScheme', eq.primitivesScheme)
 
         _, stepsWithoutSimplify___self = self.makeSubject(variable, simplify=simplify)
+        # print('self.makeSubject COMPLETE!'); import pdb;pdb.set_trace()
         _, stepsWithoutSimplify___eq = eq.makeSubject(variable, simplify=simplify)
+        # print('eq.makeSubject COMPLETE!'); import pdb;pdb.set_trace()
         if self.verbose:
             print('after makeSubject self.astScheme: ', self.astScheme)
             print('after makeSubject self.astScheme totalNodeCountScheme: ', self.totalNodeCountScheme)

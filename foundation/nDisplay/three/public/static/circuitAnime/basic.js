@@ -6,6 +6,23 @@ class CircuitAnime {
         this.variableSelector = variableSelector;// it is a function that uses a list_equationNetworkInfoDict, but takes a circuit
         this.simplify = simplify;
         this.animationName = animationName;
+
+        //camera positions
+        const cameraPosition = this.circuit.camera.position;
+        this.facingCoordinate = {x:6*cameraPosition.x, y:6*cameraPosition.y, z:6*cameraPosition.z};
+        this.vorPosition = {x:3*cameraPosition.x, y:3*cameraPosition.y, z:3*cameraPosition.z};
+        this.hinPosition = {x:3*cameraPosition.x, y:3*cameraPosition.y, z:3*cameraPosition.z};
+
+        //highlight colours
+        this.componentHighlightColour = {r:0.6, g:0.1, b:0.1};
+        this.componentVariableHighlightColour = {r:-0.1, g:-0.6, b:-0.1};
+        this.variableHighlightColour = {r:-0.1, g:-0.6, b:-0.1}
+
+        //pauses
+        this.pauseBetweenEachVorHinDisplay = 4000;//milliseconds
+        this.pauseAfterRevealingEquation = 4000;//milliseconds
+        this.pauseBetweenEachVariableHighlight = 4000;//milliseconds
+        this.pauseBetweenEachComponentHighlight = 4000;//milliseconds
     }
 
     play() {
@@ -52,7 +69,7 @@ class CircuitAnime {
 
                     console.log('running solveEquation animation is running')
                     // look back.
-                    const facingCoordinate = {x:6*cameraPosition.x, y:6*cameraPosition.y, z:6*cameraPosition.z};
+                    const facingCoordinate = animeSelf.facingCoordinate;//{x:6*cameraPosition.x, y:6*cameraPosition.y, z:6*cameraPosition.z};
                     self.smoothLookAt(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z, function(){
                     // self.smoothMoveCameraPosition(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z ,function() {
                         console.log('finished looking back'); let previousEquationType = 'vor'; 
@@ -72,9 +89,11 @@ class CircuitAnime {
                             const equationDimensions = self.getDimensions(latexStrMeshUUID);
                             self.setRotation(latexStrMeshUUID, 0, Math.PI, 0)
                             if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
-                                self.setPosition(latexStrMeshUUID, facingCoordinate.x-equationDimensions.xLen, facingCoordinate.y, facingCoordinate.z);
+                                // self.setPosition(latexStrMeshUUID, facingCoordinate.x-equationDimensions.xLen, facingCoordinate.y, facingCoordinate.z);
+                                self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-equationDimensions.xLen, animeSelf.vorPosition.y, animeSelf.vorPosition.z)
                             } else {//hin always introduce new equations
-                                self.setPosition(latexStrMeshUUID, facingCoordinate.x+equationDimensions.xLen, facingCoordinate.y, facingCoordinate.z);
+                                // self.setPosition(latexStrMeshUUID, facingCoordinate.x+equationDimensions.xLen, facingCoordinate.y, facingCoordinate.z);
+                                self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x+equationDimensions.xLen, animeSelf.hinPosition.y, animeSelf.hinPosition.z);
                             }
 
 
@@ -105,7 +124,7 @@ class CircuitAnime {
                                     self.hide(latexStrMeshUUID)
                                 }
                                 equationReveal(theList, theList___idx+1);
-                            }, 4000)
+                            }, animeSelf.pauseBetweenEachVorHinDisplay)
 
                         }
                         equationReveal(Object.entries(self.runningStepsIdx__branchedStepsIdx), 0)
@@ -129,15 +148,15 @@ class CircuitAnime {
 
             self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
-            function findEquationAnimation___functionGen(// is the parametrisation neccessary, what about using self.?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO?
+            function findEquationAnimation___functionGen(
 
                 ) {
                 //for animation, we store mesh in meshUUID__mesh, and only when we need the mesh, then we add to the THREE.Scene, as recommended by ChatGPT
                 
 
-                //load all the equations to scene, and then only when we need the actors then we set visible=true<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                //load all the equations to scene, and then only when we need the actors then we set visible=true
 
-                //need a destroy function to remove actors that we do not need any more from the scene<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                //need a destroy function to remove actors that we do not need any more from the scene
 
                 //this is the render loop for animation
                 return function() {
@@ -176,13 +195,12 @@ class CircuitAnime {
                                 // console.log('highlight nodeId', nodeId, ' type: ', id__type[nodeId], ' meshId: ', id__uuid[nodeId]); 
                                 if (visited.indexOf(nodeId) <0) {
                                     visited.push(nodeId)
-                                    self.highlight({meshUUID:self.id__uuid[nodeId], redMag:0.6, greenMag:0.1, blueMag:0.1})
+                                    self.highlight({meshUUID:self.id__uuid[nodeId], redMag:animeSelf.componentHighlightColour.r, greenMag:animeSelf.componentHighlightColour.g, blueMag:animeSelf.componentHighlightColour.b})
 
                                 }
                             })
                         });
                         // console.log('highlighted nodes', window.performance.now())
-
                         //[3]
                         const equationMeshUUID = self.textStr__textMeshUUID[graphInfoD['equation']]['meshUUID']
                         const equationDimensions = self.getDimensions(equationMeshUUID);
@@ -190,22 +208,16 @@ class CircuitAnime {
                         // self.highlight({meshUUID:equationMeshUUID, redMag:0.6, greenMag:0.1, blueMag:0.1}); //this group does not even have attributes and cannot be highlighted this way
                         self.setPosition(equationMeshUUID, equationDimensions.xLen/2, equationDimensions.yLen/2, equationDimensions.zLen+50);
                         self.reveal(equationMeshUUID); //self.renderer.render(self.scene, self.camera);
-
                         // console.log('revealed equations', graphInfoD['equation'], ' ', window.performance.now());
                         // debugger;
-
-
                         // console.log('pausing for 8 seconds 0', window.performance.now())
-
                         self.pause(()=>{
                             // console.log('finished pausing 0', window.performance.now())
-
                             // debugger;
                             //[4] unhighlight network
                             // self.unhighlight(equationMeshUUID);
                             graphInfoD['list_list_networkNodeIds'].forEach(list_nodeId => {
                             // console.log('UNhighlighting list_nodeId: ', graphInfoD['list_list_networkNodeIds'], '<<<UN<<')
-
                                 const visited = [];
                                 list_nodeId.forEach(nodeId => {
                                     if (visited.indexOf(nodeId) <0) {
@@ -215,42 +227,29 @@ class CircuitAnime {
                                 })
                             });
                             // debugger;
-
-
-
                             self.pause(()=>{
-
-
                                 //[6] use recursion to play the variables one by one
                                 function variableDisplay(list_variableInfoD, list_variableInfoD___idx) {
                                     if (list_variableInfoD___idx >= list_variableInfoD.length){
-
                                         //[5]
                                         self.hide(equationMeshUUID);
-
                                         // console.log('hid equations', graphInfoD['equation'], window.performance.now());
                                         //call the next equation animation
                                         equationDisplay(list_equationNetworkInfoDict, list_equationNetworkInfoDict___idx+1);
                                         return;
                                     }
                                     const variableInfoD = list_variableInfoD[list_variableInfoD___idx]
-
                                     const variableStr = variableInfoD['variableStr'];
-
                                     //[7]
                                     //highlight variableComponent
                                     const componentMeshUUID = self.id__uuid[graphInfoD['variableStr__nodeId'][variableStr]]
-                                    self.highlight({meshUUID: componentMeshUUID, redMag:-0.1, greenMag:-0.6, blueMag:-0.1})
+                                    self.highlight({meshUUID: componentMeshUUID, redMag:animeSelf.componentVariableHighlightColour.r, greenMag:animeSelf.componentVariableHighlightColour.g, blueMag:animeSelf.componentVariableHighlightColour.b})
                                     // console.log('highlighted variableNodes', window.performance.now())
-
-
                                     //[8] each chaStr is only a part of the variable, so we want them to light up togehter
                                     variableInfoD['info'].forEach(([chaStr, charMeshUUID]) => {
-                                        self.highlight({meshUUID:charMeshUUID, redMag:-0.1, greenMag:-0.6, blueMag:-0.1});
+                                        self.highlight({meshUUID:charMeshUUID, redMag:animeSelf.variableHighlightColour.r, greenMag:animeSelf.variableHighlightColour.g, blueMag:animeSelf.variableHighlightColour.b});
                                         // console.log('highlighted: ', chaStr, ' uuid: ', charMeshUUID, '<<<<<<<<<<<<<<<<<<<<<<<variable highlighting????????????????????????????????????????????????????')
                                     })
-
-
                                     // console.log('highlighted variable', window.performance.now())
                                     // console.log('pausing for 8 seconds 1', window.performance.now())
                                     self.pause(()=>{
@@ -264,23 +263,14 @@ class CircuitAnime {
                                             self.unhighlight(charMeshUUID)
                                         })
                                         // console.log('unhighlight variable', window.performance.now())
-
                                         variableDisplay(list_variableInfoD, list_variableInfoD___idx+1);
-                                    }, 4000);// pause for 8 seconds, then unhighlight relevant_component and relevant_variable
-
+                                    }, animeSelf.pauseBetweenEachComponentHighlight);// pause for 8 seconds, then unhighlight relevant_component and relevant_variable
                                 }
                                 variableDisplay(self.textStr__textMeshUUID[graphInfoD['equation']]['info'], 0);
-
-
-                            }, 4000);
-
-
-
-                        }, 4000);
-
+                            }, animeSelf.pauseBetweenEachVariableHighlight);
+                        }, animeSelf.pauseAfterRevealingEquation);
                     }
                     equationDisplay(self.list_equationNetworkInfoDict, 0);
-
                 }
             }
             //schedule animation
@@ -290,9 +280,6 @@ class CircuitAnime {
             }, false);
         }
         self.animate_findEquations(findEquations___readyCallback);
-
-
-
     }
 }
 

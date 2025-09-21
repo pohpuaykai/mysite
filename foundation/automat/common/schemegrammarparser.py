@@ -2,6 +2,7 @@ import sys
 
 
 class SchemeGrammarParser:
+    variableStartMarker = '$'#'"Why did you choose $ as mark?", asked Winnie_the_Pooh. "Because this will never have anything to do with money, so, i will never have any variable collision"'
     """There are 3 MODEs
     MODE0: iPattern has no variables
 
@@ -30,14 +31,15 @@ class SchemeGrammarParser:
         self.verbose = verbose
         import pprint
         self.pp = pprint.PrettyPrinter(indent=4)
-        self.variableStartMarker = '$'#'"Why did you choose $ as mark?", asked Winnie_the_Pooh. "Because this will never have anything to do with money, so, i will never have any variable collision"'
+        
         self.newEnclosureNodeCounter = -1
         self.allTakenNums = None # for when output has less variables than input, and we need to create
 
         self.iPattern = iPattern
         self.oPattern = oPattern
         #0
-        self.getMode()
+        # self.getMode()
+        self.mode = SchemeGrammarParser.getMode(self.iPattern)
         #1
         self.oPatternSansNum, self.oUniqueVariables, self.oSortedVariablesAndPosition, self.oSortedVariablesAndPositionSansNum = self.getVariablesAndPosition(self.oPattern)
         self.iPatternSansNum, self.iUniqueVariables, self.iSortedVariablesAndPosition, self.iSortedVariablesAndPositionSansNum = self.getVariablesAndPosition(self.iPattern) #need for prepValsForExtraOVarsForEachMatch
@@ -63,33 +65,36 @@ class SchemeGrammarParser:
         self.matchIOPatterns()
 
 
-    def getMode(self):
-        if self.variableStartMarker not in self.iPattern:
-            self.mode = 0
+    @classmethod
+    def getMode(cls, iPattern):
+        mode = None
+        if SchemeGrammarParser.variableStartMarker not in iPattern:
+            mode = 0
         else:#check for MODE1
             #after splitting by $ should only contain space and numbers
             MODE1 = True
             from foundation.automat.common.checker import Booler
-            for part in self.iPattern.split(self.variableStartMarker):
-                if len(part) >0 and not Booler.isNum(part):
+            for part in iPattern.split(SchemeGrammarParser.variableStartMarker):
+                if len(part) > 0 and not Booler.isNum(part):
                     MODE1 = False
                     break
             if MODE1:
-                #check for bad MODE1, 
+                #check for bad MODE1,
                 #no space before or after iPattern
-                if self.iPattern.startswith(' '):
+                if iPattern.startswith(' '):
                     raise Exception('There must be no space at the start of iPattern')
-                if self.iPattern.endswith(' '):
+                if iPattern.endswith(' '):
                     raise Exception('There must be no space at the end of iPattern')
                 #exactly 1 space between each variable
-                partsBySpace = self.iPattern.split(' ')#hardcoding?
+                partsBySpace = iPattern.split(' ') #hardcoding?
                 numberOfSpaces = len(list(filter(lambda part: len(part)==0, partsBySpace)))
                 numberOfVariables = len(list(filter(lambda part: len(part)>0, partsBySpace)))
                 if numberOfVariables-1!=numberOfSpaces:
-                    raise Exception("There must be 1 space between each variable")
-                self.mode = 1
-            else:#check for mode2, must be able to be passed by schemeParser
-                self.mode = 2
+                    raise Exception("There must be 1 space between eaceh variable")
+                mode = 1
+            else:#check for mode2, must be able to be passed by schemeParser... TODO
+                mode = 2
+        return mode
 
     def getVariablesAndPosition(self, rawPattern):
         """
@@ -690,7 +695,7 @@ class SchemeGrammarParser:
         self.iId__data = {}; self.iEnclosureTree = {}
         def recursiveMatch(absoluteStartPos, absoluteEndPos, parentNodeId): # recursiveMatch is called on each matchedVariable and also the initial_string
             noMatch = False
-            iPatternSegments = self.iPatternSansNum.split(self.variableStartMarker); currentPointerPosition = absoluteStartPos;
+            iPatternSegments = self.iPatternSansNum.split(SchemeGrammarParser.variableStartMarker); currentPointerPosition = absoluteStartPos;
             iVars = []; iStatics = []; iHins = []; iVors = []; noOfMatches = 0
             while not noMatch and currentPointerPosition < len(self.iStr):#there might be more than 1 matches on s
                 iVar = []; iStatic = [];

@@ -2671,7 +2671,7 @@ def test__bipartiteSolver__simpleParallelCircuit0Vor(verbose=False):
     subject = 'V_{R_{3}}'
     eq0 = Equation(latexEq, 'latex', verbose=verbose)
     #
-    # print('In makesubjecttest0.py, schemeStr: ', eq0.schemeStr)
+    # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~In makesubjecttest0.py, schemeStr: ', eq0.schemeStr)
     # print('In makesubjecttest0.py, astScheme: ', eq0.astScheme)
     #
     modifiedAST, stepsWithSimplify = eq0.makeSubject(subject, simplify=True)

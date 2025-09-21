@@ -8,6 +8,7 @@ from yaml import safe_load
 from foundation.automat import AUTOMAT_MODULE_DIR, info
 # from foundation.automat.common.longestcommonsubsequence import LongestCommonSubsequence
 # from foundation.automat.common.regexshorts import Regexshorts as rs
+from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
 from foundation.automat.core.manipulate.manipulate import Manipulate
 
 class Recommend:
@@ -27,16 +28,43 @@ class Recommend:
 
     """
     PATTERN_FILENAMES__CLASSNAMES = Manipulate.PATTERN_FILENAMES__CLASSNAMES()
+    #properties of _metaData
+    _metaData = None
+    _manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
+    _metaFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'recommend', 'meta')
+    _metaFilename = 'manipulations_patterns.npy'
+    #
 
-    def __init__(self, equation, verbose=False):
+    @classmethod
+    def getMetaData(cls, redrive=False):
+        if Recommend._metaData is None or redrive:
+            Recommend._metaData = cls._generateMetaInformation()
+        else:
+            try:
+                # self.metaData = np.array(np.load(file=os.path.join(self.metaFolder, self.metaFilename)))
+                Recommend._metaData = np.array(np.load(file=os.path.join(Recommend._metaFolder, Recommend._metaFilename), allow_pickle=True))
+            except:
+                import traceback; traceback.print_exc()
+                # if self.verbose:
+                #     import traceback
+                #     info('loading of metaData Failed, generating metaData')
+                #     traceback.print_exc()
+                #regenerate
+                print('failed to load from disk, so have to reload')
+                Recommend._metaData = cls._generateMetaInformation()
+        return Recommend._metaData
+
+
+
+    def __init__(self, redrive=False, verbose=False):
         self.verbose=verbose
         # self.verbose = False
-        self.eq = equation
-        self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
-        self.metaFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'recommend', 'meta')
-        self.metaFilename = 'manipulations_patterns.npy'
-        self.metaData = None
-        self._retrieveMetaInformation()
+        # self.eq = equation
+        # self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
+        # self.metaFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'recommend', 'meta')
+        # self.metaFilename = 'manipulations_patterns.npy'
+        # self.metaData = None
+        # self._retrieveMetaInformation()
         # print(type(self.metaData))
         # import pdb;pdb.set_trace()
 
@@ -50,12 +78,13 @@ class Recommend:
         return manipulateClass
 
 
-    def _generateMetaInformation(self):
+    @classmethod
+    def _generateMetaInformation(cls):
         from foundation.automat.parser.sorte.schemeparser import Schemeparser
         metaData = []
-        for filename in os.listdir(self.manipulateConfigFileFolder):
+        for filename in os.listdir(cls._manipulateConfigFileFolder):
             if filename.endswith('.yaml'): # then its good! sei vorsichtung um nicht zu non-configuration-files zu beitragen
-                config = self._loadYAMLFromFilePath(os.path.join(self.manipulateConfigFileFolder, filename))
+                config = cls._loadYAMLFromFilePath(os.path.join(cls._manipulateConfigFileFolder, filename))
                 if 'manipulations' not in config or config['manipulations'] is None:
                     continue
                 for idx, manipulations in enumerate(config['manipulations']):
@@ -66,12 +95,16 @@ class Recommend:
                                 continue
                             # print(d); print('config'); print(config)
                             # import pdb;pdb.set_trace()
-                            iAst, iFunctions, iVariables, iPrimitives, iTotalNodeCount, iStartPos__nodeId = Schemeparser(equationStr=d['scheme'])._parse()
-                            oAst, oFunctions, oVariables, oPrimitives, oTotalNodeCount, oStartPos__nodeId = Schemeparser(equationStr=d['return'])._parse()
-                            # if filename == 'subtractzero.yaml':
-                            #     print(filename, direction, idx)
-                            #     print(iFunctions)
-                            #     import pdb;pdb.set_trace()
+                            iSchemeparser = Schemeparser(equationStr=d['scheme'])
+                            oSchemeparser = Schemeparser(equationStr=d['return'])
+                            iAst, iFunctions, iVariables, iPrimitives, iTotalNodeCount, iStartPos__nodeId = iSchemeparser._parse()
+                            oAst, oFunctions, oVariables, oPrimitives, oTotalNodeCount, oStartPos__nodeId = oSchemeparser._parse()
+                            iLabelsInOrderOfStartPos = list(map(lambda label: label[0] if label.startswith(SchemeGrammarParser.variableStartMarker) else label, iSchemeparser.getLabelsInOrderOfStartPos()))
+                            iListWithoutLabels = list(map(lambda sublist: sublist.replace('(', '0').replace(' ', '1').replace(')', '2'), iSchemeparser.getListWithoutLabels()))
+
+                            
+                            iMode = SchemeGrammarParser.getMode(d['scheme'])
+                            #need to get the mode for the iPattern<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                             metaData.append({#TODO sqlite database? lol OR implement your own BTree, werde settle for numpy for now
                                 'identity':{
                                     'idx':idx,
@@ -99,6 +132,11 @@ class Recommend:
                                 'iPrimitives':iPrimitives,
                                 'iTotalNodeCount':iTotalNodeCount,
                                 'iStartPos__nodeId':iStartPos__nodeId,
+                                'iDepth':iSchemeparser.getASTDepth(),
+                                'iWidth':iSchemeparser.getASTWidth(),
+                                'iLabelsInOrderOfStartPos':iLabelsInOrderOfStartPos,
+                                'iListWithoutLabels':iListWithoutLabels,
+                                'iMode':iMode,
                                 #o
                                 'oAst':oAst,
                                 'oFunctions':oFunctions,
@@ -116,38 +154,11 @@ class Recommend:
                                 'primitiveOI':set(oPrimitives.keys()) - set(iPrimitives.keys()),
                                 'totalNodeCountIO':iTotalNodeCount - oTotalNodeCount
                             })
-        np.save(file=os.path.join(self.metaFolder, self.metaFilename), arr=metaData)#, allow_pickle=False) # ValueError: Object arrays cannot be saved when allow_pickle=False
+        np.save(file=os.path.join(cls._metaFolder, cls._metaFilename), arr=metaData, allow_pickle=True) # ValueError: Object arrays cannot be saved when allow_pickle=False
         #then https://numpy.org/doc/stable/reference/generated/numpy.save.html says its a security issue.... WHAT TO DO?
-        self.metaData = np.array(metaData)
-
-    def _retrieveMetaInformation(self, rederive=False):
-        """
-        TODO change to SINGLETON, um this function load faster, so that the loading only done on application load once.
-#maybe have tags for each manipulation, for what equation it is suitable for???? should be done in the experience file.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        #~ DRAFT ~#
-
-
-        read from folder meta (if available)
-        if not available OR rederive=True, 
-            read all the YAML from manipulate/configuration
-            calculate meta-information and store it in folder meta
-
-        :param rederive:
-        :type rederive:
-        """
-        if self.metaData is None or rederive:
-            self._generateMetaInformation()
-        else:
-            try:
-                self.metaData = np.array(np.load(file=os.path.join(self.metaFolder, self.metaFilename)))
-            except:
-                if self.verbose:
-                    import traceback
-                    info('loading of metaData Failed, generating metaData')
-                    traceback.print_exc()
-                #regenerate
-                self._generateMetaInformation()
+        # self.metaData = np.array(metaData)
+        print('regenerated metaData') # this is to double_check how many times the metaData is regenerated and loaded from disk
+        return np.array(metaData)
 
 
     def filterMetaList(self, metaList, searchCol, searchTerms):
@@ -181,159 +192,200 @@ class Recommend:
             return metaList[mask]
 
     def getRowsInMeta(self, searchCol, searchTerms):
-        return self.filterMetaList(self.metaData, searchCol, searchTerms)
+        metaData = Recommend.getMetaData()
+        return self.filterMetaList(metaData, searchCol, searchTerms)
+        # return self.filterMetaList(self.metaData, searchCol, searchTerms)
 
 
-    def simplify(self, hint=None):
-        """
-The smaller the self.equation.astScheme the more simple???<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+    def simplify(self, eq, hint=None):
+        #run FILTER_HEURISTIC and SORTIN_HEURISTIC
+        from copy import copy
+
+        #HELPER
+        def combiningDictionaries(iPrimitives, iFunctions):
+            d = copy(iPrimitives); d.update(iFunctions)
+            return d
+        #
+        simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') # the number of nodes get lesser, its ok, its this is a 1 step
+        breadthOfEquation = eq.schemeparser.getASTWidth()
+        depthOfEquation = eq.schemeparser.getASTDepth()
+        entityTotalCountOfEquation = eq.totalNodeCountScheme
+        equationEntityToCount = combiningDictionaries(eq.primitivesScheme, eq.functionsScheme)#copy(self.eq.primitivesScheme).update(self.eq.functionsScheme)
+        equationEntityStartEndPos = eq.schemeparser.getLabelsInOrderOfStartPos()
+        equationBracketSpaceList = list(map(lambda sublist: sublist.replace('(', '0').replace(' ', '1').replace(')', '2'), eq.schemeparser.getListWithoutLabels()))
+        #
+        # print('0.*****************************')
+        # print('schemeStr: ', eq.schemeStr)
+        # print('len(manipulations):', len(simplifyingManipulations))
+        # print('breadthOfEquation: ', breadthOfEquation)
+        # print('depthOfEquation: ', depthOfEquation)
+        # print('equationEntityToCount: ', equationEntityToCount)
+        # print('entityTotalCountOfEquation: ', entityTotalCountOfEquation)
+        # print('equationEntityStartEndPos: ', equationEntityStartEndPos)
+        # print('equationBracketSpaceList: ', equationBracketSpaceList)
+        # import pdb;pdb.set_trace()
+        #
 
 
-
-
-###
-Cannot be applied to Differentiation|Integration
-Please see:
-hi Sir, i just found something irritating in a computer algebra system(CAS)... i will write in latex
-Suppose we are to solve $\frac{d}{dx} \\log_a(B(x))$, where a is any number
-If the CAS took the wrong route and went:
-$\frac{d}{dx} \\ln(e^{\\log_a(B(x))})$
-it would have gotten:
-$\frac{(\\log_a(B(x)))(e^{\\log_a(B(x)))}}{e^{\\log_a(B(x))}}$
-and after simplifying it would have gotten:
-$\\log_a(B(x))$
-Which is wrong, but all the rules applied are valid... is there some kind of hiearchy_of_rules or some rules that are omitted?
-###
-
-        #~ DRAFT ~#
-
-
-        ~UNHINTED SEARCH~
-
-
-
-        ~HINTED SEARCH~
-
-
-
-        :param hint:
-        a dictionary, containing the last op performed...
-        (TODO: give the whole series of op that was performed on the equation. -> maybe store this on `Equation`?)
-        (TODO: give characteristics of the equation, like the number of +, -, ..., primitives used, )
-        :type hint:
-        """
-
-        self.simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') #maybe if the number of node count is reduced then it is a simplying step.. but what if we need the number of nodes to increase before we can reduce it?
-        # TODO HEURIS: differentiation/integration/functors related configurations should be ignore and filtered out
+        simplifyingManipulations = list(filter(lambda row:
+            self.breadthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iWidth'], breadthOfEquation), simplifyingManipulations))
         
-        if self.verbose:
-            #should this be under self.verbose? seems like a pretty decent HEURES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
-            relevantManipulations = sorted(self.simplifyingManipulations, key=lambda row: row['oTotalNodeCount']) #TODO refactor to self function. 
-            # import pprint; pp = pprint.PrettyPrinter(indent=4)
-            # print('***************************************')
-            # pp.pprint(relevantManipulations[0])
-            # pp.pprint(list(map(lambda d: d['identity']['filename'], relevantManipulations)))
+        # print('1.*****************************')
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        simplifyingManipulations = list(filter(lambda row:
+            self.depthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iDepth'], depthOfEquation),simplifyingManipulations))
+        
+        # print('2.*****************************')
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        simplifyingManipulations = list(filter(lambda row:
+            self.totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(row['iTotalNodeCount'], entityTotalCountOfEquation), simplifyingManipulations))
+        
+        # print('3.*****************************')
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        simplifyingManipulations = list(filter(lambda row: #iVariables will only contain $ variable for iPattern
+            self.entityCountsOfIPatternInEquation___FILTERHEURISTIC(combiningDictionaries(row['iPrimitives'], row['iFunctions']), equationEntityToCount), simplifyingManipulations))
+        
+        # print('4.*****************************')
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        simplifyingManipulations = list(filter(lambda row: #metaData needs to store iPatternEntityStartEndPos
+            self.orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(row['iLabelsInOrderOfStartPos'], row['iMode'], equationEntityStartEndPos), simplifyingManipulations))
+        
+        # print('5.*****************************')
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        simplifyingManipulations = list(filter(lambda row: #metaData needs to store iPatternBracketSpaceList
+            self.orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(row['iListWithoutLabels'], equationBracketSpaceList), simplifyingManipulations))
+        
+        # print('6.*****************************')
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        
+        #TODO SORTIN_HEURISTICs, simplest iPattern first?
+        simplifyingManipulations = sorted(simplifyingManipulations, key=lambda row: row['oTotalNodeCount'])
+        #TODO more SORTIN_HEURISTICs?
 
-            # import pdb;pdb.set_trace()
-
-        if hint is None:
+        if hint is None: # maybe this should not be here... <<<<<<<<<<<<<<<
             self.combingSearch()
-        elif 'invertedResults' in hint:
-        # elif 'op' in hint: # is this check necessary? break into parts?
-            """
-            hint['invertedResults'] = {   
-            ('-', 6): {'newKey': ('-', 6), 'newValue': (('-', 4), ('0', 10))},
-            ('=', 0): {'newKey': ('=', 0), 'newValue': (('*', 8), ('-', 6))}
-            }
+        else:
+            #run through each manipulation
+            rmIdentities = list(map(lambda row: row['identity'], simplifyingManipulations))
+            for idd in rmIdentities:
+                manipulateClass = self.getManipulateClass(idd['filename'])
+                # import pdb;pdb.set_trace()
+                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
+                returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)
 
-            tupleKey with higher id, is the one being swapped, and we take the funcName of the newKey
-            """
-            #also if there is - 0, we should try subtractzero first.... but the logic... should not be here. TODO
-            # print('hint: ', hint)
-            # import pdb;pdb.set_trace()
-            # largestNodeId = -1 # the nodeId is now not according to rootOfTree being first.... so we cannot do it this way
-            # funcAdded = None
-            # for oldFuncName, nodeId in hint['invertedResults'].keys():
-            #     if largestNodeId < nodeId:
-            #         largestNodeId = nodeId
-            #         funcAdded = oldFuncName
+                if returnTup is not None: # successfully applied manipulation,  we will return it first
+                    #
+                    #use sgp.schemeId__argCount, and sgp.schemeNodeChangeLog to get function/variable/primitive count? for variable, schemeId__argCount=1, for function, schemeId__argCount>1, for primitive, schemeId__argCount=0
+                    #but the downstream equation.simplify does not need countsOfFunctionVariablePrimitivesRemoved anymore!
+                    #equation.simplify needs, can be reparsed by schemeparser, but those with nodeId, need to be changed to the OLD nodeIds provided by sgp
+                    #or should they be provided by sgp? but it is weird to put latexParser in sgp...?
+                    sgp, manipulateType, manipulateClassName = returnTup
+                    rootOfTree___simplified = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    ast___simplified = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    startPos__nodeId___simplified = sgp.startPos__nodeId___oStr
+                    nodeId__len___simplified = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
+                    schemeStr___simplified = sgp.oStr
 
-            # functionNamesJustAdded = [funcAdded]
-            # functionNamesJustAdded = list(map(lambda d: d[0], hint['invertedResults'].keys()))
-            #functionNamesJustAdded should take the newKey from invertedResults
-            functionNamesJustAdded = list(map(lambda d: d['newKey'][0], hint['invertedResults'].values()))
-            if len(functionNamesJustAdded) == 0:
-                if self.verbose:
-                    print(f'Could not identify functions just added, hint: {hint}')
-            else:
-                #TODO HEURIS: if no trigo in the formula, can just ignore all the trigoPatterns
-                #TODO HEURIS: if no log/sqrt/expo, not need those patterns .... not sure about that
-                if self.verbose:
-                    print('hint: ', hint)
-                    print(functionNamesJustAdded, '<<functionNamesJustAdded')
-                    # import pdb;pdb.set_trace()#<<<< some thing wrong with 
-                relevantManipulations = self.filterMetaList(self.simplifyingManipulations, 'iFunctions', functionNamesJustAdded)# should use: self.simplifyingManipulations AS a base
-                if self.verbose:
-                    import pprint; pp = pprint.PrettyPrinter(indent=4)
-                    print('***************************************')
-                    # pp.pprint(relevantManipulations[0])
-                    pp.pprint(list(map(lambda d: d['identity']['filename'], relevantManipulations)))
-                # TODO HEURIS: those with least number of output nodes, should be tried first :)
-                # TODO HEURIS: alot of LCSS matches (prefix/suffix/middlefixes) with pattern and target, should be tried first: https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
-                # NOTE that np.array mess up the sorting_order
-                relevantManipulations = sorted(relevantManipulations, key=lambda row: row['oTotalNodeCount']) #TODO refactor to self function. 
-                # print('TYPEEEEE; ', type(self.simplifyingManipulations))
-                if self.verbose:
-                    print('** total number of metaData: ', len(self.metaData))
-                    print('**there are ', len(relevantManipulations), ' manipulations that we trying out')
-                    print('** here are the top 10: ')
-                    printables = list(map(lambda row: f"{row['oTotalNodeCount']} {row['identity']}", relevantManipulations))
-                    for printable in printables:
-                        print(printable)
+                    functions___simplified = sgp.schemeparser___oStr.functions
+                    variables___simplified = sgp.schemeparser___oStr.variables
+                    primitives___simplified = sgp.schemeparser___oStr.primitives
+                    totalNodeCount___simplified = sgp.schemeparser___oStr.totalNodeCount
+                    latexStr___simplified = sgp.schemeparser___oStr._toLatex()
 
-                rmIdentities = list(map(lambda row: row['identity'], relevantManipulations))
-                for idd in rmIdentities:
-                    manipulateClass = self.getManipulateClass(idd['filename'])
-                    # import pdb;pdb.set_trace()
-                    manipulate = manipulateClass(self.eq, idd['direction'], idd['idx'], verbose=self.verbose)
-                    if self.verbose:
-                        print(f"SIMPLIFYING trying applying {idd['filename']}, {idd['idx']}, {idd['direction']} to {self.eq.ast}", "|", manipulate.inputGrammar, "|", manipulate.outputGrammar)
-                    returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)
-                    if self.verbose:
-                        print(f"SIMPLIFYING tried applying {idd['filename']}, {idd['idx']}, {idd['direction']}, hasResult?: {returnTup is not None}")
-
-                    if returnTup is not None: # successfully applied manipulation
+                    iPattern = sgp.iPattern
+                    oPattern = sgp.oPattern
+                    return rootOfTree___simplified, ast___simplified, startPos__nodeId___simplified, nodeId__len___simplified, schemeStr___simplified, functions___simplified, variables___simplified, primitives___simplified, totalNodeCount___simplified, latexStr___simplified, manipulateType, manipulateClassName, iPattern, oPattern
 
 
-                        #
-                        #use sgp.schemeId__argCount, and sgp.schemeNodeChangeLog to get function/variable/primitive count? for variable, schemeId__argCount=1, for function, schemeId__argCount>1, for primitive, schemeId__argCount=0
-                        #but the downstream equation.simplify does not need countsOfFunctionVariablePrimitivesRemoved anymore!
-                        #equation.simplify needs, can be reparsed by schemeparser, but those with nodeId, need to be changed to the OLD nodeIds provided by sgp
-                        #or should they be provided by sgp? but it is weird to put latexParser in sgp...?
-                        sgp, manipulateType, manipulateClassName = returnTup
-                        rootOfTree___simplified = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        ast___simplified = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        startPos__nodeId___simplified = sgp.startPos__nodeId___oStr
-                        nodeId__len___simplified = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
-                        schemeStr___simplified = sgp.oStr
+    def breadthOfIPatternAtMostEquation___FILTERHEURISTIC(self, breadthOfIPattern, breadthOfEquation):#<<<<<<<<<<<<<<needs to do breadth in schemeParser
+        """
+        breadth of IPattern as a schemeTree, must be less than or equals to the breadth of equation as a schemeTree
+        """
+        return breadthOfIPattern <= breadthOfEquation
 
-                        functions___simplified = sgp.schemeparser___oStr.functions
-                        variables___simplified = sgp.schemeparser___oStr.variables
-                        primitives___simplified = sgp.schemeparser___oStr.primitives
-                        totalNodeCount___simplified = sgp.schemeparser___oStr.totalNodeCount
-                        latexStr___simplified = sgp.schemeparser___oStr._toLatex()
+    def depthOfIPatternAtMostEquation___FILTERHEURISTIC(self, depthOfIPattern, depthOfEquation):#<<<<<<<<<<<<<<<<<<needs to do depth in schemeParser
+        """
+        depth Of IPattern as a schemeTree, must be less than or equals to the depth of equation as a schemeTree
+        """
+        return depthOfIPattern <= depthOfEquation
 
-                        iPattern = sgp.iPattern
-                        oPattern = sgp.oPattern
-                        return rootOfTree___simplified, ast___simplified, startPos__nodeId___simplified, nodeId__len___simplified, schemeStr___simplified, functions___simplified, variables___simplified, primitives___simplified, totalNodeCount___simplified, latexStr___simplified, manipulateType, manipulateClassName, iPattern, oPattern
+    #{HEURISTICS SchemeStructural} the positions of the brackets_and_spaces of the iPattern must be found in the positions of the brackets_and_spaces of the equation, otherwise there is no need to consider that equation. 
 
-            #if we reach here this means non of the prioritised-simplifyingManipulations worked.
-            if self.verbose:
-                info(f'we cannot find a suitable manipulation based on the hint lastOp: {hint["invertedResults"]}, will combingSearch')
-            #for now we return None #self.combingSearch() # then we comb :)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+    def totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(self, entityTotalCountOfIPattern, entityTotalCountOfEquation):
+        """
+        entityTotalCount is the total number of schemeLabels in either IPattern or Equation
 
+        if there are (strictly) more schemeLabels in IPattern than there are schemeLabels in Equation, then iPattern cannot be found in Equation
+        """
+        return entityTotalCountOfIPattern <= entityTotalCountOfEquation
 
+    def entityCountsOfIPatternInEquation___FILTERHEURISTIC(self, iPatternEntityToCount, equationEntityToCount):
+        """
+        iPatternEntityToCount is a dictionary from string to integer, where string is a schemeLabel and integer is the number of times the schemeLabel appears in iPattern
+        equationEntityToCount is a dictionary from string to integer, where string is a schemeLabel and integer is the number of times the schemeLabel appears in equation
 
+        if there is some schemeLabel that has greater count in iPattern, than in equationEntityToCount, then this iPattern cannot be found in equation, no need to try
+        """
+        for schemeLabel, count in iPatternEntityToCount.items():
+            equationSchemeLabelCount = equationEntityToCount.get(schemeLabel, 0)
+            if count > equationSchemeLabelCount:
+                return False
+        return True
+        
+
+    def orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(self, iPatternEntityStartEndPos, iMode, equationEntityStartEndPos):#<<<<<<<<<<<<<<<<<<<<<<<<<needs to call the method already in the schemeparser and cache the results, so that SGP can use it too
+        """
+        we order the schemeLabels_of_iPattern by startPosition, and order the schemeLabels_of_Equation by startPosition
+        if the schemeLabels_of_iPattern (as a list), cannot be found in the schemeLabels_of_Equation (as a list), then this iPattern cannot be found in equation, no need to try
+        
+        And the 'in' works like this:
+        0. we let MODE1 pass, so we should only have MODE0 and MODE2
+        1. chop up the iPatternEntityStartEndPos by $, then find each segment in order by PyRegex, but we join the list with () {cannot in the schemeLabels, by schemeDefinition}
+        2. if some segment cannot be found in order, then return false
+        """
+        if iMode == 1:
+            return True
+        #heran we only have iMode==0 or iMode==2
+        schemeLabelDelimiter = ')(' # this cannot be found in entityStartEndPos
+        delimitedEquationEntityStartEndPos = schemeLabelDelimiter.join(equationEntityStartEndPos)
+        def joinByAppending(list_str):#this way of appending, compared to the standard_python_join, prevents the BAD non_splitting of schemeLabelDelimiter+SchemeGrammarParser.variableStartMarker+schemeLabelDelimiter, if SchemeGrammarParser.variableStartMarker is at the end of the iPatternEntityStartEndPos
+            ts = ''
+            for s in list_str:
+                ts += s + schemeLabelDelimiter
+            return ts
+        segments = list(filter(lambda s: s!= SchemeGrammarParser.variableStartMarker and len(s) > 0, joinByAppending(iPatternEntityStartEndPos).split(schemeLabelDelimiter+SchemeGrammarParser.variableStartMarker+schemeLabelDelimiter)))
+        equationStartPos = 0
+        equationEntityStartEndPos = joinByAppending(equationEntityStartEndPos)
+        # print('equationEntityStartEndPos', equationEntityStartEndPos)
+        # print('segments: ', segments); 
+        # import pdb;pdb.set_trace()
+        for segment in segments:
+            try:
+                equationStartPos = equationEntityStartEndPos[equationStartPos:].index(segment) + len(segment)
+            except:
+                return False
+        return True
+
+    def orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(self, iPatternBracketSpaceList, equationBracketSpaceList):
+        """
+        we order the bracketsAndSpacesOf{everything excluding the schemeLabels|entities} into iPatternBracketSpaceList, equationBracketSpaceList
+        if the iPatternBracketSpaceList cannot be found in equationBracketSpaceList, then this iPattern cannot be found in equation, no need to try
+
+        The 'in' works similiarly to orderOfEntitiesOfIPatternInEquation
+        0. for MODE1, we need to add a space, because in MODE1 we do not count the schemeFunction. Also note that MODE1 will just be bunch of spaces
+        1. 
+        2. if some segment cannot be found in order, then return false
+
+        """
+        schemeStructureDelimiter = ')(' # this cannot be found in anySchemeStr, because there must be at least 1 space between openBracket and closeBracket
+        delimitedEquationBracketSpaceList = schemeStructureDelimiter.join(equationBracketSpaceList)
+        equationStartPos = 0
+        for segment in iPatternBracketSpaceList:
+            try:
+                equationStartPos = delimitedEquationBracketSpaceList[equationStartPos:].index(segment) + len(segment)
+            except:
+                return False
+        return True
 
     def reduceVariablesCount(self, variable):
         """
@@ -402,14 +454,86 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
 
         Also our current_method_of_substitution does not allow SchemeFunctions to be substituted away, if this was possible other paths to derive the parallel_sum_of_resistance might be possible... {ELEGANCE}
 
-
+        #a possible HACK for now, without needing substitution and the maximum increase will only be 2^{number_of_variables} so no infiniteLoop, is
+        #each equation has a set of variables, when we join them by a path, we can just union the variables and remove the intermediate variable to form the new vertex.
+        #just that we have to let the user know how the new vertex was formed
 
         :param dependentVariableId: is a vertexId, (not from list_equations nor list_variables)
         :param list_independentVariableIds: are vertexIds (not from list_equations nor list_variables)
         :param type__list_vertexIds: type is either (0)equationKey or (1)variableKey (the partite of each vertexId), values are a list of vertexIds of its key's partite
-        """
-        #[TODO optimization possible, if the bipartite graph equationVariables_bg is disconnected, only take the connected part that is related to dependent|indepedentVariables]
+        
 
+
+
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds
+
+        """
+        #get all the parameters passed to this function, so that we can write a unit test{START}
+        # print('******************************************************************************')
+        # print('list_equations:')
+        # print(list(map(lambda equation: equation.schemeStr, list_equations)))
+        # print('list_variables')
+        # print(list_variables)
+        # print('equationVariables_bg')
+        # print(equationVariables_bg)
+        # print('vertexId__equationVariableId')
+        # print(vertexId__equationVariableId)
+        # print('equationId__vertexId')
+        # print(equationId__vertexId)
+        # print('variableId__vertexId')
+        # print(variableId__vertexId)
+        # print('type__list_vertexIds')
+        # print(type__list_vertexIds)
+        # print('equationKey')
+        # print(equationKey)
+        # print('variableKey')
+        # print(variableKey)
+        # print('dependentVariableId')
+        # print(dependentVariableId)
+        # print('list_independentVariableIds')
+        # print(list_independentVariableIds)
+        # import pdb;pdb.set_trace()
+        #get all the parameters passed to this function, so that we can write a unit test{END}
+
+        bipartiteTreeExpand = False
+
+        class EquationVertexIdIssuer:
+            def __init__(self, currentMaxEquationId, currentMaxEquationVertexId):
+                self.currentMaxEquationId = currentMaxEquationId
+                self.currentMaxEquationVertexId = currentMaxEquationVertexId
+            def getNewEquationIdAndEquationVertexId(self):
+                self.currentMaxEquationId += 1; self.currentMaxEquationVertexId += 1
+                return self.currentMaxEquationId, self.currentMaxEquationVertexId
+
+        currentMaxEquationId = len(list_equations)-1; currentMaxEquationVertexId = max(list(equationId__vertexId.values())+list(variableId__vertexId.values()))
+        # import pdb;pdb.set_trace()
+        # print('currentMaxEquationVertexId', currentMaxEquationVertexId)
+        equationVertexIdIssuer = EquationVertexIdIssuer(currentMaxEquationId, currentMaxEquationVertexId)
+
+        #we are using tuple_variableVertexIdContaining as an id for equationVertexId
+        tuple_variableVertexIdContaining__equationVertexId = {}#for checking duplicates
+        equationVertexId__tuple_variableVertexIdContaining = {}
+        for equationVertexId in equationId__vertexId.values():
+            tuple_variableVertexIdContaining = tuple(sorted(equationVariables_bg[equationVertexId]))
+            tuple_variableVertexIdContaining__equationVertexId[tuple_variableVertexIdContaining] = equationVertexId
+            equationVertexId__tuple_variableVertexIdContaining[equationVertexId] = tuple_variableVertexIdContaining
+        if bipartiteTreeExpand:
+            equationVertexId__tuple_variableVertexIdContaining___NEW = {} # for user easy returns
+        # print('equationVertexId__tuple_variableVertexIdContaining')
+        # print(equationVertexId__tuple_variableVertexIdContaining); import pdb;pdb.set_trace()
+
+
+        #[TODO optimization possible, if the bipartite graph equationVariables_bg is disconnected, only take the connected part that is related to dependent|indepedentVariables]
         from foundation.automat.common.priorityqueue import PriorityQueue
         #since we are finding all possible paths, what about save_points? (each save_point is [priority_queue, list_of_next_explored, index_of_visited_to_back_track]), everytime, we finish the PQ, but we cannot find an answer that gets all the unwantedVariables, we popOff a savePoint, but if we popOff more than 1 savePoint, savePoint0 and then savePoint1, we have to make sure we do not go back to the same savePoint0 again when we explore savePoint1... not sure how to do that
         allVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], range(0, len(list_variables))))
@@ -457,7 +581,8 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         maxLength=0; maxLengthPaths = []
         HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; WANTEDVARIABLE_PENALTY = -2* HIGH_WEIGHTS#[TODO many optimizations possible here]
         PATHLENGTH_FACTOR = 10
-        visitedPaths = [] # paths that have been explored before
+        visitedPaths = [] # paths that have been explored before, we can use a set , since order does not matter? or we have to use a list?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not used yet<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
         # while len(stack)>0:
         while len(priorityQueue)>0:
             current___dict = priorityQueue.popMax()
@@ -467,7 +592,54 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
                     
             for orderOfExploration, neighbour in enumerate(sorted(equationVariables_bg[current], key=lambda vertexId: LOW_WEIGHTS if vertexId in unwantedVariableVertexIds or vertexId in allEquationVertexIds else HIGH_WEIGHTS)):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
                 if neighbour not in current___dict['visited']:
-                    childDict = {'current':neighbour, 'path':current___dict['path']+[neighbour], 'visited':current___dict['visited']+[neighbour]}
+                    newPath = current___dict['path']+[neighbour]
+                    childDict = {'current':neighbour, 'path':newPath, 'visited':current___dict['visited']+[neighbour]}
+                    if bipartiteTreeExpand:
+                        #
+                        if set(wantedVariableVertexIds).intersection(set(newPath)) == set(wantedVariableVertexIds): # we already hit all the wanted Variables
+                            print('found!'); import pdb;pdb.set_trace()
+                            favouritePath = newPath; break
+                        #
+
+                        #on the second equationVertexId, union all the variables of both equationsTogether to form a NEW equationVertexId{track this}
+                        #add the NEW equationVertexId to equationVariables_bg
+                        #childDict['current'] need to jump to the NEW equationVertexId
+                        #{neighbour in equationVertexId__tuple_variableVertexIdContaining} is to check if neighbour is an equation
+                        if len(newPath) > 2 and neighbour in equationVertexId__tuple_variableVertexIdContaining: #this means we have 1equation, 1variable ending the path and neighbour is the next equation
+                            # print('newPath: ', newPath)
+                            equationVertexId0, variableVertexIdToEliminate, equationVertexId1 = newPath[-3:]
+                            # print('equationVertexId0', equationVertexId0)
+                            equation0VariableIds = equationVertexId__tuple_variableVertexIdContaining[equationVertexId0]
+                            equation1VariableIds = equationVertexId__tuple_variableVertexIdContaining[equationVertexId1]
+                            newEquationVariableIds = set(equation0VariableIds).union(set(equation1VariableIds)) - set([variableVertexIdToEliminate])
+                            tuple_variableVertexIdContaining = tuple(sorted(newEquationVariableIds))
+                            #add newEquationVariableIds into the 
+                            # print('tuple_variableVertexIdContaining__equationVertexId')
+                            # print(tuple_variableVertexIdContaining__equationVertexId); import pdb;pdb.set_trace()
+                            if tuple_variableVertexIdContaining not in tuple_variableVertexIdContaining__equationVertexId: # this prevents infiniteLoop, but it is not working<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                newEquationId, newEquationVertexId = equationVertexIdIssuer.getNewEquationIdAndEquationVertexId()
+                                #this is just for TESTING please remove
+                                # if newEquationVertexId > 512:
+                                #     raise Exception() # cannot have more than 2^9 new equations
+                                #
+                                tuple_variableVertexIdContaining__equationVertexId[tuple_variableVertexIdContaining] = newEquationVertexId
+                                equationVertexId__tuple_variableVertexIdContaining[newEquationVertexId] = tuple_variableVertexIdContaining
+                                #graph update. update the new equation, also update its neighbours
+                                equationNeighbourIds = list(set(tuple_variableVertexIdContaining)-set(wantedVariableVertexIds))
+                                equationVariables_bg[newEquationVertexId] = equationNeighbourIds
+                                for variableId in equationNeighbourIds:
+                                    equationVariables_bg[variableId].append(newEquationVertexId)
+                                #
+                                vertexId__equationVariableId[newEquationVertexId] = newEquationId
+                                equationId__vertexId[newEquationId] = newEquationVertexId
+                                type__list_vertexIds[equationKey].append(newEquationVertexId)
+                                equationVertexId__tuple_variableVertexIdContaining___NEW[newEquationVertexId] = tuple_variableVertexIdContaining
+                            childDict['current'] = newEquationVertexId
+                            # print('equationVariables_bg', equationVariables_bg)
+                            #
+
+
+                    #
                     if len(childDict['path']) > maxLength:
                         maxLength = len(childDict['path'])
                         maxLengthPaths = [] # only store longest path, this will not work if the #OfNodes(equationVariables_bg) increases as we process equationVariables_bg <Heuristic>
@@ -493,7 +665,10 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         # print(maxLengthPaths)
         # print('********')
         favouritePath = maxLengthPaths[0] # [TODO many optimisations possible here]
-        return favouritePath
+        if bipartiteTreeExpand:
+            return favouritePath, equationVertexId__tuple_variableVertexIdContaining___NEW
+        else:
+            return favouritePath
 
 
     def combingSearch(self):
@@ -526,7 +701,8 @@ Which is wrong, but all the rules applied are valid... is there some kind of hie
         raise Exception("unimplemented")
 
 
-    def _loadYAMLFromFilePath(self, filepath):
+    @classmethod
+    def _loadYAMLFromFilePath(cls, filepath):
         with open(filepath, 'r') as f:
             data = safe_load(f)
             return data
