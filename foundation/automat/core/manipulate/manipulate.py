@@ -41,6 +41,8 @@ class Manipulate:
 
 
     def __init__(self, equation, direction, idx, verbose=False):
+        self.direction = direction; self.idx = idx
+
         self.eq = equation
         self.verbose = verbose
         #make and store the scheme string
@@ -94,10 +96,12 @@ class Manipulate:
         #         print(f'{self.outputGrammar} has no grammar')
         #     return self.outputGrammar # output does not depend on input variables, no manipulation needed.
         # import pdb;pdb.set_trace()
-        if self.applicable(startPos__nodeId): # here we have matches
+        # print('applying iPattern: ', self.inputGrammar, 'on', self.schemeStr, 'corresponding oPattern: ', self.outputGrammar)
+        if self.applicable(startPos__nodeId): # here we have matches, BUT, we should permuate applying outputGrammar to all the matches{using skipNode}, sometimes, we do not want to change all the inputGrammar
             existingVariables = list(self.eq.variablesScheme.keys())
             # manipulatedSchemeWord = self.grammarParser.parse(self.schemeStr, existingVariables=existingVariables)
             # print('self.variableMinArgs: ', self.variableMinArgs); print('self.variableMaxArgs: ', self.variableMaxArgs); import pdb;pdb.set_trace()
+            print(self.TYPE, self.__class__.__name__, self.direction, self.idx, 'applying oPattern: ', self.outputGrammar, '| ON|', self.schemeStr, 'associated iPattern: ', self.inputGrammar)
             manipulatedSchemeWord = self.grammarParser.parse(nodeIdsToSkip=[], variableMinArgs=self.variableMinArgs, variableMaxArgs=self.variableMaxArgs)
             
             # return Schemeparser(equationStr=manipulatedSchemeWord)
@@ -107,7 +111,7 @@ class Manipulate:
             # # TODO seems unelegant..., but we should not modify self.eq and it also seems unelegant to instantiate Equation again
             # # TODO perhaps Manipulate should be a object of Equation?
 
-                return self.grammarParser, self.TYPE, self.__class__.__name__
+                return self.grammarParser, self.TYPE, self.__class__.__name__, self.direction, self.idx
                 # return Schemeparser(equationStr=manipulatedSchemeWord), self.grammarParser.schemeNodeChangeLog, Schemeparser(equationStr=self.inputGrammar), Schemeparser(equationStr=self.outputGrammar)
 
             #     print(self.grammarParser.verPosWord)

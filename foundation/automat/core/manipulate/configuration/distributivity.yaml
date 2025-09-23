@@ -34,6 +34,111 @@ manipulations:
       $0: null
       $1: null
       $2: null
+
+#also alternate between / and *
+  - type: 'regex'
+    vor:
+      scheme: '(+ (/ $0 $1) (/ $0 $2))'
+      return: '(* $0 (+ (/ 1 $1) (/ 1 $2)))'
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+  - type: 'regex'
+    vor:
+      scheme: '(- (/ $0 $1) (/ $0 $2))'
+      return: '(* $0 (- (/ 1 $1) (/ 1 $2)))'
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+
+#
+  - type: 'regex'
+    vor:
+      scheme: '(+ (/ $0 $1) (* $0 $2))'
+      return: '(* $0 (+ (/ 1 $1) $2))'
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+  - type: 'regex'
+    vor:
+      scheme: '(- (/ $0 $1) (* $0 $2))'
+      return: '(* $0 (- (/ 1 $1) $2))'
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+
+
+#
+  - type: 'regex'
+    vor:
+      scheme: '(+ (* $0 $1) (/ $0 $2))'
+      return: '(* $0 (+ $1 (/ 1 $2)))'
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+  - type: 'regex'
+    vor:
+      scheme: '(- (* $0 $1) (/ $0 $2))'
+      return: '(* $0 (- $1 (/ 1 $2)))'
+    minArgs:
+      $0: 0
+      $1: 0
+      $2: 0
+    maxArgs:
+      $0: null
+      $1: null
+      $2: null
+    preCond:
+      $0: null
+      $1: null
+      $2: null
+
+
   - type: 'regex'
     vor:
       scheme: '(+ (/ $1 $0) (/ $2 $0))'

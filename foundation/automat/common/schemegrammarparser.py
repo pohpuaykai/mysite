@@ -687,8 +687,14 @@ class SchemeGrammarParser:
         # nodeId__len = self.schemeparser___iStr.nodeId__len
         # nodeStartPos__nodeEndPos, level__nodeStartPos, nodeStartPos__level, _ = self.schemeparser___iStr._getLevelingInformation()
         #
-        def getAllSchemeLevelCompliantPositionAfter(currentPosition, currentLevel):
-            return list(filter(lambda startPos: startPos>=currentPosition, self.level__nodeStartPos___iStr[currentLevel]))
+        # def getAllSchemeLevelCompliantPositionAfter(currentPosition, currentLevel):#currentPosition should be after a scheme_compliant_variable
+        #     print('currentLevel', currentLevel)
+        #     print('self.level__nodeStartPos___iStr', self.level__nodeStartPos___iStr)
+        #     return list(filter(lambda startPos: startPos>=currentPosition, self.level__nodeStartPos___iStr[currentLevel]))
+
+
+        def getiPatternLevelCompliantPositionAt(currentPosition, currentLevel):
+            return list(filter(lambda startPos: startPos>=currentPosition, self.level__nodeStartPos___iStr[currentLevel]))[0]
 
 
         # self.noMatches = True #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<then if found any valid matches, then set to false
@@ -696,51 +702,86 @@ class SchemeGrammarParser:
         def recursiveMatch(absoluteStartPos, absoluteEndPos, parentNodeId): # recursiveMatch is called on each matchedVariable and also the initial_string
             noMatch = False
             iPatternSegments = self.iPatternSansNum.split(SchemeGrammarParser.variableStartMarker); currentPointerPosition = absoluteStartPos;
-            iVars = []; iStatics = []; iHins = []; iVors = []; noOfMatches = 0
+            # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            # print('iPatternSegments', iPatternSegments)
+
+            iVars = []; iStatics = []; iHins = []; iVors = []; noOfMatches = 0; vorStartPointer = absoluteStartPos
             while not noMatch and currentPointerPosition < len(self.iStr):#there might be more than 1 matches on s
                 iVar = []; iStatic = [];
                 matchedSchemeLevel = None; #all matches on this enclosureNode, might not be on the same schemeLevel, so we have to None matchedSchemeLevel on every match
-                for segmentIdx, ips in enumerate(iPatternSegments):
+                segmentIdx = 0
+                while segmentIdx < len(iPatternSegments):
+                # for segmentIdx, ips in enumerate(iPatternSegments):
+                    ips = iPatternSegments[segmentIdx]
                     if segmentIdx == 0:
                         try:
+                            # print('looking for ips', ' in ', '|'+self.iStr[currentPointerPosition:absoluteEndPos]+'|')
                             staticStartPos = currentPointerPosition+self.iStr[currentPointerPosition:absoluteEndPos].index(ips)#s already chopped, no need to chop again
+                            #here there is match
+                            segmentIdx+=1
                         except:
                             noMatch = True
+                            # import pdb; pdb.set_trace()
                             break
-                        #vorHin Capture
-                        vorHin = (currentPointerPosition, staticStartPos)
+                        #vorHin Capture#if match was reseted, vorHin should also be reseted<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        # vorHin = (currentPointerPosition, staticStartPos)
+                        vorHin = (vorStartPointer, staticStartPos)
                         if len(iVors) == 0:
                             iVors.append(vorHin)
                         else: # middle vorHin, add to both
                             iVors.append(vorHin); iHins.append(vorHin)
                         iStatic.append((staticStartPos, staticStartPos+len(ips))) #capture
                         currentPointerPosition = staticStartPos + len(ips) # also =startOfIVar
+                        vorStartPointer = currentPointerPosition
                         matchedSchemeLevel = self.nodeStartPos__level___iStr[staticStartPos]#this is schemeLevel=0 in iPattern
                     else: # we have to find the next scheme_level_compliant position, that also matches ips, because ONLY variables must be scheme_level_compliant, and in this MODE2, segments do not have to be scheme_level_compliant
-                        foundSegmentMatch = False
+
                         iVarIdxInISortedVariablesAndPosition = len(iVar)
                         # var___i, iPos = self.iSortedVariablesAndPosition[iVarIdxInISortedVariablesAndPosition]
                         var___i, iPos = self.iSortedVariablesAndPositionSansNum[iVarIdxInISortedVariablesAndPosition]
                         # print('self.iSortedVariablesAndPositionSansNum', self.iSortedVariablesAndPositionSansNum); import pdb;pdb.set_trace()
                         iVarLevel = self.nodeStartPos__level___ip[iPos] # level in iPattern, need to convert iPatternSchemeLevel to iStrSchemeLevel
-                        list_schemeLevelCompliantStartPos = getAllSchemeLevelCompliantPositionAfter(currentPointerPosition, matchedSchemeLevel+iVarLevel)# matchedSchemeLevel=schemeLevel_in_iStr=schemeLevel0_in_iPattern, iVarLevel=schemeLevel_in_iPattern_of_iVar, so to get the schemeLevel_of_iVar_in_iStr=matchedSchemeLevel+(iVarLevel-0)
-                        # print('currentPointerPosition: ', currentPointerPosition)
-                        # print('currentLevel: ', matchedSchemeLevel+iVarLevel)
-                        # print('ips', ips)
-                        # print('list_schemeLevelCompliantStartPos', list_schemeLevelCompliantStartPos); import pdb;pdb.set_trace()
-                        for schemeStartPos in list_schemeLevelCompliantStartPos:
-                            schemeEndPos = self.nodeStartPos__nodeEndPos___iStr[schemeStartPos]
-                            if self.iStr[schemeEndPos:schemeEndPos+len(ips)] == ips:#this ensure ips_matching, using schemeEndPos instead of schemeStartPos, because schemeStartPos marks beginning_of_variable
-                                foundSegmentMatch = True
-                                staticStartPos = schemeStartPos
-                                iVar.append((schemeStartPos, schemeEndPos)) # capture
-                                iStatic.append((schemeEndPos, schemeEndPos+len(ips))) # capture
-                                currentPointerPosition = schemeEndPos + len(ips)
-                                # print('ips match found'); import pdb;pdb.set_trace()
-                                break
-                        if not foundSegmentMatch: #even if there is one segment that does not match
-                            # print('foundSegmentMatch'); import pdb;pdb.set_trace()
+                        
+                        schemeEndPos = currentPointerPosition
+                        #
+                        # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                        # print('ips: ', '|'+ips+'|')
+                        # print('iPos', iPos)
+                        # print("self.nodeStartPos__level___ip", self.nodeStartPos__level___ip)
+                        # print('currentPointerPosition', currentPointerPosition)#IS currentPointerPosition always before a schemeCompliantVariableOfIPattern?
+                        # print('matchedSchemeLevel', matchedSchemeLevel)
+                        # print('iVarLevel', iVarLevel)
+                        # print('schemeEndPos', schemeEndPos)
+                        #
+                        schemeStartPos = getiPatternLevelCompliantPositionAt(currentPointerPosition, matchedSchemeLevel+iVarLevel)# matchedSchemeLevel=schemeLevel_in_iStr=schemeLevel0_in_iPattern, iVarLevel=schemeLevel_in_iPattern_of_iVar, so to get the schemeLevel_of_iVar_in_iStr=matchedSchemeLevel+(iVarLevel-0)
+                        schemeEndPos = self.nodeStartPos__nodeEndPos___iStr[schemeStartPos]
+                        if self.iStr[schemeEndPos:schemeEndPos+len(ips)] == ips:
+                            staticStartPos = schemeStartPos
+                            iVar.append((schemeStartPos, schemeEndPos)) # capture
+                            iStatic.append((schemeEndPos, schemeEndPos+len(ips))) # capture
+                            currentPointerPosition = schemeEndPos + len(ips)
+                            vorStartPointer = currentPointerPosition
+                            # print('ips match found =) at currentPointerPosition', currentPointerPosition, 'schemeStartPos: ', schemeStartPos, 'schemeEndPos: ', schemeEndPos); 
+                            # import pdb;pdb.set_trace()
+                            segmentIdx += 1
+                        else:
+                            #did not match the whole of list_schemeLevelCompliantStartPos ?
+                            #so we should currentPointer should move to the end of list_schemeLevelCompliantStartPos?
+                            currentPointerPosition = schemeStartPos#+len(ips) # +len(ips) is to keep the currentPointerPosition always at the start of schemeCompliantVariableOfIPattern
+                            segmentIdx = 0 # if all the list_schemeLevelCompliantStartPos (which are all the valid are no match), then we cannot continue with this matching anymore
+                            # print('this ips no match! currentPointerPosition:', currentPointerPosition); 
+                            # print('iStatics: ', iStatics)
+                            # print('iStatic', iStatic)
+                            # print(absoluteStartPos)
+                            # import pdb;pdb.set_trace()
                             noMatch = True
+                            iVors.pop(); 
+                            if len(iHins) > 0:
+                                iHins.pop()
+                            # iHins = []; iVors = []; 
+                            # noOfMatches -=1;
+                            iVar = []; iStatic = []; vorStartPointer = absoluteStartPos
+
                 # if len(iVar) > 0:#, but might not be a complete match... has to be a complete match<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 if len(iVar) == len(self.iSortedVariablesAndPositionSansNum) and self.variablesConsistent(iVar):
                     iVars.append(iVar); iStatics.append(iStatic)
@@ -762,7 +803,8 @@ class SchemeGrammarParser:
 
                 #recurse on each variable, no matter if the variablesConsistent or NOT
                 self.iEnclosureTree[parentNodeId] = []
-                # print('iVars: ', iVars); import pdb;pdb.set_trace()
+                # print('iVars: ', iVars, '<<<<<<<<<<<<<<<<<<<<<<<<<'); 
+                # import pdb;pdb.set_trace()
                 for matchIdx, iVar in enumerate(iVars):
                     for iVarIdx, (varStartPos, varEndPos) in enumerate(iVar):
                         varNodeId = self.getEnclosureNodeId()
@@ -852,6 +894,10 @@ class SchemeGrammarParser:
             raise Exception('please call buildEnclosureTree first')
 
         # if len(self.iEnclosureTree) == 0: # there are no matches
+        
+        #
+        # print('iId__data', self.iId__data)
+        #
         if self.noMatches:
             return self.oStr
 
@@ -1372,6 +1418,9 @@ class SchemeGrammarParser:
             }
             # print('oStr: ', oStr); import pdb;pdb.set_trace()
             return oStr
+        #
+        # print('iId__data', self.iId__data)
+        #
         self.oStr = recursiveGenerate(0, self.getOEnclosureNodeId())# 0 is the iEnclosureRootId
 
         # print('****************************')
@@ -1508,7 +1557,9 @@ class SchemeGrammarParser:
 
         from copy import copy
         from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import
-        self.schemeparser___oStr = Schemeparser(equationStr=self.oStr)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the others so we do not call schemeparser on iStr again
+        # print('self.iId__data', self.iId__data)
+        # print('self.oStr: ', self.oStr)
+        self.schemeparser___oStr = Schemeparser(equationStr=self.oStr)#, verbose=self.verbose)#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<refactor the others so we do not call schemeparser on iStr again
         self.ast___oStr, functionsD___oStr, variablesD___oStr, primitives___oStr, totalNodeCount___oStr, self.startPos__nodeId___oStr = self.schemeparser___oStr._parse()
         self.nodeId__labelLen___oStr = self.schemeparser___oStr._getLabelLength()
         self.nodeId__labelLen___iStr = self.schemeparser___iStr._getLabelLength()

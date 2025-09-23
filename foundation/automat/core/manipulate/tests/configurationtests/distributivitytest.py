@@ -104,11 +104,287 @@ def test__hin1__configTest(verbose=False):
     
 
 def test__vor2__configTest(verbose=False):
-    eqs = '(= a (+ (/ b c) (/ d c)))' # fill it in
+    eqs = '(= a (+ (/ b c) (/ b d)))' # fill it in
     eqsType = 'scheme'
     #filename = 'distributivity'
     direction = 'vor'
     idx = 2
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (+ (/ $0 $1) (/ $0 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* b (+ (/ 1 c) (/ 1 d))))' # (* $0 (+ (/ 1 $1) (/ 1 $2)))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin2__configTest(verbose=False):
+    eqs = '(= a (* b (+ (/ 1 c) (/ 1 d))))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 2
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ (/ 1 $1) (/ 1 $2)))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (+ (/ b c) (/ b d)))' # (+ (/ $0 $1) (/ $0 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor3__configTest(verbose=False):
+    eqs = '(= a (- (/ b c) (/ b d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 3
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (- (/ $0 $1) (/ $0 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* b (- (/ 1 c) (/ 1 d))))' # (* $0 (- (/ 1 $1) (/ 1 $2)))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin3__configTest(verbose=False):
+    eqs = '(= a (* b (- (/ 1 c) (/ 1 d))))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 3
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* $0 (- (/ 1 $1) (/ 1 $2)))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (- (/ b c) (/ b d)))' # (- (/ $0 $1) (/ $0 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor4__configTest(verbose=False):
+    eqs = '(= a (+ (/ b c) (* b d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 4
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (+ (/ $0 $1) (* $0 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* b (+ (/ 1 c) d)))' # (* $0 (+ (/ 1 $1) $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin4__configTest(verbose=False):
+    eqs = '(= a (* b (+ (/ 1 c) d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 4
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ (/ 1 $1) $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (+ (/ b c) (* b d)))' # (+ (/ $0 $1) (* $0 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor5__configTest(verbose=False):
+    eqs = '(= a (- (/ b c) (* b d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 5
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (- (/ $0 $1) (* $0 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* b (- (/ 1 c) d)))' # (* $0 (- (/ 1 $1) $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin5__configTest(verbose=False):
+    eqs = '(= a (* b (- (/ 1 c) d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 5
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* $0 (- (/ 1 $1) $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (- (/ b c) (* b d)))' # (- (/ $0 $1) (* $0 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor6__configTest(verbose=False):
+    eqs = '(= a (+ (* b c) (/ b d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 6
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 $1) (/ $0 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* b (+ c (/ 1 d))))' # (* $0 (+ $1 (/ 1 $2)))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin6__configTest(verbose=False):
+    eqs = '(= a (* b (+ c (/ 1 d))))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 6
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ $1 (/ 1 $2)))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (+ (* b c) (/ b d)))' # (+ (* $0 $1) (/ $0 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor7__configTest(verbose=False):
+    eqs = '(= a (- (* b c) (/ b d)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 7
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (- (* $0 $1) (/ $0 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* b (- c (/ 1 d))))' # (* $0 (- $1 (/ 1 $2)))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin7__configTest(verbose=False):
+    eqs = '(= a (* b (- c (/ 1 d))))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 7
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* $0 (- $1 (/ 1 $2)))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (- (* b c) (/ b d)))' # (- (* $0 $1) (/ $0 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor8__configTest(verbose=False):
+    eqs = '(= a (+ (/ b c) (/ d c)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 8
     eq0 = Equation(eqs, eqsType)
     ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (+ (/ $1 $0) (/ $2 $0))
@@ -126,12 +402,12 @@ def test__vor2__configTest(verbose=False):
 
     
 
-def test__hin2__configTest(verbose=False):
+def test__hin8__configTest(verbose=False):
     eqs = '(= a (/ (+ b c) d))' # fill it in
     eqsType = 'scheme'
     #filename = 'distributivity'
     direction = 'hin'
-    idx = 2
+    idx = 8
     eq0 = Equation(eqs, eqsType)
     ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ (+ $1 $2) $0)
@@ -149,12 +425,12 @@ def test__hin2__configTest(verbose=False):
 
     
 
-def test__vor3__configTest(verbose=False):
+def test__vor9__configTest(verbose=False):
     eqs = '(= a (- (/ b c) (/ d c)))' # fill it in
     eqsType = 'scheme'
     #filename = 'distributivity'
     direction = 'vor'
-    idx = 3
+    idx = 9
     eq0 = Equation(eqs, eqsType)
     ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (- (/ $1 $0) (/ $2 $0))
@@ -172,12 +448,12 @@ def test__vor3__configTest(verbose=False):
 
     
 
-def test__hin3__configTest(verbose=False):
+def test__hin9__configTest(verbose=False):
     eqs = '(= a (/ (- b c) d))' # fill it in
     eqsType = 'scheme'
     #filename = 'distributivity'
     direction = 'hin'
-    idx = 3
+    idx = 9
     eq0 = Equation(eqs, eqsType)
     ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
     manipulatedSchemeEquation = ma0.apply() # (/ (- $1 $2) $0)
@@ -205,4 +481,16 @@ if __name__=='__main__':
     test__hin2__configTest(True) # Not tested yet
     test__vor3__configTest(True) # Not tested yet
     test__hin3__configTest(True) # Not tested yet
+    test__vor4__configTest(True) # Not tested yet
+    test__hin4__configTest(True) # Not tested yet
+    test__vor5__configTest(True) # Not tested yet
+    test__hin5__configTest(True) # Not tested yet
+    test__vor6__configTest(True) # Not tested yet
+    test__hin6__configTest(True) # Not tested yet
+    test__vor7__configTest(True) # Not tested yet
+    test__hin7__configTest(True) # Not tested yet
+    test__vor8__configTest(True) # Not tested yet
+    test__hin8__configTest(True) # Not tested yet
+    test__vor9__configTest(True) # Not tested yet
+    test__hin9__configTest(True) # Not tested yet
     

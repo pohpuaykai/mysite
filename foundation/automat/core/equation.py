@@ -61,14 +61,18 @@ class Equation:
         else: # from str to ast???
             self._eqs = equationStr
             self._parserName = parserName
-            self._parser = Parser(parserName)
-            (self.ast, self.functions, self.variables, self.primitives,
-             self.totalNodeCount, self.startPos__nodeId) = self._parser.parse(self._eqs)
             if parserName.lower() == 'scheme':
+                from foundation.automat.parser.sorte.schemeparser import Schemeparser # not elegant, please refactor
+
+                self.schemeparser = Schemeparser(equationStr=self._eqs)#self._parser
+                (self.ast, self.functions, self.variables, self.primitives,
+                 self.totalNodeCount, self.startPos__nodeId) = self.schemeparser._parse()
+                self._parser = self.schemeparser
+
+
                 self.schemeStr = equationStr
                 self.startPos__nodeId = self._parser.startPos__nodeId
                 self.nodeId__len = self._parser.nodeId__len
-                self.schemeparser = self._parser
                 self.astScheme = self.ast
                 self.rootOfTree = self._parser.rootOfTree
                 self.functionsScheme = self.functions
@@ -78,6 +82,10 @@ class Equation:
                 self.startPos__nodeIdScheme = self._parser.startPos__nodeId
                 self.nodeId__lenScheme = self._parser.nodeId__len
             else: # unparse to schemeStr, because schemeStr and startPos__nodeId are essential data to equation now, used by Manipulate.py
+                
+                self._parser = Parser(parserName)
+                (self.ast, self.functions, self.variables, self.primitives,
+                 self.totalNodeCount, self.startPos__nodeId) = self._parser.parse(self._eqs)
                 self.loadASTWithSchemeParser(self.ast)
 
             #TODO this can be removed, once we calculate self.functionsScheme, self.variablesScheme, self.primitivesScheme, self.totalNodeCountScheme, self.startPos__nodeIdScheme

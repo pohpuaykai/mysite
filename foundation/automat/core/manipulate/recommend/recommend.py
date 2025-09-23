@@ -37,19 +37,13 @@ class Recommend:
 
     @classmethod
     def getMetaData(cls, redrive=False):
-        if Recommend._metaData is None or redrive:
+        if redrive:
             Recommend._metaData = cls._generateMetaInformation()
         else:
             try:
-                # self.metaData = np.array(np.load(file=os.path.join(self.metaFolder, self.metaFilename)))
                 Recommend._metaData = np.array(np.load(file=os.path.join(Recommend._metaFolder, Recommend._metaFilename), allow_pickle=True))
             except:
                 import traceback; traceback.print_exc()
-                # if self.verbose:
-                #     import traceback
-                #     info('loading of metaData Failed, generating metaData')
-                #     traceback.print_exc()
-                #regenerate
                 print('failed to load from disk, so have to reload')
                 Recommend._metaData = cls._generateMetaInformation()
         return Recommend._metaData
@@ -58,15 +52,6 @@ class Recommend:
 
     def __init__(self, redrive=False, verbose=False):
         self.verbose=verbose
-        # self.verbose = False
-        # self.eq = equation
-        # self.manipulateConfigFileFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate','configuration')
-        # self.metaFolder = os.path.join(AUTOMAT_MODULE_DIR, 'core', 'manipulate', 'recommend', 'meta')
-        # self.metaFilename = 'manipulations_patterns.npy'
-        # self.metaData = None
-        # self._retrieveMetaInformation()
-        # print(type(self.metaData))
-        # import pdb;pdb.set_trace()
 
 
     def getManipulateClass(self, filename):
@@ -196,9 +181,16 @@ class Recommend:
         return self.filterMetaList(metaData, searchCol, searchTerms)
         # return self.filterMetaList(self.metaData, searchCol, searchTerms)
 
+    def sortForHeuristicsRelevantTo(self, eq, manipulations):
+        manipulations = sorted(manipulations, key=lambda row: self.mostNumberOfIPatternNodes___SORTINGHEURISTIC(row['iTotalNodeCount']))
+        return manipulations
 
-    def simplify(self, eq, hint=None):
-        #run FILTER_HEURISTIC and SORTIN_HEURISTIC
+
+    def filterForHeuristicsRelevantTo(self, eq, manipulations):
+        #TODO please move to this the end of this function, should not be done here
+        manipulations = self.sortForHeuristicsRelevantTo(eq, manipulations)
+        #
+
         from copy import copy
 
         #HELPER
@@ -206,7 +198,6 @@ class Recommend:
             d = copy(iPrimitives); d.update(iFunctions)
             return d
         #
-        simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') # the number of nodes get lesser, its ok, its this is a 1 step
         breadthOfEquation = eq.schemeparser.getASTWidth()
         depthOfEquation = eq.schemeparser.getASTDepth()
         entityTotalCountOfEquation = eq.totalNodeCountScheme
@@ -216,7 +207,7 @@ class Recommend:
         #
         # print('0.*****************************')
         # print('schemeStr: ', eq.schemeStr)
-        # print('len(manipulations):', len(simplifyingManipulations))
+        # print('len(manipulations):', len(manipulations))
         # print('breadthOfEquation: ', breadthOfEquation)
         # print('depthOfEquation: ', depthOfEquation)
         # print('equationEntityToCount: ', equationEntityToCount)
@@ -227,37 +218,46 @@ class Recommend:
         #
 
 
-        simplifyingManipulations = list(filter(lambda row:
-            self.breadthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iWidth'], breadthOfEquation), simplifyingManipulations))
+        manipulations = list(filter(lambda row:
+            self.breadthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iWidth'], breadthOfEquation), manipulations))
         
         # print('1.*****************************')
-        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
-        simplifyingManipulations = list(filter(lambda row:
-            self.depthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iDepth'], depthOfEquation),simplifyingManipulations))
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
+        manipulations = list(filter(lambda row:
+            self.depthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iDepth'], depthOfEquation),manipulations))
         
         # print('2.*****************************')
-        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
-        simplifyingManipulations = list(filter(lambda row:
-            self.totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(row['iTotalNodeCount'], entityTotalCountOfEquation), simplifyingManipulations))
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
+        manipulations = list(filter(lambda row:
+            self.totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(row['iTotalNodeCount'], entityTotalCountOfEquation), manipulations))
         
         # print('3.*****************************')
-        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
-        simplifyingManipulations = list(filter(lambda row: #iVariables will only contain $ variable for iPattern
-            self.entityCountsOfIPatternInEquation___FILTERHEURISTIC(combiningDictionaries(row['iPrimitives'], row['iFunctions']), equationEntityToCount), simplifyingManipulations))
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
+        manipulations = list(filter(lambda row: #iVariables will only contain $ variable for iPattern
+            self.entityCountsOfIPatternInEquation___FILTERHEURISTIC(combiningDictionaries(row['iPrimitives'], row['iFunctions']), equationEntityToCount), manipulations))
         
         # print('4.*****************************')
-        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
-        simplifyingManipulations = list(filter(lambda row: #metaData needs to store iPatternEntityStartEndPos
-            self.orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(row['iLabelsInOrderOfStartPos'], row['iMode'], equationEntityStartEndPos), simplifyingManipulations))
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
+        manipulations = list(filter(lambda row: #metaData needs to store iPatternEntityStartEndPos
+            self.orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(row['iLabelsInOrderOfStartPos'], row['iMode'], equationEntityStartEndPos), manipulations))
         
         # print('5.*****************************')
-        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
-        simplifyingManipulations = list(filter(lambda row: #metaData needs to store iPatternBracketSpaceList
-            self.orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(row['iListWithoutLabels'], equationBracketSpaceList), simplifyingManipulations))
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
+        manipulations = list(filter(lambda row: #metaData needs to store iPatternBracketSpaceList
+            self.orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(row['iListWithoutLabels'], equationBracketSpaceList), manipulations))
         
         # print('6.*****************************')
-        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='subtractzero' and row['identity']['idx']==2, simplifyingManipulations)))>0); import pdb;pdb.set_trace()
+        # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
         
+
+        return manipulations
+
+
+
+    def simplify(self, eq, hint=None):
+        #run FILTER_HEURISTIC and SORTIN_HEURISTIC
+        simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') # the number of nodes get lesser, its ok, its this is a 1 step
+        simplifyingManipulations = self.filterForHeuristicsRelevantTo(eq, simplifyingManipulations)
         #TODO SORTIN_HEURISTICs, simplest iPattern first?
         simplifyingManipulations = sorted(simplifyingManipulations, key=lambda row: row['oTotalNodeCount'])
         #TODO more SORTIN_HEURISTICs?
@@ -271,7 +271,7 @@ class Recommend:
                 manipulateClass = self.getManipulateClass(idd['filename'])
                 # import pdb;pdb.set_trace()
                 manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
-                returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)
+                returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)#there is no need for hint? eq has the latest startPos__nodeId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                 if returnTup is not None: # successfully applied manipulation,  we will return it first
                     #
@@ -279,7 +279,7 @@ class Recommend:
                     #but the downstream equation.simplify does not need countsOfFunctionVariablePrimitivesRemoved anymore!
                     #equation.simplify needs, can be reparsed by schemeparser, but those with nodeId, need to be changed to the OLD nodeIds provided by sgp
                     #or should they be provided by sgp? but it is weird to put latexParser in sgp...?
-                    sgp, manipulateType, manipulateClassName = returnTup
+                    sgp, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
                     rootOfTree___simplified = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     ast___simplified = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     startPos__nodeId___simplified = sgp.startPos__nodeId___oStr
@@ -353,9 +353,11 @@ class Recommend:
             for s in list_str:
                 ts += s + schemeLabelDelimiter
             return ts
-        segments = list(filter(lambda s: s!= SchemeGrammarParser.variableStartMarker and len(s) > 0, joinByAppending(iPatternEntityStartEndPos).split(schemeLabelDelimiter+SchemeGrammarParser.variableStartMarker+schemeLabelDelimiter)))
+        segments = list(filter(lambda s: s!= SchemeGrammarParser.variableStartMarker and len(s) > 0, 
+            joinByAppending(iPatternEntityStartEndPos).split(SchemeGrammarParser.variableStartMarker+schemeLabelDelimiter)))
         equationStartPos = 0
         equationEntityStartEndPos = joinByAppending(equationEntityStartEndPos)
+        # print('iPatternEntityStartEndPos', iPatternEntityStartEndPos)
         # print('equationEntityStartEndPos', equationEntityStartEndPos)
         # print('segments: ', segments); 
         # import pdb;pdb.set_trace()
@@ -386,6 +388,9 @@ class Recommend:
             except:
                 return False
         return True
+
+    def mostNumberOfIPatternNodes___SORTINGHEURISTIC(self, iTotalNodeCount):
+        return -iTotalNodeCount
 
     def reduceVariablesCount(self, variable):
         """
@@ -504,7 +509,10 @@ class Recommend:
         # print(list_independentVariableIds)
         # import pdb;pdb.set_trace()
         #get all the parameters passed to this function, so that we can write a unit test{END}
-
+        from copy import copy
+        #
+        import pprint; pp = pprint.PrettyPrinter(indent=4)
+        #
         bipartiteTreeExpand = False
 
         class EquationVertexIdIssuer:
@@ -578,7 +586,7 @@ class Recommend:
             'path':[maxEquationVertexId],
             'visited':[]
         }, -1)
-        maxLength=0; maxLengthPaths = []
+        # maxLength=0; maxLengthPaths = []
         HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; WANTEDVARIABLE_PENALTY = -2* HIGH_WEIGHTS#[TODO many optimizations possible here]
         PATHLENGTH_FACTOR = 10
         visitedPaths = [] # paths that have been explored before, we can use a set , since order does not matter? or we have to use a list?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not used yet<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -587,18 +595,23 @@ class Recommend:
         while len(priorityQueue)>0:
             current___dict = priorityQueue.popMax()
             current = current___dict['current']
-
-            current___dict['visited'].append(current)
+            visited = copy(current___dict['visited'])
+            visited.append(current)
                     
+
+            #############
+            pp.pprint(current___dict)
+            import pdb;pdb.set_trace()
+            #############
             for orderOfExploration, neighbour in enumerate(sorted(equationVariables_bg[current], key=lambda vertexId: LOW_WEIGHTS if vertexId in unwantedVariableVertexIds or vertexId in allEquationVertexIds else HIGH_WEIGHTS)):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
-                if neighbour not in current___dict['visited']:
+                if neighbour not in visited:
                     newPath = current___dict['path']+[neighbour]
-                    childDict = {'current':neighbour, 'path':newPath, 'visited':current___dict['visited']+[neighbour]}
+                    childDict = {'current':neighbour, 'path':newPath, 'visited':visited+[neighbour]}
                     if bipartiteTreeExpand:
                         #
-                        if set(wantedVariableVertexIds).intersection(set(newPath)) == set(wantedVariableVertexIds): # we already hit all the wanted Variables
-                            print('found!'); import pdb;pdb.set_trace()
-                            favouritePath = newPath; break
+                        # if set(wantedVariableVertexIds).intersection(set(newPath)) == set(wantedVariableVertexIds): # we already hit all the wanted Variables
+                        #     print('found!'); import pdb;pdb.set_trace()
+                        #     favouritePath = newPath; break
                         #
 
                         #on the second equationVertexId, union all the variables of both equationsTogether to form a NEW equationVertexId{track this}
@@ -640,17 +653,19 @@ class Recommend:
 
 
                     #
-                    if len(childDict['path']) > maxLength:
-                        maxLength = len(childDict['path'])
-                        maxLengthPaths = [] # only store longest path, this will not work if the #OfNodes(equationVariables_bg) increases as we process equationVariables_bg <Heuristic>
-                    if len(childDict['path']) == maxLength:#there might be many paths with same maxLength, if we have a choice, HOW TO CHOOSE<<<<<<<<<<<<<<<<<<<<<<<TODO?
-                        maxLengthPaths.append(childDict['path'])
-                    #Priority Heuristic
-                    childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
-                    childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
-                    childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path
-                    childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0
-                    priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
+                    if childDict['path'] not in visitedPaths:
+                        visitedPaths.append(childDict['path'])
+                        # if len(childDict['path']) > maxLength:
+                        #     maxLength = len(childDict['path'])
+                        #     maxLengthPaths = [] # only store longest path, this will not work if the #OfNodes(equationVariables_bg) increases as we process equationVariables_bg <Heuristic>
+                        # if len(childDict['path']) == maxLength:#there might be many paths with same maxLength, if we have a choice, HOW TO CHOOSE<<<<<<<<<<<<<<<<<<<<<<<TODO?
+                        #     maxLengthPaths.append(childDict['path'])
+                        #Priority Heuristic
+                        childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
+                        childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
+                        childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path
+                        childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0
+                        priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #
                     # print('******')
                     # print('neighbour', neighbour, 'priority: ', childDictPriority-orderOfExploration)
@@ -664,42 +679,100 @@ class Recommend:
         # print('maxLengthPaths:')
         # print(maxLengthPaths)
         # print('********')
+        maxLen = min(map(lambda s: len(s), visitedPaths))
+        maxLengthPaths = list(filter(lambda s: len(s)==maxLen, visitedPaths))
         favouritePath = maxLengthPaths[0] # [TODO many optimisations possible here]
         if bipartiteTreeExpand:
             return favouritePath, equationVertexId__tuple_variableVertexIdContaining___NEW
         else:
-            return favouritePath
+            return favouritePath, []
 
 
-    def combingSearch(self):
+    def combingSearch(self, equation, maximumDepth=256): #<<<<<<<<<<<maybe rename to solve|simplify
         """
-        #~ DRAFT ~#
+        an option for early return? if we see the same formula showing up for more than "the_number_of_times_number_of_schemeNodes" of the formula, then return, also if history ends with all node_swapping_manipulations{no_increase_no_decrease}, then they are the same formulas
+        """#if manipulation is node_swapping, check the last_consecutive_history for it, it should not be repeated in the last_consecutive_history
+        ####for debugging
+        import pprint; pp = pprint.PrettyPrinter(indent=4)
+        ####
+        from copy import deepcopy
+        from foundation.automat.common.priorityqueue import PriorityQueue
 
-        use Dijkstra : (courtesy of ChatGPT)
+        from foundation.automat.core.equation import Equation
+        visitedSchemeStrs = [equation.schemeStr]#<<<<<<<<<<<<<<<<<<instead of using set, use list, so that you can see when each schemeStr was added<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        # manipulations = Recommend.getMetaData()
+        priorityQueue = PriorityQueue(); 
+        priorityQueue.insert({
+            'eq':equation,
+            'depth':0,
+            'history':[],
+            'unHistory':[]#the equivalent of history, but in reverse fo each item in history
+        }, -1)
+        while len(priorityQueue) > 0:
+            state = priorityQueue.popMax()
+            eq = state['eq']; depth = state['depth']; history = state['history']; unHistory = state['unHistory']
+            if depth >= maximumDepth:
+                # print('stopping search... because one of the states reached maximumDepth')
+                #what to return?
+                break
+            manipulations = self.filterForHeuristicsRelevantTo(eq, Recommend.getMetaData()) # branches
+            #####for debugging
+            # print('~~~~~~~~~~~~~')
+            # pp.pprint(state)
+            # print('~~~~~~~~~~~~~')
+            #####
+            # print('len(manipulations): ', len(manipulations))
+            for idd in map(lambda row: row['identity'], manipulations):
+                #skip all the manipulations that you have just done
+                historyKey = (idd['filename'], idd['direction'], idd['idx']); 
+                reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
+                unHistoryKey = (idd['filename'], reverseDirection, idd['idx'])
+                if historyKey in history[-1:] or unHistoryKey in unHistory[-1:]: # this is not working <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    print('skipping manipulate: ', historyKey)
+                    continue #skip, we do not want to directly undo our affords
+                manipulateClass = self.getManipulateClass(idd['filename'])
+                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
+                # print('*************************************************separate call ', historyKey)
+                returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=True)
+                if returnTup is not None: # successfully applied manipulation,  we will return it first
+                    sgp, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
+                    # rootOfTree___simplified = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    # ast___simplified = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    # startPos__nodeId___simplified = sgp.startPos__nodeId___oStr
+                    # nodeId__len___simplified = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
+                    # schemeStr___simplified = sgp.oStr
 
-        TODO implement Dijkstra with heurestic in common
-        nodes are equations, nodes are connected if we can apply a manipulation from a node to another node.
-        there are some end nodes, where if our search hits, then it terminates (Take me Ohm)
+                    # functions___simplified = sgp.schemeparser___oStr.functions
+                    # variables___simplified = sgp.schemeparser___oStr.variables
+                    # primitives___simplified = sgp.schemeparser___oStr.primitives
+                    # totalNodeCount___simplified = sgp.schemeparser___oStr.totalNodeCount
+                    # latexStr___simplified = sgp.schemeparser___oStr._toLatex()
 
-
-
-        import heapq
-
-        # Create an empty priority queue
-        priority_queue = []
-
-        # Push elements with priorities
-        heapq.heappush(priority_queue, (2, "Task A"))  # Priority 2
-        heapq.heappush(priority_queue, (1, "Task B"))  # Priority 1
-        heapq.heappush(priority_queue, (3, "Task C"))  # Priority 3
-
-        # Pop elements (smallest priority first)
-        print(heapq.heappop(priority_queue))  # Output: (1, 'Task B')
-        print(heapq.heappop(priority_queue))  # Output: (2, 'Task A')
-        print(heapq.heappop(priority_queue))  # Output: (3, 'Task C')
-        """
-        raise Exception("unimplemented")
-
+                    eq___new = Equation(sgp.oStr, parserName='scheme')
+                    eq___new.astScheme = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    eq___new.rootOfTree = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    eq___new.startPos__nodeIdScheme = sgp.startPos__nodeId___oStr
+                    eq___new.nodeId__lenScheme = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
+                    if sgp.oStr not in visitedSchemeStrs:
+                        history = deepcopy(history); unHistory = deepcopy(unHistory)
+                        history.append((idd['filename'], idd['direction'], idd['idx']))
+                        reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
+                        unHistory.append((idd['filename'], reverseDirection, idd['idx']))
+                        visitedSchemeStrs.append(sgp.oStr)
+                        priorityQueue.insert({
+                            'eq':eq___new,
+                            'depth':depth+1,
+                            'history':history,
+                            'unHistory':unHistory#the equivalent of history, but in reverse fo each item in history
+                        }, -(depth+1))
+                        #heuristics, so there are simplification_patterns where the nodes decrease from iPattern to oPattern, these should also serve as targets, so formulas that have the most potential to be matched by these patterns, should be given higher priority..<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        #heuristics, if we can simplify until there is only 1 of each variable, we can solve for anyvariable, by moving_left_to_right<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        #how to put the eq___new in? what priority?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    #else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
+        # print('we actually finished running, this was not expected', visitedSchemeStrs)
+        minStrLen = min(map(lambda s: len(s), visitedSchemeStrs))
+        minSchemeStrs = sorted(list(filter(lambda s: len(s)==minStrLen, visitedSchemeStrs)))
+        return minSchemeStrs
 
     @classmethod
     def _loadYAMLFromFilePath(cls, filepath):
