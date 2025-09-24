@@ -12,7 +12,7 @@ pp = pprint.PrettyPrinter(indent=4)
     
 
 def test__vor0__configTest(verbose=False):
-    eqs = '(= y (* x "1"))' # fill it in
+    eqs = '(= y (* x 1))' # fill it in
     eqsType = 'scheme'
     #filename = 'unitofmultiplication'
     direction = 'vor'
@@ -45,7 +45,7 @@ def test__hin0__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (* y "1") (* x "1"))' # (* $0 1)
+    expected = '(= (* y 1) (* x 1))' # (* $0 1)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
@@ -58,7 +58,7 @@ def test__hin0__configTest(verbose=False):
     
 
 def test__vor1__configTest(verbose=False):
-    eqs = '(= y (/ x "1"))' # fill it in
+    eqs = '(= y (/ x 1))' # fill it in
     eqsType = 'scheme'
     #filename = 'unitofmultiplication'
     direction = 'vor'
@@ -91,7 +91,7 @@ def test__hin1__configTest(verbose=False):
     manipulatedSchemeEquation = ma0.apply() # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
-    expected = '(= (/ y "1") (/ x "1"))' # (/ $0 1)
+    expected = '(= (/ y 1) (/ x 1))' # (/ $0 1)
     ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
     expectedAst = ast0
     print(inspect.currentframe().f_code.co_name, ' PASSED? ', 

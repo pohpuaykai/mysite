@@ -513,7 +513,7 @@ class Recommend:
         #
         import pprint; pp = pprint.PrettyPrinter(indent=4)
         #
-        bipartiteTreeExpand = False
+        bipartiteTreeExpand = True
 
         class EquationVertexIdIssuer:
             def __init__(self, currentMaxEquationId, currentMaxEquationVertexId):
@@ -548,6 +548,7 @@ class Recommend:
         wantedVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], [dependentVariableId]+list_independentVariableIds))
         unwantedVariableVertexIds = list(set(allVariableVertexIds) - set(wantedVariableVertexIds))
         allEquationVertexIds = list(map(lambda equationId: equationId__vertexId[equationId], range(0, len(list_equations))))
+        originalEquationVertexIds = copy(allEquationVertexIds)
         #remove wantedVariableVertexIds
         equationVariables_bg___noWantedVariableVertexIds = {}
         for parentVertexId, childVertexIds in equationVariables_bg.items():
@@ -559,14 +560,16 @@ class Recommend:
                 equationVariables_bg___noWantedVariableVertexIds[parentVertexId] = filteredChildVertexIds
         equationVariables_bg = equationVariables_bg___noWantedVariableVertexIds
 
-        #finding a startNode
+        #finding a startNode, maybe start with the most number of unwanted variable...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         maxEquationVertexId = None;maxTotalCount = -1
         wantedVariables = []
         for wantedVariableId in [dependentVariableId]+list_independentVariableIds:
             wantedVariables.append(list_variables[wantedVariableId])
+        unwantedVariables = set([dependentVariableId]+list_independentVariableIds) - set(wantedVariables)
         for equationId, equation in enumerate(list_equations):
             variables__count = equation.variablesScheme; totalWantedVariableCount = 0
-            for wantedVariable in set(variables__count.keys()).intersection(set(wantedVariables)):
+            # for wantedVariable in set(variables__count.keys()).intersection(set(wantedVariables)):
+            for unwantedVariables in set(variables__count.keys()).intersection(unwantedVariables):
                 totalWantedVariableCount += variables__count[wantedVariable]
             if totalWantedVariableCount > maxTotalCount:
                 maxTotalCount = totalWantedVariableCount; maxEquationVertexId = equationId__vertexId[equationId]
@@ -587,21 +590,42 @@ class Recommend:
             'visited':[]
         }, -1)
         # maxLength=0; maxLengthPaths = []
-        HIGH_WEIGHTS = 3000; LOW_WEIGHTS = 0; WANTEDVARIABLE_PENALTY = -2* HIGH_WEIGHTS#[TODO many optimizations possible here]
+        HIGH_WEIGHTS = 100; LOW_WEIGHTS = 0; 
+        WANTEDVARIABLE_PENALTY = -2* HIGH_WEIGHTS # substituting away an unwanted variable
+        NEWEQUATION_PENALTY = -2 * len(allVariableVertexIds) * HIGH_WEIGHTS
+        INCREASE_IN_UNWANTED_VARIABLE_PENALTY = -2* HIGH_WEIGHTS
+        INCREASE_IN_WANTED_VARIABLE_PENALTY = 3* HIGH_WEIGHTS#[TODO many optimizations possible here]
         PATHLENGTH_FACTOR = 10
         visitedPaths = [] # paths that have been explored before, we can use a set , since order does not matter? or we have to use a list?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not used yet<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         # while len(stack)>0:
         while len(priorityQueue)>0:
+            #######
+            # print('priorityQueue: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            # print(priorityQueue.sortedList)
+            #######
             current___dict = priorityQueue.popMax()
             current = current___dict['current']
+
+            #############early termination
+            if set(originalEquationVertexIds).issubset(set(current___dict['path'])): #we used all the original equations
+                # print('used up all the ORIGINAL equations')
+                return current___dict['path'], equationVertexId__tuple_variableVertexIdContaining___NEW
+            #############
+
+
+
             visited = copy(current___dict['visited'])
             visited.append(current)
                     
 
+            #heuristic early termination: when you have used all the_original_equations? Not the expanded ones?
+
             #############
-            pp.pprint(current___dict)
-            import pdb;pdb.set_trace()
+            # print('new equations: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            # print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+            # pp.pprint(current___dict)
+            # import pdb;pdb.set_trace()
             #############
             for orderOfExploration, neighbour in enumerate(sorted(equationVariables_bg[current], key=lambda vertexId: LOW_WEIGHTS if vertexId in unwantedVariableVertexIds or vertexId in allEquationVertexIds else HIGH_WEIGHTS)):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
                 if neighbour not in visited:
@@ -629,12 +653,12 @@ class Recommend:
                             #add newEquationVariableIds into the 
                             # print('tuple_variableVertexIdContaining__equationVertexId')
                             # print(tuple_variableVertexIdContaining__equationVertexId); import pdb;pdb.set_trace()
+                            # print('tuple_variableVertexIdContaining', tuple_variableVertexIdContaining)
+                            # print('tuple_variableVertexIdContaining__equationVertexId', tuple_variableVertexIdContaining__equationVertexId)
+                            # import pdb;pdb.set_trace()
                             if tuple_variableVertexIdContaining not in tuple_variableVertexIdContaining__equationVertexId: # this prevents infiniteLoop, but it is not working<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                                 newEquationId, newEquationVertexId = equationVertexIdIssuer.getNewEquationIdAndEquationVertexId()
-                                #this is just for TESTING please remove
-                                # if newEquationVertexId > 512:
-                                #     raise Exception() # cannot have more than 2^9 new equations
-                                #
+                                allEquationVertexIds.append(newEquationVertexId)
                                 tuple_variableVertexIdContaining__equationVertexId[tuple_variableVertexIdContaining] = newEquationVertexId
                                 equationVertexId__tuple_variableVertexIdContaining[newEquationVertexId] = tuple_variableVertexIdContaining
                                 #graph update. update the new equation, also update its neighbours
@@ -663,8 +687,24 @@ class Recommend:
                         #Priority Heuristic
                         childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
                         childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
-                        childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path
-                        childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0
+                        childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path,  and then at some point in the history go for the shorter path first, when most of the original equations are exhausted?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0 # because this means we will substitute the wanted variable away
+                        if neighbour in allEquationVertexIds: #if it is an equation
+                            variableVertexIds = list(equationVertexId__tuple_variableVertexIdContaining[neighbour]) # this is not a good way to get the containing_variables, because, we removed the variables from equationVariables_bg
+                            eliminatedVariableVertexId = childDict['path'][-2]
+                            # print('neighbour', neighbour)
+                            # print('variableVertexIds: ', variableVertexIds)
+                            for variableVertexId in variableVertexIds:
+                                if variableVertexId != eliminatedVariableVertexId: #ignore the variable that will be eliminated
+                                    if variableVertexId in wantedVariableVertexIds:
+                                        # print('wanted added: ', INCREASE_IN_WANTED_VARIABLE_PENALTY, 'to', childDictPriority, '=', childDictPriority+INCREASE_IN_WANTED_VARIABLE_PENALTY)
+                                        childDictPriority += INCREASE_IN_WANTED_VARIABLE_PENALTY
+                                    else: # it is unwanted
+                                        # print('unwanted added: ', INCREASE_IN_UNWANTED_VARIABLE_PENALTY, 'to', childDictPriority, '=', childDictPriority+INCREASE_IN_UNWANTED_VARIABLE_PENALTY)
+                                        childDictPriority += INCREASE_IN_UNWANTED_VARIABLE_PENALTY
+                        if bipartiteTreeExpand:
+                            childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
+                        # print('inserting: ', childDict, childDictPriority)
                         priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #
                     # print('******')
@@ -685,7 +725,7 @@ class Recommend:
         if bipartiteTreeExpand:
             return favouritePath, equationVertexId__tuple_variableVertexIdContaining___NEW
         else:
-            return favouritePath, []
+            return favouritePath, {}
 
 
     def combingSearch(self, equation, maximumDepth=256): #<<<<<<<<<<<maybe rename to solve|simplify
@@ -727,7 +767,7 @@ class Recommend:
                 historyKey = (idd['filename'], idd['direction'], idd['idx']); 
                 reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
                 unHistoryKey = (idd['filename'], reverseDirection, idd['idx'])
-                if historyKey in history[-1:] or unHistoryKey in unHistory[-1:]: # this is not working <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                if historyKey in history[-1:] or unHistoryKey in unHistory[-1:]:
                     print('skipping manipulate: ', historyKey)
                     continue #skip, we do not want to directly undo our affords
                 manipulateClass = self.getManipulateClass(idd['filename'])
@@ -754,21 +794,36 @@ class Recommend:
                     eq___new.startPos__nodeIdScheme = sgp.startPos__nodeId___oStr
                     eq___new.nodeId__lenScheme = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
                     if sgp.oStr not in visitedSchemeStrs:
-                        history = deepcopy(history); unHistory = deepcopy(unHistory)
-                        history.append((idd['filename'], idd['direction'], idd['idx']))
+                        history___new = deepcopy(history); unHistory___new = deepcopy(unHistory)
+                        history___new.append((idd['filename'], idd['direction'], idd['idx']))
                         reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
-                        unHistory.append((idd['filename'], reverseDirection, idd['idx']))
+                        unHistory___new.append((idd['filename'], reverseDirection, idd['idx']))
                         visitedSchemeStrs.append(sgp.oStr)
-                        priorityQueue.insert({
+                        #priority settings
+                        priority = -(depth+1)
+                        #
+                        childDict = {
                             'eq':eq___new,
                             'depth':depth+1,
-                            'history':history,
-                            'unHistory':unHistory#the equivalent of history, but in reverse fo each item in history
-                        }, -(depth+1))
+                            'history':history___new,
+                            'unHistory':unHistory___new#the equivalent of history, but in reverse fo each item in history
+                        }
+                        priorityQueue.insert(childDict, priority)
+                        #
+                        # print(visitedSchemeStrs); 
+                        # pp.pprint({
+                        #     'eq':eq___new.schemeStr,
+                        #     'depth':depth+1,
+                        #     'history':history___new,
+                        #     'unHistory':unHistory___new#the equivalent of history, but in reverse fo each item in history
+                        # });import pdb;pdb.set_trace()
+                        #
+                        #heuristics, if a certain type of history has been tried before, reorder the priority_queue to try something new?
                         #heuristics, so there are simplification_patterns where the nodes decrease from iPattern to oPattern, these should also serve as targets, so formulas that have the most potential to be matched by these patterns, should be given higher priority..<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        #heuristics, if we can simplify until there is only 1 of each variable, we can solve for anyvariable, by moving_left_to_right<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        #heuristics, if we can simplify until there is only 1 of each variable, we can solve for anyVariable, by makeSubject<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        
                         #how to put the eq___new in? what priority?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    #else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
+                    # else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
         # print('we actually finished running, this was not expected', visitedSchemeStrs)
         minStrLen = min(map(lambda s: len(s), visitedSchemeStrs))
         minSchemeStrs = sorted(list(filter(lambda s: len(s)==minStrLen, visitedSchemeStrs)))

@@ -83,7 +83,7 @@ class BipartiteSolver:
         print('vertexId__equationVariableId', vertexId__equationVariableId)
         print('vertexId__EquationOrVariable', vertexId__EquationOrVariable)
 
-        substitutionPath = Recommend.bipartiteSearch(
+        substitutionPath, equationVertexId__tuple_variableVertexIdContaining = Recommend.bipartiteSearch(
             listOfCollectedEquations, 
             listOfVariables, 
             equationVariables_g, 
