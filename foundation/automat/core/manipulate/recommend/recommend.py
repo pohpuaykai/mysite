@@ -507,6 +507,7 @@ class Recommend:
         # print(dependentVariableId)
         # print('list_independentVariableIds')
         # print(list_independentVariableIds)
+        # print('******************************************************************************')
         # import pdb;pdb.set_trace()
         #get all the parameters passed to this function, so that we can write a unit test{END}
         from copy import copy
@@ -562,15 +563,20 @@ class Recommend:
 
         #finding a startNode, maybe start with the most number of unwanted variable...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         maxEquationVertexId = None;maxTotalCount = -1
-        wantedVariables = []
-        for wantedVariableId in [dependentVariableId]+list_independentVariableIds:
-            wantedVariables.append(list_variables[wantedVariableId])
-        unwantedVariables = set([dependentVariableId]+list_independentVariableIds) - set(wantedVariables)
+        wantedVariables = list(map(lambda variableId: variableId__vertexId[variableId], [dependentVariableId]+list_independentVariableIds))
+        unwantedVariables = list(map(lambda variableId: variableId__vertexId[variableId], set(range(0, len(list_variables))) - set(wantedVariables)))
+        # print('unwantedVariables: ', unwantedVariables)
         for equationId, equation in enumerate(list_equations):
-            variables__count = equation.variablesScheme; totalWantedVariableCount = 0
+            # variables__count = equation.variablesScheme; 
+            variables__count = dict(map(lambda n: (n, 1), equationVariables_bg[equationId__vertexId[equationId]]))#it has to have only 1 count, otherwise it will not work?
+            totalWantedVariableCount = 0
+            # print('variables__count: ', variables__count)
             # for wantedVariable in set(variables__count.keys()).intersection(set(wantedVariables)):
-            for unwantedVariables in set(variables__count.keys()).intersection(unwantedVariables):
-                totalWantedVariableCount += variables__count[wantedVariable]
+            # for unwantedVariable in set(variables__count.keys()).intersection(unwantedVariables):
+            #     # totalWantedVariableCount += variables__count[wantedVariable]
+            #     totalWantedVariableCount += variables__count[unwantedVariable]
+            totalWantedVariableCount = len(set(variables__count.keys()).intersection(unwantedVariables))
+            # print('equationId: ', equationId, 'variables__count', variables__count, 'totalWantedVariableCount', totalWantedVariableCount, 'maxTotalCount: ', maxTotalCount)
             if totalWantedVariableCount > maxTotalCount:
                 maxTotalCount = totalWantedVariableCount; maxEquationVertexId = equationId__vertexId[equationId]
 
@@ -579,22 +585,34 @@ class Recommend:
         #check if all the variables to be substituted away are in our path
         #or we can start from a variable, then add the appropriate equation to the beginning of the resulting path
         #maxEquationVertexId might be None... then for now just get a random one...
-        if maxEquationVertexId is None:#[TODO many optimizations possible here] Ou est vers origin, ja?
-            maxEquationVertexId = allEquationVertexIds[0] # startNode
+        # if maxEquationVertexId is None:#[TODO many optimizations possible here] Ou est vers origin, ja?
+        #     maxEquationVertexId = allEquationVertexIds[0] # startNode
         # print('unwantedVariableVertexIds', unwantedVariableVertexIds); print('wantedVariableVertexIds', wantedVariableVertexIds)
-        # print('startNode: ', maxEquationVertexId)
+        # print('startNode: ', maxEquationVertexId); import pdb;pdb.set_trace()
+
+        #
+        variableCount = {}
+        for variableVertexId in equationVariables_bg[maxEquationVertexId]:
+            variableCount[variableVertexId] = 1
+        #
+
+
         priorityQueue = PriorityQueue(); 
         priorityQueue.insert({
             'current':maxEquationVertexId, 
             'path':[maxEquationVertexId],
-            'visited':[]
+            'visited':[],
+            #we assume that this equation only has 1 of each variable
+            'variableCount':variableCount
         }, -1)
         # maxLength=0; maxLengthPaths = []
         HIGH_WEIGHTS = 100; LOW_WEIGHTS = 0; 
         WANTEDVARIABLE_PENALTY = -2* HIGH_WEIGHTS # substituting away an unwanted variable
         NEWEQUATION_PENALTY = -2 * len(allVariableVertexIds) * HIGH_WEIGHTS
         INCREASE_IN_UNWANTED_VARIABLE_PENALTY = -2* HIGH_WEIGHTS
-        INCREASE_IN_WANTED_VARIABLE_PENALTY = 3* HIGH_WEIGHTS#[TODO many optimizations possible here]
+        INCREASE_IN_WANTED_VARIABLE_PENALTY = 3* HIGH_WEIGHTS
+        TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY = -float('inf')#should be -infinity because this will produce a path that is not usable...
+        #[TODO many optimizations possible here]
         PATHLENGTH_FACTOR = 10
         visitedPaths = [] # paths that have been explored before, we can use a set , since order does not matter? or we have to use a list?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not used yet<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -614,23 +632,42 @@ class Recommend:
             #############
 
 
-
             visited = copy(current___dict['visited'])
             visited.append(current)
                     
 
             #heuristic early termination: when you have used all the_original_equations? Not the expanded ones?
 
+            if current in allEquationVertexIds:#neighbours will be variables
+                #we will deal with unwanted variables first
+                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in unwantedVariableVertexIds else LOW_WEIGHTS)
+            else:#neighbours will be equations
+                #we will choose old Equations first not new equations
+                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in equationVertexId__tuple_variableVertexIdContaining___NEW else LOW_WEIGHTS)
+
+
             #############
             # print('new equations: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             # print(equationVertexId__tuple_variableVertexIdContaining___NEW)
-            # pp.pprint(current___dict)
-            # import pdb;pdb.set_trace()
+            # if current___dict['path'][:10] == [6, 7, 10, 8, 14, 1, 0, 4, 3, 2]:
+            # if current___dict['path'][:12] == [6, 7, 10, 8, 14, 9, 12, 1, 0, 4, 3, 2]:
+            # if current___dict['path'][:3] == [0, 3, 11]:
+                # print('current:', current)
+                # print('neighbours: ', neighbours)
+                # pp.pprint(current___dict)
+                # import pdb;pdb.set_trace()
             #############
-            for orderOfExploration, neighbour in enumerate(sorted(equationVariables_bg[current], key=lambda vertexId: LOW_WEIGHTS if vertexId in unwantedVariableVertexIds or vertexId in allEquationVertexIds else HIGH_WEIGHTS)):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
+            for orderOfExploration, neighbour in enumerate(neighbours):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
                 if neighbour not in visited:
                     newPath = current___dict['path']+[neighbour]
-                    childDict = {'current':neighbour, 'path':newPath, 'visited':visited+[neighbour]}
+
+                    childDict = {
+                        'current':neighbour, 
+                        'path':newPath, 
+                        'visited':visited+[neighbour],
+                        'variableCount':current___dict['variableCount']
+                        # we assume that this equation only has 1 of each variable
+                    }
                     if bipartiteTreeExpand:
                         #
                         # if set(wantedVariableVertexIds).intersection(set(newPath)) == set(wantedVariableVertexIds): # we already hit all the wanted Variables
@@ -642,14 +679,40 @@ class Recommend:
                         #add the NEW equationVertexId to equationVariables_bg
                         #childDict['current'] need to jump to the NEW equationVertexId
                         #{neighbour in equationVertexId__tuple_variableVertexIdContaining} is to check if neighbour is an equation
-                        if len(newPath) > 2 and neighbour in equationVertexId__tuple_variableVertexIdContaining: #this means we have 1equation, 1variable ending the path and neighbour is the next equation
+                        if len(newPath) > 2 and neighbour in allEquationVertexIds:#equationVertexId__tuple_variableVertexIdContaining: #this means we have 1equation, 1variable ending the path and neighbour is the next equation
+                            
+
+
                             # print('newPath: ', newPath)
                             equationVertexId0, variableVertexIdToEliminate, equationVertexId1 = newPath[-3:]
                             # print('equationVertexId0', equationVertexId0)
-                            equation0VariableIds = equationVertexId__tuple_variableVertexIdContaining[equationVertexId0]
-                            equation1VariableIds = equationVertexId__tuple_variableVertexIdContaining[equationVertexId1]
-                            newEquationVariableIds = set(equation0VariableIds).union(set(equation1VariableIds)) - set([variableVertexIdToEliminate])
-                            tuple_variableVertexIdContaining = tuple(sorted(newEquationVariableIds))
+                            # equation0VariableIds = equationVertexId__tuple_variableVertexIdContaining[equationVertexId0]
+                            # equation1VariableIds = equationVertexId__tuple_variableVertexIdContaining[equationVertexId1]
+                            # newEquationVariableIds = set(equation0VariableIds).union(set(equation1VariableIds)) - set([variableVertexIdToEliminate])
+                            
+
+
+
+                            #we need to update the variableCount
+                            variableCount = copy(current___dict['variableCount'])
+                            tuple_variableVertexIdContaining = equationVertexId__tuple_variableVertexIdContaining[neighbour]
+                            for variableVertexId, count in current___dict['variableCount'].items():
+                                if variableVertexId != variableVertexIdToEliminate:
+                                    if variableVertexId in tuple_variableVertexIdContaining:
+                                        variableCount[variableVertexId] += 1
+                                    # else:
+                                    #     variableCount[variableVertexId] = 1
+                                else:
+                                    variableCount[variableVertexId] -= 1
+                                    if variableCount[variableVertexId] == 0:
+                                        del variableCount[variableVertexId]
+                            for newVariableVertexId in set(tuple_variableVertexIdContaining) - set(current___dict['variableCount'].keys()):
+                                if newVariableVertexId != variableVertexIdToEliminate:
+                                    variableCount[newVariableVertexId] = 1
+                            childDict['variableCount'] = variableCount
+
+
+                            tuple_variableVertexIdContaining = tuple(sorted(variableCount.keys()))
                             #add newEquationVariableIds into the 
                             # print('tuple_variableVertexIdContaining__equationVertexId')
                             # print(tuple_variableVertexIdContaining__equationVertexId); import pdb;pdb.set_trace()
@@ -671,7 +734,10 @@ class Recommend:
                                 equationId__vertexId[newEquationId] = newEquationVertexId
                                 type__list_vertexIds[equationKey].append(newEquationVertexId)
                                 equationVertexId__tuple_variableVertexIdContaining___NEW[newEquationVertexId] = tuple_variableVertexIdContaining
+                            else:
+                                newEquationVertexId = tuple_variableVertexIdContaining__equationVertexId[tuple_variableVertexIdContaining]
                             childDict['current'] = newEquationVertexId
+
                             # print('equationVariables_bg', equationVariables_bg)
                             #
 
@@ -684,7 +750,7 @@ class Recommend:
                         #     maxLengthPaths = [] # only store longest path, this will not work if the #OfNodes(equationVariables_bg) increases as we process equationVariables_bg <Heuristic>
                         # if len(childDict['path']) == maxLength:#there might be many paths with same maxLength, if we have a choice, HOW TO CHOOSE<<<<<<<<<<<<<<<<<<<<<<<TODO?
                         #     maxLengthPaths.append(childDict['path'])
-                        #Priority Heuristic
+                        #Priority Heuristic>
                         childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
                         childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
                         childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path,  and then at some point in the history go for the shorter path first, when most of the original equations are exhausted?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -702,10 +768,15 @@ class Recommend:
                                     else: # it is unwanted
                                         # print('unwanted added: ', INCREASE_IN_UNWANTED_VARIABLE_PENALTY, 'to', childDictPriority, '=', childDictPriority+INCREASE_IN_UNWANTED_VARIABLE_PENALTY)
                                         childDictPriority += INCREASE_IN_UNWANTED_VARIABLE_PENALTY
+                        #if try to substitute away a variable that has more count than 1, then give a heavy penalty
+                        if neighbour in allVariableVertexIds and childDict['variableCount'].get(neighbour, 0) > 1:
+                            childDictPriority += TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY
+                        #Priority Heuristic<
                         if bipartiteTreeExpand:
                             childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
                         # print('inserting: ', childDict, childDictPriority)
-                        priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
+                        if childDictPriority > float('-inf'):#we discard everything that is infinity
+                            priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #
                     # print('******')
                     # print('neighbour', neighbour, 'priority: ', childDictPriority-orderOfExploration)
@@ -768,7 +839,7 @@ class Recommend:
                 reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
                 unHistoryKey = (idd['filename'], reverseDirection, idd['idx'])
                 if historyKey in history[-1:] or unHistoryKey in unHistory[-1:]:
-                    print('skipping manipulate: ', historyKey)
+                    # print('skipping manipulate: ', historyKey)
                     continue #skip, we do not want to directly undo our affords
                 manipulateClass = self.getManipulateClass(idd['filename'])
                 manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)

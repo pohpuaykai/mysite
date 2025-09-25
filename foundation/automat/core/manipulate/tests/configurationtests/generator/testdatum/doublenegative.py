@@ -16,4 +16,10 @@ TEST_DATUM={
                       'input': '(= a (- 0 (+ (- 0 b) c)))'},
 
 
+
+    ('vor', '3'): {   'expected': '(= a (- 0 (- (- 0 b) c)))',
+                      'input': '(= a (+ b c))'},
+    ('hin', '3'): {   'expected': '(= a (+ b c))',
+                      'input': '(= a (- 0 (- (- 0 b) c)))'},
+
                       }
