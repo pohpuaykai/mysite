@@ -463,6 +463,9 @@ class Recommend:
         #each equation has a set of variables, when we join them by a path, we can just union the variables and remove the intermediate variable to form the new vertex.
         #just that we have to let the user know how the new vertex was formed
 
+        #the whole substitution is calculated (with or without simplification?), so that we can have resultingSchemeStr for SimplificationMatching<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<this seems very heavy.... and double_work? unless we can somehow make each calculationLighter, or on the side(parallelProcessing, like the state is doing manicure while being in the PQueue)
+        #preference to have similiar formulas calculated in together in succession, this might be too specific for resistance_sum_derivation, but can be weighted according to wanted V unwanted variables<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
         :param dependentVariableId: is a vertexId, (not from list_equations nor list_variables)
         :param list_independentVariableIds: are vertexIds (not from list_equations nor list_variables)
         :param type__list_vertexIds: type is either (0)equationKey or (1)variableKey (the partite of each vertexId), values are a list of vertexIds of its key's partite
@@ -544,7 +547,6 @@ class Recommend:
 
         #[TODO optimization possible, if the bipartite graph equationVariables_bg is disconnected, only take the connected part that is related to dependent|indepedentVariables]
         from foundation.automat.common.priorityqueue import PriorityQueue
-        #since we are finding all possible paths, what about save_points? (each save_point is [priority_queue, list_of_next_explored, index_of_visited_to_back_track]), everytime, we finish the PQ, but we cannot find an answer that gets all the unwantedVariables, we popOff a savePoint, but if we popOff more than 1 savePoint, savePoint0 and then savePoint1, we have to make sure we do not go back to the same savePoint0 again when we explore savePoint1... not sure how to do that
         allVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], range(0, len(list_variables))))
         wantedVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], [dependentVariableId]+list_independentVariableIds))
         unwantedVariableVertexIds = list(set(allVariableVertexIds) - set(wantedVariableVertexIds))
@@ -775,7 +777,7 @@ class Recommend:
                         if bipartiteTreeExpand:
                             childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
                         # print('inserting: ', childDict, childDictPriority)
-                        if childDictPriority > float('-inf'):#we discard everything that is infinity
+                        if childDictPriority > float('-inf'):#we discard everything that is -infinity
                             priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #
                     # print('******')
