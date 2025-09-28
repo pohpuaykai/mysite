@@ -519,6 +519,54 @@ class Recommend:
         #
         bipartiteTreeExpand = True
 
+        #group the equations by similarity (this was working well when we wanted to find the resistorSumFormulas for series2Resistor & parallel2Resistor)
+        list_equationStrs = list(map(lambda equation: equation.schemeStr, list_equations))
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser
+        def getEntitiesOfPattern(patternStr):
+            parser = Schemeparser(equationStr=patternStr)
+            ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+            stack = [parser.rootOfTree]; nodeId__label = {}
+            while len(stack) > 0:
+                current = stack.pop()
+                nodeId__label[current[1]] = current[0]
+                children = ast.get(current, [])
+                stack += children
+            entities = []
+            for startPos, nodeId in startPos__nodeId.items():
+                l = len(nodeId__label[nodeId])
+                entities.append((startPos, startPos+l))
+            return entities, functionsD, variablesD, primitives, totalNodeCount
+        #
+        idx__entities = {}; 
+        # idx__functions = {}; idx__variables = {}; idx__primitives = {} # more complex divisors of cutoff, can be devised...later<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        idx__divisorOfCutOff = {} # for now, we use a simple divisorOfCutOff
+        for idx, schemeStr in enumerate(list_equationStrs):
+            entities, functions, variables, primitives, totalNodeCount = getEntitiesOfPattern(schemeStr)
+            idx__entities[idx] = entities
+            # idx__functions[idx] = functions
+            # idx__primitives[idx] = primitives
+            # idx__variables[idx] = variables
+            idx__divisorOfCutOff[idx] = totalNodeCount + 0.0 # to make it float
+        #
+        from foundation.automat.common.stringcompare import StringCompare
+        tuple_comparisonIdx__score = {}
+        for idx0, schemeStr0 in enumerate(list_equationStrs):
+            for idx1, schemeStr1 in enumerate(list_equationStrs[idx0+1:]):
+                idx1 += idx0+1
+                tuple_comparisonIdx__score[(idx0, idx1)] = StringCompare.damerauLevenschsteinMimickWithEntities( # this could be altered to give scores more suitable for the set of equations
+                    schemeStr0, schemeStr1, idx__entities[idx0], idx__entities[idx1]) / (idx__divisorOfCutOff[idx0]+idx__divisorOfCutOff[idx1])
+        #everything above was for generating tuple_comparisonIdx__score, which is grouping equations together, which we will do from here
+        #use UnionFind+cutoffScore...
+        cutoffScore = 0.34#hardcode for now... there must be someway to parametrise this?
+        from foundation.automat.common.unionfindbyrankwithpathcompression import UnionFindByRankWithPathCompression
+        uf = UnionFindByRankWithPathCompression(len(list_equationStrs))
+        for (idx0, idx1), score in tuple_comparisonIdx__score.items():
+            if score < cutoffScore:
+                uf.union(idx0, idx1)
+        #use uf to give high priority if adjacent equations are in the same union.
+        #
+
+
         class EquationVertexIdIssuer:
             def __init__(self, currentMaxEquationId, currentMaxEquationVertexId):
                 self.currentMaxEquationId = currentMaxEquationId
@@ -613,6 +661,7 @@ class Recommend:
         NEWEQUATION_PENALTY = -2 * len(allVariableVertexIds) * HIGH_WEIGHTS
         INCREASE_IN_UNWANTED_VARIABLE_PENALTY = -2* HIGH_WEIGHTS
         INCREASE_IN_WANTED_VARIABLE_PENALTY = 3* HIGH_WEIGHTS
+        SAME_EQUATION_GROUP_REWARDS = 3 * HIGH_WEIGHTS * len(allEquationVertexIds)
         TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY = -float('inf')#should be -infinity because this will produce a path that is not usable...
         #[TODO many optimizations possible here]
         PATHLENGTH_FACTOR = 10
@@ -624,7 +673,8 @@ class Recommend:
             # print('priorityQueue: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             # print(priorityQueue.sortedList)
             #######
-            current___dict = priorityQueue.popMax()
+            # current___dict = priorityQueue.popMax()
+            priority, current___dict = priorityQueue.popMaxWithPriority()
             current = current___dict['current']
 
             #############early termination
@@ -645,7 +695,7 @@ class Recommend:
                 neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in unwantedVariableVertexIds else LOW_WEIGHTS)
             else:#neighbours will be equations
                 #we will choose old Equations first not new equations
-                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in equationVertexId__tuple_variableVertexIdContaining___NEW else LOW_WEIGHTS)
+                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in originalEquationVertexIds else LOW_WEIGHTS)
 
 
             #############
@@ -656,8 +706,9 @@ class Recommend:
             # if current___dict['path'][:3] == [0, 3, 11]:
                 # print('current:', current)
                 # print('neighbours: ', neighbours)
-                # pp.pprint(current___dict)
-                # import pdb;pdb.set_trace()
+            print('p: ', priority)
+            pp.pprint(current___dict)
+            import pdb;pdb.set_trace()
             #############
             for orderOfExploration, neighbour in enumerate(neighbours):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
                 if neighbour not in visited:
@@ -773,10 +824,17 @@ class Recommend:
                         #if try to substitute away a variable that has more count than 1, then give a heavy penalty
                         if neighbour in allVariableVertexIds and childDict['variableCount'].get(neighbour, 0) > 1:
                             childDictPriority += TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY
+                        #if neighbour(an OG equation) is in the same union as the last equation, then give a higher priority
+                        if len(newPath) > 2 and neighbour in allEquationVertexIds and neighbour in originalEquationVertexIds:
+                            equationVertexId0, variableVertexIdToEliminate, equationVertexId1 = newPath[-3:]
+                            if equationVertexId0 in originalEquationVertexIds and uf.together(vertexId__equationVariableId[neighbour], vertexId__equationVariableId[equationVertexId0]):
+                                childDictPriority += SAME_EQUATION_GROUP_REWARDS#<<<<<<<<<<<<<<<<<<<<<test if this is working...
+                                print('added rewards to newPath: ', newPath)
                         #Priority Heuristic<
                         if bipartiteTreeExpand:
                             childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
                         # print('inserting: ', childDict, childDictPriority)
+                        # print('priority: ', childDictPriority)
                         if childDictPriority > float('-inf'):#we discard everything that is -infinity
                             priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #

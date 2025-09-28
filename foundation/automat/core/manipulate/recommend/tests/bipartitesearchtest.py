@@ -10,14 +10,23 @@ pp = pprint.PrettyPrinter(indent=4)
 def bipartiteSearch__dc_twoResistor_series(verbose=False):
     list_equationStrs = [
         '(= I_{R_{0}} I_{DC_{1}})', 
-        '(= I_{R_{0}} I_{R_{3}})', 
+        '(= I_{R_{0}} I_{R_{3}})', #i don't have to use this equation, how do i know? my current early termination is not good enough.
         '(= I_{DC_{1}} I_{R_{3}})', 
         '(= (+ (- (- 0 V_{R_{0}}) V_{R_{3}}) V_{DC_{1}}) 0)', 
         '(= (/ V_{R_{0}} I_{R_{0}}) R_{R_{0}})', 
         '(= (/ V_{DC_{1}} I_{DC_{1}}) R_{DC_{1}})', 
         '(= (/ V_{R_{3}} I_{R_{3}}) R_{R_{3}})'
     ]
-    list_variables = ['I_{R_{0}}', 'I_{DC_{1}}', 'I_{R_{3}}', 'V_{R_{0}}', 'V_{R_{3}}', 'V_{DC_{1}}', 'R_{R_{0}}', 'R_{DC_{1}}', 'R_{R_{3}}']
+    list_variables = [
+    'I_{R_{0}}', 
+    'I_{DC_{1}}', 
+    'I_{R_{3}}', 
+    'V_{R_{0}}', 
+    'V_{R_{3}}', 
+    'V_{DC_{1}}', 
+    'R_{R_{0}}', 
+    'R_{DC_{1}}', 
+    'R_{R_{3}}']
     equationVariables_bg = {1: [0, 3, 10], 0: [1, 2], 2: [0, 5, 12], 3: [1, 4], 4: [3, 5, 14], 5: [2, 4], 7: [6, 10], 6: [7, 8, 9], 8: [6, 14], 9: [6, 12], 10: [7, 1, 11], 11: [10], 12: [9, 2, 13], 13: [12], 14: [8, 4, 15], 15: [14]}
     vertexId__equationVariableId = {0: 0, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 4, 9: 5, 10: 4, 11: 6, 12: 5, 13: 7, 14: 6, 15: 8}
     equationId__vertexId = {0: 0, 1: 3, 2: 5, 3: 6, 4: 10, 5: 12, 6: 14}

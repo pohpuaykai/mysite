@@ -35,8 +35,8 @@ class StringCompare:
                 if i >1 and j >1 and a[i-1]==b[j-2] and a[i-2]==b[j-1]:#the 'so_called_transposition' only compares 2_characters_before_after
                     d[i][j] = min(d[i][j], d[i-2][j-2]+1)#transposition, cost is fixed as +1, but we don't even consider prev_cost, if the test does not pass.........
         #
-        import pprint; pp = pprint.PrettyPrinter(indent=4);
-        pp.pprint(d)
+        # import pprint; pp = pprint.PrettyPrinter(indent=4);
+        # pp.pprint(d)
         #
         return d[len(a)][len(b)]
 
@@ -134,13 +134,13 @@ class StringCompare:
                     #     raise Exception(f'comparisonDictionaries has a dictionary: {compare}, whose nonEquality is not handled')
                 
 
-                print(costs)
+                # print(costs)
                 #
                 d[i][j] = costAggregator(costs)
         #
         #
-        import pprint; pp = pprint.PrettyPrinter(indent=4);
-        pp.pprint(d)
+        # import pprint; pp = pprint.PrettyPrinter(indent=4);
+        # pp.pprint(d)
         #
         return d[-1][-1]
 
@@ -289,13 +289,13 @@ class StringCompare:
                     #     raise Exception(f'comparisonDictionaries has a dictionary: {compare}, whose nonEquality is not handled')
                 
 
-                print(costs)
+                # print(costs)
                 #
                 d[i][j] = costAggregator(costs)
         #
         #
-        import pprint; pp = pprint.PrettyPrinter(indent=4);
-        pp.pprint(d)
+        # import pprint; pp = pprint.PrettyPrinter(indent=4);
+        # pp.pprint(d)
         #
         return d[-1][-1]
 

@@ -25,6 +25,9 @@ class UnionFindByRankWithPathCompression:
             # representative of this set
         return self.parent[x]
 
+    def together(self, x, y):
+        return self.find(x)==self.find(y)
+
     # Do union of two sets represented
     # by x and y
     def union(self, x, y):

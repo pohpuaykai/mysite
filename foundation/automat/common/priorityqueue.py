@@ -14,6 +14,11 @@ class PriorityQueue:#UNIT_TEST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
         tuple_priority_item = self.sortedList.pop()
         return tuple_priority_item[1]
 
+
+    def popMaxWithPriority(self):
+        tuple_priority_item = self.sortedList.pop()
+        return tuple_priority_item
+
     def popMin(self):
         tuple_priority_item = self.sortedList.pop(0)
         return tuple_priority_item[1]

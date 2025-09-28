@@ -79,6 +79,6 @@ if __name__=='__main__':
     # test__damerauLevenshteinMimick__schemegrammarparser_distributivity(True)
     test__damerauLevenshteinMimickWithEntities__schemegrammarparser_distributivity(True)
     #for schemeCompliance copy all the test cases from 
-    #from foundation.automat.common.tests.longestcommonsubsequencetest
-    #from foundation.automat.common.tests.schemegrammarparsertest
+    #from foundation.automat.common.tests.longestcommonsubsequencetest<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    #from foundation.automat.common.tests.schemegrammarparsertest<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     #use this to group the similar formulas together and then apply them in succession for bipartiteGraph
