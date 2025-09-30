@@ -1,7 +1,8 @@
-
+import {Recorder} from '../mediaRecorder/recorder.js';
 
 class CircuitAnime {
-    constructor(animationName, circuit, variableSelector, simplify) {
+    constructor(animationName, circuit, variableSelector, simplify, record) {
+        const self = this;
         this.circuit = circuit;// this is a circuit.js
         this.variableSelector = variableSelector;// it is a function that uses a list_equationNetworkInfoDict, but takes a circuit
         this.simplify = simplify;
@@ -23,6 +24,20 @@ class CircuitAnime {
         this.pauseAfterRevealingEquation = 4000;//milliseconds
         this.pauseBetweenEachVariableHighlight = 4000;//milliseconds
         this.pauseBetweenEachComponentHighlight = 4000;//milliseconds
+
+        //displayEquationsRelativeEquations
+        this.vorHinEquationRelativePositions = 'up_down' //this one looks prettier
+
+        //
+        this.record = record; 
+        if (record) {
+            this.permissionGiven = false;
+            function permissionGivenCallback() {
+                self.permissionGiven = true;
+                console.log('self.permissionGiven: ', self.permissionGiven)
+            }
+            this.recorder = new Recorder(permissionGivenCallback, this.circuit.renderer.domElement);//this.circuit.renderer.domElement is the canvas of THREE?
+        }
     }
 
     play() {
@@ -57,28 +72,38 @@ class CircuitAnime {
                      *  self.textStr__textMeshUUID
                      *  self.meshUUID__mesh
                      * **/
-                    console.log('self.branchedStepsIdx__latexStrs', self.branchedStepsIdx__latexStrs)
-                    console.log('self.runningStepsIdx__branchedStepsIdx', self.runningStepsIdx__branchedStepsIdx)
-                    console.log('self.list_runningIdx__toClearAll', self.list_runningIdx__toClearAll)
-                    console.log('self.list_runningIdx__toKeep', self.list_runningIdx__toKeep)
+                    // console.log('self.branchedStepsIdx__latexStrs', self.branchedStepsIdx__latexStrs)
+                    // console.log('self.runningStepsIdx__branchedStepsIdx', self.runningStepsIdx__branchedStepsIdx)
+                    // console.log('self.list_runningIdx__toClearAll', self.list_runningIdx__toClearAll)
+                    // console.log('self.list_runningIdx__toKeep', self.list_runningIdx__toKeep)
                     // debugger
 
                     const cameraPosition = self.camera.position;
-                    console.log(cameraPosition)
+                    // console.log(cameraPosition)
                     // debugger
 
-                    console.log('running solveEquation animation is running')
+                    // console.log('running solveEquation animation is running')
                     // look back.
                     const facingCoordinate = animeSelf.facingCoordinate;//{x:6*cameraPosition.x, y:6*cameraPosition.y, z:6*cameraPosition.z};
                     self.smoothLookAt(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z, function(){
                     // self.smoothMoveCameraPosition(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z ,function() {
-                        console.log('finished looking back'); let previousEquationType = 'vor'; 
+                        // console.log('finished looking back'); let previousEquationType = 'vor'; 
                         let lastDidNotHideMeshUUID___vor = null; let lastDidNotHideMeshUUID___hin = null;
                         function equationReveal(theList, theList___idx) {
                             if (theList___idx >= theList.length) {
                                 self.animationScheduler.pause(); 
-                                console.log('animationScheduler.pause DONE')
-                                // self.removeMeshesByRequestingAnimation('solveEquations');
+                                // console.log('animationScheduler.pause DONE')
+                                self.removeMeshesByRequestingAnimation('solveEquations', function() {
+
+                                    if (animeSelf.record) {
+                                        console.log('stopped recording')
+                                        self.pause(function() {
+
+                                            animeSelf.recorder.stopRecording();//maybe pause until THREE has cleared all the actors then stop? STILL MISSING a few frames at the back
+                                            animeSelf.recorder.sendVideoToBackend(animeSelf.formatDateTime(new Date()));
+                                        }, 8000)// pause for 8 seconds to make sure we get the last few frames.
+                                    }
+                                });
                                 // console.log('removed ')
                                 return
                             }
@@ -88,17 +113,29 @@ class CircuitAnime {
                             const latexStrMeshUUID = self.textStr__textMeshUUID[self.branchedStepsIdx__latexStrs[branchedStepsIdx]]['meshUUID'];
                             const equationDimensions = self.getDimensions(latexStrMeshUUID);
                             self.setRotation(latexStrMeshUUID, 0, Math.PI, 0)
-                            if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
-                                // self.setPosition(latexStrMeshUUID, facingCoordinate.x-equationDimensions.xLen, facingCoordinate.y, facingCoordinate.z);
-                                self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-equationDimensions.xLen, animeSelf.vorPosition.y, animeSelf.vorPosition.z)
-                            } else {//hin always introduce new equations
-                                // self.setPosition(latexStrMeshUUID, facingCoordinate.x+equationDimensions.xLen, facingCoordinate.y, facingCoordinate.z);
-                                self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x+equationDimensions.xLen, animeSelf.hinPosition.y, animeSelf.hinPosition.z);
+
+                            if (animeSelf.vorHinEquationRelativePositions == 'left_right') {
+
+                                if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
+                                    //center the y
+                                    self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-equationDimensions.xLen, animeSelf.vorPosition.y-(equationDimensions.yLen/2), animeSelf.vorPosition.z)
+                                } else {//hin always introduce new equations
+                                    self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x+equationDimensions.xLen, animeSelf.hinPosition.y-(equationDimensions.yLen/2), animeSelf.hinPosition.z);
+                                }
+                            } else if (animeSelf.vorHinEquationRelativePositions == 'up_down') {
+
+                                if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
+                                    //center the x
+                                    self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-(equationDimensions.xLen/2), animeSelf.vorPosition.y-equationDimensions.yLen, animeSelf.vorPosition.z)
+                                } else {//hin always introduce new equations
+                                    self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x-(equationDimensions.xLen/2), animeSelf.hinPosition.y+equationDimensions.yLen, animeSelf.hinPosition.z);
+                                }
+
                             }
 
 
                             if (self.list_runningIdx__toClearAll.includes(parseInt(runningStepsIdx)) && lastDidNotHideMeshUUID___hin !== null && lastDidNotHideMeshUUID___vor !== null) { //hide both, previous, or running_equation don't hide
-                                console.log('going to clear screen')
+                                // console.log('going to clear screen')
                                 // debugger;
                                 self.hide(lastDidNotHideMeshUUID___hin)
                                 self.hide(lastDidNotHideMeshUUID___vor)
@@ -106,7 +143,7 @@ class CircuitAnime {
 
 
                             self.reveal(latexStrMeshUUID); 
-                            console.log('revealed: ', self.branchedStepsIdx__latexStrs[branchedStepsIdx], branchedStepsIdx)
+                            // console.log('revealed: ', self.branchedStepsIdx__latexStrs[branchedStepsIdx], branchedStepsIdx)
                             self.pause(()=>{
                                 /**
                                  * branchedStepsIdx = [stepIdx, 'vor', subStepIdx, 'vor__subSteps']; 
@@ -177,9 +214,9 @@ class CircuitAnime {
                     function equationDisplay(list_equationNetworkInfoDict, list_equationNetworkInfoDict___idx) {
                         if (list_equationNetworkInfoDict___idx >= list_equationNetworkInfoDict.length) {
                             // self.animationScheduler.pause(); 
-                            console.log('finished Animation equationDisplay$$$$$$$$$$$')
+                            // console.log('finished Animation equationDisplay$$$$$$$$$$$')
                             //TODO maybe... remove all the latexStrings on the scene? But there are latexStrings that in solveEquation animation that are the same as in findEquation, and they will be cleared too.
-                            self.removeMeshesByRequestingAnimation('findEquations');
+                            self.removeMeshesByRequestingAnimation('findEquations', function(){});
                             // here is where you should run the next animation.
                             self.animationScheduler.playNextAnimation()
                             return;
@@ -270,7 +307,27 @@ class CircuitAnime {
                             }, animeSelf.pauseBetweenEachVariableHighlight);
                         }, animeSelf.pauseAfterRevealingEquation);
                     }
-                    equationDisplay(self.list_equationNetworkInfoDict, 0);
+                    if (animeSelf.record) {
+                        console.log('pausing for permission to be given')
+                        // while(!animeSelf.permissionGiven){} //not sure if this will work. spin until user gives permission
+                        self.pauseUntilCallback(
+                            function() {
+
+                                console.log('started recording in anime')
+                                animeSelf.recorder.startRecording();
+                                equationDisplay(self.list_equationNetworkInfoDict, 0);
+
+                            },
+                            function() {
+                                console.log('checking if flag: animeSelf.permissionGiven is true: ', animeSelf.permissionGiven)
+                                return animeSelf.permissionGiven
+                            }
+                        )
+
+                    } else {
+                        equationDisplay(self.list_equationNetworkInfoDict, 0);
+                    }
+                    
                 }
             }
             //schedule animation
@@ -280,6 +337,18 @@ class CircuitAnime {
             }, false);
         }
         self.animate_findEquations(findEquations___readyCallback);
+    }
+
+    formatDateTime(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      // return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      return `${year}${month}${day}${hours}${minutes}${seconds}`;
     }
 }
 

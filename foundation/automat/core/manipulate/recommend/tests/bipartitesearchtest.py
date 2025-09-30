@@ -10,7 +10,7 @@ pp = pprint.PrettyPrinter(indent=4)
 def bipartiteSearch__dc_twoResistor_series(verbose=False):
     list_equationStrs = [
         '(= I_{R_{0}} I_{DC_{1}})', 
-        '(= I_{R_{0}} I_{R_{3}})', #i don't have to use this equation, how do i know? my current early termination is not good enough.
+        '(= I_{R_{0}} I_{R_{3}})', #i don't have to use this equation, how do i know? my current early termination is not good enough, this equivalent is not present in the dc_parallel, maybe alter KCLequationFinder with linear_independence??<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         '(= I_{DC_{1}} I_{R_{3}})', 
         '(= (+ (- (- 0 V_{R_{0}}) V_{R_{3}}) V_{DC_{1}}) 0)', 
         '(= (/ V_{R_{0}} I_{R_{0}}) R_{R_{0}})', 
@@ -341,5 +341,5 @@ def bipartiteSearch__dc_twoResistor_parallel(verbose=False):
 
 
 if __name__=='__main__':
-    bipartiteSearch__dc_twoResistor_series(True)
-    # bipartiteSearch__dc_twoResistor_parallel(True)
+    # bipartiteSearch__dc_twoResistor_series(True)# still wrong, returning this:[6, 7, 10, 8, 14, 1, 0, 4, 3, 2, 5, 9, 12], maybe because its the longer path, but we do not need one of the equations
+    bipartiteSearch__dc_twoResistor_parallel(True)

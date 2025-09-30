@@ -706,9 +706,9 @@ class Recommend:
             # if current___dict['path'][:3] == [0, 3, 11]:
                 # print('current:', current)
                 # print('neighbours: ', neighbours)
-            print('p: ', priority)
-            pp.pprint(current___dict)
-            import pdb;pdb.set_trace()
+            # print('p: ', priority)
+            # pp.pprint(current___dict)
+            # import pdb;pdb.set_trace()
             #############
             for orderOfExploration, neighbour in enumerate(neighbours):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
                 if neighbour not in visited:
@@ -828,13 +828,14 @@ class Recommend:
                         if len(newPath) > 2 and neighbour in allEquationVertexIds and neighbour in originalEquationVertexIds:
                             equationVertexId0, variableVertexIdToEliminate, equationVertexId1 = newPath[-3:]
                             if equationVertexId0 in originalEquationVertexIds and uf.together(vertexId__equationVariableId[neighbour], vertexId__equationVariableId[equationVertexId0]):
-                                childDictPriority += SAME_EQUATION_GROUP_REWARDS#<<<<<<<<<<<<<<<<<<<<<test if this is working...
-                                print('added rewards to newPath: ', newPath)
+                                childDictPriority += SAME_EQUATION_GROUP_REWARDS
+                                # print('added rewards to newPath: ', newPath)
                         #Priority Heuristic<
                         if bipartiteTreeExpand:
                             childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
                         # print('inserting: ', childDict, childDictPriority)
                         # print('priority: ', childDictPriority)
+                        #Heuristics: should orders in the same group matter? if we already reached a group before, should we proceed with that group first?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         if childDictPriority > float('-inf'):#we discard everything that is -infinity
                             priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
                     #

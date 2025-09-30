@@ -127,3 +127,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+VIDEO_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'videos')
+if not os.path.isdir(VIDEO_FOLDERPATH):
+    os.makedirs(VIDEO_FOLDERPATH)

@@ -103,8 +103,8 @@ class DCTwoResistorParallel extends Circuit {
             console.log('list_independentVarStr', list_independentVarStr);
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
-        const simplify = true;
-        (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, simplify)).play();
+        const simplify = true; const record = true;
+        (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, simplify, record)).play();
 
         return {
             'scene':this.scene,

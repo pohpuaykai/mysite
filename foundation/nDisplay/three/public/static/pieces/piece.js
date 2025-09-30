@@ -16,7 +16,7 @@ class Piece {
         this.renderer = renderer;
         this.controls = controls;
         this.meshUUID__mesh = {};//TODO do we still need this if everything goes to the scene directly?
-        console.log(meshes);
+        // console.log(meshes);
         meshes.forEach(mesh => {this.meshUUID__mesh[mesh.uuid] = mesh});
 
         this.latexMeshCreator = new LatexMeshCreator();
@@ -33,11 +33,11 @@ class Piece {
         actor.highlight(redMag, greenMag, blueMag);
         this.render();
         // this.meshUUID__mesh[meshUUID] = actor;
-        console.log('highlighted: ', actor)
+        // console.log('highlighted: ', actor)
     }
 
     unhighlight(meshUUID) {
-        console.log('unhighlight: ', meshUUID)
+        // console.log('unhighlight: ', meshUUID)
         // const actor = this.meshUUID__mesh[meshUUID];
 
         const actor = this.scene.getObjectByProperty('uuid', meshUUID);//TODO delegate unhighlight to Actor
@@ -71,10 +71,10 @@ class Piece {
             indices.add(latexStrIdx);
             console.log(indices.size, list_latexStr.length, indices.length == list_latexStr.length)
             if (indices.size == list_latexStr.length) { // all the meshes are ready in textStr__textMeshUUID
-                console.log('piece.js is calling the readyCallback')
+                // console.log('piece.js is calling the readyCallback')
                 readyCallback();
-                console.log('this.textStr__textMeshUUID', self.textStr__textMeshUUID);
-                console.log('self.meshUUID__mesh', self.meshUUID__mesh)
+                // console.log('this.textStr__textMeshUUID', self.textStr__textMeshUUID);
+                // console.log('self.meshUUID__mesh', self.meshUUID__mesh)
             }
         }
         this.latexMeshCreator.getMeshes(list_latexStr, equationMeshCallback, readyCallback, this.textStr__textMeshUUID, requestingAnimationName);
@@ -85,17 +85,18 @@ class Piece {
     }
 
 
-    removeMeshesByRequestingAnimation(animationName) {
+    removeMeshesByRequestingAnimation(animationName, completionCallback) {
         const meshUUID__mesh___new = {}; const self = this;
         Object.keys(this.meshUUID__mesh).forEach(meshUUID => {
             if (self.meshUUID__mesh[meshUUID].requestingAnimationName !== animationName) {
                 meshUUID__mesh___new[meshUUID] = this.meshUUID__mesh[meshUUID]; //keep
             } else {
                 this.scene.remove(this.meshUUID__mesh[meshUUID]);
-                console.log('remove: ', meshUUID)
+                // console.log('remove: ', meshUUID)
             }
         })
         this.meshUUID__mesh = meshUUID__mesh___new;
+        completionCallback();
     }
 
     play(playIfTrue) {
@@ -109,10 +110,22 @@ class Piece {
         self.animationScheduler.pause();// if i am not using requestAnimationFrame, how is this still useful?
         const timeoutId = setTimeout(afterPause, milliseconds);
         function afterPause() {
-            // self.animationScheduler.start();
-            // console.log('afterPause')
             continueFunction();
             clearTimeout(timeoutId);
+        }
+    }
+
+    pauseUntilCallback(continueFunction, untilCallBack) {
+
+        const self = this;
+        self.animationScheduler.pause();// if i am not using requestAnimationFrame, how is this still useful?
+        const intervalId = setInterval(afterPause, 1000);//check every second?
+        function afterPause() {
+            if (untilCallBack()) {//must be true
+                continueFunction();
+                clearTimeout(intervalId);
+
+            }
         }
     }
 
@@ -137,7 +150,7 @@ class Piece {
     }
 
     enter(meshUUID) {
-        console.log('in piece.js: ', meshUUID, ', ', this.meshUUID__mesh[meshUUID])
+        // console.log('in piece.js: ', meshUUID, ', ', this.meshUUID__mesh[meshUUID])
         this.scene.add(this.meshUUID__mesh[meshUUID]); this.render();
     }
 
@@ -224,8 +237,8 @@ class Piece {
 
     smoothMoveCameraPosition(x, y, z, readyCallback) {
         const cameraPosition = this.camera.position;
-        console.log(cameraPosition);
-        console.log('x',x, 'y', y, 'z', z);
+        // console.log(cameraPosition);
+        // console.log('x',x, 'y', y, 'z', z);
         // debugger;
         function closeTo(val, tar, precision) {
             return Math.abs(tar-val)<2*Math.abs(precision)
@@ -251,7 +264,7 @@ class Piece {
                 zMoveSpeed = (z-cameraPosition.z)*moveSpeed; 
             }
             
-            console.log('xMoveSpeed', xMoveSpeed);console.log('yMoveSpeed', yMoveSpeed);console.log('zMoveSpeed', zMoveSpeed);
+            // console.log('xMoveSpeed', xMoveSpeed);console.log('yMoveSpeed', yMoveSpeed);console.log('zMoveSpeed', zMoveSpeed);
             // console.log(xMoveSpeed); console.log(yMoveSpeed); console.log(zMoveSpeed)
             function moveCamera___recursion(currentX, currentY, currentZ) {
                 if (closeTo(currentX, x, xMoveSpeed) && closeTo(currentY, y, yMoveSpeed) && closeTo(currentZ, z, zMoveSpeed)) {

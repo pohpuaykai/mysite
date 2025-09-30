@@ -2,6 +2,7 @@
 import * as THREE from './static/three/three.module.js';
 // import {GLTFLoader} from './static/three/GLTFLoader.js';
 import {SVGLoader} from './static/three/SVGLoader.js';
+import {Recorder} from './static/mediaRecorder/recorder.js';
 
 // import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
 // import {asyncCreateLatexMesh} from './static/custom/LatexMeshCreater.js';
@@ -83,6 +84,10 @@ const circuit = new DCTwoResistorParallel(scene, camera, renderer, controls, [])
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
 // const circuit = new Q2_3_5_aMoreComplexCircuit__P84(scene, camera, renderer, controls, []);
+
+
+
+
 const rD = circuit.act();
 //spread the returnDictionary into this environment: (ChatGPT says cannot get local scope representation)
 scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer']; 

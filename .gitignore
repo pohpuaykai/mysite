@@ -8,3 +8,4 @@ db.sqlite3
 #foundation/automat/parser/tests/genASTSVG/examples/**
 #foundation/nDisplay/three/public/static/meshes/**
 foundation/ecircuit/orthogonalLayouts/tests/rccl_SVGOuts/**
+video/videos/**
