@@ -40,8 +40,9 @@ class Manipulate:
 
 
 
-    def __init__(self, equation, direction, idx, verbose=False):
+    def __init__(self, equation, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
         self.direction = direction; self.idx = idx
+        self.calculateSchemeNodeChanges = calculateSchemeNodeChanges
 
         self.eq = equation
         self.verbose = verbose
@@ -59,7 +60,7 @@ class Manipulate:
     def initGrammerParser(self):
         #check if inputGrammar has no variables, 
         #if inputGrammar has no variables, then replace the outputGrammar's variables with variable, that is not in eq
-        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, verbose=self.verbose)#memoise the grammarParser TODO
+        self.grammarParser = self.grammarParserClass(self.inputGrammar, self.outputGrammar, calculateSchemeNodeChanges=self.calculateSchemeNodeChanges, verbose=self.verbose)#memoise the grammarParser TODO
 
 
 
@@ -77,8 +78,8 @@ class Manipulate:
         if self.grammarParser is None:
             self.initGrammerParser()
         #
-        if self.verbose:
-            print('self.schemeStr', self.schemeStr)
+        # if self.verbose:
+        #     print('self.schemeStr', self.schemeStr)
         #
         # self.grammarParser.buildEnclosureTree(self.schemeStr)
         self.grammarParser.matchIPattern(self.schemeStr, startPos__nodeId=startPos__nodeId)
@@ -101,12 +102,12 @@ class Manipulate:
             existingVariables = list(self.eq.variablesScheme.keys())
             # manipulatedSchemeWord = self.grammarParser.parse(self.schemeStr, existingVariables=existingVariables)
             # print('self.variableMinArgs: ', self.variableMinArgs); print('self.variableMaxArgs: ', self.variableMaxArgs); import pdb;pdb.set_trace()
-            print(self.TYPE, self.__class__.__name__, self.direction, self.idx, 'applying oPattern: ', self.outputGrammar, '| ON|', self.schemeStr, 'associated iPattern: ', self.inputGrammar)
+            # print(self.TYPE, self.__class__.__name__, self.direction, self.idx, 'applying oPattern: ', self.outputGrammar, '| ON|', self.schemeStr, 'associated iPattern: ', self.inputGrammar)
+            #option to turn off schemeNodeChangeLog so that search might be faster<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             manipulatedSchemeWord = self.grammarParser.parse(nodeIdsToSkip=[], variableMinArgs=self.variableMinArgs, variableMaxArgs=self.variableMaxArgs)
-            
             # return Schemeparser(equationStr=manipulatedSchemeWord)
 
-            if toAst: 
+            if toAst: #<<<<<<<<<<<<<<rename this flag for equation
 
             # # TODO seems unelegant..., but we should not modify self.eq and it also seems unelegant to instantiate Equation again
             # # TODO perhaps Manipulate should be a object of Equation?
@@ -114,20 +115,20 @@ class Manipulate:
                 return self.grammarParser, self.TYPE, self.__class__.__name__, self.direction, self.idx
                 # return Schemeparser(equationStr=manipulatedSchemeWord), self.grammarParser.schemeNodeChangeLog, Schemeparser(equationStr=self.inputGrammar), Schemeparser(equationStr=self.outputGrammar)
 
-            #     print(self.grammarParser.verPosWord)
-            #     self.grammarParser.verPosWord 
-            #     from foundation.automat.parser.sorte.schemeparser import Schemeparser
-            #     iParser = Schemeparser(equationStr=self.schemeStr)
-            #     iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount = iParser._parse() # on this parse the nodeIds are completely different than in the original eq
-            #     oParser = Schemeparser(equationStr=manipulatedSchemeWord)
-            #     oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount = oParser._parse() # on this parse the nodeIds are completely different than in the original eq
-            #     #this means we depend on the grammarParser to tell us, what has been removed at what position. TODO
+            #need to return the equation
+            if self.calculateSchemeNodeChanges: # then we can get the orginal nodeIds
 
-            #     # import pdb;pdb.set_trace()
-            #     return oAst, oFunctionsD, oVariablesD, oPrimitives, oTotalNodeCount, oParser.startPos__nodeId, \
-            #     iAst, iFunctionsD, iVariablesD, iPrimitives, iTotalNodeCount, iParser.startPos__nodeId, \
-            #     self.schemeStr, manipulatedSchemeWord
-            return manipulatedSchemeWord
+                from foundation.automat.core.equation import Equation
+                eq___new = Equation(self.grammarParser.oStr, parserName='scheme')
+                eq___new.astScheme = self.grammarParser.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                eq___new.rootOfTree = self.grammarParser.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                eq___new.startPos__nodeIdScheme = self.grammarParser.startPos__nodeId___oStr
+                eq___new.nodeId__lenScheme = self.grammarParser.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
+                return eq___new, self.TYPE, self.__class__.__name__, self.direction, self.idx
+            else:# we have to give new nodeIds
+                # eq__new = Equation(self.schemeparser___oStr)#if Equation takes a schemegrammar parser, then it will be faster
+                return manipulatedSchemeWord, self.TYPE, self.__class__.__name__, self.direction, self.idx
+            # return manipulatedSchemeWord
         return None # pattern unapplicable
 
 

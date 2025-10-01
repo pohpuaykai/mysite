@@ -733,7 +733,9 @@ class Wire extends Actor {// extends THREE.Object3D {//THREE.Line {
 
 
         //add touchingFaces to this wire.
-        const solderableLeads = []; const offset = radius+0.001; console.log(offset); const touchPointsOfSolderableLeads = [];
+        const solderableLeads = []; const offset = radius+0.001; 
+        // console.log(offset); 
+        const touchPointsOfSolderableLeads = [];
         for (let i=0; i<wirePath.length-1; i++) {//number_of_solderableLeads == wirePath.length
             const startCoordinate = wirePath[i]; const endCoordinate = wirePath[i+1];
             // console.log('s', startCoordinate); console.log('e', endCoordinate);

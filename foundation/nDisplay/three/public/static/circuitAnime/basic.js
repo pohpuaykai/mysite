@@ -1,10 +1,11 @@
 import {Recorder} from '../mediaRecorder/recorder.js';
 
-class CircuitAnime {
-    constructor(animationName, circuit, variableSelector, simplify, record) {
+class CircuitAnime {//with subtitles, please do on another class<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    constructor(animationName, circuit, variableSelector, ticketing, simplify, record) {
         const self = this;
         this.circuit = circuit;// this is a circuit.js
         this.variableSelector = variableSelector;// it is a function that uses a list_equationNetworkInfoDict, but takes a circuit
+        this.ticketing = ticketing;
         this.simplify = simplify;
         this.animationName = animationName;
 
@@ -183,6 +184,11 @@ class CircuitAnime {
             let list_equationLatexStr; let dependentVarStr; let list_independentVarStr;
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
+            //if ticketing, then we have to wait for the ticket to be ready before we can call this...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            console.log('list_equationLatexStr', list_equationLatexStr);
+            console.log('dependentVarStr', dependentVarStr);
+            console.log('list_independentVarStr', list_independentVarStr);
+            // debugger;
             self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
             function findEquationAnimation___functionGen(

@@ -13,7 +13,7 @@ class SchemeGrammarParser:
     """
 
 
-    def __init__(self, iPattern, oPattern, verbose=False):
+    def __init__(self, iPattern, oPattern, calculateSchemeNodeChanges=True, verbose=False):
         """
         This method is supposed to 
         0. get information about iPattern (what MODE is it?)
@@ -28,7 +28,7 @@ class SchemeGrammarParser:
         :param oPattern:
         :type oPattern:
         """
-        self.verbose = verbose
+        self.verbose = verbose; self.calculateSchemeNodeChanges = calculateSchemeNodeChanges
         import pprint
         self.pp = pprint.PrettyPrinter(indent=4)
         
@@ -767,6 +767,7 @@ class SchemeGrammarParser:
                         else:
                             #did not match the whole of list_schemeLevelCompliantStartPos ?
                             #so we should currentPointer should move to the end of list_schemeLevelCompliantStartPos?
+                            # print('restarting............ currentPointerPosition: ', currentPointerPosition, 'schemeStartPos: ', schemeStartPos)
                             currentPointerPosition = schemeStartPos#+len(ips) # +len(ips) is to keep the currentPointerPosition always at the start of schemeCompliantVariableOfIPattern
                             segmentIdx = 0 # if all the list_schemeLevelCompliantStartPos (which are all the valid are no match), then we cannot continue with this matching anymore
                             # print('this ips no match! currentPointerPosition:', currentPointerPosition); 
@@ -780,7 +781,13 @@ class SchemeGrammarParser:
                                 iHins.pop()
                             # iHins = []; iVors = []; 
                             # noOfMatches -=1;
-                            iVar = []; iStatic = []; vorStartPointer = absoluteStartPos
+                            iVar = []; iStatic = []; 
+                            # print('iHins', iHins); print('iVors', iVors)
+
+                            if len(iStatics) == 0:
+                                vorStartPointer = absoluteStartPos
+                            else:
+                                vorStartPointer = iStatics[-1][-1][-1]
 
                 # if len(iVar) > 0:#, but might not be a complete match... has to be a complete match<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 if len(iVar) == len(self.iSortedVariablesAndPositionSansNum) and self.variablesConsistent(iVar):
@@ -918,25 +925,28 @@ class SchemeGrammarParser:
             self.prepValsForExtraOVarsForEachMatch()
             self.generateOStr___MODE0()
             self.oEnclosureTreeId__iEnclosureTreeId = dict(map(lambda t: (t[1], t[0]), self.iEnclosureTreeId__oEnclosureTreeId.items()))
-            self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
-            if self.userProvided_startPos__nodeId:
-                self.calculate__startPos__nodeId()
+            if self.calculateSchemeNodeChanges:
+                self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
+                if self.userProvided_startPos__nodeId:
+                    self.calculate__startPos__nodeId()
         elif self.mode == 1:
             self.mapIOVariables()
             self.prepValsForExtraOVarsForEachMatch()
             self.generateOStr___MODE1()
             self.oEnclosureTreeId__iEnclosureTreeId = dict(map(lambda t: (t[1], t[0]), self.iEnclosureTreeId__oEnclosureTreeId.items()))
-            self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
-            if self.userProvided_startPos__nodeId:
-                self.calculate__startPos__nodeId()
+            if self.calculateSchemeNodeChanges:
+                self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
+                if self.userProvided_startPos__nodeId:
+                    self.calculate__startPos__nodeId()
         elif self.mode == 2:
             self.mapIOVariables()
             self.prepValsForExtraOVarsForEachMatch()
             self.generateOStr___MODE2()
             self.oEnclosureTreeId__iEnclosureTreeId = dict(map(lambda t: (t[1], t[0]), self.iEnclosureTreeId__oEnclosureTreeId.items()))
-            self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
-            if self.userProvided_startPos__nodeId:
-                self.calculate__startPos__nodeId()
+            if self.calculateSchemeNodeChanges:
+                self.changesBetweenIStrVOStrForAllSchemeNodes()# self.calculateVerPosWord()
+                if self.userProvided_startPos__nodeId:
+                    self.calculate__startPos__nodeId()
 
         return self.oStr
 

@@ -11,6 +11,16 @@ class DCTwoResistorParallel extends Circuit {
      * **/
     constructor(scene, camera, renderer, controls, meshes) {
         super(scene, camera, renderer, controls, meshes);
+
+        this.languages_descriptions = {//This will be read out at the beginning of the animation at the frontend, should be done in many languages...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            'en-US':'The is a two resistor circuit connected in parallel',
+            'zh-CN':'',
+            'ja-JP':'',
+            'de-DE':'',
+            'fr-FR':'',
+            'ru-RU':''
+        }
+
     }
 
     act() {
@@ -98,13 +108,13 @@ class DCTwoResistorParallel extends Circuit {
                     }
                 });
             });
-            console.log('list_equationLatexStr', list_equationLatexStr);
-            console.log('dependentVarStr', dependentVarStr);
-            console.log('list_independentVarStr', list_independentVarStr);
+            // console.log('list_equationLatexStr', list_equationLatexStr);
+            // console.log('dependentVarStr', dependentVarStr);
+            // console.log('list_independentVarStr', list_independentVarStr);
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
-        const simplify = true; const record = true;
-        (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, simplify, record)).play();
+        const simplify = true; const record = false; const ticketing = true;
+        (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, ticketing, simplify, record)).play();
 
         return {
             'scene':this.scene,

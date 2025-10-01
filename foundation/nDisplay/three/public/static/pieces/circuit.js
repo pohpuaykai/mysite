@@ -82,18 +82,11 @@ class Circuit extends Piece{
     animate_findEquations(readyCallback, animationName) {//TODO meshToAnimation, should take a 
         const self = this;
         function CALLBACK__findEquations(list_equationNetworkInfoDict){
-            // console.log("equationStr__variables"); console.log(equationStr__variables)
-            // console.log("componentId__list_variables"); console.log(componentId__list_variables)
             self.list_equationNetworkInfoDict = list_equationNetworkInfoDict;
-
-            // solvingCallback(list_equationNetworkInfoDict);
-            // const findEquationAnimation = findEquationAnimation___functionGen(list_equationNetworkInfoDict);
-            // self.scheduleAnimation(findEquationAnimation, 0);//0 is a priority, lower number gets animated first.
             let latexStrs = [];
             for(let i=0; i<list_equationNetworkInfoDict.length; i++) {
                 latexStrs.push([list_equationNetworkInfoDict[i]['equation'], list_equationNetworkInfoDict[i]['variables']]);
             }
-            console.log('list_equationNetworkInfoDict', list_equationNetworkInfoDict)
             latexStrs = [...new Set(latexStrs)];
             self.makeLatexMesh(latexStrs, readyCallback, 'findEquations'); // also give latexStr to variables mapping
         }
@@ -106,11 +99,23 @@ class Circuit extends Piece{
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
         const self = this;
-        xhr.onreadystatechange  = function(){
+        xhr.onreadystatechange = function(){
+
+            function handleResponseText(responseText) {
+                const list_equationNetworkInfoDict = JSON.parse(responseText);
+                callback(list_equationNetworkInfoDict);
+            }
 
             if (this.readyState == 4 && this.status == 200) {
-              const list_equationNetworkInfoDict = JSON.parse(this.responseText);
-              callback(list_equationNetworkInfoDict);
+              if (isNaN(parseInt(this.responseText))) {//not a ticket, its the actual
+                handleResponseText(this.responseText);
+              } else if(this.responseText.length > 0) {//is a ticketNum
+                const ticketNum = this.responseText;
+                function ticketCallback(responseText) {
+                    handleResponseText(responseText);
+                }
+                self.pollForTicket(ticketNum, ticketCallback);
+              }
             }
         }
         // xhr.onerror = function(){}
@@ -124,6 +129,7 @@ class Circuit extends Piece{
             'id__type':self.id__type,//circuit.id__type,
             'id__positiveLeadsDirections':self.id__positiveLeadsDirections,//circuit.id__positiveLeadsDirections,
             'edge__solderableIndices':self.edge__solderableIndices,//circuit.edge__solderableIndices
+            'wantsTicket':true
         }));
     }
 
@@ -135,7 +141,6 @@ class Circuit extends Piece{
     // list_independentVarStr
         const self = this;
         function CALLBACK__solveEquations(steps, latexStrs) {
-            // debugger;
             self.makeLatexMesh(latexStrs, readyCallback, 'solveEquations');
 
         }
@@ -148,8 +153,8 @@ class Circuit extends Piece{
         const self = this;
         xhr.onreadystatechange  = function(){
 
-            if (this.readyState == 4 && this.status == 200) {
-              const responseDict = JSON.parse(this.responseText);
+            function handleResponseText(responseText) {
+              const responseDict = JSON.parse(responseText);
               const steps = responseDict['steps']
               const branchedStepsIdxs = responseDict['branchedStepsIdxs']
               const latexStrs = responseDict['latexStrs']// not needed: list_tuple_latexStrVariableStr
@@ -170,6 +175,18 @@ class Circuit extends Piece{
               self.list_runningIdx__toKeep = list_runningIdx__toKeep;
               callback(steps, list_tuple_latexStrVariableStr);
 
+            }
+
+            if (this.readyState == 4 && this.status == 200) {
+              if (isNaN(parseInt(this.responseText))) {//not a ticket, its the actual
+                handleResponseText(this.responseText);
+              } else if(this.responseText.length > 0) {//is a ticketNum
+                const ticketNum = this.responseText;
+                function ticketCallback(responseText) {
+                    handleResponseText(responseText);
+                }
+                self.pollForTicket(ticketNum, ticketCallback);
+              }
               // asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
             }
         }
@@ -178,14 +195,15 @@ class Circuit extends Piece{
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         // xhr.setRequestHeader('Content-Type', 'application/json');
         // circuit.getNetworkGraph();
-        self.getNetworkGraph();
+        // self.getNetworkGraph();
 
         xhr.send(JSON.stringify({
             'list_equationStr':list_equationStr,
             'id__type':self.id__type,
             'dependentVarStr':dependentVarStr,
             'list_independentVarStr':list_independentVarStr,
-            'simplify':simplify //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO test
+            'simplify':simplify, //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO test
+            'wantsTicket':true
         }));
 
     }
@@ -202,7 +220,7 @@ class Circuit extends Piece{
 
     createComponent({componentName, position={x:0, y:0, z:0}, rotation={x:0, y:0, z:0}, additionalInfo={}}) {
         let component;
-        console.log(componentName);
+        // console.log(componentName);
         switch(componentName) {
             case 'resistor':
                 component = new ComponentResistor(position, rotation);

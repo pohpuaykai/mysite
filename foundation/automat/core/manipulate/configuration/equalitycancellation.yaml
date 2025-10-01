@@ -58,3 +58,32 @@ manipulations:
     preCond:
       $0: null
       $1: null
+
+  - type: 'regex'
+    vor:
+      scheme: '(= (* $0 $1) $0)'
+      return: '(= $1 1)'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null
+
+#good to group all the multiplications together into a \PI or \SIGMA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  - type: 'regex'
+    vor:
+      scheme: '(= (* (* $0 $1) $2) $0)'
+      return: '(= (* $1 $2) 1)'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

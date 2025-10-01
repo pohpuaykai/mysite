@@ -7,7 +7,7 @@ import {asyncCreateTextMesh} from '../custom/TextMeshCreater.js'
 class Piece {
     
     /**
-     * NEED to move all the things only relevant to circuit, to circuit.js<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO
+     * 
      * **/
     constructor(scene, camera, renderer, controls, meshes) {
 
@@ -324,6 +324,37 @@ class Piece {
             self.controls.update()
             readyCallback();
         })
+    }
+
+    pollForTicket(ticketNum, ticketCallback) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const self = this;
+        let hadReturned = false; const timeOutIds = [];
+
+        function poll() {//recursive polling no need to setInterval and then clear interval
+
+            const formData = new FormData();
+            formData.append('ticketNum', ticketNum)
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function(){
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText.length > 0) {//if the ticket is not ready, backend will send a length zero string
+                        ticketCallback(this.responseText);
+                        hadReturned = true;
+                        timeOutIds.forEach((timeOutId) => {
+                            clearTimeout(timeOutId)
+                        })
+                    } else if(!hadReturned) {
+                        const timeOutId = setTimeout(poll, 1000); // wait 1s before next poll
+                        timeOutIds.push(timeOutId)
+                    }
+                }
+            }
+            xhr.open('POST', pollable_url);
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.send(formData);
+        }
+        poll();
     }
 
 }

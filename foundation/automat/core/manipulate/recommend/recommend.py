@@ -53,7 +53,7 @@ class Recommend:
     def __init__(self, redrive=False, verbose=False):
         self.verbose=verbose
 
-
+    @classmethod
     def getManipulateClass(self, filename):
         className = Recommend.PATTERN_FILENAMES__CLASSNAMES[filename]
         import importlib, inspect
@@ -181,14 +181,15 @@ class Recommend:
         return self.filterMetaList(metaData, searchCol, searchTerms)
         # return self.filterMetaList(self.metaData, searchCol, searchTerms)
 
-    def sortForHeuristicsRelevantTo(self, eq, manipulations):
-        manipulations = sorted(manipulations, key=lambda row: self.mostNumberOfIPatternNodes___SORTINGHEURISTIC(row['iTotalNodeCount']))
+    @classmethod
+    def sortForHeuristicsRelevantTo(cls, eq, manipulations):
+        manipulations = sorted(manipulations, key=lambda row: cls.mostNumberOfIPatternNodes___SORTINGHEURISTIC(row['iTotalNodeCount']))
         return manipulations
 
-
-    def filterForHeuristicsRelevantTo(self, eq, manipulations):
+    @classmethod
+    def filterForHeuristicsRelevantTo(cls, eq, manipulations):#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<does not need to take in eq, only needs schemeparser<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REFACTOR
         #TODO please move to this the end of this function, should not be done here
-        manipulations = self.sortForHeuristicsRelevantTo(eq, manipulations)
+        manipulations = cls.sortForHeuristicsRelevantTo(eq, manipulations)
         #
 
         from copy import copy
@@ -219,32 +220,32 @@ class Recommend:
 
 
         manipulations = list(filter(lambda row:
-            self.breadthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iWidth'], breadthOfEquation), manipulations))
+            cls.breadthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iWidth'], breadthOfEquation), manipulations))
         
         # print('1.*****************************')
         # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
         manipulations = list(filter(lambda row:
-            self.depthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iDepth'], depthOfEquation),manipulations))
+            cls.depthOfIPatternAtMostEquation___FILTERHEURISTIC(row['iDepth'], depthOfEquation),manipulations))
         
         # print('2.*****************************')
         # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
         manipulations = list(filter(lambda row:
-            self.totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(row['iTotalNodeCount'], entityTotalCountOfEquation), manipulations))
+            cls.totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(row['iTotalNodeCount'], entityTotalCountOfEquation), manipulations))
         
         # print('3.*****************************')
         # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
         manipulations = list(filter(lambda row: #iVariables will only contain $ variable for iPattern
-            self.entityCountsOfIPatternInEquation___FILTERHEURISTIC(combiningDictionaries(row['iPrimitives'], row['iFunctions']), equationEntityToCount), manipulations))
+            cls.entityCountsOfIPatternInEquation___FILTERHEURISTIC(combiningDictionaries(row['iPrimitives'], row['iFunctions']), equationEntityToCount), manipulations))
         
         # print('4.*****************************')
         # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
         manipulations = list(filter(lambda row: #metaData needs to store iPatternEntityStartEndPos
-            self.orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(row['iLabelsInOrderOfStartPos'], row['iMode'], equationEntityStartEndPos), manipulations))
+            cls.orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(row['iLabelsInOrderOfStartPos'], row['iMode'], equationEntityStartEndPos), manipulations))
         
         # print('5.*****************************')
         # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
         manipulations = list(filter(lambda row: #metaData needs to store iPatternBracketSpaceList
-            self.orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(row['iListWithoutLabels'], equationBracketSpaceList), manipulations))
+            cls.orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(row['iListWithoutLabels'], equationBracketSpaceList), manipulations))
         
         # print('6.*****************************')
         # print('still there?:', len(list(filter(lambda row: row['identity']['filename']=='distributivity' and row['identity']['idx']==0, manipulations)))>0); import pdb;pdb.set_trace()
@@ -257,7 +258,7 @@ class Recommend:
     def simplify(self, eq, hint=None):
         #run FILTER_HEURISTIC and SORTIN_HEURISTIC
         simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') # the number of nodes get lesser, its ok, its this is a 1 step
-        simplifyingManipulations = self.filterForHeuristicsRelevantTo(eq, simplifyingManipulations)
+        simplifyingManipulations = Recommend.filterForHeuristicsRelevantTo(eq, simplifyingManipulations)
         #TODO SORTIN_HEURISTICs, simplest iPattern first?
         simplifyingManipulations = sorted(simplifyingManipulations, key=lambda row: row['oTotalNodeCount'])
         #TODO more SORTIN_HEURISTICs?
@@ -268,9 +269,9 @@ class Recommend:
             #run through each manipulation
             rmIdentities = list(map(lambda row: row['identity'], simplifyingManipulations))
             for idd in rmIdentities:
-                manipulateClass = self.getManipulateClass(idd['filename'])
+                manipulateClass = Recommend.getManipulateClass(idd['filename'])
                 # import pdb;pdb.set_trace()
-                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
+                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], calculateSchemeNodeChanges=True, verbose=self.verbose)
                 returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)#there is no need for hint? eq has the latest startPos__nodeId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                 if returnTup is not None: # successfully applied manipulation,  we will return it first
@@ -296,22 +297,23 @@ class Recommend:
                     oPattern = sgp.oPattern
                     return rootOfTree___simplified, ast___simplified, startPos__nodeId___simplified, nodeId__len___simplified, schemeStr___simplified, functions___simplified, variables___simplified, primitives___simplified, totalNodeCount___simplified, latexStr___simplified, manipulateType, manipulateClassName, iPattern, oPattern
 
-
-    def breadthOfIPatternAtMostEquation___FILTERHEURISTIC(self, breadthOfIPattern, breadthOfEquation):#<<<<<<<<<<<<<<needs to do breadth in schemeParser
+    @classmethod
+    def breadthOfIPatternAtMostEquation___FILTERHEURISTIC(cls, breadthOfIPattern, breadthOfEquation):#<<<<<<<<<<<<<<needs to do breadth in schemeParser
         """
         breadth of IPattern as a schemeTree, must be less than or equals to the breadth of equation as a schemeTree
         """
         return breadthOfIPattern <= breadthOfEquation
 
-    def depthOfIPatternAtMostEquation___FILTERHEURISTIC(self, depthOfIPattern, depthOfEquation):#<<<<<<<<<<<<<<<<<<needs to do depth in schemeParser
+    @classmethod
+    def depthOfIPatternAtMostEquation___FILTERHEURISTIC(cls, depthOfIPattern, depthOfEquation):#<<<<<<<<<<<<<<<<<<needs to do depth in schemeParser
         """
         depth Of IPattern as a schemeTree, must be less than or equals to the depth of equation as a schemeTree
         """
         return depthOfIPattern <= depthOfEquation
 
     #{HEURISTICS SchemeStructural} the positions of the brackets_and_spaces of the iPattern must be found in the positions of the brackets_and_spaces of the equation, otherwise there is no need to consider that equation. 
-
-    def totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(self, entityTotalCountOfIPattern, entityTotalCountOfEquation):
+    @classmethod
+    def totalEntityCountOfIPatternAtMostEquation___FILTERHEURISTIC(cls, entityTotalCountOfIPattern, entityTotalCountOfEquation):
         """
         entityTotalCount is the total number of schemeLabels in either IPattern or Equation
 
@@ -319,7 +321,8 @@ class Recommend:
         """
         return entityTotalCountOfIPattern <= entityTotalCountOfEquation
 
-    def entityCountsOfIPatternInEquation___FILTERHEURISTIC(self, iPatternEntityToCount, equationEntityToCount):
+    @classmethod
+    def entityCountsOfIPatternInEquation___FILTERHEURISTIC(cls, iPatternEntityToCount, equationEntityToCount):
         """
         iPatternEntityToCount is a dictionary from string to integer, where string is a schemeLabel and integer is the number of times the schemeLabel appears in iPattern
         equationEntityToCount is a dictionary from string to integer, where string is a schemeLabel and integer is the number of times the schemeLabel appears in equation
@@ -332,8 +335,8 @@ class Recommend:
                 return False
         return True
         
-
-    def orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(self, iPatternEntityStartEndPos, iMode, equationEntityStartEndPos):#<<<<<<<<<<<<<<<<<<<<<<<<<needs to call the method already in the schemeparser and cache the results, so that SGP can use it too
+    @classmethod
+    def orderOfEntitiesOfIPatternInEquation___FILTERHEURISTIC(cls, iPatternEntityStartEndPos, iMode, equationEntityStartEndPos):#<<<<<<<<<<<<<<<<<<<<<<<<<needs to call the method already in the schemeparser and cache the results, so that SGP can use it too
         """
         we order the schemeLabels_of_iPattern by startPosition, and order the schemeLabels_of_Equation by startPosition
         if the schemeLabels_of_iPattern (as a list), cannot be found in the schemeLabels_of_Equation (as a list), then this iPattern cannot be found in equation, no need to try
@@ -368,7 +371,8 @@ class Recommend:
                 return False
         return True
 
-    def orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(self, iPatternBracketSpaceList, equationBracketSpaceList):
+    @classmethod
+    def orderofBracketAndSpacesOfIPatternInEquation___FILTERHEURISTIC(cls, iPatternBracketSpaceList, equationBracketSpaceList):
         """
         we order the bracketsAndSpacesOf{everything excluding the schemeLabels|entities} into iPatternBracketSpaceList, equationBracketSpaceList
         if the iPatternBracketSpaceList cannot be found in equationBracketSpaceList, then this iPattern cannot be found in equation, no need to try
@@ -389,7 +393,8 @@ class Recommend:
                 return False
         return True
 
-    def mostNumberOfIPatternNodes___SORTINGHEURISTIC(self, iTotalNodeCount):
+    @classmethod
+    def mostNumberOfIPatternNodes___SORTINGHEURISTIC(cls, iTotalNodeCount):
         return -iTotalNodeCount
 
     def reduceVariablesCount(self, variable):
@@ -416,7 +421,7 @@ class Recommend:
 
     @classmethod
     def bipartiteSearch(
-        self, 
+        cls, 
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -472,6 +477,9 @@ class Recommend:
         
 
 
+        #for eCircuits we can use thevenin or norton to simplify large circuits, should implement this in another kind of solver?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+        #implement MaximumDepth for this too<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         list_equations, 
         list_variables, 
@@ -859,20 +867,22 @@ class Recommend:
         else:
             return favouritePath, {}
 
-
-    def combingSearch(self, equation, maximumDepth=256): #<<<<<<<<<<<maybe rename to solve|simplify
+    @classmethod
+    def combingSearch(cls, equation, maximumDepth=7, verbose=False): #<<<<<<<<<<<maybe rename to solve|simplify
         """
         an option for early return? if we see the same formula showing up for more than "the_number_of_times_number_of_schemeNodes" of the formula, then return, also if history ends with all node_swapping_manipulations{no_increase_no_decrease}, then they are the same formulas
         """#if manipulation is node_swapping, check the last_consecutive_history for it, it should not be repeated in the last_consecutive_history
         ####for debugging
         import pprint; pp = pprint.PrettyPrinter(indent=4)
         ####
+        import sys
         from copy import deepcopy
         from foundation.automat.common.priorityqueue import PriorityQueue
 
         from foundation.automat.core.equation import Equation
         visitedSchemeStrs = [equation.schemeStr]#<<<<<<<<<<<<<<<<<<instead of using set, use list, so that you can see when each schemeStr was added<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         # manipulations = Recommend.getMetaData()
+        schemeLeastLength = sys.maxsize; leastLengthSchemeEquations = []; solvingSteps = []
         priorityQueue = PriorityQueue(); 
         priorityQueue.insert({
             'eq':equation,
@@ -880,14 +890,23 @@ class Recommend:
             'history':[],
             'unHistory':[]#the equivalent of history, but in reverse fo each item in history
         }, -1)
+        if verbose:
+            currentReachedMaximumDepth = 0
         while len(priorityQueue) > 0:
             state = priorityQueue.popMax()
             eq = state['eq']; depth = state['depth']; history = state['history']; unHistory = state['unHistory']
+            #
+            if verbose:
+                if depth > currentReachedMaximumDepth:
+                    currentReachedMaximumDepth = depth
+                    print('new depth: ', currentReachedMaximumDepth)
+            #
+
             if depth >= maximumDepth:
                 # print('stopping search... because one of the states reached maximumDepth')
                 #what to return?
                 break
-            manipulations = self.filterForHeuristicsRelevantTo(eq, Recommend.getMetaData()) # branches
+            manipulations = cls.filterForHeuristicsRelevantTo(eq, Recommend.getMetaData()) # branches
             #####for debugging
             # print('~~~~~~~~~~~~~')
             # pp.pprint(state)
@@ -902,12 +921,13 @@ class Recommend:
                 if historyKey in history[-1:] or unHistoryKey in unHistory[-1:]:
                     # print('skipping manipulate: ', historyKey)
                     continue #skip, we do not want to directly undo our affords
-                manipulateClass = self.getManipulateClass(idd['filename'])
-                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
+                manipulateClass = cls.getManipulateClass(idd['filename'])
+                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=verbose)
                 # print('*************************************************separate call ', historyKey)
-                returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=True)
+                returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=False)
                 if returnTup is not None: # successfully applied manipulation,  we will return it first
-                    sgp, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
+                    # sgp, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
+                    manipulatedSchemeWord, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
                     # rootOfTree___simplified = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     # ast___simplified = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     # startPos__nodeId___simplified = sgp.startPos__nodeId___oStr
@@ -920,22 +940,33 @@ class Recommend:
                     # totalNodeCount___simplified = sgp.schemeparser___oStr.totalNodeCount
                     # latexStr___simplified = sgp.schemeparser___oStr._toLatex()
 
-                    eq___new = Equation(sgp.oStr, parserName='scheme')
-                    eq___new.astScheme = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    eq___new.rootOfTree = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    eq___new.startPos__nodeIdScheme = sgp.startPos__nodeId___oStr
-                    eq___new.nodeId__lenScheme = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
-                    if sgp.oStr not in visitedSchemeStrs:
+                    # eq___new = Equation(sgp.oStr, parserName='scheme')
+                    # eq___new.astScheme = sgp.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    # eq___new.rootOfTree = sgp.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    # eq___new.startPos__nodeIdScheme = sgp.startPos__nodeId___oStr
+                    # eq___new.nodeId__lenScheme = sgp.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
+                    # if sgp.oStr not in visitedSchemeStrs:
+                    if manipulatedSchemeWord not in visitedSchemeStrs:
                         history___new = deepcopy(history); unHistory___new = deepcopy(unHistory)
                         history___new.append((idd['filename'], idd['direction'], idd['idx']))
                         reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
                         unHistory___new.append((idd['filename'], reverseDirection, idd['idx']))
-                        visitedSchemeStrs.append(sgp.oStr)
+                        visitedSchemeStrs.append(manipulatedSchemeWord)# visitedSchemeStrs.append(sgp.oStr)
+                        #
+                        if len(manipulatedSchemeWord) < schemeLeastLength:
+                            solvingSteps = []
+                            leastLengthSchemeEquations = []
+                            schemeLeastLength = len(manipulatedSchemeWord)
+                        if len(manipulatedSchemeWord) == schemeLeastLength:
+                            leastLengthSchemeEquations.append(manipulatedSchemeWord)
+                            solvingSteps.append(history___new)
+                        #
                         #priority settings
-                        priority = -(depth+1)
+                        #Heuristics: stack simplifications together, here the more experience the better
+                        priority = -(depth+1) #Heuristics: if it can reach more reducingManipulation, then higher priority<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         #
                         childDict = {
-                            'eq':eq___new,
+                            'eq':Equation(manipulatedSchemeWord, parserName='scheme'),
                             'depth':depth+1,
                             'history':history___new,
                             'unHistory':unHistory___new#the equivalent of history, but in reverse fo each item in history
@@ -954,12 +985,50 @@ class Recommend:
                         #heuristics, so there are simplification_patterns where the nodes decrease from iPattern to oPattern, these should also serve as targets, so formulas that have the most potential to be matched by these patterns, should be given higher priority..<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         #heuristics, if we can simplify until there is only 1 of each variable, we can solve for anyVariable, by makeSubject<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         
-                        #how to put the eq___new in? what priority?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     # else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
         # print('we actually finished running, this was not expected', visitedSchemeStrs)
-        minStrLen = min(map(lambda s: len(s), visitedSchemeStrs))
-        minSchemeStrs = sorted(list(filter(lambda s: len(s)==minStrLen, visitedSchemeStrs)))
-        return minSchemeStrs
+        # minStrLen = min(map(lambda s: len(s), visitedSchemeStrs)) # but some schemeStrings with same length, might be unfactorised, have 2 as a factor, instead of 1, for example. 
+        # minSchemeStrs = sorted(list(filter(lambda s: len(s)==minStrLen, visitedSchemeStrs)))
+        #but i also need the solving steps..<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #with the least number of variables, and least number of non1s?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        # return minSchemeStrs
+
+        #return solutions with the least number of variables, and least number of non1s along with their 
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import
+        minimumVariableCount = sys.maxsize; 
+        minimumNon01Count = sys.maxsize;
+        chosenSchemeStrs = []; chosenASTs = []; chosenRootOfTrees = []; chosenVariables = []
+        chosenIndices = []
+        for idx, schemeStr in enumerate(leastLengthSchemeEquations):
+            schemeparser = Schemeparser(equationStr=schemeStr)
+            ast, functions, variables, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
+            totalVariableCount = sum(list(functions.values()))
+            totalNon01Count = sum(list(map(lambda t: t[1], filter(lambda t: t[0] not in ['0', '1'], primitives.items()))))
+            if totalVariableCount < minimumVariableCount or totalNon01Count < minimumNon01Count:
+                minimumVariableCount = totalVariableCount
+                minimumNon01Count = totalNon01Count
+                chosenSchemeStrs = []; chosenASTs = []; chosenRootOfTrees = []; chosenVariables = []
+                chosenIndices = []
+            if totalVariableCount == minimumVariableCount or totalNon01Count == minimumNon01Count:
+                chosenSchemeStrs.append(schemeStr); chosenASTs.append(ast); chosenRootOfTrees.append(schemeparser.rootOfTree); chosenVariables.append(list(set(variables.values())))
+                chosenIndices.append(idx)
+        #get the few with the smallest history
+        chosenSchemeStrWithSolvingSteps = []; 
+        relevantSolvingSteps = list(filter(lambda t: t[0] in chosenIndices, enumerate(solvingSteps)))
+        smallestHistoryLength = min(list(map(lambda idx_solvingStep: len(idx_solvingStep[1]), relevantSolvingSteps)))
+        for idx, solvingStep in relevantSolvingSteps:
+            if len(solvingStep) == smallestHistoryLength:
+                theIdx = chosenIndices.index(idx)
+                ss = chosenSchemeStrs[theIdx]
+                chosenSchemeStrWithSolvingSteps.append({
+                    'schemeStr':ss,
+                    'solvingStep':solvingStep,
+                    'ast':chosenASTs[theIdx],
+                    'rootOfTree':chosenRootOfTrees[theIdx],
+                    'variables':chosenVariables[theIdx]
+                })
+        return chosenSchemeStrWithSolvingSteps
+
 
     @classmethod
     def _loadYAMLFromFilePath(cls, filepath):

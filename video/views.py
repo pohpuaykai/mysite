@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 
-# Create your views here.
+
 def circuitAnimeRecord(request):
     if 'file' in request.FILES:
         uploaded_file = request.FILES['file'] # this is a InMemoryUploadedFile

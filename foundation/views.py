@@ -5,13 +5,16 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from foundation.decorators import ticketable
+from foundation.models import Ticket
+
 #https://doc.babylonjs.com/features/introductionToFeatures/chap1/first_app
-# Create your views here.
 def index(request):
     return render(request, os.path.join(settings.BASE_DIR, 'foundation', 'nDisplay', 'three', 'public', 'index.html'))
     # return render(request, "foundation/index.html", {})#TODO please remove this<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
+@ticketable
 def automat_findEquations(request):
 
     """
@@ -45,14 +48,14 @@ def automat_findEquations(request):
     for edge, solderableLeads in circuit_details['edge__solderableIndices'].items():
         edgeStart___str, edgeEnd___str = edge.split(',')
         edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
-    print('networkGraph')
-    pp.pprint(networkGraph)
-    pp.pprint(id__type)
-    pp.pprint(id__positiveLeadsDirections)
-    print('edge__solderableIndices:')
-    pp.pprint(edge__solderableIndices)
-    print('id__positiveLeadsDirections')
-    pp.pprint(id__positiveLeadsDirections)
+    # print('networkGraph')
+    # pp.pprint(networkGraph)
+    # pp.pprint(id__type)
+    # pp.pprint(id__positiveLeadsDirections)
+    # print('edge__solderableIndices:')
+    # pp.pprint(edge__solderableIndices)
+    # print('id__positiveLeadsDirections')
+    # pp.pprint(id__positiveLeadsDirections)
 
     # componentId__list_variables = {}
     # def updateDictList(newComponentId__list_variables):
@@ -84,7 +87,7 @@ def automat_findEquations(request):
     """
     for equationFinderClass in EquationFinder.getAllEquationFinders():
         # equationFinderClass.list_equations = []
-        print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        # print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         # print('len(equationStr__variables)', len(equationStr__variables))
 
         for infoD in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
@@ -110,11 +113,12 @@ def automat_findEquations(request):
                 'variableStr__nodeId':variableStr__nodeId
             })
 
-    pp.pprint(returnData)
+    # pp.pprint(returnData)
     #cache this, return the cache id, and then for solveEquations endpoint, give option of using the cached items, like Equation instead of equationStr, to speed things <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     return HttpResponse(dumps(returnData), content_type="text/plain")
 
 
+@ticketable
 def automat_solveEquations(request):
     """
     input:
@@ -224,3 +228,18 @@ def automat_solveEquations(request):
         'list_runningIdx__toClearAll':list_runningIdx__toClearAll, 
         'list_runningIdx__toKeep':list_runningIdx__toKeep
     }), content_type="text/plain")
+
+
+def pollable(request):
+    # print('request.POST: ', request.POST); import pdb;pdb.set_trace()
+    if 'ticketNum' in request.POST:#ticketNum is the id col of the SQLite
+        try:
+            ticketObj = Ticket.objects.get(id=int(request.POST['ticketNum']))
+        except:
+            return HttpResponse('', content_type="text/plain")
+        responseContent = ticketObj.responseContent
+        if responseContent is None: # this means that the backend thread is not done yet, so we should not delete the ticket
+            return HttpResponse('', content_type='text/plain')
+        ticketObj.delete()
+        return HttpResponse(responseContent, content_type="text/plain")
+    return HttpResponse('', content_type="text/plain")

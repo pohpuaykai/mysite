@@ -96,10 +96,10 @@ scene = rD['scene']; camera = rD['camera']; renderer = rD['renderer'];
 // const wireBetween10 = rD['meshes']['wireBetween10'];
 // const wireBetween11 = rD['meshes']['wireBetween11'];
 // const animate = rD['animate'];
-console.log('circuit network:', circuit.getNetworkGraph());
-console.log('circuit network stringify:', JSON.stringify(circuit.getNetworkGraph()));
-console.log('circuit id__type: ', circuit.id__type);
-console.log('circuit edge__solderableIndices: ', circuit.edge__solderableIndices);
+// console.log('circuit network:', circuit.getNetworkGraph());
+// console.log('circuit network stringify:', JSON.stringify(circuit.getNetworkGraph()));
+// console.log('circuit id__type: ', circuit.id__type);
+// console.log('circuit edge__solderableIndices: ', circuit.edge__solderableIndices);
 
 
 window.addEventListener( 'resize', onWindowResize );

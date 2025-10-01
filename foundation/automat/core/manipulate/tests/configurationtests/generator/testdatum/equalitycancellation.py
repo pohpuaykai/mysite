@@ -20,4 +20,15 @@ TEST_DATUM={
                       'input': '(= (- b a) (- c a))'},
 
 
+    ('hin', '4'): {   'expected': '(= (* a b) a)',
+                      'input': '(= b 1)'},
+    ('vor', '4'): {   'expected': '(= b 1)',
+                      'input': '(= (* a b) a)'},
+
+
+    ('hin', '5'): {   'expected': '(= (* (* a b) c) a)',
+                      'input': '(= (* b c) 1)'},
+    ('vor', '5'): {   'expected': '(= (* b c) 1)',
+                      'input': '(= (* (* a b) c) a)'},
+
 }

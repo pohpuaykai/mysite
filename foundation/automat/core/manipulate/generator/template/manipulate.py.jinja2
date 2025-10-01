@@ -8,9 +8,9 @@ class {{className}}(Manipulate):
     """
     TYPE = '{{type}}'
 
-    def __init__(self, equation, direction, idx, verbose=False):
+    def __init__(self, equation, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
         """
 
         """
         self.rawRegexes = {{manipulations}}
-        super().__init__(equation, direction, idx, verbose=verbose)
+        super().__init__(equation, direction, idx, calculateSchemeNodeChanges=calculateSchemeNodeChanges, verbose=verbose)

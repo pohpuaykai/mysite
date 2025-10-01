@@ -2120,6 +2120,45 @@ def test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplicatio
         )
 
 
+
+def test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication2(verbose=False):
+    """"""
+    inputPattern = '(* $0 1)'
+    outputPattern = '$0'
+    schemeword = '(= (* (/ 1 z) 1) (* (* (/ 1 (* y x)) 1) (+ (* y 1) (* 1 x))))'
+    parser = Schemeparser(equationStr=schemeword)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    nodeIdsToSkip = []
+    variableMinArgs = {}
+    variableMaxArgs = {}
+    sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
+    sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+    manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
+    expected = None
+    expected_schemeNodeChangeLog = None
+    expected_startPos__nodeId = {}
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('schemeNodeChangeLog(positional changes):')
+        pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
+        print('expected_startPos__nodeId: ')
+        pp.pprint(sgparser.startPos__nodeId___oStr)
+        print('OG startPos__nodeId: ')
+        pp.pprint(startPos__nodeId)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword 
+        and \
+        expected_schemeNodeChangeLog == sgparser.schemeNodeChangeLog #sgparser.schemeNodeChangeLog keeps swapping order... TODO why?
+        and \
+        expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
+        )
+
+
+
+
 # def test__latexParserUnparse__(verbose=False):
 #     """"""
 #     inputPattern = None
@@ -2158,39 +2197,40 @@ def test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplicatio
 
 if __name__=='__main__':
     #should include parts that can be differentiated and parts that cannot be differentiated<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    test__ideal__addition()
-    test__idealNested__addition()
-    test__simpleLeft__addition()
-    test__simpleRight__addition()
-    test__sameLevel__addition()
-    test__nested__addition()
-    test__nestedSameLevel__addition()
-    test__2deep2wide__addition()
-    test__2deep2wideSkip__addition()
-    test__2deep2wideSkipTopLevel__addition()
-    test__notApplicable__addition()
-    test__functionCountChanges__subtractZero() #MODE2 decrease_in_static reverse_MODE1
-    test__functionCountChanges__distributivity() #MODE2 simple decrease_in_static decrease_in_var
-    test__moreVariableOutputThanInput__exponential1IsAnythingToThe0() # MODE0 complicated small_vorhin
-    test__exponential1IsAnythingToThe0__skipNode() # MODE0 complicated small_vorhin skipNode
-    test__manipulateLogarithm__logSameBaseAsArgumentGives1() # MODE0 
+    # test__ideal__addition()
+    # test__idealNested__addition()
+    # test__simpleLeft__addition()
+    # test__simpleRight__addition()
+    # test__sameLevel__addition()
+    # test__nested__addition()
+    # test__nestedSameLevel__addition()
+    # test__2deep2wide__addition()
+    # test__2deep2wideSkip__addition()
+    # test__2deep2wideSkipTopLevel__addition()
+    # test__notApplicable__addition()
+    # test__functionCountChanges__subtractZero() #MODE2 decrease_in_static reverse_MODE1
+    # test__functionCountChanges__distributivity() #MODE2 simple decrease_in_static decrease_in_var
+    # test__moreVariableOutputThanInput__exponential1IsAnythingToThe0() # MODE0 complicated small_vorhin
+    # test__exponential1IsAnythingToThe0__skipNode() # MODE0 complicated small_vorhin skipNode
+    # test__manipulateLogarithm__logSameBaseAsArgumentGives1() # MODE0 
 
-    test__manipulateExponential__exponential1IsAnythingToThe1() #MODE1_simple
-    test__exponential1IsAnythingToThe1__complicatedWithUserSkip() #MODE1_complicatedWithSkip
-    test__manipulateLogarithm__changeBaseFormula() #MODE2 simple increase_in_static generate_extra_outputVar
-    test__onlyVariable__multiplyDivideCancal() #MODE1
-    test__onlyVariable__multiplyDivideCancal6LevelsDeep() #MODE1 complicated
-    test__latexParserUnparse__sqrtInSqrt() #MODE2 small_decrease_in_static
-    test__latexParserUnparse__parallelSumOfCapacitance() #MODE2 decrease_in_static
-    test__latexParserUnparse__6levelsOfMatchesMODE2() #MODE2 complicated decrease_in_static vorhin_with_many_schemeNodes
-    test__latexParserUnparser__impedanceOfParallelRLCCircuit1() #MODE2 static_increase big_vorhin
-    test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1()#MODE2 static_increase big_vorhin
-    test__differentiation__simple()#MODE2 duplicated_iVar_in_oStr 
-    test__differentiation__doesNotMeetvariableMinArgsCriteria()
-    test__latexParserUnparse__Trig1()
-    test__simpleParallel2ResistorSimplication__MultiplydividecancelVARIABLECONSISTENT()
+    # test__manipulateExponential__exponential1IsAnythingToThe1() #MODE1_simple
+    # test__exponential1IsAnythingToThe1__complicatedWithUserSkip() #MODE1_complicatedWithSkip
+    # test__manipulateLogarithm__changeBaseFormula() #MODE2 simple increase_in_static generate_extra_outputVar
+    # test__onlyVariable__multiplyDivideCancal() #MODE1
+    # test__onlyVariable__multiplyDivideCancal6LevelsDeep() #MODE1 complicated
+    # test__latexParserUnparse__sqrtInSqrt() #MODE2 small_decrease_in_static
+    # test__latexParserUnparse__parallelSumOfCapacitance() #MODE2 decrease_in_static
+    # test__latexParserUnparse__6levelsOfMatchesMODE2() #MODE2 complicated decrease_in_static vorhin_with_many_schemeNodes
+    # test__latexParserUnparser__impedanceOfParallelRLCCircuit1() #MODE2 static_increase big_vorhin
+    # test__latexParserUnparse__bipartiteSearch_dc_twoResistor_parallel_STEP1()#MODE2 static_increase big_vorhin
+    # test__differentiation__simple()#MODE2 duplicated_iVar_in_oStr 
+    # test__differentiation__doesNotMeetvariableMinArgsCriteria()
+    # test__latexParserUnparse__Trig1()
+    # test__simpleParallel2ResistorSimplication__MultiplydividecancelVARIABLECONSISTENT()
 
-    test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_doubleInverse()
-    test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication0()
-    test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication1()
+    # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_doubleInverse()
+    # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication0()
+    # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication1(True)
+    test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication2(True)
     #after this test latexUnparse, equation.Manipulate again

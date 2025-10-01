@@ -28,7 +28,7 @@ class EquationFinder(ABC):
         self.id__type = id__type
         self.id__positiveLeadsDirections = id__positiveLeadsDirections
         self.edge__solderableIndices = edge__solderableIndices
-        print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+        # print('self.edge__solderableIndices', self.edge__solderableIndices, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
         if not EquationFinder._has_run_common_code:#THIS CODES are repeated for everyChild class... 
             self.cycles = SmallCycleFinder.findCycles(self.networkGraph)
             self.directedCycles = []#We want it to persist across HTTP requests?
@@ -36,7 +36,7 @@ class EquationFinder(ABC):
             self.list_equations = []#EquationFinder.list_equations
             EquationFinder.componentId__list_variables = dict(map(lambda idx: (idx, []), id__type))
             self.assignDirectionToEdges()#produces self.directedCycles# self.edge__solderableIndices = EquationFinder.edge__solderableIndices
-            print('directedCycles: ', EquationFinder.directedCycles)
+            # print('directedCycles: ', EquationFinder.directedCycles)
             EquationFinder.edge__solderableIndices =self.edge__solderableIndices
             self.groupComponentsIntoPathsAndBalls()
             self.superNodeIds = EquationFinder.superNodeIds
@@ -44,15 +44,15 @@ class EquationFinder(ABC):
             self.tuple_startSuperNodeId_endSuperNodeId__list_path = EquationFinder.tuple_startSuperNodeId_endSuperNodeId__list_path # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
             self.superNodeUndirectedGraph = EquationFinder.superNodeUndirectedGraph#{}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
             
-            print('superNodeIds: ')
-            print(self.superNodeIds)
-            print('list_nodeIds___degs: ')
-            print(self.list_nodeIds___deg2)
-            print('tuple_startSuperNodeId_endSuperNodeId__list_path')
-            print(self.tuple_startSuperNodeId_endSuperNodeId__list_path)
-            print('superNodeUndirectedGraph: ')
-            print(self.superNodeUndirectedGraph)
-            print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            # print('superNodeIds: ')
+            # print(self.superNodeIds)
+            # print('list_nodeIds___degs: ')
+            # print(self.list_nodeIds___deg2)
+            # print('tuple_startSuperNodeId_endSuperNodeId__list_path')
+            # print(self.tuple_startSuperNodeId_endSuperNodeId__list_path)
+            # print('superNodeUndirectedGraph: ')
+            # print(self.superNodeUndirectedGraph)
+            # print(EquationFinder._has_run_common_code, 'ran before<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             EquationFinder._has_run_common_code = True
         else:
             self.cycles = EquationFinder.cycles
@@ -169,9 +169,9 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
         directedSpanningTree, subtracted_edges = SpanningTree.undirectedSpanningTreeDBFSSearchUndirectedGraph(
             self.networkGraph, startNode=startNode, breadthFirst=False, directed='current')
 
-        print(directedSpanningTree)
-        print(subtracted_edges)
-        print('startNode: ', startNode)
+        # print(directedSpanningTree)
+        # print(subtracted_edges)
+        # print('startNode: ', startNode)
         stack = [{'current': startNode, 'path':[startNode]}]; paths = []
         while len(stack) > 0:
             cd = stack.pop()
@@ -268,7 +268,7 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
                         self.directedEdges.append((directedCycle[i], directedCycle[i+1]))
 
 
-        print('directedCycles: ', self.directedCycles)
+        # print('directedCycles: ', self.directedCycles)
 
         EquationFinder.directedCycles = self.directedCycles
         EquationFinder.directedEdges = self.directedEdges  # we want it to persist across HTTP Requests
@@ -360,9 +360,9 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
         """
         solderableIndices = self.edge__solderableIndices[directedEdge]
 
-        print('solderableIndices', list(solderableIndices))
-        print('directedEdge[0]', self.id__positiveLeadsDirections[directedEdge[0]])
-        print('directedEdge[1]', self.id__positiveLeadsDirections[directedEdge[1]])
+        # print('solderableIndices', list(solderableIndices))
+        # print('directedEdge[0]', self.id__positiveLeadsDirections[directedEdge[0]])
+        # print('directedEdge[1]', self.id__positiveLeadsDirections[directedEdge[1]])
         all_positiveLeads = []
         for solderableIdx0 in map(lambda solderableTup: solderableTup[1], self.id__positiveLeadsDirections[directedEdge[0]]):
             for solderableIdx1 in map(lambda solderableTup: solderableTup[0], self.id__positiveLeadsDirections[directedEdge[1]]):
@@ -370,7 +370,7 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
 
 
         isPositive = list(solderableIndices) in all_positiveLeads
-        print('>>>>>', list(solderableIndices), all_positiveLeads, isPositive)
+        # print('>>>>>', list(solderableIndices), all_positiveLeads, isPositive)
         return isPositive
 
     def directedEdgeIsPositive(self, directedEdge):#TODO this should be renamed to directedEdgeIsPositive
@@ -457,7 +457,7 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
 
     def sumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, associatedComponentIdList, addAsEquation=True):
         latexStr = Latexparser.makePlusAndMinus(list_vars, equivalentVariableDict)
-        print('sumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
+        # print('sumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
         if addAsEquation:
             self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
         else:
@@ -465,17 +465,17 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
 
     def harmonicSumOfPositiveNegativeToLatexAndScheme(self, list_vars, equivalentVariableDict, associatedComponentIdList):
         latexStr = Latexparser.makeHarmonicPlusAndMinusEqualsZero(list_vars, equivalentVariableDict)
-        print('harmonicSumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
+        # print('harmonicSumOfPositiveNegativeToLatexAndScheme; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
     def simpleRatioToLatexAndScheme(self, equivalentRatio, numerator, denominator, associatedComponentIdList):
         latexStr = Latexparser.makeSimpleRatio(equivalentRatio, numerator, denominator)
-        print('simpleRatioToLatexAndScheme; latexStr: ', latexStr)
+        # print('simpleRatioToLatexAndScheme; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
     def firstOrderSeperableDifferentialEquation(self, equivalent, derivativeMultiplier, differentiand, differentiator, associatedComponentIdList):
         latexStr = Latexparser.makeFirstOrderSeparableDifferentialEquation(equivalent, derivativeMultiplier, differentiand, differentiator)
-        print('firstOrderSeperableDifferentialEquation; latexStr: ', latexStr)
+        # print('firstOrderSeperableDifferentialEquation; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
     def makeLinearFirstOrderDifferentialEquation(self, equivalent, listOfTerms, associatedComponentIdList):
@@ -485,7 +485,7 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
         ]
         """
         latexStr = Latexparser.makeLinearFirstOrderDifferentialEquation(equivalent, listOfTerms)
-        print('makeLinearFirstOrderDifferentialEquation; latexStr: ', latexStr)
+        # print('makeLinearFirstOrderDifferentialEquation; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
     def addLatexStrAsEquation(self, latexStr, associatedComponentIdList):# TODO associate equation with components used, and equationFinder used.<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -495,12 +495,12 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
 
     def makeRatio(self, numerator, denominator):
         latexStr = Latexparser.makeRatio(numerator, denominator)
-        print('makeRatio; latexStr: ', latexStr)
+        # print('makeRatio; latexStr: ', latexStr)
         return latexStr
 
     def exponentialMinusOne(self, equivalent, multiplicative, exponent, associatedComponentIdList):
         latexStr = Latexparser.exponentialMinusOne(equivalent, multiplicative, exponent)
-        print('exponentialMinusOne; latexStr: ', latexStr)
+        # print('exponentialMinusOne; latexStr: ', latexStr)
         self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
     def getConstantVariable(self, name):

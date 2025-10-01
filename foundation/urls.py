@@ -6,4 +6,6 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("automat_findEquations/", views.automat_findEquations, name="findEquations"),
     path("automat_solveEquations/", views.automat_solveEquations, name="solveEquations"),
+
+    path("pollable/", views.pollable, name="pollable"),
 ]

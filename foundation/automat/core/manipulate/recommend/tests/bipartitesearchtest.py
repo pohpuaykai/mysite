@@ -49,7 +49,7 @@ def bipartiteSearch__dc_twoResistor_series(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        list_independentVariableIds, verbose=verbose)
     expected_substitutionPath = None
     expected_equationVertexId__tuple_variableVertexIdContaining = None
 
@@ -104,7 +104,7 @@ def bipartiteSearch__dc_twoResistor_parallel(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        list_independentVariableIds, verbose=verbose)
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {#it took such a long way... might it be shortened with simplify? but will the 'shorter' way be faster?
     15: (2, 3, 6, 14),

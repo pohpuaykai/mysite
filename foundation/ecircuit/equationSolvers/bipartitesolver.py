@@ -3,11 +3,12 @@ from foundation.automat.core.manipulate.recommend.recommend import Recommend
 
 class BipartiteSolver:
 
-    def __init__(self, listOfCollectedEquations, dependentVariableStr, independentVariableStrs):
+    def __init__(self, listOfCollectedEquations, dependentVariableStr, independentVariableStrs, verbose=False):
         self.listOfCollectedEquations = listOfCollectedEquations
         self.dependentVariableStr = dependentVariableStr
         self.independentVariableStrs = independentVariableStrs
         self.vertexIdIssuer = VertexIdIssuer()
+        self.verbose=verbose
 
     def _solve(self, simplify=False):
         """
@@ -131,18 +132,18 @@ class BipartiteSolver:
             print('vertexId', vertexId)
             if idx % 2 == 0: # vertexId==equationVertexId
                 hinEquation = listOfCollectedEquations[vertexId__equationVariableId[vertexId]]
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                # print('hinEquation.schemeStr: ', hinEquation.schemeStr, 'root:', hinEquation.rootOfTree, 'ast:', hinEquation.astScheme)
+                # print('vorEquation.schemeStr: ', vorEquation.schemeStr, 'root:', vorEquation.rootOfTree, 'ast:', vorEquation.astScheme)
+                # print('subjectOfEquation: ', entVariable)
+                # print('simplify: ', simplify)
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 hinDict = {
                     'latex':Latexparser(ast=hinEquation.astScheme, rootOfTree=hinEquation.rootOfTree)._unparse(),
                     'variables':list(hinEquation.variables.keys()),
                     'scheme':hinEquation.schemeStr,
                     'root':hinEquation.rootOfTree
                 }
-                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-                # print('hinEquation.schemeStr: ', hinEquation.schemeStr)
-                # print('vorEquation.schemeStr: ', vorEquation.schemeStr)
-                # print('subjectOfEquation: ', entVariable)
-                # print('simplify: ', simplify)
-                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
                 _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable, simplify=simplify)
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
@@ -164,20 +165,90 @@ class BipartiteSolver:
                 # print('substitutionStep ', (idx/2), ': ', hinEquation.schemeStr, ' subVar: ', entVariable)
                 
                 vorEquation = hinEquation
-                broadSteps.append({
-                    'hin': hinDict,
-                    'vor':{
+                vorDict = {
                         'latex':Latexparser(ast=vorEquation.astScheme, rootOfTree=vorEquation.rootOfTree)._unparse(),
                         'variables':list(vorEquation.variables.keys()),
                         'scheme':vorEquation.schemeStr,
                         'root':vorEquation.rootOfTree
-                    },
+                    }
+                broadSteps.append({
+                    'hin': hinDict,
+                    'vor':vorDict,
                     'sub':entVariable,
                     'vor__subSteps':list(reversed(_stepsWithoutSimplify___vor)),
                     'hin__subSteps':list(reversed(_stepsWithoutSimplify___hin))
                 })
             else: # vertexId==variableVertexId
                 entVariable = listOfVariables[vertexId__equationVariableId[vertexId]]
+
+        #
+        print('passing to combingSearch: ', vorEquation.schemeStr)
+        #
+        from foundation.automat.parser.sorte.schemeparser import Schemeparser
+
+        eq = Equation(equationStr=vorEquation.schemeStr, parserName='scheme')
+        chosenSchemeStrsWithSolvingSteps = Recommend.combingSearch(eq)
+        chosenSchemeStrWithSolvingSteps = chosenSchemeStrsWithSolvingSteps[0] # for now we just take the first one
+        vor__subSteps = []
+        for (manipulationFilename, direction, idx) in chosenSchemeStrWithSolvingSteps['solvingStep']:
+
+            manipulateClass = Recommend.getManipulateClass(manipulationFilename)
+            # import pdb;pdb.set_trace()
+            manipulate = manipulateClass(eq, direction, idx, calculateSchemeNodeChanges=True, verbose=self.verbose)
+            returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=True)#there is no need for hint? eq has the latest startPos__nodeId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            sgp, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
+            schemeStr = sgp.oStr
+            latexStr = sgp.schemeparser___oStr._toLatex()
+
+            vor__subSteps.append({#should the subSteps exclude the last step? since that is the main step?
+                'resultSchemeStr':schemeStr,
+                'resultAST':sgp.schemeparser___oStr.ast,
+                'resultLatexStr':latexStr,#parse the latex here? or in Recommend?<<<<<<<<<<
+                'resultRootOfTree':sgp.schemeparser___oStr.rootOfTree,
+                'resultVariables':list(set(sgp.schemeparser___oStr.variables.keys())),
+                'stepType':'simplification',
+            })
+            eq = Equation(equationStr=schemeStr, parserName='scheme')
+
+        schemeparser = Schemeparser(equationStr=chosenSchemeStrWithSolvingSteps['schemeStr'])
+        ast, functions, variables, primitives, totalNodeCount, startPos__nodeId = schemeparser._parse()
+        variablesSet = list(set(variables.keys()))
+        broadSteps.append({
+
+            'vor':{#take the end of chosenSchemeStrWithSolvingSteps
+                'latex':Latexparser(ast=ast, rootOfTree=schemeparser.rootOfTree)._unparse(),
+                'variables':variablesSet,
+                'scheme':chosenSchemeStrWithSolvingSteps['schemeStr'],
+                'root':schemeparser.rootOfTree
+            },
+            'hin':{#take the end of chosenSchemeStrWithSolvingSteps
+                'latex':Latexparser(ast=ast, rootOfTree=schemeparser.rootOfTree)._unparse(),
+                'variables':variablesSet,
+                'scheme':chosenSchemeStrWithSolvingSteps['schemeStr'],
+                'root':schemeparser.rootOfTree
+            },
+            
+            # 'vor':vorDict,
+            # 'hin':{#take the end of chosenSchemeStrWithSolvingSteps
+            #     'latex':Latexparser(ast=ast, rootOfTree=schemeparser.rootOfTree)._unparse(),
+            #     'variables':variablesSet,
+            #     'scheme':chosenSchemeStrWithSolvingSteps['schemeStr'],
+            #     'root':schemeparser.rootOfTree
+            # },
+
+            # 'hin':vorDict,
+            # 'vor': {#take the end of chosenSchemeStrWithSolvingSteps
+            #     'latex':Latexparser(ast=ast, rootOfTree=schemeparser.rootOfTree)._unparse(),
+            #     'variables':variablesSet,
+            #     'scheme':chosenSchemeStrWithSolvingSteps['schemeStr'],
+            #     'root':schemeparser.rootOfTree
+            # },
+            'sub':'',
+            'vor__subSteps':remove_AST_AND_RootOfTree(vor__subSteps),
+            'hin__subSteps':[]
+        })
+
         return broadSteps
 
 

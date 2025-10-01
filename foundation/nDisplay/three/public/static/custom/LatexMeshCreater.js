@@ -47,6 +47,7 @@ class LatexMeshCreator {
         // console.log('variables', variables, 'latexStr', latexStr)
         const list_startPosEndPosVariableStr = []
         variables.forEach(variableStr => {
+          console.log('variableStr: ', variableStr, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
           for(const match of latexStr.matchAll(new RegExp(RegExp.escape(variableStr), "g"))) {
             list_startPosEndPosVariableStr.push([match.index, match.index+variableStr.length, variableStr]);
           }

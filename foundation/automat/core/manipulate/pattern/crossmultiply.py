@@ -8,9 +8,9 @@ class Crossmultiply(Manipulate):
     """
     TYPE = 'essential'
 
-    def __init__(self, equation, direction, idx, verbose=False):
+    def __init__(self, equation, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
         """
 
         """
         self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(+ (/ $0 $1) (/ $2 $3))', 'return': '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))'}, 'minArgs': {'$0': 0, '$1': 0}, 'maxArgs': {'$0': None, '$1': None}, 'preCond': {'$0': None, '$1': None}, 'hin': {'scheme': '(/ (+ (* $0 $3) (* $1 $2)) (* $1 $3))', 'return': '(+ (/ $0 $1) (/ $2 $3))'}}]
-        super().__init__(equation, direction, idx, verbose=verbose)
+        super().__init__(equation, direction, idx, calculateSchemeNodeChanges=calculateSchemeNodeChanges, verbose=verbose)
