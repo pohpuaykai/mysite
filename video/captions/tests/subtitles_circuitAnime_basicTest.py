@@ -1,20 +1,35 @@
 import inspect
 import pprint
 
-from video.captions.captions import generateECircuitVideoCaptions
+from video.captions.captions import generateSubtitles_solvingSteps
 
 
 pp = pprint.PrettyPrinter(indent=4)
 
-def test__captionGenerate(verbose=False):
-    introduction = {
-        'en-US':'The is a two resistor circuit connected in parallel',
+def test_generateSubtitles_findEquations(verbose=False):
+
+
+    list_equationLatexStr = None
+    dependentVarStr = None
+    list_independentVarStr = None
+
+
+def test_generateSubtitles_solvingSteps(verbose=False):
+
+    introductions = {
+        'en-US':'The is a two resistor circuit connected in parallel, we are solving for the ', # the solving for part should be
         'zh-CN':'',
         'ja-JP':'',
         'de-DE':'',
         'fr-FR':'',
         'ru-RU':''
     }
+
+    conclusions = {}
+
+
+
+
     solvingSteps = [   {   'hin': {},
         'hin__subSteps': [],
         'sub': '',
@@ -322,11 +337,11 @@ def test__captionGenerate(verbose=False):
                                                         'R_{DC_{8}}',
                                                         'R_{R_{3}}'],
                                  'stepType': 'simplification'}]}]
-    captions = generateECircuitVideoCaptions(solvingSteps, introduction)
+    subtitles = generateSubtitles_solvingSteps(solvingSteps, introductions, conclusions)
     if verbose:
-        print(captions)
+        print(subtitles)
     # print(inspect.currentframe().f_code.co_name, ' PASSED? ', len(Function.TRIGONOMETRIC_NAMES)>0)
 
 
 if __name__=='__main__':
-    test__captionGenerate(True)
+    test_generateSubtitles_solvingSteps(True)

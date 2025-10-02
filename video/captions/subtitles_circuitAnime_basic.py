@@ -1,19 +1,23 @@
 
 
-def generateECircuitVideoCaptions(solvingSteps, introduction):
-    # introduction = '' # introduction should be provided by the frontend, each circuit will have a description, after findEquation<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+def generateSubtitles_findEquations(list_equationLatexStr, dependentVarStr, list_independentVarStr, introductions, conclusions):
+    """
+
+    """
+    
+
+    return
+
+
+
+def generateSubtitles_solvingSteps(solvingSteps, introductions, conclusions):
+    """
+    Because front end might do some processing to the animationData from the backend, to generate the right audio, we have to take the data directly from the frontend to generate subtitles.
+
+    """
 
     for solvingStep in solvingSteps:
         pass
-
-    conclusions = {
-        'en-US':'There are many redundant steps, can you find a more elegant solution? Leave your solution in the comments below!',
-        'zh-CN':'',
-        'ja-JP':'',
-        'de-DE':'',
-        'fr-FR':'',
-        'ru-RU':''
-    }
 
     return 
 

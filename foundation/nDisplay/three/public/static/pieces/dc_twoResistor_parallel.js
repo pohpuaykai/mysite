@@ -12,11 +12,38 @@ class DCTwoResistorParallel extends Circuit {
     constructor(scene, camera, renderer, controls, meshes) {
         super(scene, camera, renderer, controls, meshes);
 
-        this.languages_descriptions = {//This will be read out at the beginning of the animation at the frontend, should be done in many languages...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            'en-US':'The is a two resistor circuit connected in parallel',
-            'zh-CN':'',
-            'ja-JP':'',
-            'de-DE':'',
+        this.language_introduction_findEquations = {//This will be read out at the beginning of the animation_findEquations
+            'en-US':'This is a circuit with two resistors connected in parallel, lets find all the equations related to the components of this circuit',
+            'zh-CN':'我们求，此二电阻器并联电路内，所有方程式。',
+            'ja-JP':'こちらは、並列に接続されている抵抗が二つである。その並列回路の素子においての公式を、全て見つけましょう',
+            'de-DE':'Die folgende Stromkreise ist in der ParallelSchaltung. Versuch wir jetzt, allen Gleichungen dieser Stromkreise der Bauelemente aufzuschreiben', //check with ChatGPT
+            'fr-FR':'',
+            'ru-RU':''
+        }
+
+        this.language_conclusion_findEquations = {//This will be read out at the end of the animation_findEquations
+            'en-US':'We have found all the equations relating to the two resistors and their parallel connectivity.',
+            'zh-CN':'现阶段，我们以求获所有相关的方程式。',
+            'ja-JP':'今まで、その並列回路の素子においての公式を、求めました。',
+            'de-DE':'Wir haben allen Gleichungen dieser Stromkreise der Bauelemente gefunden,', //check with ChatGPT
+            'fr-FR':'',
+            'ru-RU':''
+        }
+
+        this.language_introduction_solvingSteps = {//This will be read out at the beginning of the animation_solvingSteps
+            'en-US':'Lets try to find the resistance of the battery in terms of the two resistors!',
+            'zh-CN':'然后，我们利用之前取获的方程式，推出总电阻。',
+            'ja-JP':'それから、求めました公式を使って、その回路は、合成抵抗が、求めましょう！',
+            'de-DE':'damit lassen wir, der Gesamtwiderstand dieser Stromkreise zu berechnen.', //check with ChatGPT
+            'fr-FR':'',
+            'ru-RU':''
+        }
+
+        this.language_conclusion_solvingSteps = {//This will be read out at the end of the animation_solvingSteps
+            'en-US':'And thats it! However, there are many redundant steps, can you find a more elegant solution? Leave your solution in the comments below!',
+            'zh-CN':'可是，之前的解题步骤有一点繁琐，您能找到更简易的解题步骤吗？请在讨论区留下您的雅论。',
+            'ja-JP':'通りですけど、無駄な手順がいっぱいあります。表した手順より、きれいな解き方を求めることができますか？ぜひ、解き方と考えが、コメント欄に、書いて下さい。',
+            'de-DE':'Und das ist so! Aber, es gibt viele überflüssig Rechnengen, davor motiviert uns, eine elegante Antworte zu suchen. Schreib uns ihre Antworte in der Commentaire!', //check with ChatGPT
             'fr-FR':'',
             'ru-RU':''
         }
@@ -86,7 +113,7 @@ class DCTwoResistorParallel extends Circuit {
                     //capture the dependentVarStr: resistance of resistor0
                     if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {//we only want to set dependentVarStr once
                         const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
-                        console.log('varString: ', varString, 'dependentVarStr')
+                        // console.log('varString: ', varString, 'dependentVarStr')
                         // if (varString !== undefined) {
                             dependentVarStr = varString;
                         // }
@@ -108,9 +135,11 @@ class DCTwoResistorParallel extends Circuit {
                     }
                 });
             });
-            // console.log('list_equationLatexStr', list_equationLatexStr);
-            // console.log('dependentVarStr', dependentVarStr);
-            // console.log('list_independentVarStr', list_independentVarStr);
+            console.log('copy this to subtitles: ')
+            console.log('list_equationLatexStr', list_equationLatexStr);
+            console.log('dependentVarStr', dependentVarStr);
+            console.log('list_independentVarStr', list_independentVarStr);
+            debugger;
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
         const simplify = true; const record = false; const ticketing = true;
