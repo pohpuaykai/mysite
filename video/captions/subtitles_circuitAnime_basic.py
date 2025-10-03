@@ -1,10 +1,64 @@
 
 
-def generateSubtitles_findEquations(list_equationLatexStr, dependentVarStr, list_independentVarStr, introductions, conclusions):
-    """
+def translateEquationFinderName(defaultEquationFinderDisplayName, languageTwoLetterCode):#<<<<<<<<<<<<move this to a more global folder... there might be other different animations next time, hopefully mechanical stimulations next =)
+    return {
+        "Kirchhoff Current Law": {
+            'en-US':"Kirchhoff Current Law",
+            'zh-CN':"基尔霍夫电流定律",
+            'ja-JP':"キルヒホッフの電流法則",
+            'de-DE':"Regel von KIRCHHOFF: Knotenregel",
+            'fr-FR':"Loi des nœuds (Première loi de Kirchhoff)",
+            'ru-RU':"Первое правило Кирхгофа (правило токов Кирхгофа)"
+        },
+        "Kirchhoff Voltage Law": {
+            'en-US':"Kirchhoff Voltage Law",
+            'zh-CN':"基尔霍夫电压定律",
+            'ja-JP':"キルヒホッフの電圧法則",
+            'de-DE':"Regel von KIRCHHOFF: Maschenregel",
+            'fr-FR':"Loi des mailles (Deuxième loi de Kirchhoff)",
+            'ru-RU':"Второе правило Кирхгофа (правило напряжений Кирхгофа)"
+        },
+        "Ohm Law": {
+            'en-US':"Ohm Law",
+            'zh-CN':"欧姆定律",
+            'ja-JP':"オームの法則",
+            'de-DE':"Ohmsches Gesetz",
+            'fr-FR':"la loi d’Ohm",
+            'ru-RU':"Закон Ома"
+        }
 
+    }
+
+
+def generateSubtitles_findEquations(list_equationNetworkInfoDict, textStr__textMeshUUID, introductions, conclusions):
     """
-    
+    list_equationNetworkInfoDict<<<<used to highlight each equation and its associated components
+    textStr__textMeshUUID<<<<<<<used to highlight each variable in the equation and its associated component
+
+
+    Steps by front end are
+    0. Highlight network with list_list_networkNodeIds
+    1. Display latex equation associated with highlighted_network with equation
+    2. pause for a while
+    3. unHighlight network 
+    4. pause for a while
+    5. highlight component representing variable
+    6. highlight variable in latex equation
+    7. pause for a while
+    8. unhighlight variable in latex equation
+    """
+    languagesTwoLetterCodes = list(introductions.keys())
+
+    for languageTwoLetterCode in languagesTwoLetterCodes:
+        for equationFound in list_equationNetworkInfoDict:
+            equationFinderDisplayName = translateEquationFinderName(equationFound['equationFinderDisplayName'], languageTwoLetterCode) #<<<<<<<<implement this
+            #0 #TODO translate, give another 2 different sentences
+            f"Using {equationFinderDisplayName} on these circuit elements, "
+            #1 # TODO translate, give another 2 different sentences
+            "We obtain the following equation"
+            #2
+            #3
+            # for 
 
     return
 

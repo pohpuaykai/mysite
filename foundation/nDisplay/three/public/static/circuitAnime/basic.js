@@ -1,6 +1,6 @@
 import {Recorder} from '../mediaRecorder/recorder.js';
 
-class CircuitAnime {//with subtitles, please do on another class<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+class CircuitAnime {
     constructor(animationName, circuit, variableSelector, ticketing, simplify, record) {
         const self = this;
         this.circuit = circuit;// this is a circuit.js
@@ -185,10 +185,10 @@ class CircuitAnime {//with subtitles, please do on another class<<<<<<<<<<<<<<<<
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
             //if ticketing, then we have to wait for the ticket to be ready before we can call this...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            console.log('list_equationLatexStr', list_equationLatexStr);
-            console.log('dependentVarStr', dependentVarStr);
-            console.log('list_independentVarStr', list_independentVarStr);
-            // debugger;
+            // console.log('list_equationLatexStr', list_equationLatexStr);
+            // console.log('dependentVarStr', dependentVarStr);
+            // console.log('list_independentVarStr', list_independentVarStr);
+            // debugger;//for copying out the variables for testing
             self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
             function findEquationAnimation___functionGen(
@@ -309,13 +309,16 @@ class CircuitAnime {//with subtitles, please do on another class<<<<<<<<<<<<<<<<
                                         variableDisplay(list_variableInfoD, list_variableInfoD___idx+1);
                                     }, animeSelf.pauseBetweenEachComponentHighlight);// pause for 8 seconds, then unhighlight relevant_component and relevant_variable
                                 }
+                                // console.log('self.textStr__textMeshUUID', 'this is being used to display each variables associations')
+                                // console.log(self.textStr__textMeshUUID)
+                                // debugger; 
+
+
                                 variableDisplay(self.textStr__textMeshUUID[graphInfoD['equation']]['info'], 0);
                             }, animeSelf.pauseBetweenEachVariableHighlight);
                         }, animeSelf.pauseAfterRevealingEquation);
                     }
                     if (animeSelf.record) {
-                        console.log('pausing for permission to be given')
-                        // while(!animeSelf.permissionGiven){} //not sure if this will work. spin until user gives permission
                         self.pauseUntilCallback(
                             function() {
 
@@ -331,6 +334,9 @@ class CircuitAnime {//with subtitles, please do on another class<<<<<<<<<<<<<<<<
                         )
 
                     } else {
+                        // console.log('list_equationNetworkInfoDict')
+                        // console.log(self.list_equationNetworkInfoDict, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<this is the one being used to make the animation')
+                        // debugger;
                         equationDisplay(self.list_equationNetworkInfoDict, 0);
                     }
                     
