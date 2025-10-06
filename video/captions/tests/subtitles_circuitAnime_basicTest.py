@@ -1,15 +1,18 @@
 import inspect
 import pprint
 
-from video.captions.captions import generateSubtitles_solvingSteps
+from video.captions.subtitles_circuitAnime_basic import generateSubtitles_findEquations, generateSubtitles_solvingSteps
 
 
 pp = pprint.PrettyPrinter(indent=4)
 
 def test_generateSubtitles_findEquations(verbose=False):
 
+    #used to tell the viewer what type it is?
+    nodeId__type = {0: 'resistor', 1: 'wire', 2: 'wire', 3: 'resistor', 4: 'wire', 5: 'wire', 6: 'wire', 7: 'wire', 8: 'battery', 9: 'wire', 10: 'wire'}
+
     #used to display each variable
-    textStr__textMeshUUID = {
+    textStr__textMeshUUID = {#<<<<check if basic.js needs all these keys, then we can make the anime slightly more light weight
     "-I_{DC_{8}}+I_{R_{0}}+I_{R_{3}}=0": {
         "info": [
             {
@@ -2656,33 +2659,33 @@ def test_generateSubtitles_findEquations(verbose=False):
         'fr-FR':'Nous avons trouvé toutes les équations relatives à ses composants.',
         'ru-RU':'Мы нашли все уравнения, касающиеся его компонентов.'
     }
+    results = generateSubtitles_findEquations(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, language_introduction_findEquations, language_conclusion_findEquations)
+
+    if verbose:
+        print('***********************')
+        pp.pprint(results)
 
 
 
 def test_generateSubtitles_solvingSteps(verbose=False):
 
-        language_introduction_solvingSteps = {
-            'en-US':'Lets try to find the resistance of the battery in terms of the two resistors!',
-            'zh-CN':'然后，我们利用之前取获的方程式，推出总电阻。',
-            'ja-JP':'それから、求めました公式を使って、その回路は、合成抵抗が、求めましょう！',
-            'de-DE':'Damit können wir den Gesamtwiderstand dieses Stromkreises berechnen.',
-            'fr-FR':'Calculons la résistance équivalente aux réseaux ci-dessous.',
-            'ru-RU':'Рассчитаем эквивалентное сопротивление сетей ниже.'
-        }
+    language_introduction_solvingSteps = {
+        'en-US':'Lets try to find the resistance of the battery in terms of the two resistors!',
+        'zh-CN':'然后，我们利用之前取获的方程式，推出总电阻。',
+        'ja-JP':'それから、求めました公式を使って、その回路は、合成抵抗が、求めましょう！',
+        'de-DE':'Damit können wir den Gesamtwiderstand dieses Stromkreises berechnen.',
+        'fr-FR':'Calculons la résistance équivalente aux réseaux ci-dessous.',
+        'ru-RU':'Рассчитаем эквивалентное сопротивление сетей ниже.'
+    }
 
-        language_conclusion_solvingSteps = {
-            'en-US':'And thats it! However, there are many redundant steps, can you find a more elegant solution? Leave your solution in the comments below!',
-            'zh-CN':'可是，之前的解题步骤有一点繁琐，您能找到更简易的解题步骤吗？请在讨论区留下您的雅论。',
-            'ja-JP':'通りですけど、無駄な手順がいっぱいあります。表した手順より、きれいな解き方を求めることができますか？ぜひ、解き方と考えが、コメント欄に、書いて下さい。',
-            'de-DE':'Und so ist es! Aber es gibt viele überflüssige Rechnengen, und das motiviert uns, nach einer eleganten Antwort zu suchen. Schreib uns deine elegante Antworte in die Commentare!',
-            'fr-FR':"C'est exact, mais il y a beaucoup d'étapes inutiles. Pouvez-vous trouver une solution plus élégante que celles que j'ai présentées ? N'hésitez pas à partager votre solution et vos réflexions dans les commentaires.",
-            'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
-        }
-
-    conclusions = {}
-
-
-
+    language_conclusion_solvingSteps = {
+        'en-US':'And thats it! However, there are many redundant steps, can you find a more elegant solution? Leave your solution in the comments below!',
+        'zh-CN':'可是，之前的解题步骤有一点繁琐，您能找到更简易的解题步骤吗？请在讨论区留下您的雅论。',
+        'ja-JP':'通りですけど、無駄な手順がいっぱいあります。表した手順より、きれいな解き方を求めることができますか？ぜひ、解き方と考えが、コメント欄に、書いて下さい。',
+        'de-DE':'Und so ist es! Aber es gibt viele überflüssige Rechnengen, und das motiviert uns, nach einer eleganten Antwort zu suchen. Schreib uns deine elegante Antworte in die Commentare!',
+        'fr-FR':"C'est exact, mais il y a beaucoup d'étapes inutiles. Pouvez-vous trouver une solution plus élégante que celles que j'ai présentées ? N'hésitez pas à partager votre solution et vos réflexions dans les commentaires.",
+        'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
+    }
 
     solvingSteps = [   {   'hin': {},
         'hin__subSteps': [],
@@ -2991,11 +2994,14 @@ def test_generateSubtitles_solvingSteps(verbose=False):
                                                         'R_{DC_{8}}',
                                                         'R_{R_{3}}'],
                                  'stepType': 'simplification'}]}]
-    subtitles = generateSubtitles_solvingSteps(solvingSteps, introductions, conclusions)
+    subtitles = generateSubtitles_solvingSteps(solvingSteps, language_introduction_solvingSteps, language_conclusion_solvingSteps)
     if verbose:
-        print(subtitles)
+        print('***********************')
+        pp.pprint(subtitles)
+
     # print(inspect.currentframe().f_code.co_name, ' PASSED? ', len(Function.TRIGONOMETRIC_NAMES)>0)
 
 
 if __name__=='__main__':
+    test_generateSubtitles_findEquations(True)
     test_generateSubtitles_solvingSteps(True)

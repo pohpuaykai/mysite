@@ -123,6 +123,7 @@ class Circuit extends Piece{
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         // xhr.setRequestHeader('Content-Type', 'application/json');
         self.getNetworkGraph();
+        // console.log('this.id__type', this.id__type); debugger;
 
         xhr.send(JSON.stringify({
             'networkGraph':self.networkGraph, //circuit.networkGraph,
