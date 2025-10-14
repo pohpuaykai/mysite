@@ -9,3 +9,4 @@ db.sqlite3
 #foundation/nDisplay/three/public/static/meshes/**
 foundation/ecircuit/orthogonalLayouts/tests/rccl_SVGOuts/**
 video/videos/**
+video/audios/**

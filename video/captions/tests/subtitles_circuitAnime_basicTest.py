@@ -1,12 +1,16 @@
 import inspect
 import pprint
 
-from video.captions.subtitles_circuitAnime_basic import generateSubtitles_findEquations, generateSubtitles_solvingSteps
+# from video.captions.subtitles_circuitAnime_basic import generateSubtitles_findEquations, generateSubtitles_solvingSteps
+from video.captions.subtitles_circuitAnime_basic import generateAudioFilePaths_findEquations, generateAudioFilePaths_solvingSteps
+
 
 
 pp = pprint.PrettyPrinter(indent=4)
 
 def test_generateSubtitles_findEquations(verbose=False):
+    from video import AUDIOFILES_DROP_FOLDER
+    folderpath = AUDIOFILES_DROP_FOLDER
 
     #used to tell the viewer what type it is?
     nodeId__type = {0: 'resistor', 1: 'wire', 2: 'wire', 3: 'resistor', 4: 'wire', 5: 'wire', 6: 'wire', 7: 'wire', 8: 'battery', 9: 'wire', 10: 'wire'}
@@ -2659,15 +2663,23 @@ def test_generateSubtitles_findEquations(verbose=False):
         'fr-FR':'Nous avons trouvé toutes les équations relatives à ses composants.',
         'ru-RU':'Мы нашли все уравнения, касающиеся его компонентов.'
     }
-    results = generateSubtitles_findEquations(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, language_introduction_findEquations, language_conclusion_findEquations)
-
+    # results = generateSubtitles_findEquations(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, language_introduction_findEquations, language_conclusion_findEquations)
+    languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = generateAudioFilePaths_findEquations(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, language_introduction_findEquations, language_conclusion_findEquations, folderpath)
     if verbose:
         print('***********************')
-        pp.pprint(results)
+        # pp.pprint(results)
+
+        pp.pprint(languages__subtitles)
+        pp.pprint(languages__subtitleIdx__dict_startTime_endTime)
+        pp.pprint(languages__filepath)
+        pp.pprint(language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
 
 
 
 def test_generateSubtitles_solvingSteps(verbose=False):
+    
+    from video import AUDIOFILES_DROP_FOLDER
+    folderpath = AUDIOFILES_DROP_FOLDER
 
     language_introduction_solvingSteps = {
         'en-US':'Lets try to find the resistance of the battery in terms of the two resistors!',
@@ -2994,14 +3006,19 @@ def test_generateSubtitles_solvingSteps(verbose=False):
                                                         'R_{DC_{8}}',
                                                         'R_{R_{3}}'],
                                  'stepType': 'simplification'}]}]
-    subtitles = generateSubtitles_solvingSteps(solvingSteps, language_introduction_solvingSteps, language_conclusion_solvingSteps)
+    # subtitles = generateSubtitles_solvingSteps(solvingSteps, language_introduction_solvingSteps, language_conclusion_solvingSteps)
+    languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = generateAudioFilePaths_solvingSteps(solvingSteps, language_introduction_solvingSteps, language_conclusion_solvingSteps, folderpath)
     if verbose:
         print('***********************')
-        pp.pprint(subtitles)
+        # pp.pprint(subtitles)
+        pp.pprint(languages__subtitles)
+        pp.pprint(languages__subtitleIdx__dict_startTime_endTime)
+        pp.pprint(languages__filepath)
+        pp.pprint(language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
 
     # print(inspect.currentframe().f_code.co_name, ' PASSED? ', len(Function.TRIGONOMETRIC_NAMES)>0)
 
 
 if __name__=='__main__':
     test_generateSubtitles_findEquations(True)
-    test_generateSubtitles_solvingSteps(True)
+    # test_generateSubtitles_solvingSteps(True)

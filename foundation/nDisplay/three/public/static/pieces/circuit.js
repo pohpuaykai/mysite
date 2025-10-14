@@ -47,35 +47,37 @@ class Circuit extends Piece{
             return bbox;
 
         }
-        let componenttypeSVGFilepath_ajax = new XMLHttpRequest(); this.componentType__boundingBox = {}; const self = this;
-        componenttypeSVGFilepath_ajax.addEventListener("load", function() {
-            const componenttype__svgfilepath___str = componenttypeSVGFilepath_ajax.responseText;
-            const COMPONENTTYPE__SVGFILEPATH___entries = Object.entries(JSON.parse(componenttype__svgfilepath___str));
-            // console.log(COMPONENTTYPE__SVGFILEPATH___entries);
-            let componentType; let svgFilepath;let absolutePath;
-            for (let i=0; i<COMPONENTTYPE__SVGFILEPATH___entries.length; i++) {
-                // if (COMPONENTTYPE__SVGFILEPATH___entries[i] != undefined) { //https://developer.mozilla.org/en-US/docs/Web/API/SVGGraphicsElement/getBBox
-                    [componentType, svgFilepath] = COMPONENTTYPE__SVGFILEPATH___entries[i];
-                    absolutePath = '/public/static/'+svgFilepath;
-                    let ajax = new XMLHttpRequest();
-                    ajax.addEventListener("load", function(componentType) {
-                        return function () {
-                            // console.log(ajax.responseText);
-                            let svgString = ajax.responseText;
-                            let svgBBox = getBBoxFromSVGString(svgString);
-                            // console.log(componentType, svgBBox);
-                            // self.componentType__boundingBox[componentType] = svgBBox;
-                            self.componentType__boundingBox[componentType] = {'width':svgBBox.width, 'height':svgBBox.height};
-                            // console.log('componentType__boundingBox', JSON.stringify(self.componentType__boundingBox));
-                        }
-                    }(componentType));
-                    // console.log(componentType, absolutePath);
-                    ajax.open("GET", absolutePath);
-                    ajax.send();
-            }
-        });
-        componenttypeSVGFilepath_ajax.open("GET", "/public/static/settings/ComponentType__SVGFilepath.json");//hide this link?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        componenttypeSVGFilepath_ajax.send();
+
+        //TODO this is currently not being used, maybe a new Genre of Anime, can have the schematic included<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        // let componenttypeSVGFilepath_ajax = new XMLHttpRequest(); this.componentType__boundingBox = {}; const self = this;
+        // componenttypeSVGFilepath_ajax.addEventListener("load", function() {
+        //     const componenttype__svgfilepath___str = componenttypeSVGFilepath_ajax.responseText;
+        //     const COMPONENTTYPE__SVGFILEPATH___entries = Object.entries(JSON.parse(componenttype__svgfilepath___str));
+        //     // console.log(COMPONENTTYPE__SVGFILEPATH___entries);
+        //     let componentType; let svgFilepath;let absolutePath;
+        //     for (let i=0; i<COMPONENTTYPE__SVGFILEPATH___entries.length; i++) {
+        //         // if (COMPONENTTYPE__SVGFILEPATH___entries[i] != undefined) { //https://developer.mozilla.org/en-US/docs/Web/API/SVGGraphicsElement/getBBox
+        //             [componentType, svgFilepath] = COMPONENTTYPE__SVGFILEPATH___entries[i];
+        //             absolutePath = '/public/static/'+svgFilepath;
+        //             let ajax = new XMLHttpRequest();
+        //             ajax.addEventListener("load", function(componentType) {
+        //                 return function () {
+        //                     // console.log(ajax.responseText);
+        //                     let svgString = ajax.responseText;
+        //                     let svgBBox = getBBoxFromSVGString(svgString);
+        //                     // console.log(componentType, svgBBox);
+        //                     // self.componentType__boundingBox[componentType] = svgBBox;
+        //                     self.componentType__boundingBox[componentType] = {'width':svgBBox.width, 'height':svgBBox.height};
+        //                     // console.log('componentType__boundingBox', JSON.stringify(self.componentType__boundingBox));
+        //                 }
+        //             }(componentType));
+        //             // console.log(componentType, absolutePath);
+        //             ajax.open("GET", absolutePath);
+        //             ajax.send();
+        //     }
+        // });
+        // componenttypeSVGFilepath_ajax.open("GET", "/public/static/settings/ComponentType__SVGFilepath.json");//hide this link?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        // componenttypeSVGFilepath_ajax.send();
     }
 
 
@@ -143,7 +145,7 @@ class Circuit extends Piece{
         const self = this;
         function CALLBACK__solveEquations(steps, latexStrs) {
             self.makeLatexMesh(latexStrs, readyCallback, 'solveEquations');
-
+            self.solvingSteps = steps;//<<<<<<<<<<<<<<<<<<<not very elegant?
         }
         this.solveEquations(CALLBACK__solveEquations, list_equationStr, dependentVarStr, list_independentVarStr, simplify)
     }
@@ -156,7 +158,7 @@ class Circuit extends Piece{
 
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
-              const steps = responseDict['steps']
+              const steps = responseDict['steps']// this is solving step, you can call getAudio here...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
               const branchedStepsIdxs = responseDict['branchedStepsIdxs']
               const latexStrs = responseDict['latexStrs']// not needed: list_tuple_latexStrVariableStr
               const list_tuple_latexStrVariableStr = responseDict['list_tuple_latexStrVariableStr']
@@ -208,6 +210,199 @@ class Circuit extends Piece{
         }));
 
     }
+
+    //[start] animeAudio
+    getAudioUrls_findEquations(callback, list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, language_introduction_findEquations, language_conclusion_findEquations) {
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        const self = this;
+        xhr.onreadystatechange  = function(){
+
+            function handleResponseText(responseText) {
+              const responseDict = JSON.parse(responseText);
+              callback(
+                  responseDict['subtitles'],
+                  responseDict['list_tuple_word_location_length_elapsedTime'],
+                  responseDict['filename'],
+                  responseDict['pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime']
+              );
+
+            }
+
+            if (this.readyState == 4 && this.status == 200) {
+              if (isNaN(parseInt(this.responseText))) {//not a ticket, its the actual
+                handleResponseText(this.responseText);
+              } else if(this.responseText.length > 0) {//is a ticketNum
+                const ticketNum = this.responseText;
+                function ticketCallback(responseText) {
+                    handleResponseText(responseText);
+                }
+                self.pollForTicket(ticketNum, ticketCallback);
+              }
+              // asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
+            }
+        }
+        // xhr.onerror = function(){}
+        xhr.open('POST', solveEquations_url);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        // circuit.getNetworkGraph();
+        // self.getNetworkGraph();
+
+        xhr.send(JSON.stringify({
+            'list_equationNetworkInfoDict':list_equationNetworkInfoDict,
+            'textStr__textMeshUUID':textStr__textMeshUUID,
+            'nodeId__type':nodeId__type,
+            'language':self.audioLanguage,
+            'introduction_findEquations':language_introduction_findEquations[self.audioLanguage],
+            'conclusion_findEquations':language_conclusion_findEquations[self.audioLanguage],
+            'wantsTicket':true
+        }));
+    }
+    getAudioUrls_solveEquations(callback, solvingSteps, language_introduction_solvingSteps, language_conclusion_solvingSteps) {
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        const self = this;
+        xhr.onreadystatechange = function(){
+
+            function handleResponseText(responseText) {
+              const responseDict = JSON.parse(responseText);
+              callback(
+                  responseDict['subtitles'],
+                  responseDict['list_tuple_word_location_length_elapsedTime'],
+                  responseDict['filename'],
+                  responseDict['pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime']
+              );
+
+            }
+
+            if (this.readyState == 4 && this.status == 200) {
+              if (isNaN(parseInt(this.responseText))) {//not a ticket, its the actual
+                handleResponseText(this.responseText);
+              } else if(this.responseText.length > 0) {//is a ticketNum
+                const ticketNum = this.responseText;
+                function ticketCallback(responseText) {
+                    handleResponseText(responseText);
+                }
+                self.pollForTicket(ticketNum, ticketCallback);
+              }
+              // asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
+            }
+        }
+        // xhr.onerror = function(){}
+        xhr.open('POST', solveEquations_url);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        // circuit.getNetworkGraph();
+        // self.getNetworkGraph();
+
+        xhr.send(JSON.stringify({
+            'solvingSteps':solvingSteps, 
+            'language':self.audioLanguage,
+            'introduction_solvingSteps':language_introduction_solvingSteps[self.audioLanguage], 
+            'conclusion_solvingSteps':language_conclusion_solvingSteps[self.audioLanguage],
+            'wantsTicket':true
+        }));
+    }
+    getWavFile(callback, wavFilename) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        const self = this;
+        xhr.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200) {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const arrayBuffer = this.response;//this is the arraybuffer
+                audioContext.decodeAudioData(arrayBuffer).then(function(audioBuffer){
+                    callback(audioBuffer)
+                });
+            }
+        }
+        xhr.open('POST', wavFiles_url);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        const formData = new FormData();
+        formData.append('filename', wavFilename)
+        xhr.send()
+    }
+    makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback) {
+        //maybe put this in its own file?
+        class WavPlayer {
+            constructor(audioBuffer) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.audioBuffer = audioBuffer;
+                this.startOffset = 0;
+                this.startTime = 0;
+                this.source; // Your AudioBufferSourceNode
+                this.pauseTimings = pauseTimings;
+                this.playerPausedCallback = playerPausedCallback;
+                this.playerResumedCallback = playerResumedCallback;
+                this.paused = true;
+                //
+                this.initTimingReachedWatcher()
+            }
+
+            initTimingReachedWatcher() {
+
+                let isProcessingInterval = false;
+                let pausedTimingLastIndex = 0;
+                const intervalId = setInterval(function(){
+                    if (isProcessingInterval) {return}
+                    let sliced = this.pauseTimings.slice(pausedTimingLastIndex, this.pauseTimings.length);
+                    for(let i=0; i<sliced.length; i++) {
+                        let pausedTiming = sliced[i];
+                        startOffsetSegment = this.audioContext.currentTime - this.startTime
+                        //console.log(startOffsetSegment + startOffset, '>', pausedTiming);
+                        if(startOffsetSegment + this.startOffset > pausedTiming) {
+                            isProcessingInterval = true;
+                            console.log('in pause loop', startOffsetSegment + this.startOffset)
+                            pausedTimingLastIndex +=1;
+                            console.log('pausedTimingLastIndex', pausedTimingLastIndex);
+                            //pauseAudio();
+                            //
+                            console.log('try source.stop()')
+                            this.source.stop();//
+                            this.playerPausedCallback(pausedTimingLastIndex-1, startOffsetSegment + this.startOffset, pausedTiming);//actual paused timing, planned paused timing?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                            console.log('adding startOffsetSegment')
+                            this.startOffset += startOffsetSegment;
+                            console.log('added to startOffset: ', this.startOffset)
+                            //
+                            const pauseTimeoutId = setTimeout(function(){
+                                console.log('timeout completed')
+                                playAudio(this.audioBuffer);
+                                playerResumedCallback(pausedTimingLastIndex-1, startOffsetSegment + this.startOffset, pausedTiming)
+                                console.log('played audio')
+                                clearTimeout(pauseTimeoutId);
+                                isProcessingInterval = false;
+                                
+                            }, 3000);//pause for 3 seconds
+                            break;
+                        }
+                    }
+                }, 50);//every 50 milliseconds
+            }
+
+            playAudio() {
+                if (this.paused) {
+                    this.startTime = this.audioContext.currentTime;
+                    this.source = audioContext.createBufferSource();
+                    this.source.buffer = this.audioBuffer;
+                    this.source.connect(this.audioContext.destination);
+                    this.source.start(0, this.startOffset);
+                }
+            }
+
+            pauseAudio() {
+                if (!this.paused) {
+                    this.source.stop();
+                    this.startOffset += this.audioContext.currentTime - this.startTime;
+                }
+            }
+        }
+        //
+        return WavPlayer(audioBuffer)
+    }
+    //[end] animeAudio
 
     createLatexMeshes(listOfLatexStrs, callback) {
         const lmc = new LatexMeshCreator(this.scene, this.renderer, this.camera, listOfLatexStrs);

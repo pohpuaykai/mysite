@@ -32,6 +32,10 @@ class Animation {
     //     this.animation = this.aggregatedAnimations
     // };
 
+    scheduleAnimation(animation, priority, animationName) {
+        this.animationHoldingPen.push({'animation':animation, 'priority':priority, 'name':animationName});//
+    }
+
     playNextAnimation() {
         if(this.lastAnimationPlayedId === null) {
             this.playing = true
@@ -84,8 +88,8 @@ class Animation {
             window.cancelAnimationFrame(this.requestId);
             this.requestId = null;
         }
-
     }
+
     // start() {//shorthand
     //     this.restartAnimation();
     // }

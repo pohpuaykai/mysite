@@ -48,6 +48,7 @@ class DCTwoResistorParallel extends Circuit {
             'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
         }
 
+        this.audioLanguage = 'en-US';
     }
 
     act() {
@@ -56,31 +57,31 @@ class DCTwoResistorParallel extends Circuit {
         this.enter(resistor0.uuid); 
         // this.scene.add(resistor0); 
         resistor0.setAllTouchingBoxVisibility(false);//this.render();
-        console.log('resistor0'); console.log(resistor0.uuid);
+        // console.log('resistor0'); console.log(resistor0.uuid);
 
         const battery0 = this.createComponent({componentName:'battery', position:{x:0, y:0, z:10}});
         this.enter(battery0.uuid);
         // this.scene.add(battery0); 
         battery0.setAllTouchingBoxVisibility(false);//this.render();
-        console.log('battery0'); console.log(battery0.uuid);
+        // console.log('battery0'); console.log(battery0.uuid);
 
         const resistor1 = this.createComponent({componentName:'resistor', position:{x:0, y:5, z:-20}})
         this.enter(resistor1.uuid)
         // this.scene.add(resistor1); 
         resistor1.setAllTouchingBoxVisibility(false); this.render();
-        console.log('resistor1'); console.log(resistor1.uuid);
+        // console.log('resistor1'); console.log(resistor1.uuid);
 
         const c = this.createComponent({componentName:'wire', position:{'x': 15, 'y': 0, 'z':-20}, additionalInfo:{'radius': 0.644/2}})
         this.enter(c.uuid);
         // this.scene.add(c);
         c.setAllTouchingBoxVisibility(false);
-        console.log('c', c);
+        // console.log('c', c);
 
         const d = this.createComponent({componentName:'wire', position:{'x': -15, 'y': 0, 'z':-20}, additionalInfo:{'radius': 0.644/2}})
         this.enter(d.uuid);
         // this.scene.add(d);
         d.setAllTouchingBoxVisibility(false);
-        console.log('d', d);
+        // console.log('d', d);
 
 
         //network|connection information

@@ -35,7 +35,7 @@ class LatexMeshCreator {
 
       // const YSize = 30;
       // const startYCoordinate = -listOfEquations_latexStrs.length* YSize/2;
-      console.log(list_latexStr)
+      // console.log(list_latexStr)
       //need to get variable to UUID<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       for(let i=0; i<list_latexStr.length; i++) {
         let latexStr; let variables;
@@ -47,7 +47,7 @@ class LatexMeshCreator {
         // console.log('variables', variables, 'latexStr', latexStr)
         const list_startPosEndPosVariableStr = []
         variables.forEach(variableStr => {
-          console.log('variableStr: ', variableStr, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+          // console.log('variableStr: ', variableStr, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
           for(const match of latexStr.matchAll(new RegExp(RegExp.escape(variableStr), "g"))) {
             list_startPosEndPosVariableStr.push([match.index, match.index+variableStr.length, variableStr]);
           }

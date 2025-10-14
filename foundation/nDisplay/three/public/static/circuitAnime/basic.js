@@ -3,11 +3,23 @@ import {Recorder} from '../mediaRecorder/recorder.js';
 class CircuitAnime {
     constructor(animationName, circuit, variableSelector, ticketing, simplify, record) {
         const self = this;
-        this.circuit = circuit;// this is a circuit.js
+        this.circuit = circuit;// this is a circuit.js is a piece.js
         this.variableSelector = variableSelector;// it is a function that uses a list_equationNetworkInfoDict, but takes a circuit
         this.ticketing = ticketing;
         this.simplify = simplify;
         this.animationName = animationName;
+        this.currentPositionInAnimation = {'idx':0}; //a dictionary that contains information about where the animation is in
+        this.updateCurrentPositionInAnimation = function() {
+            self.currentPositionInAnimation['idx'] += 1
+        }
+        this.currentPositionInAudio = {'idx':0};//a dictionary that contains information about where the animation is in
+        this.updateCurrentPositionInAudio = function() {
+            self.currentPositionInAudio['idx'] += 1
+        }
+
+        this.isAudioVideoInSync = function() {
+            //what to check here? need to check currentPositionInAnimation&currentPositionInAudio<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        }
 
         //camera positions
         const cameraPosition = this.circuit.camera.position;
@@ -21,7 +33,7 @@ class CircuitAnime {
         this.variableHighlightColour = {r:-0.1, g:-0.6, b:-0.1}
 
         //pauses
-        this.pauseBetweenEachVorHinDisplay = 4000;//milliseconds
+        this.pauseBetweenEachVorHinDisplay = 4000;//milliseconds //this is now a minimum pause, so even if audio and video are in sync there will be this pause
         this.pauseAfterRevealingEquation = 4000;//milliseconds
         this.pauseBetweenEachVariableHighlight = 4000;//milliseconds
         this.pauseBetweenEachComponentHighlight = 4000;//milliseconds
@@ -39,315 +51,392 @@ class CircuitAnime {
             }
             this.recorder = new Recorder(permissionGivenCallback, this.circuit.renderer.domElement);//this.circuit.renderer.domElement is the canvas of THREE?
         }
+        this.gotAudio_findEquations = false;//flag to make sure we got audio
+        this.gotAudio_solveEquations = false;//flag to make sure we got audio
     }
 
     play() {
         const self = this.circuit;
         const animeSelf = this;
+        animeSelf.noop = function(...any) {}
 
-        function solveEquation___readyCallback() {
+        function solveEquation___readyCallback(){
+            // debugger
+            const datum1 = Object.entries(self.runningStepsIdx__branchedStepsIdx).map(([runningStepsIdx, branchedStepsIdx], idx)=>{
+                const tag = 'eq'+idx.toString()
+                const data = {
+                    '<<>>':tag
+                }
+                data[tag] = [runningStepsIdx, branchedStepsIdx]
+                return data
+            });
 
-            function solveEquation___functionGen(
-                /**
-                 * 
-                 * At the last of each list of subSteps, hold the 
-                 * 
-                 * 
-                 * you can know if it is the last of subSteps, by using
-                 * self.solvingSteps
-                 * &&
-                 * branchedStepsIdx
-                 * **/
+            let lastDidNotHideMeshUUID___vor = null; let lastDidNotHideMeshUUID___hin = null;
+            function positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx) {
+                const latexStrMeshUUID = self.textStr__textMeshUUID[self.branchedStepsIdx__latexStrs[branchedStepsIdx]]['meshUUID'];
+                const equationDimensions = self.getDimensions(latexStrMeshUUID);
+                self.setRotation(latexStrMeshUUID, 0, Math.PI, 0)
+                if (animeSelf.vorHinEquationRelativePositions == 'left_right') {
+                    if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
+                        //center the y
+                        self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-equationDimensions.xLen, animeSelf.vorPosition.y-(equationDimensions.yLen/2), animeSelf.vorPosition.z)
+                    } else {//hin always introduce new equations
+                        self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x+equationDimensions.xLen, animeSelf.hinPosition.y-(equationDimensions.yLen/2), animeSelf.hinPosition.z);
+                    }
+                } else if (animeSelf.vorHinEquationRelativePositions == 'up_down') {
+                    if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
+                        //center the x
+                        self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-(equationDimensions.xLen/2), animeSelf.vorPosition.y-equationDimensions.yLen, animeSelf.vorPosition.z)
+                    } else {//hin always introduce new equations
+                        self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x-(equationDimensions.xLen/2), animeSelf.hinPosition.y+equationDimensions.yLen, animeSelf.hinPosition.z)
+                    }
+                }
 
-            ) {
-                return function() {
-                    /**
-                     * We have :
-                     * self.steps
-                     * self.branchedStepsIdx__latexStrs
-                     * self.runningStepsIdx__branchedStepsIdx
-                     * self.list_runningIdx__toClearAll
-                     * self.list_runningIdx__toKeep
-                     * 
-                     * also the latexMeshes from LatexMeshCreater.js
-                     *  self.textStr__textMeshUUID
-                     *  self.meshUUID__mesh
-                     * **/
-                    // console.log('self.branchedStepsIdx__latexStrs', self.branchedStepsIdx__latexStrs)
-                    // console.log('self.runningStepsIdx__branchedStepsIdx', self.runningStepsIdx__branchedStepsIdx)
-                    // console.log('self.list_runningIdx__toClearAll', self.list_runningIdx__toClearAll)
-                    // console.log('self.list_runningIdx__toKeep', self.list_runningIdx__toKeep)
-                    // debugger
+                //although it is a standard reveal, we still want to hide the previous, RENAME this function?
+                if (self.list_runningIdx__toClearAll.includes(parseInt(runningStepsIdx)) && lastDidNotHideMeshUUID___hin !== null && lastDidNotHideMeshUUID___vor !== null) { //hide both, previous, or running_equation don't hide
+                    self.hide(lastDidNotHideMeshUUID___hin)
+                    self.hide(lastDidNotHideMeshUUID___vor)
+                }
 
-                    const cameraPosition = self.camera.position;
-                    // console.log(cameraPosition)
-                    // debugger
+                self.reveal(latexStrMeshUUID);
+            }
 
-                    // console.log('running solveEquation animation is running')
-                    // look back.
-                    const facingCoordinate = animeSelf.facingCoordinate;//{x:6*cameraPosition.x, y:6*cameraPosition.y, z:6*cameraPosition.z};
-                    self.smoothLookAt(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z, function(){
-                    // self.smoothMoveCameraPosition(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z ,function() {
-                        // console.log('finished looking back'); let previousEquationType = 'vor'; 
-                        let lastDidNotHideMeshUUID___vor = null; let lastDidNotHideMeshUUID___hin = null;
-                        function equationReveal(theList, theList___idx) {
-                            if (theList___idx >= theList.length) {
-                                self.animationScheduler.pause(); 
-                                // console.log('animationScheduler.pause DONE')
-                                self.removeMeshesByRequestingAnimation('solveEquations', function() {
+            function standardRevealSolvingStep(threadSelf, rIdx, preCalInfoDict) {
+                const line = preCalInfoDict['line'];const data = line[rIdx];
+                let runningStepsIdx//seems like this is not needed
+                let branchedStepsIdx
+                [runningStepsIdx, branchedStepsIdx] = data
+                positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx)
+            }
 
-                                    if (animeSelf.record) {
-                                        console.log('stopped recording')
-                                        self.pause(function() {
-
-                                            animeSelf.recorder.stopRecording();//maybe pause until THREE has cleared all the actors then stop? STILL MISSING a few frames at the back
-                                            animeSelf.recorder.sendVideoToBackend(animeSelf.formatDateTime(new Date()));
-                                        }, 8000)// pause for 8 seconds to make sure we get the last few frames.
-                                    }
-                                });
-                                // console.log('removed ')
-                                return
-                            }
-                            let runningStepsIdx; let branchedStepsIdx;
-                            [runningStepsIdx, branchedStepsIdx] = theList[theList___idx]
-                            // console.log("self.textStr__textMeshUUID", self.textStr__textMeshUUID)
-                            const latexStrMeshUUID = self.textStr__textMeshUUID[self.branchedStepsIdx__latexStrs[branchedStepsIdx]]['meshUUID'];
-                            const equationDimensions = self.getDimensions(latexStrMeshUUID);
-                            self.setRotation(latexStrMeshUUID, 0, Math.PI, 0)
-
-                            if (animeSelf.vorHinEquationRelativePositions == 'left_right') {
-
-                                if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
-                                    //center the y
-                                    self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-equationDimensions.xLen, animeSelf.vorPosition.y-(equationDimensions.yLen/2), animeSelf.vorPosition.z)
-                                } else {//hin always introduce new equations
-                                    self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x+equationDimensions.xLen, animeSelf.hinPosition.y-(equationDimensions.yLen/2), animeSelf.hinPosition.z);
-                                }
-                            } else if (animeSelf.vorHinEquationRelativePositions == 'up_down') {
-
-                                if (branchedStepsIdx[1] == 'vor') {//put it slightly to the left, the running_equation
-                                    //center the x
-                                    self.setPosition(latexStrMeshUUID, animeSelf.vorPosition.x-(equationDimensions.xLen/2), animeSelf.vorPosition.y-equationDimensions.yLen, animeSelf.vorPosition.z)
-                                } else {//hin always introduce new equations
-                                    self.setPosition(latexStrMeshUUID, animeSelf.hinPosition.x-(equationDimensions.xLen/2), animeSelf.hinPosition.y+equationDimensions.yLen, animeSelf.hinPosition.z);
-                                }
-
-                            }
-
-
-                            if (self.list_runningIdx__toClearAll.includes(parseInt(runningStepsIdx)) && lastDidNotHideMeshUUID___hin !== null && lastDidNotHideMeshUUID___vor !== null) { //hide both, previous, or running_equation don't hide
-                                // console.log('going to clear screen')
-                                // debugger;
-                                self.hide(lastDidNotHideMeshUUID___hin)
-                                self.hide(lastDidNotHideMeshUUID___vor)
-                            }
-
-
-                            self.reveal(latexStrMeshUUID); 
-                            // console.log('revealed: ', self.branchedStepsIdx__latexStrs[branchedStepsIdx], branchedStepsIdx)
-                            self.pause(()=>{
-                                /**
-                                 * branchedStepsIdx = [stepIdx, 'vor', subStepIdx, 'vor__subSteps']; 
-                                 * 
-                                 * 
-                                 * **/
-                                // console.log('runningStepsIdx', runningStepsIdx, 'list_runningIdx__toKeep', self.list_runningIdx__toKeep, ' in? ', self.list_runningIdx__toKeep.includes(parseInt(runningStepsIdx))); debugger;
-                                if (self.list_runningIdx__toKeep.includes(parseInt(runningStepsIdx))) {
-                                    if (branchedStepsIdx[1] === 'vor') {
-                                        lastDidNotHideMeshUUID___vor = latexStrMeshUUID
-                                    } else if (branchedStepsIdx[1] === 'hin') {
-                                        lastDidNotHideMeshUUID___hin = latexStrMeshUUID
-                                    }
-                                } else {
-                                    self.hide(latexStrMeshUUID)
-                                }
-                                equationReveal(theList, theList___idx+1);
-                            }, animeSelf.pauseBetweenEachVorHinDisplay)
-
-                        }
-                        equationReveal(Object.entries(self.runningStepsIdx__branchedStepsIdx), 0)
-                        // debugger;
-                    });
+            function standardHideSolvingStep(threadSelf, rIdx, preCalInfoDict) {
+                const line = preCalInfoDict['line'];const data = line[rIdx]; // we want to hide the previous, so -1?
+                let runningStepsIdx
+                let branchedStepsIdx
+                [runningStepsIdx, branchedStepsIdx] = data
+                const latexStrMeshUUID = self.textStr__textMeshUUID[self.branchedStepsIdx__latexStrs[branchedStepsIdx]]['meshUUID'];
+                if (self.list_runningIdx__toKeep.includes(parseInt(runningStepsIdx))) {
+                    if (branchedStepsIdx[1] === 'vor') {
+                        lastDidNotHideMeshUUID___vor = latexStrMeshUUID
+                    } else if (branchedStepsIdx[1] === 'hin') {
+                        lastDidNotHideMeshUUID___hin = latexStrMeshUUID
+                    }
+                } else {
+                    self.hide(latexStrMeshUUID)
                 }
             }
 
+            const callbacks1 = {
+                'eq0':{
+                    'until_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){return true},//templates can be add in Animation.js as a guide, no need to put it here?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    'minWaitTime_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){return 4000;},
+                    //'finish_recursor':function(threadSelf, rIdx, preCalInfoDict){},
+                    'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                        const facingCoordinate = animeSelf.facingCoordinate;
+                        self.smoothLookAt(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z, function(){
+                            // console.log('**7**'); debugger
+                        });
+                    },
+                    'continueCallbacks_recursor':[
+                        function(threadSelf, rIdx, preCalInfoDict){
+                            const line = preCalInfoDict['line'];
+                            const data = line[rIdx];
+                            let runningStepsIdx//seems like this is not needed
+                            let branchedStepsIdx
+                            [runningStepsIdx, branchedStepsIdx] = data
+                            positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx)
+                        },
+                        // animeSelf.noop,
+                        standardHideSolvingStep
+                    ],
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return 10;}//put in all the correct timings and then test<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                }
+            }
+            //add a callback for every data in 
+            for(let i=1; i<datum1.length; i++) {
+                callbacks1['eq'+i.toString()] = {
+                    'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return 4000;},
+                    'continue_recursor':function(threadSelf, rIdx, preCalInfoDict) {
+                        //hide previous eq
+                        standardHideSolvingStep(threadSelf, rIdx-1, preCalInfoDict)
+                    },
+                    'continueCallbacks_recursor':[standardRevealSolvingStep],
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return 10;}
+                };
+            }
+            //add the clean up and stopRecording
+            callbacks1['eq'+(datum1.length-1).toString()]['finish_recursor'] = function(threadSelf, rIdx, preCalInfoDict) {
+                standardHideSolvingStep(threadSelf, rIdx, preCalInfoDict);// hide this equation
+                // self.animationScheduler.pause(); //nessercity?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                console.log('animationScheduler.pause DONE')
+                self.removeMeshesByRequestingAnimation('solveEquations', function() {//could this be a frame? like in Adobe Flash?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    //animeSelf.updateCurrentPositionInAnimation()
+                    if (animeSelf.record) {
+                        console.log('stopped recording')
+                        self.pause(function() {
 
-            //schedule animation
-            self.scheduleAnimation(solveEquation___functionGen(), 1, 'solveEquation');//1 so that it will run after the findEquationAnimation
+                            animeSelf.recorder.stopRecording();//maybe pause until THREE has cleared all the actors then stop? STILL MISSING a few frames at the back
+                            animeSelf.recorder.sendVideoToBackend(animeSelf.formatDateTime(new Date()));
+                        }, 8000)// pause for 8 seconds to make sure we get the last few frames.
+                    }
+                });
+            }
+
+            const thread1 = self.animeTemplate(datum1, callbacks1);
+            console.log('solvingSteps init completed<<<<<<<<<<<<<<<<<<<<<<')
+
+            self.scheduleAnimation(thread1, 1, 'solveEquation');//1 so that it will run after the findEquationAnimation
             self.play(function() {
-                return self.animationScheduler.animationHoldingPen.length >=2;//check that all the animation is in before playing
+                return self.animationScheduler.animationHoldingPen.length >=2;//check that all the animation is in before playing, needs to let the animations signal the animationScheduler before playing<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             }, false);
         }
 
-        function findEquations___readyCallback() {//when the latexEquationStrs has been converted to meshes, and we have str__uuid in the piece.js, list_equationNetworkInfoDict is ready also
-            // //making the parameters need for animate__solveEquations
+        function findEquations___readyCallback(){
+            //once ready call for the equations to be solved first..., or this should be a Frame?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
             let list_equationLatexStr; let dependentVarStr; let list_independentVarStr;
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
-            //if ticketing, then we have to wait for the ticket to be ready before we can call this...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            // console.log('list_equationLatexStr', list_equationLatexStr);
-            // console.log('dependentVarStr', dependentVarStr);
-            // console.log('list_independentVarStr', list_independentVarStr);
-            // debugger;//for copying out the variables for testing
             self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
-            function findEquationAnimation___functionGen(
+        //
 
-                ) {
-                //for animation, we store mesh in meshUUID__mesh, and only when we need the mesh, then we add to the THREE.Scene, as recommended by ChatGPT
-                
-
-                //load all the equations to scene, and then only when we need the actors then we set visible=true
-
-                //need a destroy function to remove actors that we do not need any more from the scene
-
-                //this is the render loop for animation
-                return function() {
-                    /**
-                     * for relevant_equation:                                                          [1]
-                     *   highlight the relevant_circuit                                                [2]
-                     *   show the relevant_equation                                                    [3]
-                     *   stop highlighting the relevant_circuit                                        [4]
-                     *   hide the relevant_equation                                                    [5]
-                     *   for (variable, component) in zip(relevant_equation, relevant_circuit):        [6]
-                     *     highlight the relevant component                                            [7]
-                     *     hightlight the relevant variable in the relevant equation                   [8]
-                     *     unhighlight the relevant component                                          [9]
-                     *     unhighlight the relevant variable in the relevant equation                  [10]
-                     * **/
-                    //use recursion to prevent all the Equation meshes from showing up together
-                    //[1]
-                    function equationDisplay(list_equationNetworkInfoDict, list_equationNetworkInfoDict___idx) {
-                        if (list_equationNetworkInfoDict___idx >= list_equationNetworkInfoDict.length) {
-                            // self.animationScheduler.pause(); 
-                            // console.log('finished Animation equationDisplay$$$$$$$$$$$')
-                            //TODO maybe... remove all the latexStrings on the scene? But there are latexStrings that in solveEquation animation that are the same as in findEquation, and they will be cleared too.
-                            self.removeMeshesByRequestingAnimation('findEquations', function(){});
-                            // here is where you should run the next animation.
-                            self.animationScheduler.playNextAnimation()
-                            return;
-                        }
-                        const graphInfoD = list_equationNetworkInfoDict[list_equationNetworkInfoDict___idx];
-// console.log('equationIdx: ', list_equationNetworkInfoDict___idx, graphInfoD['equation'], '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                        
-                        //[2]
-                        graphInfoD['list_list_networkNodeIds'].forEach(list_nodeId => {
-                            // console.log('highlighting list_nodeId: ', graphInfoD['list_list_networkNodeIds'], '<<<HL<<')
-                            const visited = []; // nodeId might be repeated
-                            list_nodeId.forEach(nodeId => {
-                                // console.log('highlight nodeId', nodeId, ' type: ', id__type[nodeId], ' meshId: ', id__uuid[nodeId]); 
-                                if (visited.indexOf(nodeId) <0) {
-                                    visited.push(nodeId)
-                                    self.highlight({meshUUID:self.id__uuid[nodeId], redMag:animeSelf.componentHighlightColour.r, greenMag:animeSelf.componentHighlightColour.g, blueMag:animeSelf.componentHighlightColour.b})
-
-                                }
-                            })
-                        });
-                        // console.log('highlighted nodes', window.performance.now())
-                        //[3]
-                        const equationMeshUUID = self.textStr__textMeshUUID[graphInfoD['equation']]['meshUUID']
-                        const equationDimensions = self.getDimensions(equationMeshUUID);
-                        // console.log('getting dimensions: ', equationDimensions);
-                        // self.highlight({meshUUID:equationMeshUUID, redMag:0.6, greenMag:0.1, blueMag:0.1}); //this group does not even have attributes and cannot be highlighted this way
-                        self.setPosition(equationMeshUUID, equationDimensions.xLen/2, equationDimensions.yLen/2, equationDimensions.zLen+50);
-                        self.reveal(equationMeshUUID); //self.renderer.render(self.scene, self.camera);
-                        // console.log('revealed equations', graphInfoD['equation'], ' ', window.performance.now());
-                        // debugger;
-                        // console.log('pausing for 8 seconds 0', window.performance.now())
-                        self.pause(()=>{
-                            // console.log('finished pausing 0', window.performance.now())
-                            // debugger;
-                            //[4] unhighlight network
-                            // self.unhighlight(equationMeshUUID);
-                            graphInfoD['list_list_networkNodeIds'].forEach(list_nodeId => {
-                            // console.log('UNhighlighting list_nodeId: ', graphInfoD['list_list_networkNodeIds'], '<<<UN<<')
-                                const visited = [];
-                                list_nodeId.forEach(nodeId => {
-                                    if (visited.indexOf(nodeId) <0) {
-                                        // console.log('unhightlight nodeId', nodeId, ' type: ', id__type[nodeId]); 
-                                        self.unhighlight(self.id__uuid[nodeId])
-                                    }
-                                })
-                            });
-                            // debugger;
-                            self.pause(()=>{
-                                //[6] use recursion to play the variables one by one
-                                function variableDisplay(list_variableInfoD, list_variableInfoD___idx) {
-                                    if (list_variableInfoD___idx >= list_variableInfoD.length){
-                                        //[5]
-                                        self.hide(equationMeshUUID);
-                                        // console.log('hid equations', graphInfoD['equation'], window.performance.now());
-                                        //call the next equation animation
-                                        equationDisplay(list_equationNetworkInfoDict, list_equationNetworkInfoDict___idx+1);
-                                        return;
-                                    }
-                                    const variableInfoD = list_variableInfoD[list_variableInfoD___idx]
-                                    const variableStr = variableInfoD['variableStr'];
-                                    //[7]
-                                    //highlight variableComponent
-                                    const componentMeshUUID = self.id__uuid[graphInfoD['variableStr__nodeId'][variableStr]]
-                                    self.highlight({meshUUID: componentMeshUUID, redMag:animeSelf.componentVariableHighlightColour.r, greenMag:animeSelf.componentVariableHighlightColour.g, blueMag:animeSelf.componentVariableHighlightColour.b})
-                                    // console.log('highlighted variableNodes', window.performance.now())
-                                    //[8] each chaStr is only a part of the variable, so we want them to light up togehter
-                                    variableInfoD['info'].forEach(([chaStr, charMeshUUID]) => {
-                                        self.highlight({meshUUID:charMeshUUID, redMag:animeSelf.variableHighlightColour.r, greenMag:animeSelf.variableHighlightColour.g, blueMag:animeSelf.variableHighlightColour.b});
-                                        // console.log('highlighted: ', chaStr, ' uuid: ', charMeshUUID, '<<<<<<<<<<<<<<<<<<<<<<<variable highlighting????????????????????????????????????????????????????')
-                                    })
-                                    // console.log('highlighted variable', window.performance.now())
-                                    // console.log('pausing for 8 seconds 1', window.performance.now())
-                                    self.pause(()=>{
-                                        // console.log('finish pausing 1', window.performance.now())
-                                        //[9]
-                                        self.unhighlight(self.id__uuid[graphInfoD['variableStr__nodeId'][variableStr]])
-                                        // console.log('unhighlight variableNode', window.performance.now())
-                                        //[10]
-                                        variableInfoD['info'].forEach(([chaStr, charMeshUUID]) => {
-                                            // console.log('chaStr', chaStr, 'charMeshUUID', charMeshUUID)
-                                            self.unhighlight(charMeshUUID)
-                                        })
-                                        // console.log('unhighlight variable', window.performance.now())
-                                        variableDisplay(list_variableInfoD, list_variableInfoD___idx+1);
-                                    }, animeSelf.pauseBetweenEachComponentHighlight);// pause for 8 seconds, then unhighlight relevant_component and relevant_variable
-                                }
-                                // console.log('self.textStr__textMeshUUID', 'this is being used to display each variables associations')
-                                // console.log(self.textStr__textMeshUUID)
-                                // debugger; 
-
-
-                                variableDisplay(self.textStr__textMeshUUID[graphInfoD['equation']]['info'], 0);
-                            }, animeSelf.pauseBetweenEachVariableHighlight);
-                        }, animeSelf.pauseAfterRevealingEquation);
+            /*
+            each item in datum0 is 
+            {
+              '<<>>':'eq{i}',
+              'data': {
+                'list_list_networkNodeIds':list_equationNetworkInfoDict[i]['list_list_networkNodeIds'],//for highlight the components used to derive equation
+                'equationMeshUUID':self.textStr__textMeshUUID[list_equationNetworkInfoDict[i]['equation']]['meshUUID'] // to reveal the equation
+              },
+              'varComponentId':[
+                  {
+                    '<<>>':'eq{i}VarCId{j}',
+                    'data':{
+                      'componentMeshUUID': self.id__uuid[list_equationNetworkInfoDict[i]['variableStr__nodeId'][self.textStr__textMeshUUID[graphInfoD['equation']]['info'][j]['variableStr']]],//for component un|highlighting
+                      'list_varChaStr,chaMeshUUID':self.textStr__textMeshUUID[list_equationNetworkInfoDict[i]['equation']]['info'][j]['info'],//for variable un|highlighting
                     }
-                    if (animeSelf.record) {
-                        self.pauseUntilCallback(
-                            function() {
+                  },
 
-                                console.log('started recording in anime')
-                                animeSelf.recorder.startRecording();
-                                equationDisplay(self.list_equationNetworkInfoDict, 0);
-
-                            },
-                            function() {
-                                console.log('checking if flag: animeSelf.permissionGiven is true: ', animeSelf.permissionGiven)
-                                return animeSelf.permissionGiven
-                            }
-                        )
-
-                    } else {
-                        // console.log('list_equationNetworkInfoDict')
-                        // console.log(self.list_equationNetworkInfoDict, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<this is the one being used to make the animation')
-                        // debugger;
-                        equationDisplay(self.list_equationNetworkInfoDict, 0);
-                    }
-                    
-                }
+              ]
             }
-            //schedule animation
-            self.scheduleAnimation(findEquationAnimation___functionGen(), 0, 'findEquation');
-            self.play(function() {
-                return self.animationScheduler.animationHoldingPen.length >=2;//check that all the animation is in before playing
-            }, false);
+            */
+            let datum0 = []; let callbacks0 = {}; let startInCallbackIdx = 0;
+
+            if (animeSelf.record) {
+                const recordingTag = 'startRecording';
+                datum0 = [{
+                    'startRecording':{},
+                    '<<>>':recordingTag
+                }];
+                callbacks0[recordingTag] = {
+                    'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        console.log('started recording in anime')
+                        animeSelf.recorder.startRecording();
+                        // threadSelf();//this is thread0
+                    },
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        console.log('checking if flag: animeSelf.permissionGiven is true: ', animeSelf.permissionGiven)
+                        return animeSelf.permissionGiven
+                    },
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return 0;}//no minWait time for recording
+                };
+                startInCallbackIdx = 1
+            }
+
+
+            for (let i=0; i<self.list_equationNetworkInfoDict.length; i++) {
+                const equationNetworkInfoDict = self.list_equationNetworkInfoDict[i];
+                const key0 = 'eq'+i.toString()
+                const item = {
+                    '<<>>':key0,
+                    'varComponentId':[]
+                }
+                item[key0] = {
+                    'list_list_networkNodeIds':equationNetworkInfoDict['list_list_networkNodeIds'],//for highlight the components used to derive equation
+                    'equationMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['meshUUID'] // to reveal the equation
+                }
+                const list_list_variableStr__nodeId = Object.entries(equationNetworkInfoDict['variableStr__nodeId']);
+                const variableInfoD = self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'];
+                //console.log("self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]", self.textStr__textMeshUUID[equationNetworkInfoDict['equation']])
+                for(let j=0; j<variableInfoD.length; j++) {
+                    const key1 = key0+'VarCId'+j.toString()
+                    const item0 = {
+                        '<<>>':key1,
+                    }
+                    item0[key1] = {
+                      'componentMeshUUID': self.id__uuid[equationNetworkInfoDict['variableStr__nodeId'][variableInfoD[j]['variableStr']]],//for component un|highlighting
+                      'list_varChaStr,chaMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'][j]['info'],//for variable un|highlighting
+                    }
+                    item['varComponentId'].push(item0)
+                }
+                datum0.push(item);
+            }
+
+            const waitTime = 1000;//change to the standard here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            const componentDisplay = function(list_list_networkNodeIds){
+                //[2]
+                //graphInfoD['list_list_networkNodeIds']
+                list_list_networkNodeIds.forEach(list_nodeId => {
+                    // console.log('highlighting list_nodeId: ', graphInfoD['list_list_networkNodeIds'], '<<<HL<<')
+                    const visited = []; // nodeId might be repeated
+                    list_nodeId.forEach(nodeId => {
+                        // console.log('highlight nodeId', nodeId, ' type: ', id__type[nodeId], ' meshId: ', id__uuid[nodeId]); 
+                        if (visited.indexOf(nodeId) <0) {
+                            visited.push(nodeId)
+                            self.highlight({meshUUID:self.id__uuid[nodeId], redMag:animeSelf.componentHighlightColour.r, greenMag:animeSelf.componentHighlightColour.g, blueMag:animeSelf.componentHighlightColour.b})
+
+                        }
+                    })
+                });
+            }
+            const formulaDisplay = function(equationMeshUUID){
+                //[3]
+                //const equationMeshUUID = self.textStr__textMeshUUID[graphInfoD['equation']]['meshUUID']
+                const equationDimensions = self.getDimensions(equationMeshUUID);
+                // console.log('getting dimensions: ', equationDimensions);
+                // self.highlight({meshUUID:equationMeshUUID, redMag:0.6, greenMag:0.1, blueMag:0.1}); //this group does not even have attributes and cannot be highlighted this way
+                self.setPosition(equationMeshUUID, equationDimensions.xLen/2, equationDimensions.yLen/2, equationDimensions.zLen+50);
+                self.reveal(equationMeshUUID); //self.renderer.render(self.scene, self.camera);
+            }
+            const componentHide = function(list_list_networkNodeIds){
+                //[4] unhighlight network
+                // self.unhighlight(equationMeshUUID);
+                //graphInfoD['list_list_networkNodeIds']
+                list_list_networkNodeIds.forEach(list_nodeId => {
+                // console.log('UNhighlighting list_nodeId: ', graphInfoD['list_list_networkNodeIds'], '<<<UN<<')
+                    const visited = [];
+                    list_nodeId.forEach(nodeId => {
+                        if (visited.indexOf(nodeId) <0) {
+                            // console.log('unhightlight nodeId', nodeId, ' type: ', id__type[nodeId]); 
+                            self.unhighlight(self.id__uuid[nodeId])
+                        }
+                    })
+                });
+            }
+            const formulaHide = function(equationMeshUUID){
+                //const equationMeshUUID = self.textStr__textMeshUUID[graphInfoD['equation']]['meshUUID']
+                self.hide(equationMeshUUID); //self.renderer.render(self.scene, self.camera);
+            }
+            const highlightVarComponent = function(componentMeshUUID, list_varChaStr__chaMeshUUID) {
+                //const variableInfoD = list_variableInfoD[list_variableInfoD___idx]
+                //const variableStr = variableInfoD['variableStr'];
+                //[7]
+                //highlight variableComponent
+                //const componentMeshUUID = self.id__uuid[graphInfoD['variableStr__nodeId'][variableStr]]
+                self.highlight({meshUUID: componentMeshUUID, redMag:animeSelf.componentVariableHighlightColour.r, greenMag:animeSelf.componentVariableHighlightColour.g, blueMag:animeSelf.componentVariableHighlightColour.b})
+                // console.log('highlighted variableNodes', window.performance.now())
+                //[8] each chaStr is only a part of the variable, so we want them to light up togehter
+                // variableInfoD['info'].
+                list_varChaStr__chaMeshUUID.forEach(([chaStr, charMeshUUID]) => {
+                    self.highlight({meshUUID:charMeshUUID, redMag:animeSelf.variableHighlightColour.r, greenMag:animeSelf.variableHighlightColour.g, blueMag:animeSelf.variableHighlightColour.b});
+                    // console.log('highlighted: ', chaStr, ' uuid: ', charMeshUUID, '<<<<<<<<<<<<<<<<<<<<<<<variable highlighting????????????????????????????????????????????????????')
+                })
+            }
+            const unhighlightVarComponent = function(componentMeshUUID, list_varChaStr__chaMeshUUID) {
+                //const variableInfoD = list_variableInfoD[list_variableInfoD___idx]
+                // const variableStr = variableInfoD['variableStr'];
+                //[9]
+                // self.unhighlight(self.id__uuid[graphInfoD['variableStr__nodeId'][variableStr]])
+                self.unhighlight(componentMeshUUID)
+                // console.log('unhighlight variableNode', window.performance.now())
+                //[10]
+                // variableInfoD['info']
+                list_varChaStr__chaMeshUUID.forEach(([chaStr, charMeshUUID]) => {
+                    // console.log('chaStr', chaStr, 'charMeshUUID', charMeshUUID)
+                    self.unhighlight(charMeshUUID)
+                })
+            }
+
+            //only the first callback and last callback are different
+
+            let tagIdOffset = 0
+            if (animeSelf.record) {
+                tagIdOffset = -1
+            }
+            let variableStr; let nodeId
+            for(let i=startInCallbackIdx; i<datum0.length; i++) {
+                callbacks0['eq'+(i+tagIdOffset).toString()]={//eq0
+                    'until_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
+                    'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;},
+                    'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        const line = preCalInfoDict['line'];
+                        const list_list_networkNodeIds = line[rIdx]['list_list_networkNodeIds'];
+                        const equationMeshUUID = line[rIdx]['equationMeshUUID'];
+                        componentDisplay(list_list_networkNodeIds)
+                        formulaDisplay(equationMeshUUID)
+                    },
+                    'continueCallbacks_recursor':[
+                        function(threadSelf,rIdx, preCalInfoDict){
+                            const line = preCalInfoDict['line'];
+                            const list_list_networkNodeIds = line[rIdx]['list_list_networkNodeIds'];
+                            componentHide(list_list_networkNodeIds)
+                        }
+                    ],
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},//extend to audio later<<<<<<<<<<<<<<<<<<<<
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;}
+                }
+                for(let j=0; j<datum0[i]['varComponentId'].length; j++) {
+                    const varCallbacks = {//for the variableStrComponentnodeId
+                        'until_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
+                        'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;},
+                        //'finish_recursor':function(threadSelf,rIdx, preCalInfoDict){},
+                        'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                            // console.log('highlightVarComponent')
+                            const line = preCalInfoDict['line'];
+                            const componentMeshUUID = line[rIdx]['componentMeshUUID'];
+                            const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
+                            highlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID)
+                        },
+                        'continueCallbacks_recursor':[
+                            function(threadSelf,rIdx, preCalInfoDict) {
+                                const line = preCalInfoDict['line'];
+                                const componentMeshUUID = line[rIdx]['componentMeshUUID'];
+                                const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
+                                unhighlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID)
+                            },
+                        ],
+                        'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
+                        'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;}
+                    };
+                    if (j == datum0[i]['varComponentId'].length-1) {
+                        varCallbacks['continueCallbacks_recursor'].push(animeSelf.noop);
+                        varCallbacks['continueCallbacks_recursor'].push(
+                            function(threadSelf, rIdx, preCalInfoDict) {
+                                const taggedWidthDepthIdx__tagName = preCalInfoDict['taggedWidthDepthIdx__tagName'];
+                                const dataLinearIdx__widthDepthIdx = preCalInfoDict['dataLinearIdx__widthDepthIdx'];
+                                const tagName = taggedWidthDepthIdx__tagName[dataLinearIdx__widthDepthIdx[rIdx]]
+                                const eqName = tagName.split('VarCId')[0]
+                                const line = preCalInfoDict['line'];
+                                const tagName__taggedWidthDepthIdx = preCalInfoDict['tagName__taggedWidthDepthIdx'];
+                                const widthDepthIdx__dataLinearIdx = preCalInfoDict['widthDepthIdx__dataLinearIdx'];
+                                const equationMeshUUID = line[parseInt(widthDepthIdx__dataLinearIdx[tagName__taggedWidthDepthIdx[eqName]])]['equationMeshUUID']
+                                formulaHide(equationMeshUUID)
+                            });
+
+                    }
+                    callbacks0['eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()] = varCallbacks
+                }
+
+            }
+            callbacks0['eq'+(datum0.length-1+tagIdOffset).toString()+'VarCId'+(datum0[datum0.length-1+tagIdOffset]['varComponentId'].length-1).toString()]['finish_recursor'] = function(threadSelf,rIdx, preCalInfoDict){
+                self.removeMeshesByRequestingAnimation('findEquations', function(){});
+                self.animationScheduler.playNextAnimation()
+            }
+            //
+            // console.log('datum0', datum0);
+            // console.log('callbacks0', callbacks0); 
+            // debugger
+            const thread0 = self.animeTemplate(datum0, callbacks0);
+
+            self.scheduleAnimation(thread0, 0, 'findEquation');
+            console.log('findEquations init completed<<<<<<<<<<<<<<<<<<<<<<<<<<')
+
         }
+
         self.animate_findEquations(findEquations___readyCallback);
     }
 

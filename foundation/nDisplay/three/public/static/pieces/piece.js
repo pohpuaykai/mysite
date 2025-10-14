@@ -1,13 +1,15 @@
 import * as THREE from '../three/three.module.js';
 
 import {Animation} from '../custom/Animation.js';
+import {ThreadTemplate} from '../custom/ThreadTemplate.js';
 import {LatexMeshCreator} from '../custom/LatexMeshCreater.js'
 import {asyncCreateTextMesh} from '../custom/TextMeshCreater.js'
 
 class Piece {
     
     /**
-     * 
+     * TODO see how we can make use of these:
+     * https://github.com/mdn/webaudio-examples<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
      * **/
     constructor(scene, camera, renderer, controls, meshes) {
 
@@ -24,7 +26,8 @@ class Piece {
 
         this.textStr__textMeshUUID = {};//store all the detailed of the textStrMesh, associates each letter of the textStr to a MeshUUID
 
-        this.animationScheduler = new Animation(scene, camera, renderer);
+        this.animationScheduler = new Animation(scene, camera, renderer);//this is more like a timeline.... that expects some number of animationThreads
+        this.animeTemplate = function(datum, callbacks) {return (new ThreadTemplate()).makeAnimeTemplateThread(datum, callbacks)}
     }
 
     highlight({meshUUID, redMag=0.23, greenMag=0.23, blueMag=0.23}) {
@@ -69,7 +72,7 @@ class Piece {
             self.enter(latexStrMeshUUID)
             //check if all the list_latexStr's meshes are prepared by idx, then call the readyCallback
             indices.add(latexStrIdx);
-            console.log(indices.size, list_latexStr.length, indices.length == list_latexStr.length)
+            // console.log(indices.size, list_latexStr.length, indices.length == list_latexStr.length)
             if (indices.size == list_latexStr.length) { // all the meshes are ready in textStr__textMeshUUID
                 // console.log('piece.js is calling the readyCallback')
                 readyCallback();
@@ -81,7 +84,7 @@ class Piece {
     }
 
     scheduleAnimation(animation, priority, animationName) {
-        this.animationScheduler.animationHoldingPen.push({'animation':animation, 'priority':priority, 'name':animationName});//
+        this.animationScheduler.scheduleAnimation(animation, priority, animationName);
     }
 
 
@@ -100,6 +103,8 @@ class Piece {
     }
 
     play(playIfTrue) {
+        console.log('playIfTrue: ', playIfTrue())
+        console.log('!this.animationScheduler.playing', !this.animationScheduler.playing)
         if(playIfTrue() && !this.animationScheduler.playing) {
             this.animationScheduler.playNextAnimation()
         }
@@ -107,7 +112,7 @@ class Piece {
 
     pause(continueFunction, milliseconds) {
         const self = this;
-        self.animationScheduler.pause();// if i am not using requestAnimationFrame, how is this still useful?
+        self.animationScheduler.pause();// if i am not using requestAnimationFrame, how is this still useful?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         const timeoutId = setTimeout(afterPause, milliseconds);
         function afterPause() {
             continueFunction();
@@ -115,16 +120,29 @@ class Piece {
         }
     }
 
-    pauseUntilCallback(continueFunction, untilCallBack) {
+    pauseUntilCallback(continueFunction, untilCallBack, minimumWaitTime) {
 
         const self = this;
-        self.animationScheduler.pause();// if i am not using requestAnimationFrame, how is this still useful?
-        const intervalId = setInterval(afterPause, 1000);//check every second?
-        function afterPause() {
-            if (untilCallBack()) {//must be true
-                continueFunction();
-                clearTimeout(intervalId);
+        self.animationScheduler.pause();// if i am not using requestAnimationFrame, how is this still useful?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        if (typeof minimumWaitTime == 'number') {
+            const timeoutId = setTimeout(function(){
+                const intervalId = setInterval(afterPause, 1000);//check every second?
+                function afterPause() {
+                    if (untilCallBack()) {//must be true
+                        continueFunction();
+                        clearTimeout(intervalId);
+                    }
+                }
+                clearTimeout(timeoutId);
+            }, minimumWaitTime);
+        } else {
+            const intervalId = setInterval(afterPause, 1000);//check every second?
+            function afterPause() {
+                if (untilCallBack()) {//must be true
+                    continueFunction();
+                    clearTimeout(intervalId);
 
+                }
             }
         }
     }
