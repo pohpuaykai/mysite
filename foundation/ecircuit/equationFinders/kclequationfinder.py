@@ -14,10 +14,10 @@ class KCLEquationFinder(EquationFinder):
         added2DegEdges = set()
         for deg2NodeId in self.list_nodeIds___deg2: # need both directions.... the edge not just the node.#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
-            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~self.networkGraph[deg2NodeId]', self.networkGraph[deg2NodeId])
+            # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~self.networkGraph[deg2NodeId]', self.networkGraph[deg2NodeId])
             [neighbour0, neighbour1] = self.networkGraph[deg2NodeId]
-            print('typeOfneighbour0: ', self.id__type[neighbour0])
-            print('typeOfneighbour1: ', self.id__type[neighbour1])
+            # print('typeOfneighbour0: ', self.id__type[neighbour0])
+            # print('typeOfneighbour1: ', self.id__type[neighbour1])
             if neighbour0 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour0) not in added2DegEdges and\
             self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
                 #
@@ -33,7 +33,7 @@ class KCLEquationFinder(EquationFinder):
                     self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                     #add equation
                     latexStr = f'{variable0___nc0}={variable1___nc0}'
-                    print('0latexStr: ', latexStr)
+                    # print('0latexStr: ', latexStr)
                     associatedComponentIdList = [[deg2NodeId, neighbour0]]
                     self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
             #
@@ -52,7 +52,7 @@ class KCLEquationFinder(EquationFinder):
                     self.addVariableToComponentIdx(neighbour1, variable1___nc1)
                     #add equation
                     latexStr = f'{variable0___nc1}={variable1___nc1}'
-                    print('1latexStr: ', latexStr)
+                    # print('1latexStr: ', latexStr)
                     associatedComponentIdList = [[deg2NodeId, neighbour1]]
                     self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
@@ -67,7 +67,7 @@ class KCLEquationFinder(EquationFinder):
                 variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour0)
                 self.addVariableToComponentIdx(neighbour0, variable1___nc0)
                 latexStr = f'{variable1___nc0}={variable1___nc1}'
-                print('2latexStr: ', latexStr)
+                # print('2latexStr: ', latexStr)
                 associatedComponentIdList = [[neighbour1, neighbour0]]
                 self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 

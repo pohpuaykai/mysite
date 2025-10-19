@@ -1,8 +1,13 @@
 from datetime import datetime
 import logging
 import os
+import pickle
 import time
 
+from video.common.parallelisationmanager import ThreadingManager, parallelise
+from video.models import Audio
+
+@ThreadingManager(maximum_number_of_running_threads=1, waitingPollingTimeInSeconds=6, saveRequestInDatabase=True, storageType='json') # only allow 1 thread, because we only have 1 speaker
 class AudioFromText:
 
     # Silence all comtypes messages
@@ -22,28 +27,48 @@ class AudioFromText:
         'ru-RU':5
     }
 
-    @classmethod
-    def convert(cls, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_'):
+    @parallelise
+    def convert(self, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
+        """
+        If we have the same wavFileOutPrefix, then we give back the same return.....<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        """
         #just for getting voices
         from video.common.text2audio import pyttsx3
         engine = pyttsx3.init()
         voices = engine.getProperty('voices')
         #
+        theWavFileOutPrefix = wavFileOutPrefix
         wavFileOutPrefix = f"{wavFileOutPrefix}_{datetime.strftime(datetime.utcnow(), '%Y%m%d%H%M%S')}"
         works = [] # this is for generating the timings
         language__list_tuple_subtitleStartPos_subtitleEndPos = {} # for marking pauses in subtitles
+        language__existingData = {}
         for language, list_subtitle in language__list_subtitle.items():
+            if useOld:
+                print(0)
+                tag = f'{theWavFileOutPrefix}{language}'
+                oldAudioData = self.getFirstOldAudioByTag(tag)
+                if oldAudioData is not None:
+                    print(1)
+                    language__existingData[language] = oldAudioData
+                    list_tuple_subtitleStartPos_subtitleEndPos = oldAudioData['list_tuple_subtitleStartPos_subtitleEndPos']
+                    wavFilePath = oldAudioData['wavFilePath']
+                else:
+                    wavFilePath = f'{wavFileOutPrefix}{language[0:2]}.wav'
+            else:
+                wavFilePath = f'{wavFileOutPrefix}{language[0:2]}.wav'
             works.append({
-                'text':os.linesep.join(list_subtitle), 
+                'text':os.linesep.join(list_subtitle), #
                 'voice':voices[AudioFromText.languageTwoLetterCode__voiceId[language]].id, 
-                'filename':f'{wavFileOutPrefix}{language[0:2]}.wav',
+                'filename':wavFilePath,
                 'language':language
             })
-            lastStartPos = 0; list_tuple_subtitleStartPos_subtitleEndPos = []
-            for subtitle in list_subtitle:
-                endPos = lastStartPos+len(subtitle)
-                list_tuple_subtitleStartPos_subtitleEndPos.append((lastStartPos, endPos))
-                lastStartPos = endPos
+            #skip if useOld
+            if not useOld or language not in language__existingData:
+                lastStartPos = 0; list_tuple_subtitleStartPos_subtitleEndPos = []
+                for subtitle in list_subtitle:
+                    endPos = lastStartPos+len(subtitle)
+                    list_tuple_subtitleStartPos_subtitleEndPos.append((lastStartPos, endPos))
+                    lastStartPos = endPos
             language__list_tuple_subtitleStartPos_subtitleEndPos[language] = list_tuple_subtitleStartPos_subtitleEndPos
         #
         speakerOccupied = False
@@ -51,14 +76,27 @@ class AudioFromText:
 
         language__wavFilePath = {}
         language__list_tuple_word_location_length_elapsedTime = {}
+        language__endTime = {}#endTime is the end of the whole audio
         list_tuple_word_location_length_elapsedTime = []
 
         def recorder(word, location, length, elapsedTime):
             list_tuple_word_location_length_elapsedTime.append((word, location, length, elapsedTime))
 
         while workIdx < len(works):
-            #init
             language = works[workIdx]['language']
+            if useOld and language in language__existingData:
+                # print(3)
+                # data = json.loads(works[workIdx]['exist'])
+                oldAudioData = language__existingData[language]
+                language__wavFilePath[language] = oldAudioData['wavFilePath']
+                language__list_tuple_word_location_length_elapsedTime[language] = oldAudioData['list_tuple_word_location_length_elapsedTime']
+                
+                if workIdx >= len(works)-1:
+                    break
+                workIdx+=1
+
+                continue
+            #init
             #
             
             #
@@ -83,6 +121,7 @@ class AudioFromText:
                 recorder(word, location, length, timeElapsed)
                 
             def onEnd(name, completed):#name is idx
+                language__endTime[language] = time.time() - now
                 _idx = name['idx']
                 speakerOccupied = False
             def onError(e):
@@ -95,9 +134,13 @@ class AudioFromText:
             work = works[workIdx]
             engine.setProperty('voice', work['voice'])
             engine.say(work['text'], name={'idx':workIdx, 'recorder':recorder})
-            wavFilePath = os.path.join(outputfolderpath, works['filename'])
+            # print('work^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+            # print(work)
+            # import pdb;pdb.set_trace()
+            wavFilePath = os.path.join(outputfolderpath, work['filename'])
             engine.save_to_file(work['text'], wavFilePath)
-            language__wavFilePath[language] = wavFilePath
+            # language__wavFilePath[language] = wavFilePath
+            language__wavFilePath[language] = os.path.basename(wavFilePath)
             if workIdx >= len(works)-1:
                 #engine.proxy.endLoop(False) # this ends the pumping
                 engine.proxy._push(engine.endLoop, ())
@@ -118,20 +161,70 @@ class AudioFromText:
         #reconstruct the subtitles_with_timings from the list_tuple_word_location_length_elapsedTime
         language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = {}
         for language, list_tuple_word_location_length_elapsedTime in language__list_tuple_word_location_length_elapsedTime.items():
+            returnedOld = False
+            if useOld and language in language__existingData:
+                existingData = language__existingData[language]
+                language__list_tuple_word_location_length_elapsedTime[language] = existingData['list_tuple_word_location_length_elapsedTime']
+                language__wavFilePath[language] = existingData['wavFilePath']
+                language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[language] = existingData['pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime']
+                returnedOld = True
+                continue
             list_tuple_subtitleStartPos_subtitleEndPos = language__list_tuple_subtitleStartPos_subtitleEndPos[language]; pauseIdx = 0;
-            pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = {}
-            for word, location, length, elapsedTime in list_tuple_word_location_length_elapsedTime:
+            # import pdb;pdb.set_trace()
+            pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = {}; perLineOffset = len(os.linesep)
+            for idx, (word, location, length, elapsedTime) in enumerate(list_tuple_word_location_length_elapsedTime):
                 subtitleStartPos, subtitleEndPos = list_tuple_subtitleStartPos_subtitleEndPos[pauseIdx]
-                if not(substitleStartPos <= location and location+length <= subtitleEndPos):
+                # print('subtitleStartPos, subtitleEndPos', subtitleStartPos, subtitleEndPos)
+                # print('pauseIdx: ', pauseIdx, 'len(list_tuple_subtitleStartPos_subtitleEndPos)', len(list_tuple_subtitleStartPos_subtitleEndPos))
+                # print('location', location, 'length:', length)
+                # print('******************************************************************')
+                if not(subtitleStartPos <= location-(pauseIdx* perLineOffset) and location+length-(pauseIdx* perLineOffset) <= subtitleEndPos):
+                    #the first of each pauseIdx, we use this to set the last of the previous pauseIdx
+                    pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[pauseIdx]['endTime'] = elapsedTime #elapsedTime is the startTime
+                    #
                     pauseIdx += 1
-                    subtitleStartPos, subtitleEndPos = list_tuple_subtitleStartPos_subtitleEndPos[pauseIdx]
+                    if pauseIdx < len(list_tuple_subtitleStartPos_subtitleEndPos):
+                        subtitleStartPos, subtitleEndPos = list_tuple_subtitleStartPos_subtitleEndPos[pauseIdx]
                 dict_startTime_endTime_listOfWordLocationLengthElapsedTime = pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime.get(pauseIdx, {
                     'startTime':elapsedTime,
                     'endTime':elapsedTime,
                     'listOfWordLocationLengthElapsedTime':[]
                 })
-                dict_startTime_endTime_listOfWordLocationLengthElapsedTime['endTime'] = elapsedTime
+                # if pauseIdx >= len(list_tuple_subtitleStartPos_subtitleEndPos):
+                #     import pdb;pdb.set_trace()
+                dict_startTime_endTime_listOfWordLocationLengthElapsedTime['endTime'] = elapsedTime#should take the next's first?
                 dict_startTime_endTime_listOfWordLocationLengthElapsedTime['listOfWordLocationLengthElapsedTime'].append((word, location, length, elapsedTime))
                 pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[pauseIdx] = dict_startTime_endTime_listOfWordLocationLengthElapsedTime
+                # print(pauseIdx);
+                # print(pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
+                # import pdb;pdb.set_trace()
+            #we use this to set the last to the endTime of the audio
+            pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[len(pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)-1]['endTime'] = language__endTime[language]
+            #
             language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[language] = pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
-        return language__list_tuple_word_location_length_elapsedTime, language__wavFilePath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
+            if useOld and not returnedOld:
+                data = {
+                    'list_tuple_subtitleStartPos_subtitleEndPos':list_tuple_subtitleStartPos_subtitleEndPos,
+                    'list_tuple_word_location_length_elapsedTime':list_tuple_word_location_length_elapsedTime,
+                    'wavFilePath':language__wavFilePath[language],
+                    'pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime':language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[language]
+                }
+                self.storeByTag(tag, data)
+        return {
+            'language__list_tuple_word_location_length_elapsedTime':language__list_tuple_word_location_length_elapsedTime,
+            'language__wavFilePath':language__wavFilePath,
+            'language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime':language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
+        }
+
+        # return language__list_tuple_word_location_length_elapsedTime, language__wavFilePath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
+
+    def getFirstOldAudioByTag(self, tag):
+        oldAudios = Audio.objects.filter(tag=tag)
+        audio = oldAudios.first()
+        if audio:
+            return pickle.loads(audio.data)
+        return None
+
+    def storeByTag(self, tag, data):
+        audio = Audio.objects.create(tag=tag, data=pickle.dumps(data))
+        audio.save()

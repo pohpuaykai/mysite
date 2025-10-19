@@ -13,7 +13,7 @@ class KVLEquationFinder(EquationFinder):
     def findEquations(self):
         #requires the polarity of each edge
         list_equationVars = []
-        print('KVL directedCycles:', EquationFinder.directedCycles)
+        # print('KVL directedCycles:', EquationFinder.directedCycles)
         for directedCycle___OG in EquationFinder.directedCycles:
             # print(directedCycle)
             #skip wires by filtering them out

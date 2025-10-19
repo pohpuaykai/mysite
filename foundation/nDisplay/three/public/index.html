@@ -7,8 +7,43 @@
     <style>
       body { margin: 0; }
     </style>
+    <script>
+      //this is by ChatGPT, it hides all the console.warn from mathjax.js and three.js
+    (function(){
+      // preserve original
+      if (!console.__originalWarn) console.__originalWarn = console.warn;
+
+      console.warn = function(...args){
+        try {
+          // Build stack to find caller script
+          const stack = (new Error()).stack || '';
+          const lowered = stack.toLowerCase();
+
+          // adjust these substrings to match how the MathJax files appear in your stack
+          const mathjaxIndicators = ['/mathjax/tex-svg.js', '/mathjax/tex-chtml-full.js', 'tex-svg.js', 'tex-chtml-full.js', 'mathjax', 'three.module.js', 'three.core.js'];
+
+          // If stack contains any of these, swallow the warning
+          for (const s of mathjaxIndicators) {
+            if (lowered.indexOf(s) !== -1) {
+              return; // ignore MathJax-related warn
+            }
+          }
+        } catch (e) {
+          // ignore errors in our filter - fall back to printing
+        }
+        // otherwise call original
+        console.__originalWarn.apply(console, args);
+      };
+
+      // optional: restore after a timeout (if you don't want permanent suppression)
+      // setTimeout(()=>{ if (console.__originalWarn) console.warn = console.__originalWarn; }, 10000);
+
+    })();
+    </script>
+    
   </head>
   <body>
+    <!--silence console.warn for MathJax-->
     <script src="/public/static/mathjax/tex-svg.js"></script>
     <script>
       window.MathJaxSVG = window.MathJax;

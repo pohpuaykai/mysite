@@ -9,16 +9,24 @@ class CircuitAnime {
         this.simplify = simplify;
         this.animationName = animationName;
         this.currentPositionInAnimation = {'idx':0}; //a dictionary that contains information about where the animation is in
-        this.updateCurrentPositionInAnimation = function() {
+        this.updateCurrentPositionInAnimation = function(state) {
             self.currentPositionInAnimation['idx'] += 1
+            self.currentPositionInAnimation['state'] = state;
         }
         this.currentPositionInAudio = {'idx':0};//a dictionary that contains information about where the animation is in
-        this.updateCurrentPositionInAudio = function() {
+        this.updateCurrentPositionInAudio = function(state) {
             self.currentPositionInAudio['idx'] += 1
+            self.currentPositionInAudio['state'] = state
         }
 
         this.isAudioVideoInSync = function() {
             //what to check here? need to check currentPositionInAnimation&currentPositionInAudio<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            console.log('*****************************')
+            console.log("videoFrame:", self.currentPositionInAnimation['idx'], "audioFrame:", self.currentPositionInAudio['idx'])
+            // console.log("videoState:", self.currentPositionInAnimation['state'])
+            // console.log("audioState:", self.currentPositionInAudio['state']['listOfWordLocationLengthElapsedTime'])
+            console.log('*****************************')
+            return self.currentPositionInAnimation['idx'] == self.currentPositionInAudio['idx']
         }
 
         //camera positions
@@ -36,10 +44,21 @@ class CircuitAnime {
         this.pauseBetweenEachVorHinDisplay = 4000;//milliseconds //this is now a minimum pause, so even if audio and video are in sync there will be this pause
         this.pauseAfterRevealingEquation = 4000;//milliseconds
         this.pauseBetweenEachVariableHighlight = 4000;//milliseconds
-        this.pauseBetweenEachComponentHighlight = 4000;//milliseconds
+        // this.pauseBetweenEachComponentHighlight = 4000;//milliseconds// this is not used anymore<<<<<<<<<<<<<<<<<<<<<
+        this.videoMinPauseTime_introduction_findEquation = 0;
+        this.videoMinPauseTime_conclusion_findEquation = 0;
+        this.videoMinPauseTime_introduction_solveEquation = 0;
+        this.videoMinPauseTime_conclusion_solveEquation = 0;
+        this.audioMinPauseTime_findEquations = 0;
+        this.audioMinPauseTime_solveEquations = 0;
+
+
+        //
+        // this.audioPlayer_findEquations = null;
+        // this.audioPlayer_solveEquations = null;
 
         //displayEquationsRelativeEquations
-        this.vorHinEquationRelativePositions = 'up_down' //this one looks prettier
+        this.vorHinEquationRelativePositions = 'up_down'; //the other one is left_right //this one looks prettier
 
         //
         this.record = record; 
@@ -51,25 +70,102 @@ class CircuitAnime {
             }
             this.recorder = new Recorder(permissionGivenCallback, this.circuit.renderer.domElement);//this.circuit.renderer.domElement is the canvas of THREE?
         }
+        this.loadedDatei_findEquations = false;//flag to make sure we finished loading datei for findEquation
+        this.loadedDatei_solveEquations = false;//flag to make sure we finished loading datei for solveEquation
         this.gotAudio_findEquations = false;//flag to make sure we got audio
         this.gotAudio_solveEquations = false;//flag to make sure we got audio
     }
 
     play() {
+        /* Workflow: piece.js schedule thread0...thread1
+        thread0:
+        - reveal equation
+        - highlight component
+        - unhighlight component
+        - highligh component&variable
+        - unhighlight component&variable
+
+        thread1:
+        - reveal vor solvingStep
+        - hide vor solvingStep
+        - reveal vor subSolvingStep
+        - hide vor subSolvingStep
+        - reveal hin solvingStep
+        - hide hin solvingStep
+        - reveal hin subSolvingStep
+        - hide hin subSolvingStep
+        */
         const self = this.circuit;
         const animeSelf = this;
         animeSelf.noop = function(...any) {}
 
-        function solveEquation___readyCallback(){
-            // debugger
-            const datum1 = Object.entries(self.runningStepsIdx__branchedStepsIdx).map(([runningStepsIdx, branchedStepsIdx], idx)=>{
+
+        function solveEquation___readyCallback(){// this will be ran second...
+            //load solveEquation audio
+
+            // console.log('self.solvingSteps.length (should be 7)', self.solvingSteps.length); debugger
+            self.getAudioUrls_solveEquations(
+                function(list_tuple_word_location_length_elapsedTime, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime, filename){
+                    animeSelf.list_tuple_word_location_length_elapsedTime=list_tuple_word_location_length_elapsedTime; 
+                    animeSelf.filename_solvingSteps = filename;
+                    const entries_pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = Object.entries(pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
+                    entries_pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime.sort((a, b)=>a[0]-b[0])
+                    const pauseTimings = entries_pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime.map(([pauseIdx, d]) => {return d['endTime']})//list of timings to pause
+                    // console.log(pausedTimings)
+                    // debugger;
+                    self.getWavFile(
+                        function(audioBuffer){
+                            animeSelf.audioPlayer_solveEquations = self.makeWavPlayer(audioBuffer, pauseTimings, 
+                                function playerPausedCallback(pauseIdx, actualPausedTiming, plannedPausedTiming){
+                                    // self.pauseUntilCallback(function(){//continue
+                                    //     self.audioPlayer_solveEquations.playAudio();
+                                    // }, function(){//until
+                                    //     return animeSelf.isAudioVideoInSync()
+                                    // }, function() {
+                                    //     return animeSelf.audioMinPauseTime_solveEquations;
+                                    // }());
+
+
+                                    // animeSelf.updateCurrentPositionInAudio();
+                                    animeSelf.updateCurrentPositionInAudio(pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[pauseIdx]);//this is more for debugging, the state is not need
+                                }, 
+                                function playerResumedCallback(pausedIdx, actualPausedTiming, plannedPausedTiming){
+
+                                },
+                                function readyCallback(){
+                                    console.log('solvingEquation audio is in>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                                    animeSelf.gotAudio_solveEquations = true
+                                },
+                                animeSelf.isAudioVideoInSync);
+                        }, filename);
+                }, 
+                self.solvingSteps,
+                self.runningStepsIdx__branchedStepsIdx,
+                self.language_introduction_solvingSteps, 
+                self.language_conclusion_solvingSteps
+            );
+            //
+            // console.log('self.runningStepsIdx__branchedStepsIdx'); console.log(self.runningStepsIdx__branchedStepsIdx); debugger;
+            let datum1 = [
+                {
+                    '<<>>':'introduction',
+                    'introduction':''
+                }
+            ]
+
+            datum1.push.apply(datum1 ,Object.entries(self.runningStepsIdx__branchedStepsIdx).map(([runningStepsIdx, branchedStepsIdx], idx)=>{
                 const tag = 'eq'+idx.toString()
                 const data = {
                     '<<>>':tag
                 }
                 data[tag] = [runningStepsIdx, branchedStepsIdx]
                 return data
-            });
+            }));
+
+            datum1.push({
+                '<<>>':'conclusion',
+                'conclusion':''
+            })
 
             let lastDidNotHideMeshUUID___vor = null; let lastDidNotHideMeshUUID___hin = null;
             function positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx) {
@@ -127,9 +223,28 @@ class CircuitAnime {
             }
 
             const callbacks1 = {
+                'introduction':{
+                    'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                        animeSelf.updateCurrentPositionInAnimation('solvingStep:introduction')//actually the state is not needed, but good for debugging
+                        // animeSelf.updateCurrentPositionInAudio()
+                        animeSelf.audioPlayer_solveEquations.playAudio()
+                        //nothing just wait for audio to finish playing
+                    },
+                    'until_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                        return animeSelf.isAudioVideoInSync();
+                    },
+                    'minWaitTime_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                        return animeSelf.videoMinPauseTime_introduction_solveEquation
+                    }
+                },
                 'eq0':{
-                    'until_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){return true},//templates can be add in Animation.js as a guide, no need to put it here?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    'minWaitTime_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){return 4000;},
+                    'until_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){
+                        // return true
+                        return animeSelf.isAudioVideoInSync();
+                    },//templates can be add in Animation.js as a guide, no need to put it here?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    'minWaitTime_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){
+                        return animeSelf.pauseBetweenEachVorHinDisplay;
+                    },
                     //'finish_recursor':function(threadSelf, rIdx, preCalInfoDict){},
                     'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
                         const facingCoordinate = animeSelf.facingCoordinate;
@@ -149,25 +264,39 @@ class CircuitAnime {
                         // animeSelf.noop,
                         standardHideSolvingStep
                     ],
-                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
-                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return 10;}//put in all the correct timings and then test<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        // return true;
+                        return animeSelf.isAudioVideoInSync();
+                    },
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return animeSelf.pauseBetweenEachVorHinDisplay;
+                    }//put in all the correct timings and then test<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 }
             }
             //add a callback for every data in 
-            for(let i=1; i<datum1.length; i++) {
+            // for(let i=1; i<datum1.length; i++) {
+            for(let i=2; i<datum1.length-1; i++) {//first one is the introduction_audio_frame, second one is the first_step. -1 for the conclusion
                 callbacks1['eq'+i.toString()] = {
-                    'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return 4000;},
+                    'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return animeSelf.pauseBetweenEachVorHinDisplay;
+                    },
                     'continue_recursor':function(threadSelf, rIdx, preCalInfoDict) {
                         //hide previous eq
                         standardHideSolvingStep(threadSelf, rIdx-1, preCalInfoDict)
+                        animeSelf.updateCurrentPositionInAnimation('solvingSteps:eq'+i.toString()+':hide')//actually the state is not needed, but good for debugging
                     },
                     'continueCallbacks_recursor':[standardRevealSolvingStep],
-                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
-                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return 10;}
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        // return true;
+                        return animeSelf.isAudioVideoInSync();
+                    },
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return animeSelf.pauseBetweenEachVorHinDisplay;
+                    }
                 };
             }
             //add the clean up and stopRecording
-            callbacks1['eq'+(datum1.length-1).toString()]['finish_recursor'] = function(threadSelf, rIdx, preCalInfoDict) {
+            callbacks1['eq'+(datum1.length-2).toString()]['finish_recursor'] = function(threadSelf, rIdx, preCalInfoDict) {//-2 because -1 is the conclusion
                 standardHideSolvingStep(threadSelf, rIdx, preCalInfoDict);// hide this equation
                 // self.animationScheduler.pause(); //nessercity?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 console.log('animationScheduler.pause DONE')
@@ -183,24 +312,89 @@ class CircuitAnime {
                     }
                 });
             }
+            callbacks1['conclusion'] = {
+                'continue_recursor':function(threadSelf, rIdx, preCalInfoDict) {
+                    animeSelf.updateCurrentPositionInAnimation('solvingSteps:conclusion')//actually the state is not needed, but good for debugging
+                },
+                'until_recursor':function(threadSelf, rIdx, preCalInfoDict) {
+                    return animeSelf.isAudioVideoInSync();
+                },
+                'minWaitTime_recursor':function(threadSelf, rIdx, preCalInfoDict) {
+                    return animeSelf.videoMinPauseTime_conclusion_findEquation
+                }
+            }
 
             const thread1 = self.animeTemplate(datum1, callbacks1);
             console.log('solvingSteps init completed<<<<<<<<<<<<<<<<<<<<<<')
 
-            self.scheduleAnimation(thread1, 1, 'solveEquation');//1 so that it will run after the findEquationAnimation
-            self.play(function() {
-                return self.animationScheduler.animationHoldingPen.length >=2;//check that all the animation is in before playing, needs to let the animations signal the animationScheduler before playing<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            self.scheduleAnimation(thread1, 1, 'solveEquation', function(){animeSelf.loadedDatei_solveEquations=true});//1 so that it will run after the findEquationAnimation
+
+            self.start(function() {//actually why not set 2 flag for data loading of findEquations and solveEquations too?
+                console.log('loadedDatei_findEquations: ', animeSelf.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', animeSelf.loadedDatei_solveEquations, 'gotAudio_findEquations: ', animeSelf.gotAudio_findEquations, 'gotAudio_solveEquations: ', animeSelf.gotAudio_solveEquations)
+                return animeSelf.loadedDatei_findEquations && animeSelf.loadedDatei_solveEquations && animeSelf.gotAudio_findEquations && animeSelf.gotAudio_solveEquations;//check that all the animation is in before playing, needs to let the animations signal the animationScheduler before playing<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             }, false);
         }
 
-        function findEquations___readyCallback(){
+
+
+        function findEquations___readyCallback(){// this will be ran first.
             //once ready call for the equations to be solved first..., or this should be a Frame?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             let list_equationLatexStr; let dependentVarStr; let list_independentVarStr;
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
-            self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
+            self.animate_solveEquations(
+                solveEquation___readyCallback, 
+                list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
+            //audio
+            // console.log('self.list_equationNetworkInfoDict', self.list_equationNetworkInfoDict);
+            // console.log('self.textStr__textMeshUUID', self.textStr__textMeshUUID);
+            // console.log('self.id__type', self.id__type)
+            // console.log('self.language_introduction_findEquations', self.language_introduction_findEquations);
+            // console.log('self.language_conclusion_findEquations', self.language_conclusion_findEquations);
+            // debugger
+            self.getAudioUrls_findEquations(
+                function(list_tuple_word_location_length_elapsedTime, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime, filename){
+                    // animeSelf.subtitles_findEquations = subtitles; 
+                    animeSelf.list_tuple_word_location_length_elapsedTime=list_tuple_word_location_length_elapsedTime; 
+                    animeSelf.filename_findEquations = filename;
+                    animeSelf.gotAudio_findEquations = true;
+                    const entries_pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = Object.entries(pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
+                    entries_pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime.sort((a, b)=>a[0]-b[0])
+                    const pauseTimings = entries_pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime.map(([pauseIdx, d]) => {return d['endTime']})//list of timings to pause
+                    // console.log(pauseTimings)
+                    // debugger;
+                    self.getWavFile(function(audioBuffer){
+                        animeSelf.audioPlayer_findEquations = self.makeWavPlayer(audioBuffer, pauseTimings, 
+                        function playerPausedCallback(pauseIdx, actualPausedTiming, plannedPausedTiming){ //need a currentPointer to the timing in animation
+                            
+                            // self.pauseUntilCallback(function(){//continue
+                            //     self.audioPlayer_findEquations.playAudio();
+                            // }, function(){//until
+                            //     return animeSelf.isAudioVideoInSync()
+                            // }, function() {
+                            //     return animeSelf.audioMinPauseTime_findEquations;
+                            // }())
+                            // animeSelf.updateCurrentPositionInAudio();
+                            animeSelf.updateCurrentPositionInAudio(pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[pauseIdx]);//this is not neccessary, more for debugging, the state is not needed.
+                        }, 
+                        function playerResumedCallback(pausedIdx, actualPausedTiming, plannedPausedTiming){
+                        }, 
+                        function readyCallback() {
+                            console.log('made findEquation Wave player>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                            animeSelf.gotAudio_findEquations = true
+                        },
+                        animeSelf.isAudioVideoInSync)
+                    }, filename);
+                }, 
+                self.list_equationNetworkInfoDict, 
+                self.textStr__textMeshUUID, 
+                self.id__type, 
+                self.language_introduction_findEquations, 
+                self.language_conclusion_findEquations
+            );
+            //
         //
 
             /*
@@ -223,7 +417,7 @@ class CircuitAnime {
               ]
             }
             */
-            let datum0 = []; let callbacks0 = {}; let startInCallbackIdx = 0;
+            let datum0 = []; let callbacks0 = {}; let startInCallbackIdx = 1;//the extra 1 is for the introduction
 
             if (animeSelf.record) {
                 const recordingTag = 'startRecording';
@@ -241,10 +435,17 @@ class CircuitAnime {
                         console.log('checking if flag: animeSelf.permissionGiven is true: ', animeSelf.permissionGiven)
                         return animeSelf.permissionGiven
                     },
-                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return 0;}//no minWait time for recording
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return 0;
+                    }//no minWait time for recording
                 };
-                startInCallbackIdx = 1
+                startInCallbackIdx = 2//the extra 1 is for the introduction
             }
+
+            datum0.push({
+                '<<>>':'introduction',
+                'introduction':''
+            });
 
 
             for (let i=0; i<self.list_equationNetworkInfoDict.length; i++) {
@@ -275,7 +476,12 @@ class CircuitAnime {
                 datum0.push(item);
             }
 
-            const waitTime = 1000;//change to the standard here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            datum0.push({
+                '<<>>':'conclusion',
+                'conclusion':''
+            });
+
+            // const waitTime = 1000;//change to the standard here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             const componentDisplay = function(list_list_networkNodeIds){
                 //[2]
@@ -351,58 +557,95 @@ class CircuitAnime {
                 })
             }
 
+            callbacks0['introduction'] = {
+                'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                    animeSelf.audioPlayer_findEquations.playAudio()
+                    // animeSelf.updateCurrentPositionInAnimation()
+                    animeSelf.updateCurrentPositionInAnimation('findEquations:introduction')//actually the state is not needed, but good for debugging
+                    // animeSelf.updateCurrentPositionInAudio()//only advance when the audio pause, to stop the video, this is done in wavePlayer
+                    //nothing just wait for audio to finish playing
+                },
+                'until_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                    return animeSelf.isAudioVideoInSync();
+                },
+                'minWaitTime_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                    return animeSelf.videoMinPauseTime_introduction_findEquation
+                }
+
+            }
+
             //only the first callback and last callback are different
 
-            let tagIdOffset = 0
-            if (animeSelf.record) {
-                tagIdOffset = -1
-            }
+            let tagIdOffset = -1 * startInCallbackIdx
             let variableStr; let nodeId
-            for(let i=startInCallbackIdx; i<datum0.length; i++) {
+            for(let i=startInCallbackIdx; i<datum0.length-1; i++) {//-1 for the conclusion
                 callbacks0['eq'+(i+tagIdOffset).toString()]={//eq0
-                    'until_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
-                    'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;},
+                    'until_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return animeSelf.isAudioVideoInSync();
+                        // return true;
+                    },
+                    'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return 0;//no pause for hiding Component?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    },
                     'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
                         const line = preCalInfoDict['line'];
                         const list_list_networkNodeIds = line[rIdx]['list_list_networkNodeIds'];
                         const equationMeshUUID = line[rIdx]['equationMeshUUID'];
-                        componentDisplay(list_list_networkNodeIds)
-                        formulaDisplay(equationMeshUUID)
+                        componentDisplay(list_list_networkNodeIds);
+                        formulaDisplay(equationMeshUUID);
+                        // animeSelf.updateCurrentPositionInAnimation()
+                        animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+':display');//actually the state is not needed, but good for debugging
                     },
                     'continueCallbacks_recursor':[
                         function(threadSelf,rIdx, preCalInfoDict){
                             const line = preCalInfoDict['line'];
                             const list_list_networkNodeIds = line[rIdx]['list_list_networkNodeIds'];
                             componentHide(list_list_networkNodeIds)
+                            // animeSelf.updateCurrentPositionInAnimation();//display and hide same data<<<<<<<<? no need to advance
                         }
                     ],
-                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},//extend to audio later<<<<<<<<<<<<<<<<<<<<
-                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;}
+                    'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return animeSelf.isAudioVideoInSync();
+                    },//extend to audio later<<<<<<<<<<<<<<<<<<<<
+                    'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                        return animeSelf.pauseAfterRevealingEquation;
+                    }
                 }
                 for(let j=0; j<datum0[i]['varComponentId'].length; j++) {
                     const varCallbacks = {//for the variableStrComponentnodeId
-                        'until_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
-                        'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;},
+                        'until_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){
+                            return animeSelf.isAudioVideoInSync();
+                            // return true;
+                        },
+                        'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){
+                            return 0;
+                        },
                         //'finish_recursor':function(threadSelf,rIdx, preCalInfoDict){},
                         'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
                             // console.log('highlightVarComponent')
                             const line = preCalInfoDict['line'];
                             const componentMeshUUID = line[rIdx]['componentMeshUUID'];
                             const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
-                            highlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID)
+                            highlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID);
                         },
                         'continueCallbacks_recursor':[
-                            function(threadSelf,rIdx, preCalInfoDict) {
-                                const line = preCalInfoDict['line'];
-                                const componentMeshUUID = line[rIdx]['componentMeshUUID'];
-                                const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
-                                unhighlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID)
-                            },
                         ],
-                        'until_recursor':function(threadSelf,rIdx, preCalInfoDict){return true;},
-                        'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){return waitTime;}
+                        'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                            return animeSelf.isAudioVideoInSync();
+                        },
+                        'minWaitTime_recursor':function(threadSelf,rIdx, preCalInfoDict){
+                            return animeSelf.pauseBetweenEachVariableHighlight;
+                        }
                     };
                     if (j == datum0[i]['varComponentId'].length-1) {
+                        varCallbacks['continueCallbacks_recursor'].push(function(threadSelf, rIdx, preCalInfoDict) {
+                            const line = preCalInfoDict['line'];
+                            const componentMeshUUID = line[rIdx]['componentMeshUUID'];
+                            const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
+                            unhighlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID);
+                            // animeSelf.updateCurrentPositionInAnimation()
+                            // animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()+':highlightVarComponent');//actually the state is not needed, but good for debugging
+                        });
                         varCallbacks['continueCallbacks_recursor'].push(animeSelf.noop);
                         varCallbacks['continueCallbacks_recursor'].push(
                             function(threadSelf, rIdx, preCalInfoDict) {
@@ -415,16 +658,41 @@ class CircuitAnime {
                                 const widthDepthIdx__dataLinearIdx = preCalInfoDict['widthDepthIdx__dataLinearIdx'];
                                 const equationMeshUUID = line[parseInt(widthDepthIdx__dataLinearIdx[tagName__taggedWidthDepthIdx[eqName]])]['equationMeshUUID']
                                 formulaHide(equationMeshUUID)
+                                animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()+':highlightVarComponent');//actually the state is not needed, but good for debugging
                             });
 
+                    } else {
+                        varCallbacks['continueCallbacks_recursor'].push(function(threadSelf, rIdx, preCalInfoDict) {
+                            const line = preCalInfoDict['line'];
+                            const componentMeshUUID = line[rIdx]['componentMeshUUID'];
+                            const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
+                            unhighlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID);
+                            // animeSelf.updateCurrentPositionInAnimation()
+                            animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()+':highlightVarComponent');//actually the state is not needed, but good for debugging
+                        });
                     }
                     callbacks0['eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()] = varCallbacks
                 }
 
             }
-            callbacks0['eq'+(datum0.length-1+tagIdOffset).toString()+'VarCId'+(datum0[datum0.length-1+tagIdOffset]['varComponentId'].length-1).toString()]['finish_recursor'] = function(threadSelf,rIdx, preCalInfoDict){
+            // debugger;
+            //-2 for the conclusion
+            callbacks0['eq'+(datum0.length-2+tagIdOffset).toString()+'VarCId'+(datum0[datum0.length-2+tagIdOffset]['varComponentId'].length-1).toString()]['finish_recursor'] = function(threadSelf,rIdx, preCalInfoDict){
                 self.removeMeshesByRequestingAnimation('findEquations', function(){});
                 self.animationScheduler.playNextAnimation()
+            }
+            callbacks0['conclusion'] = {
+                'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                    // animeSelf.updateCurrentPositionInAnimation()
+                    animeSelf.updateCurrentPositionInAnimation('findEquations:conclusion');//actually the state is not needed, but good for debugging
+                    //nothing just wait for audio to finish playing
+                },
+                'until_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                    return animeSelf.isAudioVideoInSync();
+                },
+                'minWaitTime_recursor':function(threadSelf, rIdx, preCalInfoDict){
+                    return animeSelf.videoMinPauseTime_conclusion_findEquation
+                }
             }
             //
             // console.log('datum0', datum0);
@@ -432,13 +700,17 @@ class CircuitAnime {
             // debugger
             const thread0 = self.animeTemplate(datum0, callbacks0);
 
-            self.scheduleAnimation(thread0, 0, 'findEquation');
+            self.scheduleAnimation(thread0, 0, 'findEquation', function(){animeSelf.loadedDatei_findEquations=true;});
             console.log('findEquations init completed<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         }
 
-        self.animate_findEquations(findEquations___readyCallback);
+
+        self.animate_findEquations(findEquations___readyCallback, animeSelf.animationName);//within animate_findEquations, calls animate_solveEquations
     }
+
+
+
 
     formatDateTime(date) {
       const year = date.getFullYear();

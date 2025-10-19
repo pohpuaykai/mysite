@@ -145,7 +145,9 @@ class Circuit extends Piece{
         const self = this;
         function CALLBACK__solveEquations(steps, latexStrs) {
             self.makeLatexMesh(latexStrs, readyCallback, 'solveEquations');
+            // console.log('step.length (should be 7)', steps.length); debugger
             self.solvingSteps = steps;//<<<<<<<<<<<<<<<<<<<not very elegant?
+            // console.log('self.solvingSteps.length (should be 7)', self.solvingSteps.length); debugger
         }
         this.solveEquations(CALLBACK__solveEquations, list_equationStr, dependentVarStr, list_independentVarStr, simplify)
     }
@@ -159,6 +161,7 @@ class Circuit extends Piece{
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
               const steps = responseDict['steps']// this is solving step, you can call getAudio here...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+              // console.log('step.length (should be 7)', steps.length); debugger
               const branchedStepsIdxs = responseDict['branchedStepsIdxs']
               const latexStrs = responseDict['latexStrs']// not needed: list_tuple_latexStrVariableStr
               const list_tuple_latexStrVariableStr = responseDict['list_tuple_latexStrVariableStr']
@@ -172,6 +175,7 @@ class Circuit extends Piece{
               }
               const runningStepsIdx__branchedStepsIdx = responseDict['runningStepsIdx__branchedStepsIdx']
               self.steps = steps;
+              // console.log('step.length (should be 7)', self.steps.length); debugger
               self.branchedStepsIdx__latexStrs = branchedStepsIdx__latexStrs;
               self.runningStepsIdx__branchedStepsIdx = runningStepsIdx__branchedStepsIdx;
               self.list_runningIdx__toClearAll = list_runningIdx__toClearAll;
@@ -212,7 +216,14 @@ class Circuit extends Piece{
     }
 
     //[start] animeAudio
-    getAudioUrls_findEquations(callback, list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, language_introduction_findEquations, language_conclusion_findEquations) {
+    getAudioUrls_findEquations(
+        callback, 
+        list_equationNetworkInfoDict, 
+        textStr__textMeshUUID, 
+        id__type, 
+        language_introduction_findEquations, 
+        language_conclusion_findEquations
+    ) {
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
@@ -222,10 +233,10 @@ class Circuit extends Piece{
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
               callback(
-                  responseDict['subtitles'],
-                  responseDict['list_tuple_word_location_length_elapsedTime'],
-                  responseDict['filename'],
-                  responseDict['pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime']
+                  // responseDict['subtitles'][self.audioLanguage],
+                  responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
+                  responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
+                  responseDict['language__wavFilePath'][self.audioLanguage]
               );
 
             }
@@ -244,7 +255,7 @@ class Circuit extends Piece{
             }
         }
         // xhr.onerror = function(){}
-        xhr.open('POST', solveEquations_url);
+        xhr.open('POST', basic_findEquations_audioFiles_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         // xhr.setRequestHeader('Content-Type', 'application/json');
         // circuit.getNetworkGraph();
@@ -253,14 +264,14 @@ class Circuit extends Piece{
         xhr.send(JSON.stringify({
             'list_equationNetworkInfoDict':list_equationNetworkInfoDict,
             'textStr__textMeshUUID':textStr__textMeshUUID,
-            'nodeId__type':nodeId__type,
+            'id__type':id__type,
             'language':self.audioLanguage,
             'introduction_findEquations':language_introduction_findEquations[self.audioLanguage],
             'conclusion_findEquations':language_conclusion_findEquations[self.audioLanguage],
-            'wantsTicket':true
+            // 'wantsTicket':true// this is always ticketed
         }));
     }
-    getAudioUrls_solveEquations(callback, solvingSteps, language_introduction_solvingSteps, language_conclusion_solvingSteps) {
+    getAudioUrls_solveEquations(callback, solvingSteps, runningStepsIdx__branchedStepsIdx, language_introduction_solvingSteps, language_conclusion_solvingSteps) {
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
@@ -269,11 +280,12 @@ class Circuit extends Piece{
 
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
+              // console.log(responseDict);
+              // debugger
               callback(
-                  responseDict['subtitles'],
-                  responseDict['list_tuple_word_location_length_elapsedTime'],
-                  responseDict['filename'],
-                  responseDict['pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime']
+                  responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
+                  responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
+                  responseDict['language__wavFilePath'][self.audioLanguage]
               );
 
             }
@@ -292,115 +304,122 @@ class Circuit extends Piece{
             }
         }
         // xhr.onerror = function(){}
-        xhr.open('POST', solveEquations_url);
+        xhr.open('POST', basic_solvingSteps_audioFiles_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         // xhr.setRequestHeader('Content-Type', 'application/json');
         // circuit.getNetworkGraph();
         // self.getNetworkGraph();
-
+        // debugger
         xhr.send(JSON.stringify({
             'solvingSteps':solvingSteps, 
+            'runningStepsIdx__branchedStepsIdx':runningStepsIdx__branchedStepsIdx,
             'language':self.audioLanguage,
             'introduction_solvingSteps':language_introduction_solvingSteps[self.audioLanguage], 
             'conclusion_solvingSteps':language_conclusion_solvingSteps[self.audioLanguage],
-            'wantsTicket':true
+            // 'wantsTicket':true// this is always ticketed
         }));
     }
     getWavFile(callback, wavFilename) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
+        xhr.responseType = 'arraybuffer';
         const self = this;
         xhr.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200) {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();//maybe you can just pass this to the makeWavPlayer, so that it is not duplicating work?
                 const arrayBuffer = this.response;//this is the arraybuffer
                 audioContext.decodeAudioData(arrayBuffer).then(function(audioBuffer){
                     callback(audioBuffer)
                 });
             }
         }
-        xhr.open('POST', wavFiles_url);
+        xhr.open('POST', wavFiles_url, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         const formData = new FormData();
+        // console.log('wavFilename', wavFilename); debugger
         formData.append('filename', wavFilename)
-        xhr.send()
+        xhr.send(formData)
     }
-    makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback) {
+    makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {
         //maybe put this in its own file?
         class WavPlayer {
-            constructor(audioBuffer) {
+            constructor(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 this.audioBuffer = audioBuffer;
                 this.startOffset = 0;
                 this.startTime = 0;
-                this.source; // Your AudioBufferSourceNode
+                this.source;// = this.audioContext.createBufferSource();
                 this.pauseTimings = pauseTimings;
+                console.log('this.pauseTimings: ', this.pauseTimings)
                 this.playerPausedCallback = playerPausedCallback;
                 this.playerResumedCallback = playerResumedCallback;
+                this.checkIfAudioVideoInSync = checkIfAudioVideoInSync;
+                this.readyCallback = readyCallback;
                 this.paused = true;
+                //this.alreadyInitWatcher = false;
+                this.pausedTimingLastIndex = 0;
+                this.readyCallback()
                 //
-                this.initTimingReachedWatcher()
             }
 
             initTimingReachedWatcher() {
-
+                const self = this;
                 let isProcessingInterval = false;
-                let pausedTimingLastIndex = 0;
                 const intervalId = setInterval(function(){
                     if (isProcessingInterval) {return}
-                    let sliced = this.pauseTimings.slice(pausedTimingLastIndex, this.pauseTimings.length);
+                    let sliced = self.pauseTimings.slice(self.pausedTimingLastIndex, self.pauseTimings.length);
                     for(let i=0; i<sliced.length; i++) {
                         let pausedTiming = sliced[i];
-                        startOffsetSegment = this.audioContext.currentTime - this.startTime
-                        //console.log(startOffsetSegment + startOffset, '>', pausedTiming);
-                        if(startOffsetSegment + this.startOffset > pausedTiming) {
+                        let startOffsetSegment = self.audioContext.currentTime - self.startTime
+                        //console.log('startOffsetSegment:', startOffsetSegment, '+self.startOffset:', self.startOffset, '>', pausedTiming);
+                        if(startOffsetSegment + self.startOffset > pausedTiming) {
+                            console.log('startOffsetSegment', startOffsetSegment, ' + ', self.startOffset, 'self.startOffset >', pausedTiming, 'pausedTiming');
                             isProcessingInterval = true;
-                            console.log('in pause loop', startOffsetSegment + this.startOffset)
-                            pausedTimingLastIndex +=1;
-                            console.log('pausedTimingLastIndex', pausedTimingLastIndex);
-                            //pauseAudio();
-                            //
-                            console.log('try source.stop()')
-                            this.source.stop();//
-                            this.playerPausedCallback(pausedTimingLastIndex-1, startOffsetSegment + this.startOffset, pausedTiming);//actual paused timing, planned paused timing?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                            console.log('adding startOffsetSegment')
-                            this.startOffset += startOffsetSegment;
-                            console.log('added to startOffset: ', this.startOffset)
-                            //
-                            const pauseTimeoutId = setTimeout(function(){
-                                console.log('timeout completed')
-                                playAudio(this.audioBuffer);
-                                playerResumedCallback(pausedTimingLastIndex-1, startOffsetSegment + this.startOffset, pausedTiming)
-                                console.log('played audio')
-                                clearTimeout(pauseTimeoutId);
+                            self.pausedTimingLastIndex +=1;
+                            self.pauseAudio(startOffsetSegment);
+                            self.playerPausedCallback(self.pausedTimingLastIndex-1, startOffsetSegment + self.startOffset, pausedTiming);//actual paused timing, planned paused timing?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                            if (self.checkIfAudioVideoInSync()) {
+                                self.playAudio(self.audioBuffer);
+                                self.playerResumedCallback(self.pausedTimingLastIndex-1, startOffsetSegment + self.startOffset, pausedTiming)
                                 isProcessingInterval = false;
-                                
-                            }, 3000);//pause for 3 seconds
+                            }
                             break;
                         }
                     }
-                }, 50);//every 50 milliseconds
+                }, 500);//every 500 milliseconds
             }
 
             playAudio() {
                 if (this.paused) {
                     this.startTime = this.audioContext.currentTime;
-                    this.source = audioContext.createBufferSource();
+                    this.source = this.audioContext.createBufferSource();
                     this.source.buffer = this.audioBuffer;
                     this.source.connect(this.audioContext.destination);
                     this.source.start(0, this.startOffset);
+                    this.paused = false;
+                    console.log('played audio')
+                    //if (!this.alreadyInitWatcher) {
+                    //    this.alreadyInitWatcher = true;
+                    //    this.initTimingReachedWatcher()
+                    //    console.log('initTimingReachedWatcher')
+                    //}
+                    this.initTimingReachedWatcher()
                 }
             }
 
-            pauseAudio() {
+            pauseAudio(pausedOffset) {
                 if (!this.paused) {
                     this.source.stop();
-                    this.startOffset += this.audioContext.currentTime - this.startTime;
+                    //this.startOffset += this.audioContext.currentTime - this.startTime;
+                    this.startOffset += pausedOffset
+                    console.log('paused:', this.startOffset);
+                    this.paused = true;
+                    console.log('paused audio')
                 }
             }
         }
         //
-        return WavPlayer(audioBuffer)
+        return new WavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync)
     }
     //[end] animeAudio
 

@@ -32,8 +32,9 @@ class Animation {
     //     this.animation = this.aggregatedAnimations
     // };
 
-    scheduleAnimation(animation, priority, animationName) {
+    scheduleAnimation(animation, priority, animationName, callback) {
         this.animationHoldingPen.push({'animation':animation, 'priority':priority, 'name':animationName});//
+        callback();
     }
 
     playNextAnimation() {
@@ -52,8 +53,10 @@ class Animation {
             this.animationHoldingPen.sort((a, b) => a['priority'] - b['priority']);//ascending order
             // this.animationHoldingPen.sort((a, b) => b['priority'] - a['priority']);//descending order
             const animationInfoDict = this.animationHoldingPen[this.lastAnimationPlayedId];// play this first one
-            console.log('playing animation: ', animationInfoDict['name'])
+            console.log('playing animation: ', animationInfoDict['name']);
+            // debugger;
             animationInfoDict['animation']();
+            this.playing = true
         }
     }
 

@@ -137,23 +137,23 @@ def automat_solveEquations(request):
     dependentVarStr = equation_details['dependentVarStr']
     list_independentVarStr = list(set((filter(lambda varStr: varStr is not None, equation_details['list_independentVarStr']))))
     simplify = equation_details['simplify']
-    print('simplify')
-    print(simplify)
-    print('id__type')
-    pp.pprint(id__type)
-    print('list_equationStr')
-    pp.pprint(list_equationStr)
-    print('dependentVarStr')
-    print(dependentVarStr)
-    print('list_independentVarStr')
-    pp.pprint(list_independentVarStr)
+    # print('simplify')
+    # print(simplify)
+    # print('id__type')
+    # pp.pprint(id__type)
+    # print('list_equationStr')
+    # pp.pprint(list_equationStr)
+    # print('dependentVarStr')
+    # print(dependentVarStr)
+    # print('list_independentVarStr')
+    # pp.pprint(list_independentVarStr)
 
 
 
-    print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print(list_equationStr); print(len(list_equationStr));
-    print('dependentVarStr', dependentVarStr); print('list_independentVarStr', list_independentVarStr)
-    print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    # print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    # print(list_equationStr); print(len(list_equationStr));
+    # print('dependentVarStr', dependentVarStr); print('list_independentVarStr', list_independentVarStr)
+    # print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
     from foundation.automat.core.equation import Equation
     listOfCollectedEquations = []; 
@@ -174,14 +174,15 @@ def automat_solveEquations(request):
     list_runningIdx__toClearAll = []; list_runningIdx__toKeep = []
 
     #steps[0] is always the beginning
-    beginning = steps.pop(0)
+    # beginning = steps.pop(0)
+    beginning = steps[0]
     branchedStepsIdx = (0, 'vor'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx; 
     branchedStepsIdxs.append(branchedStepsIdx); latexStrs.append(beginning['vor']['latex'])
     list_tuple_latexStrVariableStr.append((beginning['vor']['latex'], beginning['vor']['variables']))
     previousVorRunningStepsIdx = runningStepsIdx; previousHinRunningStepsIdx = None
 
     #
-    for stepIdx, step in enumerate(steps):
+    for stepIdx, step in enumerate(steps[1:]): # skip first step
         hasVorSubStep = False
         for vorSubStepIdx, vorSubStep in enumerate(step['vor__subSteps']):
             branchedStepsIdx = (stepIdx+1, 'vor', vorSubStepIdx, 'vor__subSteps'); runningStepsIdx += 1; runningStepsIdx__branchedStepsIdx[runningStepsIdx] = branchedStepsIdx; 
@@ -220,6 +221,9 @@ def automat_solveEquations(request):
         previousVorRunningStepsIdx = runningStepsIdx
 
 
+    # pp.pprint(runningStepsIdx__branchedStepsIdx);
+    # import pdb;pdb.set_trace()
+
     return HttpResponse(dumps({
         'steps':steps, 'branchedStepsIdxs':branchedStepsIdxs, 
         'latexStrs':latexStrs, 
@@ -241,5 +245,8 @@ def pollable(request):
         if responseContent is None: # this means that the backend thread is not done yet, so we should not delete the ticket
             return HttpResponse('', content_type='text/plain')
         ticketObj.delete()
+        print('***********************************************responseContent:')
+        print(responseContent)
+        print('***********************************************')
         return HttpResponse(responseContent, content_type="text/plain")
     return HttpResponse('', content_type="text/plain")

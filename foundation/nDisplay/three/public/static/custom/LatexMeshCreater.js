@@ -27,7 +27,7 @@ class LatexMeshCreator {
     }
 
 
-    getMeshes(list_latexStr, equationMeshCallback, textStr__textMeshUUID___existing, requestingAnimationName) {
+    getMeshes(list_latexStr, equationMeshCallback, meshUUID__mesh___existing, textStr__textMeshUUID___existing, requestingAnimationName) {
       const meshUUID__mesh = {};
       const self = this; //self.generatedMeshes = [];
       // console.log("this.stylizedDecCode__Char", this.stylizedDecCode__Char)
@@ -40,8 +40,8 @@ class LatexMeshCreator {
       for(let i=0; i<list_latexStr.length; i++) {
         let latexStr; let variables;
         [latexStr, variables] = list_latexStr[i];
-        if (latexStr in textStr__textMeshUUID___existing) { // if already exist there is not need to recreate it, it will still be available in circuit.js (latexStr)
-          textStr__textMeshUUID___existing[latexStr].setRequestingAnimation(requestingAnimationName)
+        if (latexStr in textStr__textMeshUUID___existing && meshUUID__mesh___existing[textStr__textMeshUUID___existing[latexStr]]) { // if already exist there is not need to recreate it, it will still be available in circuit.js (latexStr)
+          meshUUID__mesh___existing[textStr__textMeshUUID___existing[latexStr]].setRequestingAnimation(requestingAnimationName)
           continue
         }
         // console.log('variables', variables, 'latexStr', latexStr)

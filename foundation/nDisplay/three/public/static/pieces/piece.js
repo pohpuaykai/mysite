@@ -80,11 +80,12 @@ class Piece {
                 // console.log('self.meshUUID__mesh', self.meshUUID__mesh)
             }
         }
-        this.latexMeshCreator.getMeshes(list_latexStr, equationMeshCallback, readyCallback, this.textStr__textMeshUUID, requestingAnimationName);
+        this.latexMeshCreator.getMeshes(list_latexStr, equationMeshCallback, this.meshUUID__mesh, this.textStr__textMeshUUID, requestingAnimationName);
+        // this.latexMeshCreator.getMeshes(list_latexStr, equationMeshCallback, readyCallback, this.textStr__textMeshUUID, requestingAnimationName);
     }
 
-    scheduleAnimation(animation, priority, animationName) {
-        this.animationScheduler.scheduleAnimation(animation, priority, animationName);
+    scheduleAnimation(animation, priority, animationName, callback) {
+        this.animationScheduler.scheduleAnimation(animation, priority, animationName, callback);
     }
 
 
@@ -102,12 +103,25 @@ class Piece {
         completionCallback();
     }
 
-    play(playIfTrue) {
+    start(playIfTrue) {
         console.log('playIfTrue: ', playIfTrue())
         console.log('!this.animationScheduler.playing', !this.animationScheduler.playing)
-        if(playIfTrue() && !this.animationScheduler.playing) {
-            this.animationScheduler.playNextAnimation()
+        const self = this;
+        function tryPlayingAnimation() {
+            console.log('checking if we can play the animation: ', playIfTrue() && !self.animationScheduler.playing)
+            if (playIfTrue() && !self.animationScheduler.playing) {//must be true
+                self.animationScheduler.playNextAnimation()
+                console.warn('played next Animation')
+                clearTimeout(intervalId);
+
+            }
         }
+        const intervalId = setInterval(tryPlayingAnimation, 1000);//check every second?
+        // if(playIfTrue() && !this.animationScheduler.playing) {
+        //     this.animationScheduler.playNextAnimation()
+
+
+        // }
     }
 
     pause(continueFunction, milliseconds) {

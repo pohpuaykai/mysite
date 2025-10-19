@@ -126,6 +126,9 @@ class ThreadTemplate {
             'tagName__taggedWidthDepthIdx':tagName__taggedWidthDepthIdx, 
             'widthDepthIdx__dataLinearIdx':widthDepthIdx__dataLinearIdx
         }
+        // console.log('preCalInfoDict')
+        // console.log(preCalInfoDict)
+        // debugger
         //create getCallback to handle defaults when the callback needed is not there
         // console.log('taggedWidthDepthIdx__tagName', taggedWidthDepthIdx__tagName)
         // console.log('dataLinearIdx__widthDepthIdx', dataLinearIdx__widthDepthIdx)
