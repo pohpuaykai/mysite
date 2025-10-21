@@ -1,27 +1,11 @@
--draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
---<<Foundations of Analog and Digital Electronic Circuits>> better read and no errors on answers
----do this to improve bipartiteSolver?
---<<Schaum's 3000 Solved Problems In Electric Circuits>>
 -make pretty animations :D
---try to achieve the voltage|current divider equation with bipartite_solver  for 
----another stupid idea for scoring bipartiteSolver
-----LCSS each equation einander, go for the highest scoring one given the neighbour?
-----group equations together by Laplacian, by LCSS_score, and try to apply them together in succession, https://en.wikipedia.org/wiki/Laplacian_matrix
-----if current LCSS is similiar enough to existing visited schemeEq, then we can early terminate?
-----maybe its time to work on the Damarau-Levenshtein to get it to be compliant with schemeLabels
----we will have to store the schemeEquation in State, and then LCSS with reducingManipulations to give reducibleStates higher score
-----instead of LCSS+scoring why not call simplify on each state? that will reduce statespace, but will each step become too long time?
-----Also if equations resembles a polynomial, should it have a higher score for bipartite?
-----This also goes for combingSearch, if equations resembles a polynomial, should it be an earlier termination for combingSearch?
----What if we stack manipulations but only so that they produce resultingManipulations, that reduce the number of schemeLabels or levels of outputPattern? and then save those stacked_manipulations as 1 manipulation? If so, then our search will have more termination_points?
----An idea from <<Foundations>> is to form simple polynomials from existing equations, where we can then select solvingVariables so that the #solvingVariables=#equations, and the use Cramer'sRuleWithCAS to solve for their closed form
-----how to form 'simple polynomials?'
-----how to select solvingVariables so that #solvingVariables=#equations
-----WORKON symbolicGaussian
+--tobe done before recording and uploading to YOUTUBE :D
+---maybe also mention the type of variable in your audio? is it a resistance_variable, current_variable, voltage_variable
+---KCL should preferably only return the wireNode to be highlighted, please do not highlight the whole loop very confusing
+---maybe also mention the type of simplification_step that is being performed? because saying the exact same thing over and over is stupid
+---also some of the audio and steps are not aligned, like some eliminationStep are not at the right timing? not all... may it be that the audio script is old? <<<<<<important
+---there is also a HeisenBug, that appears only sometimes: The AudioContext encountered an error from the audio device or the WebAudio renderer.
 
----dc_twoResistor_parallel.js
----dc_twoResistor_series.js
----Q2_3_5_aMoreComplexCircuit__P84.js
 
 
 
@@ -50,6 +34,37 @@ USE 1 or 2 facebook resistor meshes (EletricalEngineeringXYZ) as examples first,
 
 
 TODO:
+
+
+
+-draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
+-current_divider 
+--there are repeated(nonLinearlyIndependent)current_equations from your Kirschoff_Current_law, PLEASE fix to make new video!!!!!!
+--<<Foundations of Analog and Digital Electronic Circuits>> better read and no errors on answers
+---do this to improve bipartiteSolver?
+--<<Schaum's 3000 Solved Problems In Electric Circuits>>
+---another stupid idea for scoring bipartiteSolver
+----LCSS each equation einander, go for the highest scoring one given the neighbour?
+----group equations together by Laplacian, by LCSS_score, and try to apply them together in succession, https://en.wikipedia.org/wiki/Laplacian_matrix
+----if current LCSS is similiar enough to existing visited schemeEq, then we can early terminate?
+----maybe its time to work on the Damarau-Levenshtein to get it to be compliant with schemeLabels
+---we will have to store the schemeEquation in State, and then LCSS with reducingManipulations to give reducibleStates higher score
+----instead of LCSS+scoring why not call simplify on each state? that will reduce statespace, but will each step become too long time?
+----Also if equations resembles a polynomial, should it have a higher score for bipartite?
+----This also goes for combingSearch, if equations resembles a polynomial, should it be an earlier termination for combingSearch?
+---What if we stack manipulations but only so that they produce resultingManipulations, that reduce the number of schemeLabels or levels of outputPattern? and then save those stacked_manipulations as 1 manipulation? If so, then our search will have more termination_points?
+---An idea from <<Foundations>> is to form simple polynomials from existing equations, where we can then select solvingVariables so that the #solvingVariables=#equations, and the use Cramer'sRuleWithCAS to solve for their closed form
+----how to form 'simple polynomials?'
+----how to select solvingVariables so that #solvingVariables=#equations
+----WORKON symbolicGaussian
+
+---dc_twoResistor_parallel.js
+---dc_twoResistor_series.js
+---Q2_3_5_aMoreComplexCircuit__P84.js
+
+
+
+
 
 
 

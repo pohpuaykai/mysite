@@ -227,7 +227,7 @@ class Piece {
         // this.camera.lookAt(new THREE.Vector3(x, y, z));
         // const toQuarternion = new THREE.Quaternion().copy(this.camera.quarternion);
         // this.camera.copy(fromQuarternion); //Restore original quarternion
-
+        let readyCallbackCalled = false;// the readyCallback, might be called many many many times.... this flag should prevent this? HOPEFULLY
         const self = this;
         function turnCamera() {
             // self.camera.quarternion.slerp(toQuarternion, 0.1); //0.1 is the speed of rotation
@@ -239,7 +239,11 @@ class Piece {
             function turnCamera___recursion(currentTheta, currentPhi) {
 
                 if (currentTheta >= theta && currentPhi >= phi) {
-                    readyCallback();
+                    if (!readyCallbackCalled) {
+                        readyCallbackCalled = true;
+                        // console.log('smoothOrbit READYCALLBACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                        readyCallback();
+                    }
                     return 
                 }
                 if(currentTheta < theta) {

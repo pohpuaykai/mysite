@@ -78,15 +78,15 @@ class DriverProxy:
         while (not self._busy) and len(self._queue):
             cmd = self._queue.pop(0)
             self._name = cmd[2]
-            print('busy? ***', self._busy,'***')
-            print('~~~~~~~~~~~~~~~~~~~queue:', list(map(lambda command: (command[0], command[2]), self._queue)))
-            print('~~~~~~~~~~~~~~~~~pumping, cmd:', (cmd[0], cmd[2]))
+            #print('busy? ***', self._busy,'***')
+            #print('~~~~~~~~~~~~~~~~~~~queue:', list(map(lambda command: (command[0], command[2]), self._queue)))
+            #print('~~~~~~~~~~~~~~~~~pumping, cmd:', (cmd[0], cmd[2]))
             try:
-                print(')))))))))))))))))))))calling', cmd[0] , 'on', cmd[1])
+                #print(')))))))))))))))))))))calling', cmd[0] , 'on', cmd[1])
                 cmd[0](*cmd[1])
-                print('call finished')
+                #print('call finished')
             except Exception as e:
-                print('in _pump, got error: ', e)
+                #print('in _pump, got error: ', e)
                 traceback.print_exc()
                 self.notify("error", exception=e)
                 if self._debug:

@@ -136,7 +136,7 @@ class ThreadTemplate {
         function getCallback(rIdx, callbackName) {
             const name__callback = callbacks[taggedWidthDepthIdx__tagName[dataLinearIdx__widthDepthIdx[rIdx]]]
             // debugger
-            if (callbackName in name__callback) {
+            if (name__callback!==undefined && callbackName in name__callback) {
                 return name__callback[callbackName]
             } else {
                 switch (callbackName) {//for returning blank functions

@@ -3147,7 +3147,6 @@ def test_generateSubtitles_solvingSteps(verbose=False):
     # print(inspect.currentframe().f_code.co_name, ' PASSED? ', len(Function.TRIGONOMETRIC_NAMES)>0)
 
 
-
 def test_generateSubtitle_findEquation(verbose=False):
     scab = SubtitlesCircuitAnimeBasic()
     languageTwoLetterCode = 'en-US'
@@ -3184,10 +3183,49 @@ def test_generateSubtitle_solvingStep(verbose=False):
         print(response)
 
 
+def test_generateEachSubtitle_findEquation(verbose=False):
+    scab = SubtitlesCircuitAnimeBasic()
+    languageTwoLetterCode = 'en-US'
+    # languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
+    ticketNumber = scab.generateEachAudioFilePath_findEquation(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, language_introduction_findEquations[languageTwoLetterCode], language_conclusion_findEquations[languageTwoLetterCode], folderpath)
+    response = scab.waitUntilResponseAvailable(ticketNumber)
+    if verbose:
+        print('***********************')
+        # pp.pprint(results)
+        # pp.pprint(languages__subtitles)
+        # pp.pprint(languages__subtitleIdx__dict_startTime_endTime)
+        # pp.pprint(languages__filepath)
+        # pp.pprint(language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
+        print(ticketNumber)
+        # pp.pprint(response)
+        import json
+        print(json.dumps(response))
+
+def test_generateEachSubtitle_solvingStep(verbose=False):
+    scab = SubtitlesCircuitAnimeBasic()
+    languageTwoLetterCode = 'en-US'
+    # languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
+    ticketNumber = scab.generateEachAudioFilePath_solvingStep(solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, language_introduction_solvingSteps[languageTwoLetterCode], language_conclusion_solvingSteps[languageTwoLetterCode], folderpath)
+    response = scab.waitUntilResponseAvailable(ticketNumber)
+    if verbose:
+        print('***********************')
+        # pp.pprint(subtitles)
+        # pp.pprint(languages__subtitles)
+        # pp.pprint(languages__subtitleIdx__dict_startTime_endTime)
+        # pp.pprint(languages__filepath)
+        # pp.pprint(language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime)
+        print(ticketNumber)
+        # pp.pprint(response)
+        print(response)
+
+
 if __name__=='__main__':
-    # test_generateSubtitle_solvingStepNoAudio(True)
+    test_generateSubtitle_solvingStepNoAudio(True)
     # test_generateSubtitle_solvingStepsNoAudio(True)
     # test_generateSubtitles_findEquations(True)
     # test_generateSubtitles_solvingSteps(True)
-    test_generateSubtitle_findEquation(True)
+    # test_generateSubtitle_findEquation(True)
     # test_generateSubtitle_solvingStep(True)
+
+    # test_generateEachSubtitle_findEquation(True)
+    # test_generateEachSubtitle_solvingStep(True)

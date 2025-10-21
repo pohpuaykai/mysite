@@ -12,7 +12,7 @@ from video import AUDIOFILES_DROP_FOLDER
 from video.captions.subtitles_circuitAnime_basic import SubtitlesCircuitAnimeBasic
 
 
-def circuitAnimeRecord(request):
+def circuitAnimeRecord(request):#receives the recorded video
     if 'file' in request.FILES:
         uploaded_file = request.FILES['file'] # this is a InMemoryUploadedFile
 
@@ -36,7 +36,7 @@ def basic_findEquations_audioFiles(request):
     details = loads(request.body)
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
     scab = SubtitlesCircuitAnimeBasic()
-    ticketNumber = scab.generateAudioFilePath_findEquation(
+    ticketNumber = scab.generateEachAudioFilePath_findEquation(
         details['list_equationNetworkInfoDict'], 
         details['textStr__textMeshUUID'], 
         details['id__type'], 
@@ -73,7 +73,7 @@ def basic_solvingSteps_audioFiles(request):
     # pp.pprint(details)
     # import pdb;pdb.set_trace()
     #
-    ticketNumber = scab.generateAudioFilePath_solvingStep(
+    ticketNumber = scab.generateEachAudioFilePath_solvingStep(
         details['solvingSteps'], 
         details['runningStepsIdx__branchedStepsIdx'], 
         details['language'],

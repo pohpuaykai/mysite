@@ -44,11 +44,11 @@ class AudioFromText:
         language__existingData = {}
         for language, list_subtitle in language__list_subtitle.items():
             if useOld:
-                print(0)
+                # print(0)
                 tag = f'{theWavFileOutPrefix}{language}'
                 oldAudioData = self.getFirstOldAudioByTag(tag)
                 if oldAudioData is not None:
-                    print(1)
+                    # print(1)
                     language__existingData[language] = oldAudioData
                     list_tuple_subtitleStartPos_subtitleEndPos = oldAudioData['list_tuple_subtitleStartPos_subtitleEndPos']
                     wavFilePath = oldAudioData['wavFilePath']
@@ -217,6 +217,51 @@ class AudioFromText:
         }
 
         # return language__list_tuple_word_location_length_elapsedTime, language__wavFilePath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
+
+    @parallelise
+    def convertEachSentenceItsOwnWav(self, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
+        from pathlib import Path
+        if useOld:
+            data = self.getFirstOldAudioByTag(wavFileOutPrefix)
+            if data is not None:
+                return data
+        from video.common.text2audio import pyttsx3
+        engine = pyttsx3.init()
+        voices = engine.getProperty('voices')
+        #
+        engine.setProperty('rate', rate)#You can adjust this value as needed
+        engine.setProperty('volume', volume)#1.0 is maximum volume
+        #
+        returnedOld = False
+        wavFileOutPrefixN = f"{wavFileOutPrefix}_{datetime.strftime(datetime.utcnow(), '%Y%m%d%H%M%S')}"
+        language__filepaths = {}
+        for language, list_subtitle in language__list_subtitle.items():
+            voice = voices[AudioFromText.languageTwoLetterCode__voiceId[language]].id
+            #create a new folder for each language
+            newOutputFolderpath = os.path.join(outputfolderpath, f'{wavFileOutPrefixN}_{language}')
+            if not os.path.isdir(newOutputFolderpath):
+                os.makedirs(newOutputFolderpath)
+            #
+            filepaths = []
+            for subtitleIdx, subtitle in enumerate(list_subtitle):
+                engine.setProperty('voice', voice)
+                # engine.say(subtitle)#if i don't want the word-by-word timing, should i still need to say it? or will engine.save_to_file suffisant?
+                wavFilePath = os.path.join(newOutputFolderpath, f'{subtitleIdx}.wav')
+                engine.save_to_file(subtitle, wavFilePath)
+                #cut out the last last 2 parts from wavFilePath
+                pathObj = Path(wavFilePath)
+                filepaths.append(os.path.join(*pathObj.parts[-2:]))
+                #
+            #
+            engine.proxy._push(engine.endLoop, ()) # add the terminating job
+            engine.runAndWait()
+                # language__wavFilePath[language] = wavFilePath
+                # language__wavFilePath[language] = os.path.basename(wavFilePath)
+            language__filepaths[language] = filepaths
+        if useOld and not returnedOld:
+            self.storeByTag(wavFileOutPrefix, language__filepaths)
+        return language__filepaths
+
 
     def getFirstOldAudioByTag(self, tag):
         oldAudios = Audio.objects.filter(tag=tag)

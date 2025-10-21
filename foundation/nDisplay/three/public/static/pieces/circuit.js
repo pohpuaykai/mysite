@@ -232,12 +232,13 @@ class Circuit extends Piece{
 
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
-              callback(
-                  // responseDict['subtitles'][self.audioLanguage],
-                  responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
-                  responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
-                  responseDict['language__wavFilePath'][self.audioLanguage]
-              );
+              // callback(
+              //     // responseDict['subtitles'][self.audioLanguage],
+              //     responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
+              //     responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
+              //     responseDict['language__wavFilePath'][self.audioLanguage]
+              // );
+              callback(responseDict[self.audioLanguage])
 
             }
 
@@ -271,7 +272,13 @@ class Circuit extends Piece{
             // 'wantsTicket':true// this is always ticketed
         }));
     }
-    getAudioUrls_solveEquations(callback, solvingSteps, runningStepsIdx__branchedStepsIdx, language_introduction_solvingSteps, language_conclusion_solvingSteps) {
+    getAudioUrls_solveEquations(
+        callback, 
+        solvingSteps, 
+        runningStepsIdx__branchedStepsIdx, 
+        language_introduction_solvingSteps, 
+        language_conclusion_solvingSteps
+    ) {
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const xhr = new XMLHttpRequest();
@@ -282,11 +289,12 @@ class Circuit extends Piece{
               const responseDict = JSON.parse(responseText);
               // console.log(responseDict);
               // debugger
-              callback(
-                  responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
-                  responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
-                  responseDict['language__wavFilePath'][self.audioLanguage]
-              );
+              // callback(
+              //     responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
+              //     responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
+              //     responseDict['language__wavFilePath'][self.audioLanguage]
+              // );
+              callback(responseDict[self.audioLanguage]);
 
             }
 
@@ -340,7 +348,32 @@ class Circuit extends Piece{
         formData.append('filename', wavFilename)
         xhr.send(formData)
     }
-    makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {
+
+    makeWavPlayerWithEndCallback(audioEndCallback) {
+        //maybe put this in its own file?
+        class WavPlayer {
+            constructor(audioEndCallback) {
+                // this.audioBuffer = audioBuffer;
+                this.audioEndCallback = audioEndCallback
+                this.audioContext = new (window.AudioContext||window.webkitAudioContext)();
+                this.restockSource()
+            }
+            play(audioBuffer) {
+                this.restockSource()
+                this.source.buffer = audioBuffer
+                this.source.connect(this.audioContext.destination);
+                this.source.start(0, 0);
+            }
+            restockSource() {
+                this.source = this.audioContext.createBufferSource();
+                this.source.addEventListener('ended', this.audioEndCallback)
+            }
+        }
+        return new WavPlayer(audioEndCallback)
+    }
+
+
+    makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {//this is not used, maybe rename to something more specific?, this is made to pause at timings, stipulated by the user, but it is not working very well
         //maybe put this in its own file?
         class WavPlayer {
             constructor(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {
