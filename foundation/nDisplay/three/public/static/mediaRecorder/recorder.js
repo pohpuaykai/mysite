@@ -1,5 +1,5 @@
 class Recorder {
-    constructor(permissionGivenCallback, canvas) {
+    constructor(permissionGivenCallback, canvas, audioContext) {
         /**
          * Lifted from 
          * https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
@@ -13,10 +13,17 @@ class Recorder {
         this.secondsPerFrame = 1000;
         this.framePerSecond = 30;
         this.mediaRecorder = null;
+
+        this.destination = audioContext.createMediaStreamDestination();
+        this.source = audioContext.createBufferSource();
+        this.source.connect(this.destination);
+
         const constraints = {
-            video:true, audio:false
+            video:true, audio:true
         };
-        let chunks = [];
+        let chunks = [];//video chunks
+
+        
 
         // navigator.mediaDevices
         //     // .getUserMedia(constraints) //getWebCam
@@ -33,7 +40,12 @@ class Recorder {
         //         console.error(`The following error occurred: ${err}`);
         //     });
 
-        const stream = canvas.captureStream(this.framePerSecond)
+        // const stream = canvas.captureStream(this.framePerSecond)// this is pure videostream
+        const videoStream = canvas.captureStream(this.framePerSecond);
+        const stream = new MediaStream([
+            ...videoStream.getVideoTracks(),
+            ...this.destination.stream.getAudioTracks()
+        ]);
         self.setupRecorder(stream)
         permissionGivenCallback();
 
@@ -54,6 +66,7 @@ class Recorder {
 
         this.mediaRecorder.ondataavailable = (event) => {
             if (event.data.size > 0) {
+                console.log('this.mediaRecorder.ondataavailable:', event.data.size)
                 self.recordedChunks.push(event.data);
             }
         };

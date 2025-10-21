@@ -9,8 +9,8 @@ class DCTwoResistorParallel extends Circuit {
     /**
      * 
      * **/
-    constructor(scene, camera, renderer, controls, meshes) {
-        super(scene, camera, renderer, controls, meshes);
+    constructor(scene, camera, renderer, audioContext, controls, meshes) {
+        super(scene, camera, renderer, audioContext, controls, meshes);
 
         this.language_introduction_findEquations = {//This will be read out at the beginning of the animation_findEquations
             'en-US':'This is a circuit with two resistors connected in parallel, lets find all the equations related to the components of this circuit',
@@ -138,7 +138,7 @@ class DCTwoResistorParallel extends Circuit {
             });
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
-        const simplify = true; const record = false; const ticketing = true;
+        const simplify = true; const record = true; const ticketing = true;
         (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, ticketing, simplify, record)).play();
 
         return {

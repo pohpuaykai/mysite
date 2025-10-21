@@ -11,7 +11,9 @@ class Piece {
      * TODO see how we can make use of these:
      * https://github.com/mdn/webaudio-examples<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
      * **/
-    constructor(scene, camera, renderer, controls, meshes) {
+    constructor(scene, camera, renderer, audioContext, controls, meshes) {
+
+        this.audioContext = audioContext;
 
         this.scene = scene;
         this.camera = camera;
@@ -391,6 +393,31 @@ class Piece {
             xhr.send(formData);
         }
         poll();
+    }
+
+
+    makeWavPlayerWithEndCallback(audioEndCallback) {
+        //maybe put this in its own file?
+        class WavPlayer {
+            constructor(audioEndCallback, audioContext) {
+                // this.audioBuffer = audioBuffer;
+                this.audioEndCallback = audioEndCallback
+                this.audioContext = audioContext;//new (window.AudioContext||window.webkitAudioContext)();
+                this.restockSource()
+            }
+            play(audioBuffer, recorderDestination) {
+                this.restockSource()
+                this.source.buffer = audioBuffer
+                this.source.connect(this.audioContext.destination);
+                this.source.connect(recorderDestination);
+                this.source.start(0, 0);
+            }
+            restockSource() {
+                this.source = this.audioContext.createBufferSource();
+                this.source.addEventListener('ended', this.audioEndCallback)
+            }
+        }
+        return new WavPlayer(audioEndCallback, this.audioContext)
     }
 
 }

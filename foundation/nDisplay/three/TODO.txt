@@ -1,5 +1,7 @@
 -make pretty animations :D
 --tobe done before recording and uploading to YOUTUBE :D
+---also you tube did not detect any sound.... some thing wrong with recorder.js?
+---generate subtitles
 ---maybe also mention the type of variable in your audio? is it a resistance_variable, current_variable, voltage_variable
 ---KCL should preferably only return the wireNode to be highlighted, please do not highlight the whole loop very confusing
 ---maybe also mention the type of simplification_step that is being performed? because saying the exact same thing over and over is stupid

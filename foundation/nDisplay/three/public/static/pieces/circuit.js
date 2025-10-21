@@ -8,8 +8,8 @@ import {ComponentBattery} from '../meshes/ComponentBattery.js';
 
 class Circuit extends Piece{
     
-    constructor(scene, camera, renderer, controls, meshes) {
-        super(scene, camera, renderer, controls, meshes);
+    constructor(scene, camera, renderer, audioContext, controls, meshes) {
+        super(scene, camera, renderer, audioContext, controls, meshes);
 
         this.animationAggregator = new Animation(scene, camera, renderer);
         
@@ -348,30 +348,6 @@ class Circuit extends Piece{
         formData.append('filename', wavFilename)
         xhr.send(formData)
     }
-
-    makeWavPlayerWithEndCallback(audioEndCallback) {
-        //maybe put this in its own file?
-        class WavPlayer {
-            constructor(audioEndCallback) {
-                // this.audioBuffer = audioBuffer;
-                this.audioEndCallback = audioEndCallback
-                this.audioContext = new (window.AudioContext||window.webkitAudioContext)();
-                this.restockSource()
-            }
-            play(audioBuffer) {
-                this.restockSource()
-                this.source.buffer = audioBuffer
-                this.source.connect(this.audioContext.destination);
-                this.source.start(0, 0);
-            }
-            restockSource() {
-                this.source = this.audioContext.createBufferSource();
-                this.source.addEventListener('ended', this.audioEndCallback)
-            }
-        }
-        return new WavPlayer(audioEndCallback)
-    }
-
 
     makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {//this is not used, maybe rename to something more specific?, this is made to pause at timings, stipulated by the user, but it is not working very well
         //maybe put this in its own file?

@@ -56,12 +56,12 @@ class CircuitAnime {
         //
         const animeSelf = this;
         this.audioPlayer_findEquations = this.circuit.makeWavPlayerWithEndCallback(
-            function() {
+            function() {//on end playAudio, we update the currentPositionInAudio
                 animeSelf.updateCurrentPositionInAudio()
             }
         );
         this.audioPlayer_solveEquations = this.circuit.makeWavPlayerWithEndCallback(
-            function() {
+            function() {//on end playAudio, we update the currentPositionInAudio
                 animeSelf.updateCurrentPositionInAudio()
             }
         );
@@ -79,7 +79,8 @@ class CircuitAnime {
                 self.permissionGiven = true;
                 console.log('self.permissionGiven: ', self.permissionGiven)
             }
-            this.recorder = new Recorder(permissionGivenCallback, this.circuit.renderer.domElement);//this.circuit.renderer.domElement is the canvas of THREE?
+            this.recorder = new Recorder(permissionGivenCallback, this.circuit.renderer.domElement, this.circuit.audioContext);//this.circuit.renderer.domElement is the canvas of THREE?
+            this.recorderDestination = this.recorder.destination;
         }
         this.loadedDatei_findEquations = false;//flag to make sure we finished loading datei for findEquation
         this.loadedDatei_solveEquations = false;//flag to make sure we finished loading datei for solveEquation
@@ -475,6 +476,8 @@ class CircuitAnime {
             let datum0 = []; let callbacks0 = {}; let startInCallbackIdx = 1;//the extra 1 is for the introduction
 
             if (animeSelf.record) {
+                // animeSelf.recorder.startRecording();
+                //
                 const recordingTag = 'startRecording';
                 datum0 = [{
                     'startRecording':{},
@@ -483,7 +486,7 @@ class CircuitAnime {
                 callbacks0[recordingTag] = {
                     'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
                         console.log('started recording in anime')
-                        animeSelf.recorder.startRecording();
+                        animeSelf.recorder.startRecording();//is the recorder being terminated by the ThreadTemplate? because when i last tested it only recorded the first few seconds
                         // threadSelf();//this is thread0
                     },
                     'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
@@ -495,6 +498,7 @@ class CircuitAnime {
                     }//no minWait time for recording
                 };
                 startInCallbackIdx = 2//the extra 1 is for the introduction
+                //
             }
 
             datum0.push({
@@ -802,7 +806,7 @@ class CircuitAnime {
             default:
                 throw Exception()
         }
-        audioPlayer.play(frameIdx__audioBuffer[audioFrameIdx]);
+        audioPlayer.play(frameIdx__audioBuffer[audioFrameIdx], this.recorderDestination);
         console.log('audio played '+threadName+' '+audioFrameIdx.toString(), 'cpInAudio: ', this.currentPositionInAudio, 'cpInVideo: ', this.currentPositionInAnimation)//, this.playAudio.caller)// this is not accessible in strict mode
     }
 
