@@ -19,8 +19,13 @@ def init(driverName=None, debug=False):
     @rtype: L{engine.Engine}
     """
     try:
+        # print('startINIT, _activeEngines: ', dict(_activeEngines))
         eng = _activeEngines[driverName]
+        # print('completed INIT')
     except KeyError:
+        #
+        # import traceback; traceback.print_exc()
+        #
         eng = Engine(driverName, debug)
         _activeEngines[driverName] = eng
     return eng

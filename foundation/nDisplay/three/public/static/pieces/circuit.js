@@ -128,6 +128,7 @@ class Circuit extends Piece{
         // console.log('this.id__type', this.id__type); debugger;
 
         xhr.send(JSON.stringify({
+            'circuitName':self.circuitName,
             'networkGraph':self.networkGraph, //circuit.networkGraph,
             'id__type':self.id__type,//circuit.id__type,
             'id__positiveLeadsDirections':self.id__positiveLeadsDirections,//circuit.id__positiveLeadsDirections,
@@ -205,6 +206,7 @@ class Circuit extends Piece{
         // self.getNetworkGraph();
 
         xhr.send(JSON.stringify({
+            'circuitName':self.circuitName,
             'list_equationStr':list_equationStr,
             'id__type':self.id__type,
             'dependentVarStr':dependentVarStr,
@@ -263,6 +265,7 @@ class Circuit extends Piece{
         // self.getNetworkGraph();
 
         xhr.send(JSON.stringify({
+            'circuitName':self.circuitName,
             'list_equationNetworkInfoDict':list_equationNetworkInfoDict,
             'textStr__textMeshUUID':textStr__textMeshUUID,
             'id__type':id__type,
@@ -319,6 +322,7 @@ class Circuit extends Piece{
         // self.getNetworkGraph();
         // debugger
         xhr.send(JSON.stringify({
+            'circuitName':self.circuitName,
             'solvingSteps':solvingSteps, 
             'runningStepsIdx__branchedStepsIdx':runningStepsIdx__branchedStepsIdx,
             'language':self.audioLanguage,

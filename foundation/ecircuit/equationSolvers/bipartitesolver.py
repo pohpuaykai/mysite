@@ -77,12 +77,16 @@ class BipartiteSolver:
 
         vertexId__equationVariableId = self.vertexIdIssuer.vertexId__equationVariableId
         list_independentVariablesIds = sorted(list(list_independentVariablesIds))
-        print('listOfVariables', listOfVariables)
-        print(dependentVariableId, 'dependentVariableId')
-        print(list_independentVariablesIds, 'list_independentVariablesIds')
-        print('equationVariables_g', equationVariables_g)
-        print('vertexId__equationVariableId', vertexId__equationVariableId)
-        print('vertexId__EquationOrVariable', vertexId__EquationOrVariable)
+        # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        # print(list(map(lambda eq: eq.schemeStr, listOfCollectedEquations)))
+        # print('listOfVariables', listOfVariables)
+        # print(dependentVariableId, 'dependentVariableId')
+        # print(list_independentVariablesIds, 'list_independentVariablesIds')
+        # print('equationVariables_g', equationVariables_g)
+        # print('vertexId__equationVariableId', vertexId__equationVariableId)
+        # print('vertexId__EquationOrVariable', vertexId__EquationOrVariable)
+        # import pdb;pdb.set_trace()
+
 
         substitutionPath, equationVertexId__tuple_variableVertexIdContaining = Recommend.bipartiteSearch(
             listOfCollectedEquations, 

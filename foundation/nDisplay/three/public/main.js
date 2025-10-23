@@ -80,7 +80,7 @@ controls.addEventListener( 'change', render );
 const audioContext = new (window.AudioContext||window.webkitAudioContext)();
 
 
-// const circuit = new DCTwoResistorSeries(scene, camera, renderer, controls, []);
+// const circuit = new DCTwoResistorSeries(scene, camera, renderer, audioContext, controls, []);
 const circuit = new DCTwoResistorParallel(scene, camera, renderer, audioContext, controls, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);

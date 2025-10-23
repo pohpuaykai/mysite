@@ -49,12 +49,17 @@ def lcid_to_locale(language_code):
 # noinspection PyPep8Naming,PyShadowingNames
 class SAPI5Driver:
     def __init__(self, proxy) -> None:
+        print('creating SAPI SPVoice')
         self._tts = comtypes.client.CreateObject("SAPI.SPVoice")
+        print('created SAPI Voice')
         # all events
         self._tts.EventInterests = 33790
         self._event_sink = SAPI5DriverEventSink()
+        print('created SAPI5DriverEventSink')
         self._event_sink.setDriver(weakref.proxy(self))
+        print('setted self._event_sink')
         self._advise = comtypes.client.GetEvents(self._tts, self._event_sink)
+        print('setted self._advise')
         self._proxy = proxy
         self._looping = False
         self._speaking = False
@@ -63,6 +68,7 @@ class SAPI5Driver:
         # initial rate
         self._rateWpm = 200
         self.setProperty("voice", self.getProperty("voice"))
+        print('setProperty: voice:')
 
     def destroy(self) -> None:
         self._tts.EventInterests = 0

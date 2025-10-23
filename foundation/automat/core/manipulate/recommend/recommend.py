@@ -527,7 +527,7 @@ class Recommend:
         #
         bipartiteTreeExpand = True
 
-        #group the equations by similarity (this was working well when we wanted to find the resistorSumFormulas for series2Resistor & parallel2Resistor)
+        #group the equations by similarity (this was working well when we wanted to find the resistorSumFormulas for series2Resistor & parallel2Resistor)# we might want to put heuristics in classes, and then turn them on and off as per experience(neuralnetwork?), since this might be a special case(over_trained_heuristic)?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         list_equationStrs = list(map(lambda equation: equation.schemeStr, list_equations))
         from foundation.automat.parser.sorte.schemeparser import Schemeparser
         def getEntitiesOfPattern(patternStr):
@@ -565,14 +565,46 @@ class Recommend:
                     schemeStr0, schemeStr1, idx__entities[idx0], idx__entities[idx1]) / (idx__divisorOfCutOff[idx0]+idx__divisorOfCutOff[idx1])
         #everything above was for generating tuple_comparisonIdx__score, which is grouping equations together, which we will do from here
         #use UnionFind+cutoffScore...
-        cutoffScore = 0.34#hardcode for now... there must be someway to parametrise this?
+        cutoffScore = 0.34#hardcode for now... there must be someway to parametrise this? neuralnetwork? BTW, this is a score, of how equation look alike
         from foundation.automat.common.unionfindbyrankwithpathcompression import UnionFindByRankWithPathCompression
         uf = UnionFindByRankWithPathCompression(len(list_equationStrs))
         for (idx0, idx1), score in tuple_comparisonIdx__score.items():
             if score < cutoffScore:
                 uf.union(idx0, idx1)
         #use uf to give high priority if adjacent equations are in the same union.
+        #convert groupings to vertexId
+        verticesIdGroupings = []
+        for group in uf.grouping():
+            verticesIdGroupings.append(list(map(lambda equationId: equationId__vertexId[equationId], group)))
         #
+
+
+        #within the same group of equations, there are same variables between all the equations, give each variable a count of the number of times they appear. when choosing a variable to subtitute away, choose the one that appears the least... #this heuristic was (this was working well when we wanted to find the resistorSumFormulas for series2Resistor & parallel2Resistor)
+        def updateCountDict(d0, d1):
+            """d0&d1 are dictionaries from string to integer"""
+            commonKeys = set(d0.keys()).intersection(set(d1.keys()))
+            d0UniqueKeys = set(d0.keys()) - commonKeys
+            d1UniqueKeys = set(d1.keys()) - commonKeys
+            allUniqueKeys = d0UniqueKeys.union(d1UniqueKeys)
+            d2 = copy(d0)
+            d2.update(d1)
+            groupTotalVariableCount = dict(filter(lambda t: t[0] in allUniqueKeys, d2.items()))
+            for commonKey in commonKeys:
+                groupTotalVariableCount[commonKey] = d0[commonKey] + d1[commonKey]
+            return groupTotalVariableCount
+        ufGroupIdx__groupTotalVariableCount = {}
+        for group in uf.grouping():
+            groupTotalVariableCount = {}
+            for equationIdx in group:
+                equation = list_equations[equationIdx]
+                groupTotalVariableCount = updateCountDict(groupTotalVariableCount, equation.variables)
+            groupTotalVariableCount = dict(map(lambda t: (list_variables.index(t[0]), t[1]), groupTotalVariableCount.items()))
+            ufGroupIdx = uf.find(equationIdx)
+            ufGroupIdx__groupTotalVariableCount[ufGroupIdx] = groupTotalVariableCount
+            # import pdb;pdb.set_trace()
+        #
+
+        #another heuristic might be crammer_method|GE? that will tell us which equation to choose and eliminate first? I think this will work very well...... a way into this heuristic is that  we do the <<2.3.5AmoreComplexCircuit>> bipartiteSolverWay manually, and then match bipartiteSolverWay to the CramerMethod<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
         class EquationVertexIdIssuer:
@@ -640,6 +672,19 @@ class Recommend:
 
 
 
+        #
+        def is_contiguous_sublist(sublist, mainlist):
+            n = len(mainlist)
+            m = len(sublist)
+            if m > n:
+                return False
+            for i in range(n - m + 1):
+                if mainlist[i:i+m] == sublist:
+                    return True
+            return False
+        #
+
+
         #check if all the variables to be substituted away are in our path
         #or we can start from a variable, then add the appropriate equation to the beginning of the resulting path
         #maxEquationVertexId might be None... then for now just get a random one...
@@ -669,10 +714,14 @@ class Recommend:
         NEWEQUATION_PENALTY = -2 * len(allVariableVertexIds) * HIGH_WEIGHTS
         INCREASE_IN_UNWANTED_VARIABLE_PENALTY = -2* HIGH_WEIGHTS
         INCREASE_IN_WANTED_VARIABLE_PENALTY = 3* HIGH_WEIGHTS
-        SAME_EQUATION_GROUP_REWARDS = 3 * HIGH_WEIGHTS * len(allEquationVertexIds)
+        # SAME_EQUATION_GROUP_REWARDS = 3 * HIGH_WEIGHTS * len(allEquationVertexIds)
+        # SAME_EQUATION_GROUP_VARIABLE_COUNT_PENALTY = -3 * HIGH_WEIGHTS * len(allEquationVertexIds)
+        SAME_EQUATION_GROUP_REWARDS = 4 * HIGH_WEIGHTS * len(uf.grouping()) # we want SAME_EQUATION_GROUP_REWARDS > SAME_EQUATION_GROUP_VARIABLE_COUNT_REWARD, in all the situations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        SAME_EQUATION_GROUP_VARIABLE_COUNT_REWARD = 0.5 * HIGH_WEIGHTS * len(uf.grouping())
         TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY = -float('inf')#should be -infinity because this will produce a path that is not usable...
         #[TODO many optimizations possible here]
-        PATHLENGTH_FACTOR = 10
+        # PATHLENGTH_FACTOR = 10
+        PATHLENGTH_FACTOR = 2 # will tend to favour BFs if number is low (what is low? it has to be relative to score...), and then to favour DFs if number is high
         visitedPaths = [] # paths that have been explored before, we can use a set , since order does not matter? or we have to use a list?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not used yet<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         # while len(stack)>0:
@@ -685,9 +734,12 @@ class Recommend:
             priority, current___dict = priorityQueue.popMaxWithPriority()
             current = current___dict['current']
 
-            #############early termination
+            #############early termination, what if you waited for a few possible solutions first? how many to wait for?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if set(originalEquationVertexIds).issubset(set(current___dict['path'])): #we used all the original equations
                 # print('used up all the ORIGINAL equations')
+                print('p: ', priority)
+                pp.pprint(current___dict)
+                import pdb;pdb.set_trace()
                 return current___dict['path'], equationVertexId__tuple_variableVertexIdContaining___NEW
             #############
 
@@ -698,12 +750,52 @@ class Recommend:
 
             #heuristic early termination: when you have used all the_original_equations? Not the expanded ones?
 
+
+
+            #also neighbours that like to previous_equation_group, should be explored first?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if current in allEquationVertexIds:#neighbours will be variables
+                def sortKey(vertexIdx, path):#should also consider current path<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    key = 0
+                    if vertexIdx in unwantedVariableVertexIds:
+                        key += 10*LOW_WEIGHTS # we want this to be higher than 
+                        eq0VertexId = path[-1]
+                        if eq0VertexId in originalEquationVertexIds:
+                            groupTotalVariableCount = ufGroupIdx__groupTotalVariableCount[uf.find(vertexId__equationVariableId[eq0VertexId])]
+                            if vertexId__equationVariableId[vertexIdx] in groupTotalVariableCount:
+                                variableCountInGroup = groupTotalVariableCount[vertexId__equationVariableId[vertexIdx]]
+                                key += (variableCountInGroup/sum(groupTotalVariableCount.values())) * LOW_WEIGHTS
+                    else:
+                        key += 10*HIGH_WEIGHTS
+                    #find previous group of equation in uf, rank by group_variable_occurence#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    return key
+
                 #we will deal with unwanted variables first
-                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in unwantedVariableVertexIds else LOW_WEIGHTS)
+                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: sortKey(vertexId, current___dict['path']))
+                # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BE variables')
+                # print(current___dict['path'])
+                # print('neighbours', neighbours)
+                # import pdb;pdb.set_trace()
             else:#neighbours will be equations
+                def sortKey(vertexIdx, path):#should also consider current path<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    key = 0
+                    if vertexIdx in originalEquationVertexIds:
+                        key += 10*LOW_WEIGHTS
+                        # print('checking: ', path[-2], vertexIdx, 'same group?: ', path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]))
+                        if path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]):
+                            key+= LOW_WEIGHTS
+                        else:
+                            key+= HIGH_WEIGHTS
+                    else:
+                        key += 10*HIGH_WEIGHTS
+                    #find previous group of equation in uf, if neighbour in the group, give higher priority#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+                    return key
                 #we will choose old Equations first not new equations
-                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: HIGH_WEIGHTS if vertexId in originalEquationVertexIds else LOW_WEIGHTS)
+                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: sortKey(vertexId, current___dict['path']))
+                # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BE equations')
+                # print(current___dict['path'])
+                # print('neighbours', neighbours)
+                # import pdb;pdb.set_trace()
 
 
             #############
@@ -813,7 +905,11 @@ class Recommend:
                         #     maxLengthPaths.append(childDict['path'])
                         #Priority Heuristic>
                         childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
+                        
+                        # this is for sorting
                         childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
+                        #
+
                         childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path,  and then at some point in the history go for the shorter path first, when most of the original equations are exhausted?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0 # because this means we will substitute the wanted variable away
                         if neighbour in allEquationVertexIds: #if it is an equation
@@ -832,12 +928,61 @@ class Recommend:
                         #if try to substitute away a variable that has more count than 1, then give a heavy penalty
                         if neighbour in allVariableVertexIds and childDict['variableCount'].get(neighbour, 0) > 1:
                             childDictPriority += TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY
+                            #
+
+                        #why is this path not rewarded:
+                        # pathToInvestigate = [5, 6, 9, 8, 11, 7, 13, 2, 0]
+                        # if newPath == pathToInvestigate:
+                        #     print('len(newPath) > 2', len(newPath) > 2)
+                        #     print('neighbour in allEquationVertexIds', neighbour in allEquationVertexIds)
+                        #     print('(originalEquationVertexIds >= set(newPath[::2]))', (set(originalEquationVertexIds) >= set(newPath[::2])))
+                        #     import pdb;pdb.set_trace()
+                        #
+
+
+                        if len(newPath) > 2 and neighbour in allEquationVertexIds and (set(originalEquationVertexIds) >= set(newPath[::2])):#does not contain any equationVertexId, that nonoriginal<<<<<<
+                            #within the same group of equations, there are same variables between all the equations, give each variable a count of the number of times they appear. when choosing a variable to subtitute away, choose the one that appears the least... #this heuristic was (this was working well when we wanted to find the resistorSumFormulas for series2Resistor & parallel2Resistor)
+                            variableIdx = vertexId__equationVariableId[newPath[-2]] # you want all the previous equations
+                            previousEquationIdx = vertexId__equationVariableId[newPath[-1]]
+                            ufGroupIdx = uf.find(previousEquationIdx)
+                            # variableIdx = vertexId__equationVariableId[newPath[-2]]
+                            # print("ufGroupIdx__groupTotalVariableCount", ufGroupIdx__groupTotalVariableCount); import pdb;pdb.set_trace()
+                            if variableIdx in ufGroupIdx__groupTotalVariableCount[ufGroupIdx]:
+                                groupTotalVariableCount = ufGroupIdx__groupTotalVariableCount[ufGroupIdx]
+                                variableCount = groupTotalVariableCount[variableIdx]
+                                totalVariableCountInGroup = sum(map(lambda t: t[1], groupTotalVariableCount.items()))
+                                penaltyAmt = SAME_EQUATION_GROUP_VARIABLE_COUNT_REWARD * ((totalVariableCountInGroup - variableCount)/(totalVariableCountInGroup*len(newPath))) # the more of the same variable in the same equation_group, the higher the penalty...
+                                childDictPriority += penaltyAmt
+                                #rewarded?
+                                # pathsToInvestigate = [[5, 6, 9, 8, 11, 7, 13, 2, 0], [5, 7, 13, 4, 3, 8, 11, 1, 9, 2, 0]]
+                                # if newPath in pathsToInvestigate:
+                                #     print(newPath, 'is penalised for same_variable_count: ', penaltyAmt,'result:', childDictPriority)
+                                #     import pdb;pdb.set_trace()
+                                #
+                                # print(newPath, childDictPriority); import pdb;pdb.set_trace()
+                            #
                         #if neighbour(an OG equation) is in the same union as the last equation, then give a higher priority
-                        if len(newPath) > 2 and neighbour in allEquationVertexIds and neighbour in originalEquationVertexIds:
-                            equationVertexId0, variableVertexIdToEliminate, equationVertexId1 = newPath[-3:]
-                            if equationVertexId0 in originalEquationVertexIds and uf.together(vertexId__equationVariableId[neighbour], vertexId__equationVariableId[equationVertexId0]):
-                                childDictPriority += SAME_EQUATION_GROUP_REWARDS
+                        # if len(newPath) > 2 and neighbour in allEquationVertexIds and neighbour in originalEquationVertexIds:
+                        #     equationVertexId0, variableVertexIdToEliminate, equationVertexId1 = newPath[-3:]
+                        #     if equationVertexId0 in originalEquationVertexIds and uf.together(vertexId__equationVariableId[neighbour], vertexId__equationVariableId[equationVertexId0]):
+                        #         childDictPriority += SAME_EQUATION_GROUP_REWARDS
                                 # print('added rewards to newPath: ', newPath)
+
+                        #SAME_EQUATION_GROUP_REWARDS, we want similiar equations(odd_index on path) to be processed together...
+                        equationVertexIdList = newPath[::2]
+                        for equationVertexIdGroupList in verticesIdGroupings:
+                            # if equationVertexIdGroupList <= equationVertexIdList: # <= means subList, so both the order and content has to match before this is true
+                            if is_contiguous_sublist(equationVertexIdGroupList, equationVertexIdList):
+                                rewardAmt = SAME_EQUATION_GROUP_REWARDS * len(equationVertexIdGroupList)
+                                childDictPriority += rewardAmt # please note that we might repeat this reward more than once for the same criteria<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                #rewarded?
+                                # pathsToInvestigate = [[5, 6, 9, 8, 11, 7, 13, 2, 0], [5, 7, 13, 4, 3, 8, 11, 1, 9, 2, 0]]
+                                # if newPath in pathsToInvestigate:
+                                #     print(newPath, 'is rewarded for same_equation_group: ', rewardAmt, 'result:', childDictPriority)
+                                #     import pdb;pdb.set_trace()
+                                #
+
+
                         #Priority Heuristic<
                         if bipartiteTreeExpand:
                             childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
@@ -861,6 +1006,9 @@ class Recommend:
         # print('********')
         maxLen = min(map(lambda s: len(s), visitedPaths))
         maxLengthPaths = list(filter(lambda s: len(s)==maxLen, visitedPaths))
+        print('maxLengthPaths')
+        print(maxLengthPaths)
+        import pdb; pdb.set_trace()
         favouritePath = maxLengthPaths[0] # [TODO many optimisations possible here]
         if bipartiteTreeExpand:
             return favouritePath, equationVertexId__tuple_variableVertexIdContaining___NEW

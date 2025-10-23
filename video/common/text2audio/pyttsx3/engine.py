@@ -20,6 +20,7 @@ def engines_by_sys_platform() -> tuple[str]:
     Return the names of all TTS engines for the current operating system.
     If sys.platform is not in _engines_by_sys_platform, return ("espeak",).
     """
+    print('sys.platform: ', sys.platform)
     return _engines_by_sys_platform.get(sys.platform, ("espeak",))
 
 
@@ -56,7 +57,9 @@ class Engine:
         @type debug: bool
         """
         self.driver_name = driverName or default_engine_by_sys_platform()
+        print('self.driver_name: ', self.driver_name)
         self.proxy = driver.DriverProxy(weakref.proxy(self), self.driver_name, debug)
+        print('self.proxy: ', self.proxy)
         self._connects = {}
         self._debug = debug
         self._driverLoop = True

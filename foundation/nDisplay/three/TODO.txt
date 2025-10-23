@@ -6,7 +6,9 @@
 ---KCL should preferably only return the wireNode to be highlighted, please do not highlight the whole loop very confusing
 ---maybe also mention the type of simplification_step that is being performed? because saying the exact same thing over and over is stupid
 ---also some of the audio and steps are not aligned, like some eliminationStep are not at the right timing? not all... may it be that the audio script is old? <<<<<<important
----there is also a HeisenBug, that appears only sometimes: The AudioContext encountered an error from the audio device or the WebAudio renderer.
+---there is also a HeisenBug on frontend, that appears only sometimes: The AudioContext encountered an error from the audio device or the WebAudio renderer.
+---the color of the highlighting... can be improved.... how? contrast? average_contrast? shiny_?
+--- the equations should hang around for a little longer, else it is confusing for the viewer
 
 
 
@@ -40,6 +42,8 @@ TODO:
 
 
 -draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
+-refactor bipartiteSearch
+--each heuristic is its own class, and all the same heuristic in a folder...
 -current_divider 
 --there are repeated(nonLinearlyIndependent)current_equations from your Kirschoff_Current_law, PLEASE fix to make new video!!!!!!
 --<<Foundations of Analog and Digital Electronic Circuits>> better read and no errors on answers
@@ -59,6 +63,8 @@ TODO:
 ----how to form 'simple polynomials?'
 ----how to select solvingVariables so that #solvingVariables=#equations
 ----WORKON symbolicGaussian
+----can we use cramer'sRule as a heuristic to guide which variables to choose?<<<<<<<<<<<<<<<<<<<<<<<<<<
+-----unwanted Variables seem to map to dependent&independentVariables of cramer'sRule...
 
 ---dc_twoResistor_parallel.js
 ---dc_twoResistor_series.js

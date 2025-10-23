@@ -56,6 +56,7 @@ def automat_findEquations(request):
     # pp.pprint(edge__solderableIndices)
     # print('id__positiveLeadsDirections')
     # pp.pprint(id__positiveLeadsDirections)
+    # import pdb;pdb.set_trace()
 
     # componentId__list_variables = {}
     # def updateDictList(newComponentId__list_variables):
@@ -147,7 +148,7 @@ def automat_solveEquations(request):
     # print(dependentVarStr)
     # print('list_independentVarStr')
     # pp.pprint(list_independentVarStr)
-
+    # import pdb;pdb.set_trace()
 
 
     # print('listOfCollectedEquations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')

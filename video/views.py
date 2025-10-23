@@ -35,8 +35,14 @@ def basic_findEquations_audioFiles(request):
     folderpath = AUDIOFILES_DROP_FOLDER
     details = loads(request.body)
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
+    #####
+    print('details:')
+    print(details)
+    import pdb;pdb.set_trace()
+    #####
     scab = SubtitlesCircuitAnimeBasic()
     ticketNumber = scab.generateEachAudioFilePath_findEquation(
+        details['circuitName'],
         details['list_equationNetworkInfoDict'], 
         details['textStr__textMeshUUID'], 
         details['id__type'], 
@@ -74,6 +80,7 @@ def basic_solvingSteps_audioFiles(request):
     # import pdb;pdb.set_trace()
     #
     ticketNumber = scab.generateEachAudioFilePath_solvingStep(
+        details['circuitName'],
         details['solvingSteps'], 
         details['runningStepsIdx__branchedStepsIdx'], 
         details['language'],

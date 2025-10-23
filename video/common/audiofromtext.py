@@ -28,7 +28,7 @@ class AudioFromText:
     }
 
     @parallelise
-    def convert(self, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
+    def convert(self, circuitName, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
         """
         If we have the same wavFileOutPrefix, then we give back the same return.....<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         """
@@ -219,23 +219,32 @@ class AudioFromText:
         # return language__list_tuple_word_location_length_elapsedTime, language__wavFilePath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
 
     @parallelise
-    def convertEachSentenceItsOwnWav(self, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
+    def convertEachSentenceItsOwnWav(self, circuitName, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=False):
         from pathlib import Path
+        print(circuitName)
+        wavFileOutPrefix = f'{wavFileOutPrefix}_{circuitName}'
         if useOld:
             data = self.getFirstOldAudioByTag(wavFileOutPrefix)
             if data is not None:
                 return data
         from video.common.text2audio import pyttsx3
+        print('starting pyttsx3 engine')
         engine = pyttsx3.init()
+        print('inited pyttsx3 engine')
         voices = engine.getProperty('voices')
+        print('got pyttsx3 voices')
         #
         engine.setProperty('rate', rate)#You can adjust this value as needed
+        print('set pyttsx3 rate')
         engine.setProperty('volume', volume)#1.0 is maximum volume
+        print('set pyttsx3 volume')
         #
         returnedOld = False
         wavFileOutPrefixN = f"{wavFileOutPrefix}_{datetime.strftime(datetime.utcnow(), '%Y%m%d%H%M%S')}"
+        print('wavFileOutPrefixN: ', wavFileOutPrefixN)
         language__filepaths = {}
         for language, list_subtitle in language__list_subtitle.items():
+            print('language>>>>>>>>>>>>>>>>>', language)
             voice = voices[AudioFromText.languageTwoLetterCode__voiceId[language]].id
             #create a new folder for each language
             newOutputFolderpath = os.path.join(outputfolderpath, f'{wavFileOutPrefixN}_{language}')
@@ -244,7 +253,9 @@ class AudioFromText:
             #
             filepaths = []
             for subtitleIdx, subtitle in enumerate(list_subtitle):
+                print('setting voice')
                 engine.setProperty('voice', voice)
+                print('setted voice')
                 # engine.say(subtitle)#if i don't want the word-by-word timing, should i still need to say it? or will engine.save_to_file suffisant?
                 wavFilePath = os.path.join(newOutputFolderpath, f'{subtitleIdx}.wav')
                 engine.save_to_file(subtitle, wavFilePath)

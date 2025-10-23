@@ -38,11 +38,14 @@ class DriverProxy:
         """
         assert driverName
         # import driver module
+        print('importing modeule: ', f"video.common.text2audio.pyttsx3.drivers.{driverName}")
         self._module = importlib.import_module(f"video.common.text2audio.pyttsx3.drivers.{driverName}")
+        print('imported modukle')
         #self._module = importlib.import_module(f"video.common.text2audio.pyttsx3.drivers.{driverName}")
         #self._module = importlib.import_module(f"pyttsx3.drivers.{driverName}")
         # build driver instance
         self._driver = self._module.buildDriver(weakref.proxy(self))
+        print('built Driver')
         # initialize refs
         self._engine = engine
         self._queue = []

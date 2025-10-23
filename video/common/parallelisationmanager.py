@@ -45,10 +45,11 @@ class ThreadingManager:
         self.parallelisable_method_names = []
         self._collect_parallelisable_methods()
         # self.
-        # print('parallelisable_method_names:', self.parallelisable_method_names)
         self.parallelisedCls = self._parallelise_methods(self.cls)
         self.parallelisedCls = self.giveMethodToWrapped(self.getReturnOfTicketNumber, 'getReturnOfTicketNumber') # beware of name collision!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         self.parallelisedCls = self.giveMethodToWrapped(self.getReturnOfDatabaseTicket, 'getReturnOfDatabaseTicket') # beware of name collision!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        
+        print('parallelisable_method_names:', self.parallelisable_method_names)
         return self.parallelisedCls
         
     
@@ -116,7 +117,9 @@ class ThreadingManager:
     @classmethod
     def _create_hooked_method(cls, method, ticket_number):
         def hooked_method(*args, **kwargs):
+            print('running hooked_method')
             cls.ticketId__results[ticket_number] = method(*args, **kwargs)
+            print('ran hooked_method')
             if ThreadingManager.saveRequestInDatabase:
                 ticket = Ticket.objects.get(id=ticket_number)
                 if ThreadingManager.storageType == 'pickle':

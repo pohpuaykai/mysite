@@ -1,3 +1,5 @@
+from copy import copy
+
 from foundation.ecircuit.equationFinders.equationfinder import EquationFinder
 
 class KCLEquationFinder(EquationFinder):
@@ -11,65 +13,67 @@ class KCLEquationFinder(EquationFinder):
         """
 
         """
-        added2DegEdges = set()
-        for deg2NodeId in self.list_nodeIds___deg2: # need both directions.... the edge not just the node.#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
-            # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~self.networkGraph[deg2NodeId]', self.networkGraph[deg2NodeId])
-            [neighbour0, neighbour1] = self.networkGraph[deg2NodeId]
-            # print('typeOfneighbour0: ', self.id__type[neighbour0])
-            # print('typeOfneighbour1: ', self.id__type[neighbour1])
-            if neighbour0 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour0) not in added2DegEdges and\
-            self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
-                #
-                added2DegEdges.add((deg2NodeId, neighbour0)); added2DegEdges.add((neighbour0, deg2NodeId))
-                #
-                if self.id__type[deg2NodeId] not in ['wire']:
+        nonWireNodeIdsDeg2 = list(filter(lambda nodeId: self.id__type[nodeId] not in ['wire'], self.list_nodeIds___deg2))
+        # print('nonWireNodeIdsDeg2', nonWireNodeIdsDeg2)
+        visitedSubgraph = {}#this a subgraph of visiteddeg2NodeId, so that we can make sure that it does not form a cycle, so that we can get linearly independent formulas<<<<<<<
+        visitedUndirectedEdges = set() # undirected because = is bidirectional
+        for deg2NodeId in nonWireNodeIdsDeg2:
+            # print('deg2NodeId: ', deg2NodeId, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            #find immediateNeighbours that are not wireNodes...BFS?
+            queue = [deg2NodeId]; immediateNeighboursNonWires = set(); immediateVisited = set()
+            while len(queue) > 0:
+                nodeId = queue.pop(0) # please use append to make a queue
+                immediateVisited.add(nodeId)
+                for cNodeId in self.networkGraph[nodeId]:
+                    if self.id__type[cNodeId] in ['wire']:
+                        if cNodeId not in immediateVisited:
+                            queue.append(cNodeId)
+                    elif deg2NodeId != cNodeId:
+                        immediateNeighboursNonWires.add(cNodeId)
+                        # print(immediateNeighboursNonWires)
+                        # import pdb;pdb.set_trace()
+            #
+            #form the current_edge_equations
+            for neighbour in immediateNeighboursNonWires:
+                if (deg2NodeId, neighbour) in visitedUndirectedEdges or (neighbour, deg2NodeId) in visitedUndirectedEdges:
+                    continue
+                visitedUndirectedEdges.add((deg2NodeId, neighbour))
+                #to make sure that we are not forming a cycle, so that we can get linearly independent formulas
+                # print('making sure we will not formCycle')
+                visitedNodes = set()
+                stack = [deg2NodeId]; willFormCycle = False; subVisited = set()
+                while len(stack) > 0:
+                    nodeId = stack.pop() # please use append to make it a stack
+                    subVisited.add(nodeId)
+                    for cNodeId in visitedSubgraph.get(nodeId, []):
+                        if cNodeId == neighbour: #this means we will form a cycle
+                            willFormCycle = True
+                            break
+                    for cNodeId in set(visitedSubgraph.get(nodeId, [])) - subVisited:  #this will mess up DFS order... does order really matter here?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        stack.append(cNodeId)
+                # print('checking if ', (deg2NodeId, neighbour), 'will form a cycle... in visitedSubgraph')
+                # print('visitedSubgraph: ', visitedSubgraph)
+                # print('willFormCycle: ', willFormCycle)
+                # import pdb;pdb.set_trace()
+                if not willFormCycle:
+                    neighbours = visitedSubgraph.get(deg2NodeId, []); neighbours.append(neighbour); visitedSubgraph[deg2NodeId] = neighbours
+                    neighbours = visitedSubgraph.get(neighbour, []); neighbours.append(deg2NodeId); visitedSubgraph[neighbour] = neighbours
+                    #add the equations
                     componentType = self.id__type[deg2NodeId]
                     variable0___nc0 = EquationFinder.getVariable('current', componentType, deg2NodeId)
                     self.addVariableToComponentIdx(deg2NodeId, variable0___nc0)
-                    #
-                    componentType = self.id__type[neighbour0]
-                    variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour0)
-                    self.addVariableToComponentIdx(neighbour0, variable1___nc0)
-                    #add equation
+
+                    componentType = self.id__type[neighbour]
+                    variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour)
+                    self.addVariableToComponentIdx(neighbour, variable1___nc0)
+
                     latexStr = f'{variable0___nc0}={variable1___nc0}'
                     # print('0latexStr: ', latexStr)
-                    associatedComponentIdList = [[deg2NodeId, neighbour0]]
+                    associatedComponentIdList = [[deg2NodeId, neighbour]]
                     self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
-            #
-            if neighbour1 in self.list_nodeIds___deg2 and (deg2NodeId, neighbour1) not in added2DegEdges and\
-            self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
+                # import pdb;pdb.set_trace()
                 #
-                added2DegEdges.add((deg2NodeId, neighbour1)); added2DegEdges.add((neighbour1, deg2NodeId))
-                #
-                if self.id__type[deg2NodeId] not in ['wire']:
-                    componentType = self.id__type[deg2NodeId]
-                    variable0___nc1 = EquationFinder.getVariable('current', componentType, deg2NodeId)
-                    self.addVariableToComponentIdx(deg2NodeId, variable0___nc1)
-                    #
-                    componentType = self.id__type[neighbour1]
-                    variable1___nc1 = EquationFinder.getVariable('current', componentType, neighbour1)
-                    self.addVariableToComponentIdx(neighbour1, variable1___nc1)
-                    #add equation
-                    latexStr = f'{variable0___nc1}={variable1___nc1}'
-                    # print('1latexStr: ', latexStr)
-                    associatedComponentIdList = [[deg2NodeId, neighbour1]]
-                    self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
-            if self.id__type[deg2NodeId] in ['wire'] and\
-            self.id__type[neighbour0] not in ['wire'] and self.id__type[neighbour1] not in ['wire']:
-                #
-                componentType = self.id__type[neighbour1]
-                variable1___nc1 = EquationFinder.getVariable('current', componentType, neighbour1)
-                self.addVariableToComponentIdx(neighbour1, variable1___nc1)
-                #
-                componentType = self.id__type[neighbour0]
-                variable1___nc0 = EquationFinder.getVariable('current', componentType, neighbour0)
-                self.addVariableToComponentIdx(neighbour0, variable1___nc0)
-                latexStr = f'{variable1___nc0}={variable1___nc1}'
-                # print('2latexStr: ', latexStr)
-                associatedComponentIdList = [[neighbour1, neighbour0]]
-                self.addLatexStrAsEquation(latexStr, associatedComponentIdList)
 
 
         list_equationVars = []; 
@@ -91,15 +95,34 @@ class KCLEquationFinder(EquationFinder):
                 list_directedPath = self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((startSuperNodeId, endSuperNodeId), self.tuple_startSuperNodeId_endSuperNodeId__list_path.get((endSuperNodeId, startSuperNodeId)))
                 for directedPath in list_directedPath: #all the components on this directedPath are ALL_positive or ALL_negative
                     # import pdb;pdb.set_trace()
-                    associatedComponentIdList.append([startSuperNodeId]+list(directedPath)+[endSuperNodeId])
+                    # associatedComponentIdList.append([startSuperNodeId]+list(directedPath)+[endSuperNodeId])
+                    # print('startSuperNodeId: ', startSuperNodeId)
+                    # print('directedPath: ', directedPath)
+                    # print('endSuperNodeId: ', endSuperNodeId)
+
+                    # import pdb;pdb.set_trace()
                     directedEdge = (startSuperNodeId, directedPath[0])
                     isPositive = directedEdge in self.directedEdges
                     # print('directedEdge', directedEdge); import pdb;pdb.set_trace()
                     #find all nonwire components
+                    alreadyAddedThisPath = False
                     visited = set()
                     for componentId in filter(lambda nodeId: self.id__type[nodeId] not in ['wire'], directedPath):
                         if componentId in visited:
                             continue
+                        if not alreadyAddedThisPath: # this is placed here so that we get the componentId duplicate check
+                            alreadyAddedThisPath = True
+                            #check if the last node of the directedPath is a wireNode, if so remove the last node from directedPath, because wire is not calculated in Lumped Matter Discipline
+                            # pathToAdd = list(copy(directedPath))
+                            pathToAdd = []
+                            #remove all the wireNode starting from the end of the pathToAdd
+                            for nodeId in reversed(directedPath):
+                                if self.id__type[nodeId] not in ['wire']:
+                                    pathToAdd.insert(0, nodeId)
+                            # if self.id__type[directedPath[-1]] in ['wire']:
+                            #     pathToAdd = list(directedPath[:-1])
+                            associatedComponentIdList.append([startSuperNodeId]+pathToAdd)
+                            #the startSuperNodeId must be a wireNode, and that is where KCL acted on, so we must add it to the associatedComponentIdList, we do not add endSuperNodeId
                         visited.add(componentId)
                         variable = EquationFinder.getVariable('current', self.id__type[componentId], componentId)
                         list_vars.append({'varStr':variable, 'positive':isPositive})#add positive Voltage variable

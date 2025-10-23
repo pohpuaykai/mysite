@@ -749,31 +749,31 @@ class SubtitlesCircuitAnimeBasic:
         return languages__scripts
 
 
-    def generateAudioFilePath_findEquation(self, list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, introduction, conclusion, folderpath):
+    def generateAudioFilePath_findEquation(self,circuitName,  list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, introduction, conclusion, folderpath):
         subtitles = self.generateSubtitle_findEquation(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, introduction, conclusion)
-        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert({languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_findEquation')
+        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert(circuitName, {languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_findEquation')
         # languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
         # return subtitles, languages__subtitleIdx__dict_startTime_endTime[languageTwoLetterCode], languages__filepath[languageTwoLetterCode], language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[languageTwoLetterCode]
         return ticketNumber
 
-    def generateAudioFilePaths_findEquations(self, list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, introductions, conclusions, folderpath):
+    def generateAudioFilePaths_findEquations(self,circuitName,  list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, introductions, conclusions, folderpath):
         languages__subtitles = self.generateSubtitles_findEquations(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, introductions, conclusions)
-        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert(languages__subtitles, folderpath, wavFileOutPrefix='basic_findEquation')
+        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert(circuitName, languages__subtitles, folderpath, wavFileOutPrefix='basic_findEquation')
         # languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
         # return languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
         return ticketNumber
 
-    def generateAudioFilePath_solvingStep(self, solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, introduction, conclusion, folderpath):
+    def generateAudioFilePath_solvingStep(self,circuitName,  solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, introduction, conclusion, folderpath):
         subtitles = self.generateSubtitle_solvingStep(solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, introduction, conclusion)
-        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert({languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_solvingStep')
+        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert(circuitName, {languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_solvingStep')
         # languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
         # return subtitles, languages__subtitleIdx__dict_startTime_endTime[languageTwoLetterCode], languages__filepath[languageTwoLetterCode], language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[languageTwoLetterCode]
         return ticketNumber
 
 
-    def generateAudioFilePaths_solvingSteps(self, solvingSteps, runningStepsIdx__branchedStepsIdx, introductions, conclusions, folderpath):
+    def generateAudioFilePaths_solvingSteps(self,circuitName,  solvingSteps, runningStepsIdx__branchedStepsIdx, introductions, conclusions, folderpath):
         languages__subtitles = self.generateSubtitles_solvingSteps(solvingSteps, runningStepsIdx__branchedStepsIdx, introductions, conclusions)
-        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert(languages__subtitles, folderpath, wavFileOutPrefix='basic_solvingStep')
+        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convert(circuitName, languages__subtitles, folderpath, wavFileOutPrefix='basic_solvingStep')
         # languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
         # return languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
         return ticketNumber
@@ -789,17 +789,17 @@ class SubtitlesCircuitAnimeBasic:
         return response
 
 
-    def generateEachAudioFilePath_findEquation(self, list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, introduction, conclusion, folderpath):
+    def generateEachAudioFilePath_findEquation(self, circuitName, list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, introduction, conclusion, folderpath):
         subtitles = self.generateSubtitle_findEquation(list_equationNetworkInfoDict, textStr__textMeshUUID, nodeId__type, languageTwoLetterCode, introduction, conclusion)
-        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convertEachSentenceItsOwnWav({languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_each_findEquation')
+        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convertEachSentenceItsOwnWav(circuitName, {languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_each_findEquation')
         # languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
         # return subtitles, languages__subtitleIdx__dict_startTime_endTime[languageTwoLetterCode], languages__filepath[languageTwoLetterCode], language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[languageTwoLetterCode]
         return ticketNumber
 
 
-    def generateEachAudioFilePath_solvingStep(self, solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, introduction, conclusion, folderpath):
+    def generateEachAudioFilePath_solvingStep(self, circuitName, solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, introduction, conclusion, folderpath):
         subtitles = self.generateSubtitle_solvingStep(solvingSteps, runningStepsIdx__branchedStepsIdx, languageTwoLetterCode, introduction, conclusion)
-        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convertEachSentenceItsOwnWav({languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_each_solvingStep')
+        ticketNumber = SubtitlesCircuitAnimeBasic.aft.convertEachSentenceItsOwnWav(circuitName, {languageTwoLetterCode:subtitles}, folderpath, wavFileOutPrefix='basic_each_solvingStep')
         # languages__subtitleIdx__dict_startTime_endTime, languages__filepath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
         # return subtitles, languages__subtitleIdx__dict_startTime_endTime[languageTwoLetterCode], languages__filepath[languageTwoLetterCode], language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime[languageTwoLetterCode]
         return ticketNumber

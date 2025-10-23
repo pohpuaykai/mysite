@@ -11,6 +11,7 @@ class DCTwoResistorParallel extends Circuit {
      * **/
     constructor(scene, camera, renderer, audioContext, controls, meshes) {
         super(scene, camera, renderer, audioContext, controls, meshes);
+        this.circuitName = 'dcTwoResistorParallel'
 
         this.language_introduction_findEquations = {//This will be read out at the beginning of the animation_findEquations
             'en-US':'This is a circuit with two resistors connected in parallel, lets find all the equations related to the components of this circuit',
