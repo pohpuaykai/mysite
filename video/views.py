@@ -36,9 +36,9 @@ def basic_findEquations_audioFiles(request):
     details = loads(request.body)
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
     #####
-    print('details:')
-    print(details)
-    import pdb;pdb.set_trace()
+    # print('details:')
+    # print(details)
+    # import pdb;pdb.set_trace()
     #####
     scab = SubtitlesCircuitAnimeBasic()
     ticketNumber = scab.generateEachAudioFilePath_findEquation(

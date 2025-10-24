@@ -77,14 +77,19 @@ class BipartiteSolver:
 
         vertexId__equationVariableId = self.vertexIdIssuer.vertexId__equationVariableId
         list_independentVariablesIds = sorted(list(list_independentVariablesIds))
-        # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-        # print(list(map(lambda eq: eq.schemeStr, listOfCollectedEquations)))
-        # print('listOfVariables', listOfVariables)
-        # print(dependentVariableId, 'dependentVariableId')
-        # print(list_independentVariablesIds, 'list_independentVariablesIds')
-        # print('equationVariables_g', equationVariables_g)
-        # print('vertexId__equationVariableId', vertexId__equationVariableId)
-        # print('vertexId__EquationOrVariable', vertexId__EquationOrVariable)
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        print(list(map(lambda eq: eq.schemeStr, listOfCollectedEquations)))
+        print('listOfVariables', listOfVariables)
+        print('equationVariables_g', equationVariables_g)
+        print('vertexId__equationVariableId', vertexId__equationVariableId)
+        print('equationId__vertexId', equationId__vertexId)
+        print('variableId__vertexId', variableId__vertexId)
+        print('type__list_vertexIds', type__list_vertexIds)
+        print('equationKey', equationKey)
+        print('variableKey', variableKey)
+        print('dependentVariableId', dependentVariableId)
+        print(list_independentVariablesIds, 'list_independentVariablesIds')
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
         # import pdb;pdb.set_trace()
 
 

@@ -9,6 +9,14 @@
 ---there is also a HeisenBug on frontend, that appears only sometimes: The AudioContext encountered an error from the audio device or the WebAudio renderer.
 ---the color of the highlighting... can be improved.... how? contrast? average_contrast? shiny_?
 --- the equations should hang around for a little longer, else it is confusing for the viewer
+--CORRECTIONS:
+TwoResistorSimpleCircuit did not take out the R_{R_0} at the end.... where_did_i_go_wrong__i_lost_a_step__somewhere_along_in_the_bitterness_AND?
+
+and also on uploading to backend it hangs.... does it need some kind of streaming download and not all at one go?Or put the video in a nonGit folder? git|editor might be mangling with it... causing the hang... if so same for audio files....
+
+and also some of the subtitles at the solvingSteps are not inSync with flashed steps?
+
+next try different languages and create the accounts
 
 
 

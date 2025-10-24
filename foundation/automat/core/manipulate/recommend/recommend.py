@@ -737,9 +737,9 @@ class Recommend:
             #############early termination, what if you waited for a few possible solutions first? how many to wait for?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if set(originalEquationVertexIds).issubset(set(current___dict['path'])): #we used all the original equations
                 # print('used up all the ORIGINAL equations')
-                print('p: ', priority)
-                pp.pprint(current___dict)
-                import pdb;pdb.set_trace()
+                # print('p: ', priority)
+                # pp.pprint(current___dict)
+                # import pdb;pdb.set_trace()
                 return current___dict['path'], equationVertexId__tuple_variableVertexIdContaining___NEW
             #############
 
@@ -781,10 +781,12 @@ class Recommend:
                     if vertexIdx in originalEquationVertexIds:
                         key += 10*LOW_WEIGHTS
                         # print('checking: ', path[-2], vertexIdx, 'same group?: ', path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]))
-                        if path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]):
-                            key+= LOW_WEIGHTS
-                        else:
-                            key+= HIGH_WEIGHTS
+                        # print(path[-2], vertexIdx, '<<<<<these should be vertexIdx')
+                        if path[-2] in originalEquationVertexIds:
+                            if path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]):
+                                key+= LOW_WEIGHTS
+                            else:
+                                key+= HIGH_WEIGHTS
                     else:
                         key += 10*HIGH_WEIGHTS
                     #find previous group of equation in uf, if neighbour in the group, give higher priority#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1006,9 +1008,9 @@ class Recommend:
         # print('********')
         maxLen = min(map(lambda s: len(s), visitedPaths))
         maxLengthPaths = list(filter(lambda s: len(s)==maxLen, visitedPaths))
-        print('maxLengthPaths')
-        print(maxLengthPaths)
-        import pdb; pdb.set_trace()
+        # print('maxLengthPaths')
+        # print(maxLengthPaths)
+        # import pdb; pdb.set_trace()
         favouritePath = maxLengthPaths[0] # [TODO many optimisations possible here]
         if bipartiteTreeExpand:
             return favouritePath, equationVertexId__tuple_variableVertexIdContaining___NEW

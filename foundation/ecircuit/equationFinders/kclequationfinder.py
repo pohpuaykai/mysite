@@ -11,9 +11,27 @@ class KCLEquationFinder(EquationFinder):
 
     def findEquations(self):
         """
-
+        We seperate the equation finding for degree2 and greater_than_degree2
         """
-        nonWireNodeIdsDeg2 = list(filter(lambda nodeId: self.id__type[nodeId] not in ['wire'], self.list_nodeIds___deg2))
+        # print(self.tuple_startSuperNodeId_endSuperNodeId__list_path); import pdb;pdb.set_trace() # for simplePaths... this is empty?????
+
+        #below is for degree 2
+
+
+        #we cannot just use nonWireNodeIdsDeg2 like this because, this will also count nonWireComponents that are only connected directly to wireNodes, an example is 2ResistorParallel
+        # nonWireNodeIdsDeg2 = list(filter(lambda nodeId: self.id__type[nodeId] not in ['wire'], self.list_nodeIds___deg2))
+        if len(self.tuple_startSuperNodeId_endSuperNodeId__list_path) > 0:# for a single path... this is empty
+            nonWireNodeIdsDeg2 = []
+            for (startSuperNodeId, endSuperNodeId), list_path in self.tuple_startSuperNodeId_endSuperNodeId__list_path.items():
+                for path in list_path:
+                    #anything in a path has degree2, but there must be more than 1 nonWireComponent in each list_path for it to be a nonWireNodeIdsDeg2
+                    possibleNonWireDeg2 = list(filter(lambda nodeId: self.id__type[nodeId] not in ['wire'], path))
+                    if len(possibleNonWireDeg2) > 1:
+                        nonWireNodeIdsDeg2 += nonWireNodeIdsDeg2
+                        nonWireNodeIdsDeg2 = set(nonWireNodeIdsDeg2)
+        else:#this is a single path, so we just take all the deg2 self.networkGraph
+            nonWireNodeIdsDeg2 = list(filter(lambda nodeId: self.id__type[nodeId] not in ['wire'], self.list_nodeIds___deg2))
+
         # print('nonWireNodeIdsDeg2', nonWireNodeIdsDeg2)
         visitedSubgraph = {}#this a subgraph of visiteddeg2NodeId, so that we can make sure that it does not form a cycle, so that we can get linearly independent formulas<<<<<<<
         visitedUndirectedEdges = set() # undirected because = is bidirectional
@@ -75,7 +93,7 @@ class KCLEquationFinder(EquationFinder):
                 #
 
 
-
+        #below is for greater than degree 2
         list_equationVars = []; 
         # visitedUndirected = set()
         visitedUndirectedSuperNodes = set()

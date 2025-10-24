@@ -12,7 +12,7 @@ class EquationFinder(ABC):
     # list_equations = [] # persist across HTTP Request (not what we want)
     componentId__list_variables = {}
     superNodeIds = []
-    list_nodeIds___deg2 = [] # for KCL
+    list_nodeIds___deg2 = [] # for KCL, but needs to be done for shortened graph, without ALL_the_wires, could it be this: superNodeUndirectedGraph please double check before you do anything<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     tuple_startSuperNodeId_endSuperNodeId__list_path = {} # each item is a ball, for parallel_addition..., for paths do flatten(self.tuple_startSuperNodeId_endSuperNodeId__list_path.values()), 
     superNodeUndirectedGraph = {}# connect supernodes directly to superNodes, ignoring paths inbetween # for KCL
     _has_run_common_code = False
