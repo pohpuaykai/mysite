@@ -72,6 +72,8 @@ def basic_solvingSteps_audioFiles(request):
     # print(request.body)
     # import pdb;pdb.set_trace()
     details = loads(request.body)
+    # print(details)
+    # import pdb;pdb.set_trace()
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
     scab = SubtitlesCircuitAnimeBasic()
     #

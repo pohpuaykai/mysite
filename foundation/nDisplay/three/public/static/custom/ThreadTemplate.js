@@ -135,7 +135,6 @@ class ThreadTemplate {
         // debugger
         function getCallback(rIdx, callbackName) {
             const name__callback = callbacks[taggedWidthDepthIdx__tagName[dataLinearIdx__widthDepthIdx[rIdx]]]
-            // debugger
             if (name__callback!==undefined && callbackName in name__callback) {
                 return name__callback[callbackName]
             } else {
@@ -202,7 +201,6 @@ class ThreadTemplate {
             );
         }
         return function(){
-            //console.log('starting animation')
             recursor(0, preCalInfoDict)
         }
     }

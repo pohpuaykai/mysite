@@ -219,14 +219,17 @@ class AudioFromText:
         # return language__list_tuple_word_location_length_elapsedTime, language__wavFilePath, language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime
 
     @parallelise
-    def convertEachSentenceItsOwnWav(self, circuitName, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=False):
+    def convertEachSentenceItsOwnWav(self, circuitName, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
         from pathlib import Path
         print(circuitName)
         wavFileOutPrefix = f'{wavFileOutPrefix}_{circuitName}'
         if useOld:
+            print('useOld! tag: ', wavFileOutPrefix)
             data = self.getFirstOldAudioByTag(wavFileOutPrefix)
             if data is not None:
+                print('returning OLD AUDIO!')
                 return data
+            print('generating new AUDIO!')
         from video.common.text2audio import pyttsx3
         print('starting pyttsx3 engine')
         engine = pyttsx3.init()

@@ -110,6 +110,7 @@ class Piece {
         console.log('!this.animationScheduler.playing', !this.animationScheduler.playing)
         const self = this;
         function tryPlayingAnimation() {
+            console.log('playIfTrue: ', playIfTrue(), '!self.animationScheduler.playing', !self.animationScheduler.playing)
             console.log('checking if we can play the animation: ', playIfTrue() && !self.animationScheduler.playing)
             if (playIfTrue() && !self.animationScheduler.playing) {//must be true
                 self.animationScheduler.playNextAnimation()

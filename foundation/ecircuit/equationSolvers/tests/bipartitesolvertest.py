@@ -14,7 +14,8 @@ def bipartiteSolver__dc_twoResistor_parallel(verbose=False):
     '(= (- V_{DC_{8}} V_{R_{3}}) 0)', 
     '(= (/ V_{R_{0}} I_{R_{0}}) R_{R_{0}})', 
     '(= (/ V_{R_{3}} I_{R_{3}}) R_{R_{3}})', 
-    '(= (/ V_{DC_{8}} I_{DC_{8}}) R_{DC_{8}})']))
+    '(= (/ V_{DC_{8}} I_{DC_{8}}) R_{DC_{8}})'
+    ]))
     dependentVariableStr='R_{DC_{8}}'
     independentVariableStrs=['R_{R_{0}}', 'R_{R_{3}}']
     solver = BipartiteSolver(listOfCollectedEquations, dependentVariableStr, independentVariableStrs, verbose=verbose)

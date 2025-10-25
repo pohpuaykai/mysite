@@ -81,6 +81,8 @@ class CircuitAnime {
             }
             this.recorder = new Recorder(permissionGivenCallback, this.circuit.renderer.domElement, this.circuit.audioContext);//this.circuit.renderer.domElement is the canvas of THREE?
             this.recorderDestination = this.recorder.destination;
+        } else {// if not recording the audioPlayer also needs destination...
+            this.recorderDestination = this.circuit.audioContext.createMediaStreamDestination();
         }
         this.loadedDatei_findEquations = false;//flag to make sure we finished loading datei for findEquation
         this.loadedDatei_solveEquations = false;//flag to make sure we finished loading datei for solveEquation
@@ -155,7 +157,8 @@ class CircuitAnime {
                 const data = {
                     '<<>>':tag
                 }
-                data[tag] = [runningStepsIdx, branchedStepsIdx]
+                data[tag] = [runningStepsIdx, branchedStepsIdx, self.branchedStepsIdx__latexStrs[branchedStepsIdx]] // actually self.branchedStepsIdx__latexStrs[branchedStepsIdx] is unnecessary but it helps with debugging
+                // data[tag] = [runningStepsIdx, branchedStepsIdx]
                 return data
             }));
 
@@ -774,9 +777,8 @@ class CircuitAnime {
                 }
             }
             //
-            // console.log('datum0', datum0);
-            // console.log('callbacks0', callbacks0); 
-            // debugger
+            console.log('datum0', datum0);
+            console.log('callbacks0', callbacks0); 
             const thread0 = self.animeTemplate(datum0, callbacks0);
 
             self.scheduleAnimation(thread0, 0, 'findEquation', function(){animeSelf.loadedDatei_findEquations=true;});

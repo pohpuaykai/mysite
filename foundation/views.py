@@ -140,12 +140,12 @@ def automat_solveEquations(request):
     dependentVarStr = equation_details['dependentVarStr']
     list_independentVarStr = list(set((filter(lambda varStr: varStr is not None, equation_details['list_independentVarStr']))))
     simplify = equation_details['simplify']
+    # print('list_equationStr')
+    # pp.pprint(list_equationStr)
     # print('simplify')
     # print(simplify)
     # print('id__type')
     # pp.pprint(id__type)
-    # print('list_equationStr')
-    # pp.pprint(list_equationStr)
     # print('dependentVarStr')
     # print(dependentVarStr)
     # print('list_independentVarStr')

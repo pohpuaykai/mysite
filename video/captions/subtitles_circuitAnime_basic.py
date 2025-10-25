@@ -416,6 +416,11 @@ class SubtitlesCircuitAnimeBasic:
                     "In this step, we will simplify.",
                     "Now, we will simplify.",
                     "This is simplifying step."
+                ],
+                8:[
+                    "Here, we grab a new equation derived from the circuit earlier.",
+                    "This is a new equation derived from the circuit earlier.",
+                    "From the earlier circuit, we have this new equation."
                 ]
             },
             'zh-CN': {
@@ -458,6 +463,11 @@ class SubtitlesCircuitAnimeBasic:
                     "于此，我们将简化方程。",
                     "现在我们将简化方程。",
                     "这是个简化步骤。"
+                ],
+                8:[
+                    "于此我们迎进这电路方程。",
+                    "这电路方程获于之前的电路。",
+                    "复习此电路方程"
                 ]
             },
             'ja-JP': {
@@ -500,6 +510,11 @@ class SubtitlesCircuitAnimeBasic:
                     "公式を簡単にしましょう。",
                     "次に、この公式を簡略化します。",
                     "公式を整理します。"
+                ],
+                8:[
+                    "ここで公式を迎えて使います",
+                    "前の回路から得られた公式を",
+                    "この公式を"
                 ]
             },
             'de-DE': {
@@ -542,6 +557,11 @@ class SubtitlesCircuitAnimeBasic:
                     "In diesem Schritt vereinfachen wir die Gleichung.",
                     "Jetzt vereinfachen wir die Gleichung.",
                     "Dies ist ein vereinfachter Schritt."
+                ],
+                8:[
+                    "Hier greifen wir auf eine neue Gleichung zurück, die wir zuvor aus dem Schaltkreis abgeleitet haben.",
+                    "Dies ist eine neue Gleichung, die zuvor aus dem Stormkreis abgeleitet wurde.",
+                    "Aus dem früheren Stormkreis haben wir diese neue Gleichung."
                 ]
             },
             'fr-FR': {
@@ -584,6 +604,11 @@ class SubtitlesCircuitAnimeBasic:
                     "Dans cette étape, nous simplifions l'équation.",
                     "Maintenant, nous simplifions l'équation.",
                     "Il s'agit d'une étape simplifiée."
+                ],
+                8:[
+                    "Nous utilisons ici une nouvelle équation que nous avons précédemment dérivée du circuit.",
+                    "Il s’agit d’une nouvelle équation précédemment dérivée du circuit.",
+                    "De l'ancien circuit nous avons cette nouvelle équation."
                 ]
             },
             'ru-RU': {
@@ -626,6 +651,11 @@ class SubtitlesCircuitAnimeBasic:
                     "На этом этапе мы упрощаем уравнение.",
                     "Теперь упростим уравнение.",
                     "Это упрощенный шаг."
+                ],
+                8:[
+                    "Здесь мы используем новое уравнение, которое мы ранее вывели из схемы.",
+                    "Это новое уравнение, ранее выведенное из схемы.",
+                    "Из старой схемы мы имеем новое уравнение."
                 ]
             }
         }
@@ -671,6 +701,8 @@ class SubtitlesCircuitAnimeBasic:
             else:
                 if pointer['sub'] == '':#is a simplification step
                     addScriptToList(7, {})
+                elif branchedStepsIdx[1] == 'hin' and len(branchedStepsIdx) == 2: # this is an introduction step, where a new equation in introduced to the scene
+                    addScriptToList(8, {})
                 else:#is a solving step
                     translate_variable_to_words = self.translateEliminateVariableToWords(pointer['sub'], languageTwoLetterCode)
                     addScriptToList(6, {'sub':translate_variable_to_words})
