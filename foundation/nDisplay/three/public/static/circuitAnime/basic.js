@@ -36,9 +36,9 @@ class CircuitAnime {
         this.hinPosition = {x:3*cameraPosition.x, y:3*cameraPosition.y, z:3*cameraPosition.z};
 
         //highlight colours
-        // this.componentHighlightColour = {r:0.6, g:0.1, b:0.1};
-        // this.componentVariableHighlightColour = {r:-0.1, g:-0.6, b:-0.1};
-        // this.variableHighlightColour = {r:-0.1, g:-0.6, b:-0.1}
+        this.componentHighlightColour = {r:0.6, g:0.1, b:0.1};
+        this.componentVariableHighlightColour = {r:-0.1, g:-0.6, b:-0.1};
+        this.variableHighlightColour = {r:-0.1, g:-0.6, b:-0.1}
         this.componentContrastPercentage = 0.23;
         this.componentVariableContrastPercentage = 0.23;
         this.variableContrastPercentage = 0.23;
@@ -60,13 +60,13 @@ class CircuitAnime {
         const animeSelf = this;
         this.audioPlayer_findEquations = this.circuit.makeWavPlayerWithEndCallback(
             function() {//on end playAudio, we update the currentPositionInAudio
-                this.list_subtitles_findEquations[this.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
+                animeSelf.list_subtitles_findEquations[animeSelf.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
                 animeSelf.updateCurrentPositionInAudio()
             }
         );
         this.audioPlayer_solveEquations = this.circuit.makeWavPlayerWithEndCallback(
             function() {//on end playAudio, we update the currentPositionInAudio
-                this.list_subtitles_solveEquations[this.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
+                animeSelf.list_subtitles_solveEquations[animeSelf.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
                 animeSelf.updateCurrentPositionInAudio()
             }
         );
@@ -570,8 +570,8 @@ class CircuitAnime {
                         // console.log('highlight nodeId', nodeId, ' type: ', id__type[nodeId], ' meshId: ', id__uuid[nodeId]); 
                         if (visited.indexOf(nodeId) <0) {
                             visited.push(nodeId)
-                            // self.highlight({meshUUID:self.id__uuid[nodeId], redMag:animeSelf.componentHighlightColour.r, greenMag:animeSelf.componentHighlightColour.g, blueMag:animeSelf.componentHighlightColour.b})
-                            self.contrast({meshUUID:self.id__uuid[nodeId], contrast_percentage:animeSelf.componentContrastPercentage})
+                            self.highlight({meshUUID:self.id__uuid[nodeId], redMag:animeSelf.componentHighlightColour.r, greenMag:animeSelf.componentHighlightColour.g, blueMag:animeSelf.componentHighlightColour.b})
+                            // self.contrast({meshUUID:self.id__uuid[nodeId], contrast_percentage:animeSelf.componentContrastPercentage})
                             
                         }
                     })
@@ -611,14 +611,14 @@ class CircuitAnime {
                 //[7]
                 //highlight variableComponent
                 //const componentMeshUUID = self.id__uuid[graphInfoD['variableStr__nodeId'][variableStr]]
-                // self.highlight({meshUUID: componentMeshUUID, redMag:animeSelf.componentVariableHighlightColour.r, greenMag:animeSelf.componentVariableHighlightColour.g, blueMag:animeSelf.componentVariableHighlightColour.b})
-                self.contrast({meshUUID:self.id__uuid[nodeId], contrast_percentage:animeSelf.componentVariableContrastPercentage})
+                self.highlight({meshUUID: componentMeshUUID, redMag:animeSelf.componentVariableHighlightColour.r, greenMag:animeSelf.componentVariableHighlightColour.g, blueMag:animeSelf.componentVariableHighlightColour.b})
+                // self.contrast({meshUUID:componentMeshUUID, contrast_percentage:animeSelf.componentVariableContrastPercentage})
                 // console.log('highlighted variableNodes', window.performance.now())
                 //[8] each chaStr is only a part of the variable, so we want them to light up togehter
                 // variableInfoD['info'].
                 list_varChaStr__chaMeshUUID.forEach(([chaStr, charMeshUUID]) => {
-                    // self.highlight({meshUUID:charMeshUUID, redMag:animeSelf.variableHighlightColour.r, greenMag:animeSelf.variableHighlightColour.g, blueMag:animeSelf.variableHighlightColour.b});
-                    self.contrast({meshUUID:self.id__uuid[nodeId], contrast_percentage:animeSelf.variableContrastPercentage})
+                    self.highlight({meshUUID:charMeshUUID, redMag:animeSelf.variableHighlightColour.r, greenMag:animeSelf.variableHighlightColour.g, blueMag:animeSelf.variableHighlightColour.b});
+                    // self.contrast({meshUUID:charMeshUUID, contrast_percentage:animeSelf.variableContrastPercentage})
                     // console.log('highlighted: ', chaStr, ' uuid: ', charMeshUUID, '<<<<<<<<<<<<<<<<<<<<<<<variable highlighting????????????????????????????????????????????????????')
                 })
             }
@@ -834,6 +834,7 @@ class CircuitAnime {
                 break;
             case 'solveEquations':
                 this.list_subtitles_solveEquations.push({'sn':audioFrameIdx, 'startTime':startTime})
+                break;
             default:
                 throw Exception()
         }

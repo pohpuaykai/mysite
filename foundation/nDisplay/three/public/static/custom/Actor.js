@@ -44,6 +44,21 @@ class Actor extends THREE.Group{
         }
     }
 
+
+    cacheOGColors() {
+        const meshes = this.getAllMainMeshes();
+        for(let i=0; i<meshes.length; i++) {
+            // console.log(meshes[i].geometry.attributes.color, ' ===undefined ', meshes[i].geometry.attributes.color === undefined)//some colors like Wire and LatexMesh does not have array
+            if (meshes[i].geometry.attributes.color === undefined) { // some colors like Wire and LatexTextMesh's color is not in geometry.attributes, but in material.color
+                // meshes[i].userData['OGColorArray'] = meshes[i].material.color;
+                meshes[i].userData['OGColorArray'] = {r:meshes[i].material.color.r, g:meshes[i].material.color.g, b:meshes[i].material.color.b}
+            } else{
+                meshes[i].userData['OGColorArray'] = meshes[i].geometry.attributes.color.array;
+            }
+            // console.log('OG meshIdx: ', i, ' OG color: ', meshes[i].userData['OGColorArray'], '########')
+        }
+
+    }
     /**
      * Changes the color of this meshUUID, and stores the original color
      * 
@@ -77,17 +92,17 @@ class Actor extends THREE.Group{
         }
 
 
-        const isDark = isDarkColor(OGred, OGgreen, OGblue)
-        let signed_contrast_percentage
-        if (isDark) {
-            signed_contrast_percentage = contrast_percentage;//make it light, bigger number
-        } else {
-            signed_contrast_percentage = 1 - contrast_percentage;//make it dark, smaller number
-        }
 
-        cacheOGColors();
-        updateColor(
+        this.cacheOGColors();
+        this.updateColor(
             function(OGred, OGgreen, OGblue){//geometryCallback
+                let isDark = isDarkColor(OGred, OGgreen, OGblue)
+                let signed_contrast_percentage
+                if (isDark) {
+                    signed_contrast_percentage = contrast_percentage;//make it light, bigger number
+                } else {
+                    signed_contrast_percentage = 1 - contrast_percentage;//make it dark, smaller number
+                }
                 return [
                     Math.max(0.0, Math.min(1.0, OGred*signed_contrast_percentage)), 
                     Math.max(0.0, Math.min(1.0, OGgreen*signed_contrast_percentage)), 
@@ -95,6 +110,12 @@ class Actor extends THREE.Group{
                 ];
             },
             function(colorCoordinate, colorFlag){//arrayCallback
+                let signed_contrast_percentage
+                if (colorCoordinate < 0.5) {//dark color
+                    signed_contrast_percentage = contrast_percentage;//make it light, bigger number
+                } else {
+                    signed_contrast_percentage = 1 - contrast_percentage;//make it dark, smaller number
+                }
                 switch (colorFlag) {
                     case 'r':
                         return Math.max(0.0, Math.min(1.0, colorCoordinate*signed_contrast_percentage));
@@ -129,7 +150,7 @@ class Actor extends THREE.Group{
         //     }
         //     // console.log('OG meshIdx: ', i, ' OG color: ', meshes[i].userData['OGColorArray'], '########')
         // }
-        cacheOGColors();
+        this.cacheOGColors();
 
         // const meshes = this.getAllMainMeshes();
         // meshes.forEach(mesh => {
@@ -157,7 +178,7 @@ class Actor extends THREE.Group{
         //         mesh.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colorArray), 3));
         //     }
         // })
-        updateColor(
+        this.updateColor(
             function(OGred, OGgreen, OGblue){//geometryCallback
                 return [
                     Math.max(0.0, Math.min(1.0, OGred+redMag)), 
@@ -178,21 +199,6 @@ class Actor extends THREE.Group{
         );
     }
 
-
-    cacheOGColors() {
-        const meshes = this.getAllMainMeshes();
-        for(let i=0; i<meshes.length; i++) {
-            // console.log(meshes[i].geometry.attributes.color, ' ===undefined ', meshes[i].geometry.attributes.color === undefined)//some colors like Wire and LatexMesh does not have array
-            if (meshes[i].geometry.attributes.color === undefined) { // some colors like Wire and LatexTextMesh's color is not in geometry.attributes, but in material.color
-                // meshes[i].userData['OGColorArray'] = meshes[i].material.color;
-                meshes[i].userData['OGColorArray'] = {r:meshes[i].material.color.r, g:meshes[i].material.color.g, b:meshes[i].material.color.b}
-            } else{
-                meshes[i].userData['OGColorArray'] = meshes[i].geometry.attributes.color.array;
-            }
-            // console.log('OG meshIdx: ', i, ' OG color: ', meshes[i].userData['OGColorArray'], '########')
-        }
-
-    }
 
     updateColor(geometryCallback, arrayCallback) {
         /**
