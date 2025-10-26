@@ -287,6 +287,52 @@ def test__hin5__configTest(verbose=False):
 
     
 
+def test__vor6__configTest(verbose=False):
+    eqs = '(= a (/ (* b a) c))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'equalitycancellation'
+    direction = 'vor'
+    idx = 6
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (= $0 (/ (* $1 $0) $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= 1 (/ b c))' # (= 1 (/ $1 $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin6__configTest(verbose=False):
+    eqs = '(= 1 (/ b c))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'equalitycancellation'
+    direction = 'hin'
+    idx = 6
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (= 1 (/ $1 $2))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (/ (* b a) c))' # (= $0 (/ (* $1 $0) $2))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
 
 if __name__=='__main__':
     test__vor0__configTest(True) # Not tested yet
@@ -301,4 +347,6 @@ if __name__=='__main__':
     test__hin4__configTest(True) # Not tested yet
     test__vor5__configTest(True) # Not tested yet
     test__hin5__configTest(True) # Not tested yet
+    test__vor6__configTest(True) # Not tested yet
+    test__hin6__configTest(True) # Not tested yet
     

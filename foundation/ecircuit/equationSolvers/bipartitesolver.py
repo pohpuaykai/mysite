@@ -155,15 +155,15 @@ class BipartiteSolver:
                 }
                 #make substitution, changes should be made on the hinEquation, hinEquation is accumulator of all the substitutations
                 _ast, _functions, _variables, _primitives, _totalNodeCount, _stepsWithoutSimplify___hin, _stepsWithoutSimplify___vor = hinEquation.linearEliminationBySubstitution(vorEquation, entVariable, simplify=simplify)
-                print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
                 
-                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~solvedHin:')
-                print('SOLVED hinEquation.schemeStr: ', hinEquation.schemeStr)
-                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-                print('hinEq steps:')
-                pp.pprint(_stepsWithoutSimplify___hin)
-                print('vorEq steps:')
-                pp.pprint(_stepsWithoutSimplify___vor); import pdb;pdb.set_trace()
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~solvedHin:')
+                # print('SOLVED hinEquation.schemeStr: ', hinEquation.schemeStr)
+                # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                # print('hinEq steps:')
+                # pp.pprint(_stepsWithoutSimplify___hin)
+                # print('vorEq steps:')
+                # pp.pprint(_stepsWithoutSimplify___vor); import pdb;pdb.set_trace()
 
                 #for now, we just take out the ast, rootOfTree from the _stepsWithoutSimplify
                 _stepsWithoutSimplify___hin = remove_AST_AND_RootOfTree(_stepsWithoutSimplify___hin)

@@ -471,6 +471,98 @@ def test__hin9__configTest(verbose=False):
 
     
 
+def test__vor10__configTest(verbose=False):
+    eqs = '(= a (+ (* b c) (* d c)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 10
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (+ (* $1 $0) (* $2 $0))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* (+ b d) c))' # (* (+ $1 $2) $0)
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin10__configTest(verbose=False):
+    eqs = '(= a (* (+ b c) d))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 10
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* (+ $1 $2) $0)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (+ (* b d) (* c d)))' # (+ (* $1 $0) (* $2 $0))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__vor11__configTest(verbose=False):
+    eqs = '(= a (- (* b c) (* d c)))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'vor'
+    idx = 11
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (- (* $1 $0) (* $2 $0))
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (* (- b d) c))' # (* (- $1 $2) $0)
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
+def test__hin11__configTest(verbose=False):
+    eqs = '(= a (* (- b c) d))' # fill it in
+    eqsType = 'scheme'
+    #filename = 'distributivity'
+    direction = 'hin'
+    idx = 11
+    eq0 = Equation(eqs, eqsType)
+    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply() # (* (- $1 $2) $0)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
+    manipulatedAst = ast
+    expected = '(= a (- (* b d) (* c d)))' # (- (* $1 $0) (* $2 $0))
+    ast0, functionsD0, variablesD0, primitives0, totalNodeCount0, startPos__nodeId0 = Schemeparser(equationStr=expected)._parse()
+    expectedAst = ast0
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', 
+        expected == manipulatedSchemeEquation and manipulatedAst == expectedAst
+    )
+    if verbose:
+        print(manipulatedSchemeEquation)
+        print(manipulatedAst)
+
+    
+
 
 if __name__=='__main__':
     test__vor0__configTest(True) # Not tested yet
@@ -493,4 +585,8 @@ if __name__=='__main__':
     test__hin8__configTest(True) # Not tested yet
     test__vor9__configTest(True) # Not tested yet
     test__hin9__configTest(True) # Not tested yet
+    test__vor10__configTest(True) # Not tested yet
+    test__hin10__configTest(True) # Not tested yet
+    test__vor11__configTest(True) # Not tested yet
+    test__hin11__configTest(True) # Not tested yet
     

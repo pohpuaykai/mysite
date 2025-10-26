@@ -87,3 +87,19 @@ manipulations:
     preCond:
       $0: null
       $1: null
+
+
+# this is a special case that arised in twoResistorSeriesCircuit
+  - type: 'regex'
+    vor:
+      scheme: '(= $0 (/ (* $1 $0) $2))'
+      return: '(= 1 (/ $1 $2))'
+    minArgs:
+      $0: 0
+      $1: 0
+    maxArgs:
+      $0: null
+      $1: null
+    preCond:
+      $0: null
+      $1: null

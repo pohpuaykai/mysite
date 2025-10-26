@@ -32,6 +32,13 @@ class Piece {
         this.animeTemplate = function(datum, callbacks) {return (new ThreadTemplate()).makeAnimeTemplateThread(datum, callbacks)}
     }
 
+    contrast({meshUUID, contrast_percentage=0.23}) {
+        // const actor = this.meshUUID__mesh[meshUUID];
+        const actor = this.scene.getObjectByProperty('uuid', meshUUID);//TODO delegate highlight to Actor
+        actor.contrast(contrast_percentage);
+        this.render();
+    }
+
     highlight({meshUUID, redMag=0.23, greenMag=0.23, blueMag=0.23}) {
         // const actor = this.meshUUID__mesh[meshUUID];
         const actor = this.scene.getObjectByProperty('uuid', meshUUID);//TODO delegate highlight to Actor

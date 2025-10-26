@@ -12,6 +12,15 @@ from video import AUDIOFILES_DROP_FOLDER
 from video.captions.subtitles_circuitAnime_basic import SubtitlesCircuitAnimeBasic
 
 
+def subtitlesTimingRecord(request):
+    print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+    print(request.POST['list_subtitles_findEquations'])
+    print(request.POST['list_subtitles_solveEquations'])
+    print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+    #please check what you can do with this.... TODO
+    return HttpResponse('', content_type="text/plain")
+
+
 def circuitAnimeRecord(request):#receives the recorded video
     if 'file' in request.FILES:
         uploaded_file = request.FILES['file'] # this is a InMemoryUploadedFile

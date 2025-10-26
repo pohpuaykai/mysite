@@ -31,4 +31,12 @@ TEST_DATUM={
     ('vor', '5'): {   'expected': '(= (* b c) 1)',
                       'input': '(= (* (* a b) c) a)'},
 
+
+    ('hin', '6'): {   'expected': '(= a (/ (* b a) c))',
+                      'input': '(= 1 (/ b c))'},
+    ('vor', '6'): {   'expected': '(= 1 (/ b c))',
+                      'input': '(= a (/ (* b a) c))'},
+
+
+
 }

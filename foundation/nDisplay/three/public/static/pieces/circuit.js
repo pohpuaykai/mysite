@@ -353,6 +353,22 @@ class Circuit extends Piece{
         xhr.send(formData)
     }
 
+    sendSubtitles(list_subtitles_findEquations, list_subtitles_solveEquations) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'arraybuffer';
+        const self = this;
+        //xhr.onreadystatechange = //no needed for now
+        xhr.open('POST', subtitlesTimingRecord_url, true);
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        const formData = new FormData();
+        // console.log('wavFilename', wavFilename); debugger
+        formData.append('list_subtitles_findEquations', list_subtitles_findEquations)
+        formData.append('list_subtitles_solveEquations', list_subtitles_solveEquations)
+        xhr.send(formData)
+
+    }
+
     makeWavPlayer(audioBuffer, pauseTimings, playerPausedCallback, playerResumedCallback, readyCallback, checkIfAudioVideoInSync) {//this is not used, maybe rename to something more specific?, this is made to pause at timings, stipulated by the user, but it is not working very well
         //maybe put this in its own file?
         class WavPlayer {

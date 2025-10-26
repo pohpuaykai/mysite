@@ -72,4 +72,15 @@ TEST_DATUM={
     ('hin', '9'): {   'expected': '(= a (- (/ b d) (/ c d)))',
                       'input': '(= a (/ (- b c) d))'},
     ('vor', '9'): {   'expected': '(= a (/ (- b d) c))',
-                      'input': '(= a (- (/ b c) (/ d c)))'}}
+                      'input': '(= a (- (/ b c) (/ d c)))'},
+
+    ('hin', '10'): {   'expected': '(= a (+ (* b d) (* c d)))',
+                      'input': '(= a (* (+ b c) d))'},
+    ('vor', '10'): {   'expected': '(= a (* (+ b d) c))',
+                      'input': '(= a (+ (* b c) (* d c)))'},
+    ('hin', '11'): {   'expected': '(= a (- (* b d) (* c d)))',
+                      'input': '(= a (* (- b c) d))'},
+    ('vor', '11'): {   'expected': '(= a (* (- b d) c))',
+                      'input': '(= a (- (* b c) (* d c)))'}
+
+                      }
