@@ -23,8 +23,8 @@ class CircuitAnime {
             //what to check here? need to check currentPositionInAnimation&currentPositionInAudio<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             console.log('*****************************')
             console.log("videoFrame:", self.currentPositionInAnimation['idx'], "audioFrame:", self.currentPositionInAudio['idx'])
-            // console.log("videoState:", self.currentPositionInAnimation['state'])
-            // console.log("audioState:", self.currentPositionInAudio['state']['listOfWordLocationLengthElapsedTime'])
+            console.log("videoState:", self.currentPositionInAnimation['state'])
+            console.log("audioState:", self.currentPositionInAudio['state'])
             console.log('*****************************')
             return self.currentPositionInAnimation['idx'] == self.currentPositionInAudio['idx']
         }
@@ -57,17 +57,19 @@ class CircuitAnime {
 
 
         //
-        const animeSelf = this;
+        const animeSelf = this; this.audioPlaying = false;
         this.audioPlayer_findEquations = this.circuit.makeWavPlayerWithEndCallback(
-            function() {//on end playAudio, we update the currentPositionInAudio
+            function(state) {//on end playAudio, we update the currentPositionInAudio
                 animeSelf.list_subtitles_findEquations[animeSelf.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
-                animeSelf.updateCurrentPositionInAudio()
+                animeSelf.updateCurrentPositionInAudio(state)
+                animeSelf.audioPlaying = false;
             }
         );
         this.audioPlayer_solveEquations = this.circuit.makeWavPlayerWithEndCallback(
-            function() {//on end playAudio, we update the currentPositionInAudio
+            function(state) {//on end playAudio, we update the currentPositionInAudio
                 animeSelf.list_subtitles_solveEquations[animeSelf.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
-                animeSelf.updateCurrentPositionInAudio()
+                animeSelf.updateCurrentPositionInAudio(state)
+                animeSelf.audioPlaying = false;
             }
         );
         this.frameIdx__audioBuffer_findEquations = null;
@@ -256,8 +258,8 @@ class CircuitAnime {
                         self.smoothLookAt(facingCoordinate.x, facingCoordinate.y, facingCoordinate.z, function(){//this is not a frame..., it does not have to wait for AudioVideoInSync
                             // console.log('**7**'); debugger
                             //seems to cause playAudio to be called twice?<<<<<<<<<<<<<<<<<<<<<<<<<<<<< yes, but i am not sure why....????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-                            // animeSelf.updateCurrentPositionInAnimation('solvingStep:introduction')//actually the state is not needed, but good for debugging
-                            // animeSelf.playAudio('solveEquations')
+                            animeSelf.updateCurrentPositionInAnimation('solvingStep:introduction')//actually the state is not needed, but good for debugging
+                            animeSelf.playAudio('solveEquations')//this one is for eq0<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<can you refactor this please?
 
                             // self.pauseUntilCallback(function(){//can you make this into a frame?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -307,7 +309,7 @@ class CircuitAnime {
                         [runningStepsIdx, branchedStepsIdx] = data
                         positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx)
                         // animeSelf.updateCurrentPositionInAnimation('solvingStep:eq0')//actually the state is not needed, but good for debugging
-                        animeSelf.playAudio('solveEquations')
+                        // animeSelf.playAudio('solveEquations')
                     },
                     'continueCallbacks_recursor':[
                         // function(threadSelf, rIdx, preCalInfoDict) {
@@ -321,8 +323,11 @@ class CircuitAnime {
                         //     animeSelf.playAudio('solveEquations')
 
                         // },
-                        animeSelf.noop
+                        animeSelf.noop,
 
+                        function(threadSelf, rIdx, preCalInfoDict) {
+                            animeSelf.playAudio('solveEquations')
+                        }
 
                         // function(threadSelf, rIdx, preCalInfoDict){
                         //     const line = preCalInfoDict['line'];
@@ -394,13 +399,22 @@ class CircuitAnime {
                             }, 8000)// pause for 8 seconds to make sure we get the last few frames.
                         }
                         if (animeSelf.recordSubtitles) {
-                            self.sendSubtitles(animeSelf.list_subtitles_findEquations, animeSelf.list_subtitles_solveEquations)
+                            self.pauseUntilCallback(
+                                function() {
+                                    self.sendSubtitles(animeSelf.list_subtitles_findEquations, animeSelf.list_subtitles_solveEquations)
+                                },
+                                function() {
+                                    return !animeSelf.audioPlaying
+                                },
+                                4000
+                            )
+                            
                         }
                     });
                 },
                 'continue_recursor':function(threadSelf, rIdx, preCalInfoDict) {
                     animeSelf.updateCurrentPositionInAnimation('solvingSteps:conclusion')//actually the state is not needed, but good for debugging
-                    animeSelf.playAudio('solveEquations')
+                    // animeSelf.playAudio('solveEquations')#already played by the previous<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<UGLY
                 },
                 'until_recursor':function(threadSelf, rIdx, preCalInfoDict) {
                     return animeSelf.isAudioVideoInSync();
@@ -826,7 +840,8 @@ class CircuitAnime {
             default:
                 throw Exception()
         }
-        audioPlayer.play(frameIdx__audioBuffer[audioFrameIdx], this.recorderDestination);
+        audioPlayer.play(frameIdx__audioBuffer[audioFrameIdx], this.recorderDestination, {'audioFrameIdx':audioFrameIdx});
+        this.audioPlaying = true;
         const startTime = performance.now()
         switch(threadName) {
             case 'findEquations':

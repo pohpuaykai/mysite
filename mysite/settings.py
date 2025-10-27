@@ -132,3 +132,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 VIDEO_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'videos')
 if not os.path.isdir(VIDEO_FOLDERPATH):
     os.makedirs(VIDEO_FOLDERPATH)
+
+VIDEO_SUBTITLES_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'subtitles')
+if not os.path.isdir(VIDEO_SUBTITLES_FOLDERPATH):
+    os.makedirs(VIDEO_SUBTITLES_FOLDERPATH)

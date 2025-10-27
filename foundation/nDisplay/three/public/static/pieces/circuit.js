@@ -240,7 +240,9 @@ class Circuit extends Piece{
               //     responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
               //     responseDict['language__wavFilePath'][self.audioLanguage]
               // );
-              callback(responseDict[self.audioLanguage])
+              // debugger
+              self.tag__getAudioUrls_findEquations = responseDict['tag']
+              callback(responseDict['language__filepaths'][self.audioLanguage])
 
             }
 
@@ -297,7 +299,12 @@ class Circuit extends Piece{
               //     responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
               //     responseDict['language__wavFilePath'][self.audioLanguage]
               // );
-              callback(responseDict[self.audioLanguage]);
+              // callback(responseDict[self.audioLanguage]);
+
+
+
+              self.tag__getAudioUrls_solveEquations = responseDict['tag']
+              callback(responseDict['language__filepaths'][self.audioLanguage])
 
             }
 
@@ -349,8 +356,11 @@ class Circuit extends Piece{
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         const formData = new FormData();
         // console.log('wavFilename', wavFilename); debugger
+        console.log('making formData')
         formData.append('filename', wavFilename)
+        console.log('wavFileName: ', wavFilename)
         xhr.send(formData)
+        console.log('sent!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     }
 
     sendSubtitles(list_subtitles_findEquations, list_subtitles_solveEquations) {
@@ -361,11 +371,19 @@ class Circuit extends Piece{
         //xhr.onreadystatechange = //no needed for now
         xhr.open('POST', subtitlesTimingRecord_url, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        const formData = new FormData();
+        // const formData = new FormData();
+        // formData.append('list_subtitles_findEquations', list_subtitles_findEquations)
+        // formData.append('list_subtitles_solveEquations', list_subtitles_solveEquations)
+        // xhr.send(formData)
         // console.log('wavFilename', wavFilename); debugger
-        formData.append('list_subtitles_findEquations', list_subtitles_findEquations)
-        formData.append('list_subtitles_solveEquations', list_subtitles_solveEquations)
-        xhr.send(formData)
+        xhr.send(JSON.stringify({
+            'circuitName':self.circuitName,
+            'list_subtitles_findEquations':list_subtitles_findEquations,
+            'tag__getAudioUrls_findEquations':self.tag__getAudioUrls_findEquations,
+            'tag__getAudioUrls_solveEquations':self.tag__getAudioUrls_solveEquations,
+            'list_subtitles_solveEquations':list_subtitles_solveEquations,
+            'language':self.audioLanguage
+        }));
 
     }
 

@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 import logging
 import os
@@ -228,6 +229,7 @@ class AudioFromText:
             data = self.getFirstOldAudioByTag(wavFileOutPrefix)
             if data is not None:
                 print('returning OLD AUDIO!')
+                # return data['language__filepaths']
                 return data
             print('generating new AUDIO!')
         from video.common.text2audio import pyttsx3
@@ -273,8 +275,12 @@ class AudioFromText:
                 # language__wavFilePath[language] = os.path.basename(wavFilePath)
             language__filepaths[language] = filepaths
         if useOld and not returnedOld:
-            self.storeByTag(wavFileOutPrefix, language__filepaths)
-        return language__filepaths
+            self.storeByTag(wavFileOutPrefix, {
+                'language__filepaths':language__filepaths, 
+                'language__list_subtitle':language__list_subtitle,
+                'tag':wavFileOutPrefix
+            })
+        return {'language__filepaths':language__filepaths, 'tag':wavFileOutPrefix}
 
 
     def getFirstOldAudioByTag(self, tag):
@@ -285,5 +291,6 @@ class AudioFromText:
         return None
 
     def storeByTag(self, tag, data):
+
         audio = Audio.objects.create(tag=tag, data=pickle.dumps(data))
         audio.save()

@@ -45,7 +45,7 @@ class Piece {
         actor.highlight(redMag, greenMag, blueMag);
         this.render();
         // this.meshUUID__mesh[meshUUID] = actor;
-        // console.log('highlighted: ', actor)
+        // console.log('highlighted: ', actor.name)
     }
 
     unhighlight(meshUUID) {
@@ -59,6 +59,7 @@ class Piece {
         if (actor.userData['highlight'] !== undefined) {
             actor.unhighlight()
             this.render();
+            // console.log('unhighlighted: ', actor.name)
         }
     }
 
@@ -197,13 +198,17 @@ class Piece {
     }
 
     reveal(meshUUID) {
-        this.scene.getObjectByProperty('uuid', meshUUID).visible = true;
+        const actor = this.scene.getObjectByProperty('uuid', meshUUID);
+        actor.visible = true;
         this.render();
+        console.log('reveal: ', actor.name)
     }
 
     hide(meshUUID) {
-        this.scene.getObjectByProperty('uuid', meshUUID).visible = false;
+        const actor = this.scene.getObjectByProperty('uuid', meshUUID);
+        actor.visible = false;
         this.render();
+        console.log('hide: ', actor.name)
     }
 
     setPosition(meshUUID, x, y, z) {
@@ -413,16 +418,19 @@ class Piece {
                 this.audioContext = audioContext;//new (window.AudioContext||window.webkitAudioContext)();
                 this.restockSource()
             }
-            play(audioBuffer, recorderDestination) {
+            play(audioBuffer, recorderDestination, state) {//state is for debugging
                 this.restockSource()
                 this.source.buffer = audioBuffer
                 this.source.connect(this.audioContext.destination);
                 this.source.connect(recorderDestination);
                 this.source.start(0, 0);
+                this.state = state//now state is just for debugging
             }
             restockSource() {
                 this.source = this.audioContext.createBufferSource();
-                this.source.addEventListener('ended', this.audioEndCallback)
+                // this.source.addEventListener('ended', this.audioEndCallback)
+                const self = this;
+                this.source.addEventListener('ended', function(){self.audioEndCallback(self.state)})//state is for debugging
             }
         }
         return new WavPlayer(audioEndCallback, this.audioContext)

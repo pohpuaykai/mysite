@@ -1,6 +1,9 @@
 from datetime import datetime
-from json import dumps, loads
+# from json import dumps, loads
+import json
 import os
+# from pickle import loads
+import pickle
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -10,13 +13,46 @@ from django.shortcuts import render
 from video import AUDIOFILES_DROP_FOLDER
 # from video.captions.subtitles_circuitAnime_basic import generateAudioFilePath_findEquation, generateAudioFilePath_solvingStep
 from video.captions.subtitles_circuitAnime_basic import SubtitlesCircuitAnimeBasic
+from video.captions.subtitles_template.webvtt.webvtt_template import WebVTTGenerator
+from video.models import Audio
 
 
 def subtitlesTimingRecord(request):
-    print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
-    print(request.POST['list_subtitles_findEquations'])
-    print(request.POST['list_subtitles_solveEquations'])
-    print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+    details = json.loads(request.body)
+    # print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+    # print(details['list_subtitles_findEquations'])
+    # print(details['list_subtitles_solveEquations'])
+    # print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')#and also how to transform it to WebVTT format
+
+
+    def getListSubtitlesBYTag(language, tag):
+        audio = Audio.objects.filter(tag=tag).first() # this cannot be None
+        return pickle.loads(audio.data)['language__list_subtitle'][language]
+
+    language = details['language']
+    list_subtitles_findEquations = getListSubtitlesBYTag(language, details['tag__getAudioUrls_findEquations'])#contains the text of the subtitles
+    list_subtitles_solveEquations = getListSubtitlesBYTag(language, details['tag__getAudioUrls_solveEquations'])#contains the text of the subtitles
+    
+    webVTTGen = WebVTTGenerator([
+        {
+            'list_subtitleTimings':details['list_subtitles_findEquations'],
+            'list_subtitles':list_subtitles_findEquations
+        },
+        {
+            'list_subtitleTimings':details['list_subtitles_solveEquations'],
+            'list_subtitles':list_subtitles_solveEquations
+        }
+    ])
+    subtitleFileContent = webVTTGen.generate()
+
+    #need to merge the content together<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    filename = datetime.strftime(datetime.utcnow(), f'basic_{details["circuitName"]}_%Y%m%d%H%M%S.vtt')
+    videoSubtitlesPath = os.path.join(settings.VIDEO_SUBTITLES_FOLDERPATH, filename)
+    f = open(videoSubtitlesPath, 'w')
+    f.write(subtitleFileContent)
+    f.close()
+    print('video Subtitle is here: ', videoSubtitlesPath, '*****************************************************')
     #please check what you can do with this.... TODO
     return HttpResponse('', content_type="text/plain")
 
@@ -42,7 +78,7 @@ def basic_findEquations_audioFiles(request):
     languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath
     """
     folderpath = AUDIOFILES_DROP_FOLDER
-    details = loads(request.body)
+    details = json.loads(request.body)
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
     #####
     # print('details:')
@@ -80,14 +116,16 @@ def basic_solvingSteps_audioFiles(request):
     folderpath = AUDIOFILES_DROP_FOLDER
     # print(request.body)
     # import pdb;pdb.set_trace()
-    details = loads(request.body)
+    details = json.loads(request.body)
     # print(details)
     # import pdb;pdb.set_trace()
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
     scab = SubtitlesCircuitAnimeBasic()
     #
-    # import pprint;pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(details)
+    import pprint;pp = pprint.PrettyPrinter(indent=4)
+    print('))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))')
+    pp.pprint(details)
+    print('))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))')
     # import pdb;pdb.set_trace()
     #
     ticketNumber = scab.generateEachAudioFilePath_solvingStep(
