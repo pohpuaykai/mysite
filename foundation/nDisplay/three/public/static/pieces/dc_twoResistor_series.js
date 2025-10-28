@@ -50,7 +50,7 @@ class DCTwoResistorSeries extends Circuit {
             'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
         }
 
-        this.audioLanguage = 'zh-CN';
+        this.audioLanguage = 'ru-RU';
 
     }
 
