@@ -51,6 +51,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+MIDDLEWARE += [
+    'mysite.middleware.ignore_sqlite_lock.IgnoreSQLiteLockMiddleware'
+]
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [

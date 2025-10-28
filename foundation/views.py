@@ -36,8 +36,8 @@ def automat_findEquations(request):
     
     """
     circuit_details = loads(request.body)
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
+    # import pprint
+    # pp = pprint.PrettyPrinter(indent=4)
     # pp.pprint(circuit_details)
     #because json keys has to be str.
     networkGraph = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraph'].items()))
@@ -48,16 +48,16 @@ def automat_findEquations(request):
     for edge, solderableLeads in circuit_details['edge__solderableIndices'].items():
         edgeStart___str, edgeEnd___str = edge.split(',')
         edge__solderableIndices[(int(edgeStart___str), int(edgeEnd___str))] = tuple(solderableLeads)
-    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print('networkGraph')
-    pp.pprint(networkGraph)
-    pp.pprint(id__type)
-    pp.pprint(id__positiveLeadsDirections)
-    print('edge__solderableIndices:')
-    pp.pprint(edge__solderableIndices)
-    print('id__positiveLeadsDirections')
-    pp.pprint(id__positiveLeadsDirections)
-    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    # print('networkGraph')
+    # pp.pprint(networkGraph)
+    # pp.pprint(id__type)
+    # pp.pprint(id__positiveLeadsDirections)
+    # print('edge__solderableIndices:')
+    # pp.pprint(edge__solderableIndices)
+    # print('id__positiveLeadsDirections')
+    # pp.pprint(id__positiveLeadsDirections)
+    # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # import pdb;pdb.set_trace()
 
     # componentId__list_variables = {}
@@ -131,8 +131,8 @@ def automat_solveEquations(request):
     list_independentVarStr
     """
     equation_details = loads(request.body)
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
+    # import pprint
+    # pp = pprint.PrettyPrinter(indent=4)
     # print('equation_details: ')
     # pp.pprint(equation_details); import pdb;pdb.set_trace()
     id__type = dict(map(lambda t: (int(t[0]), t[1]), equation_details['id__type'].items()))
@@ -167,7 +167,7 @@ def automat_solveEquations(request):
 
     steps = BipartiteSolver(listOfCollectedEquations, dependentVarStr, list_independentVarStr)._solve(simplify=simplify)#frontend tell me if i should simplify
 
-    pp.pprint(steps)
+    # pp.pprint(steps)
 
     #linearise steps
     # branchedStepsIdx__latexStrs = {}; 
@@ -248,8 +248,8 @@ def pollable(request):
         if responseContent is None: # this means that the backend thread is not done yet, so we should not delete the ticket
             return HttpResponse('', content_type='text/plain')
         ticketObj.delete()
-        print('***********************************************responseContent:')
-        print(responseContent)
-        print('***********************************************')
+        # print('***********************************************responseContent:')
+        # print(responseContent)
+        # print('***********************************************')
         return HttpResponse(responseContent, content_type="text/plain")
     return HttpResponse('', content_type="text/plain")

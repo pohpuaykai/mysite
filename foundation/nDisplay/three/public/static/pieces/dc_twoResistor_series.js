@@ -50,7 +50,7 @@ class DCTwoResistorSeries extends Circuit {
             'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
         }
 
-        this.audioLanguage = 'en-US';
+        this.audioLanguage = 'zh-CN';
 
     }
 
@@ -129,7 +129,7 @@ class DCTwoResistorSeries extends Circuit {
             console.log('list_independentVarStr', list_independentVarStr);
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
-        const simplify = true; const record = false; const ticketing = true; const recordSubtitles = true;
+        const simplify = true; const record = true; const ticketing = true; const recordSubtitles = true;
         (new CircuitAnime('dc_twoResistor_series', this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
 
 

@@ -49,23 +49,34 @@ def subtitlesTimingRecord(request):
 
     filename = datetime.strftime(datetime.utcnow(), f'basic_{details["circuitName"]}_%Y%m%d%H%M%S.vtt')
     videoSubtitlesPath = os.path.join(settings.VIDEO_SUBTITLES_FOLDERPATH, filename)
-    f = open(videoSubtitlesPath, 'w')
+    f = open(videoSubtitlesPath, 'w', encoding='utf-8')
     f.write(subtitleFileContent)
     f.close()
-    print('video Subtitle is here: ', videoSubtitlesPath, '*****************************************************')
+    # print('video Subtitle is here: ', videoSubtitlesPath, '*****************************************************')
     #please check what you can do with this.... TODO
     return HttpResponse('', content_type="text/plain")
 
 
 def circuitAnimeRecord(request):#receives the recorded video
+    storageMethod = 'django'#<<<<<<<<<<<<refactor
     if 'file' in request.FILES:
-        uploaded_file = request.FILES['file'] # this is a InMemoryUploadedFile
 
-        videoFilePath = os.path.join(settings.VIDEO_FOLDERPATH, uploaded_file.name)#, datetime.strftime(datetime.utcnow(), "%Y%M%d%H%M%S"))
+        if storageMethod == 'plain':
+            uploaded_file = request.FILES['file'] # this is a InMemoryUploadedFile
 
-        f = open(videoFilePath, 'wb')
-        f.write(uploaded_file.read())
-        f.close()
+            videoFilePath = os.path.join(settings.VIDEO_FOLDERPATH, uploaded_file.name)#, datetime.strftime(datetime.utcnow(), "%Y%M%d%H%M%S"))
+
+            f = open(videoFilePath, 'wb')
+            f.write(uploaded_file.read())
+            f.close()
+        elif storageMethod == 'django':#hopeflly this does not crash
+            from django.core.files.storage import FileSystemStorage
+            uploaded_file = request.FILES['file'] # this is a InMemoryUploadedFile
+
+            # videoFilePath = os.path.join(settings.VIDEO_FOLDERPATH, uploaded_file.name)#, datetime.strftime(datetime.utcnow(), "%Y%M%d%H%M%S"))
+
+            fs = FileSystemStorage(location=settings.VIDEO_FOLDERPATH)
+            filename = fs.save(uploaded_file.name, uploaded_file)
     return HttpResponse('', content_type="text/plain")
 
 

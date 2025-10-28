@@ -56,8 +56,11 @@ class ThreadingManager:
     @classmethod
     def _get_ticket_number(cls):
         if ThreadingManager.saveRequestInDatabase:
-            ticket = Ticket.objects.create(responseContent=None)
-            ticketNumber = ticket.id
+            try:
+                ticket = Ticket.objects.create(responseContent=None) # 2 HTTPRequestThreads might be trying to create at the same time, resulting in <<sqlite3.OperationalError: database is locked>>, we do not want the thread to wait if there is another thread because we only need 1 audio. So we catch the error and ignore it...
+                ticketNumber = ticket.id
+            except:
+                import traceback; traceback.print_exc()
         else:
             cls.current_ticket_number += 1
             ticketNumber = cls.current_ticket_number
@@ -142,10 +145,7 @@ class ThreadingManager:
 
     def getReturnOfDatabaseTicket(self, ticket_number):
         with ThreadingManager.databaseLock:
-            try:
-                ticket = Ticket.objects.get(id=str(ticket_number))
-            except:
-                return 
+            ticket = Ticket.objects.get(id=str(ticket_number))
             if ticket.responseContent is None:
                 return None
             if ThreadingManager.storageType == 'pickle':

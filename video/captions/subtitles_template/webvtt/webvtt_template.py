@@ -14,7 +14,7 @@ class WebVTTGenerator:
         lastSnNumber = 0; touList_subtitleTimings = []; touList_subtitles = []; firstStartTime = None
         for dict_s in list_dict_listSubtitleTimings_listSubtitles:
             for subtitleItem in dict_s['list_subtitles']:
-                touList_subtitles.append(subtitleItem) # subtitleItem is string.
+                touList_subtitles.append(subtitleItem.replace(os.linesep, '')) # subtitleItem is string.
             for subtitleTimingItem in dict_s['list_subtitleTimings']:
                 subtitleTimingItem__new = copy(subtitleTimingItem)
                 subtitleTimingItem__new['sn'] = subtitleTimingItem['sn'] + lastSnNumber

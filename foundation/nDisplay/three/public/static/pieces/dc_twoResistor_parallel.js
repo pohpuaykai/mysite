@@ -49,7 +49,7 @@ class DCTwoResistorParallel extends Circuit {
             'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
         }
 
-        this.audioLanguage = 'en-US';
+        this.audioLanguage = 'zh-CN';
     }
 
     act() {
@@ -139,7 +139,7 @@ class DCTwoResistorParallel extends Circuit {
             });
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
-        const simplify = true; const record = false; const ticketing = true; const recordSubtitles = true
+        const simplify = true; const record = false; const ticketing = true; const recordSubtitles = true;
         (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
 
         return {

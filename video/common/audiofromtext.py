@@ -223,7 +223,7 @@ class AudioFromText:
     def convertEachSentenceItsOwnWav(self, circuitName, language__list_subtitle, outputfolderpath, volume=0.1, rate=150, wavFileOutPrefix='basic_', useOld=True):
         from pathlib import Path
         print(circuitName)
-        wavFileOutPrefix = f'{wavFileOutPrefix}_{circuitName}'
+        wavFileOutPrefix = f'{wavFileOutPrefix}_{circuitName}_{"_".join(sorted(language__list_subtitle.keys()))}'
         if useOld:
             print('useOld! tag: ', wavFileOutPrefix)
             data = self.getFirstOldAudioByTag(wavFileOutPrefix)
