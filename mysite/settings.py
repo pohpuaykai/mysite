@@ -133,10 +133,17 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-VIDEO_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'videos')
+# VIDEO_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'videos')
+VIDEO_FOLDERPATH = os.path.join(os.environ['circuitAnimeVideoDropFolder'], 'video')#'D:\\circuitAnimeVideos\\video'
 if not os.path.isdir(VIDEO_FOLDERPATH):
     os.makedirs(VIDEO_FOLDERPATH)
 
-VIDEO_SUBTITLES_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'subtitles')
+# VIDEO_SUBTITLES_FOLDERPATH = os.path.join(BASE_DIR, 'video', 'subtitles')
+VIDEO_SUBTITLES_FOLDERPATH = os.path.join(os.environ['circuitAnimeVideoDropFolder'], 'subtitles')#'D:\\circuitAnimeVideos\\subtitles'
 if not os.path.isdir(VIDEO_SUBTITLES_FOLDERPATH):
     os.makedirs(VIDEO_SUBTITLES_FOLDERPATH)
+
+
+AUDIOFILES_DROP_FOLDER = os.path.join(os.environ['circuitAnimeVideoDropFolder'], 'audio')#'D:\\circuitAnimeVideos\\audio'
+if not os.path.isdir(AUDIOFILES_DROP_FOLDER):
+    os.makedirs(AUDIOFILES_DROP_FOLDER)

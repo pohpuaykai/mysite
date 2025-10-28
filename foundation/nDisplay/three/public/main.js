@@ -25,8 +25,8 @@ import {GuiControls} from './static/custom/GuiControls.js';
 // import {ComponentACSignalGenerator} from './static/meshes/ComponentACSignalGenerator.js';
 // import {Wire} from './static/meshes/Wire.js';
 
-import {DCTwoResistorSeries} from './static/pieces/dc_twoResistor_series.js';
-// import {DCTwoResistorParallel} from './static/pieces/dc_twoResistor_parallel.js';
+// import {DCTwoResistorSeries} from './static/pieces/dc_twoResistor_series.js';
+import {DCTwoResistorParallel} from './static/pieces/dc_twoResistor_parallel.js';
 // import {Q2_3_5_aMoreComplexCircuit__P84} from './static/pieces/foundations_of_analog_and_digital_electronic_circuits_anantAgarwal/Q2_3_5_aMoreComplexCircuit__P84.js';
 // import {Q3_21__P18} from './static/pieces/3000_solved_problems_in_electric_circuits__syedANasar/Q3_21__P18.js';
 
@@ -80,8 +80,8 @@ controls.addEventListener( 'change', render );
 const audioContext = new (window.AudioContext||window.webkitAudioContext)();
 
 
-const circuit = new DCTwoResistorSeries(scene, camera, renderer, audioContext, controls, []);
-// const circuit = new DCTwoResistorParallel(scene, camera, renderer, audioContext, controls, []);
+// const circuit = new DCTwoResistorSeries(scene, camera, renderer, audioContext, controls, []);
+const circuit = new DCTwoResistorParallel(scene, camera, renderer, audioContext, controls, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
 // const circuit = new Q3_21__P18(scene, camera, renderer, controls, []);
 // const circuit = new Q2_3_5_aMoreComplexCircuit__P84(scene, camera, renderer, controls, []);

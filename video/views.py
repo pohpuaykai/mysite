@@ -10,7 +10,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 # from foundation.decorators import ticketable
-from video import AUDIOFILES_DROP_FOLDER
 # from video.captions.subtitles_circuitAnime_basic import generateAudioFilePath_findEquation, generateAudioFilePath_solvingStep
 from video.captions.subtitles_circuitAnime_basic import SubtitlesCircuitAnimeBasic
 from video.captions.subtitles_template.webvtt.webvtt_template import WebVTTGenerator
@@ -88,7 +87,7 @@ def basic_findEquations_audioFiles(request):
     Outputs:
     languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath
     """
-    folderpath = AUDIOFILES_DROP_FOLDER
+    folderpath = settings.AUDIOFILES_DROP_FOLDER
     details = json.loads(request.body)
     # subtitles, list_tuple_word_location_length_elapsedTime, filepath, pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime = 
     #####
@@ -124,7 +123,7 @@ def basic_solvingSteps_audioFiles(request):
     Outputs:
     languages__subtitles, languages__subtitleIdx__dict_startTime_endTime, languages__filepath
     """
-    folderpath = AUDIOFILES_DROP_FOLDER
+    folderpath = settings.AUDIOFILES_DROP_FOLDER
     # print(request.body)
     # import pdb;pdb.set_trace()
     details = json.loads(request.body)
@@ -160,7 +159,7 @@ def basic_solvingSteps_audioFiles(request):
 def wavFiles(request):
     filename = request.POST.get('filename')
     print('obtainingwav filename: ', filename)
-    filepath = os.path.join(AUDIOFILES_DROP_FOLDER, filename)
+    filepath = os.path.join(settings.AUDIOFILES_DROP_FOLDER, filename)
     print('wavFilepatH: ', filepath)
     file = open(filepath, 'rb')
     # return HttpResponse(file.read(), content_type="application/octet-stream")

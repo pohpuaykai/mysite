@@ -16,17 +16,17 @@ class DCTwoResistorSeries extends Circuit {
         //This is just copy and paste from dc_twoResistor_parallel, not updated yet<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         this.language_introduction_findEquations = {//This will be read out at the beginning of the animation_findEquations
             'en-US':'This is a circuit with two resistors connected in series, lets find all the equations related to the components of this circuit',
-            'zh-CN':'我们求，此二电阻器并联电路内，所有方程式。',
-            'ja-JP':'こちらは、並列に接続されている抵抗が二つである。その並列回路の素子においての公式を、全て見つけましょう',
-            'de-DE':'Der folgende Stromkreis ist eine ParallelSchaltung. Versuchen wir jetzt, alle Gleichungen der Bauelemente dieses Stromkreises aufzuschreiben',
-            'fr-FR':'Nous avons deux résistances en parallèle et nous allons trouver toutes les équations relatives à ses composants.',
-            'ru-RU':'У нас есть два резистора, соединенных параллельно, и нам нужно найти все уравнения, связанные с их компонентами.'
+            'zh-CN':'我们求，此二电阻器串联电路内，所有方程式。',
+            'ja-JP':'こちらは、並列に接続されている抵抗が二つである。その直列回路の素子においての公式を、全て見つけましょう',
+            'de-DE':'Der folgende Stromkreis ist eine ReihenSchaltung. Versuchen wir jetzt, alle Gleichungen der Bauelemente dieses Stromkreises aufzuschreiben',
+            'fr-FR':'Nous avons deux résistances en série et nous allons trouver toutes les équations relatives à ses composants.',
+            'ru-RU':'У нас есть два последовательно соединенных резистора, и нам нужно найти все уравнения, связанные с их компонентами.'
         }
 
         this.language_conclusion_findEquations = {//This will be read out at the end of the animation_findEquations
             'en-US':'We have found all the equations relating to the two resistors and their series connectivity.',
             'zh-CN':'现阶段，我们以求获所有相关的方程式。',
-            'ja-JP':'今まで、その並列回路の素子においての公式を、求めました。',
+            'ja-JP':'今まで、その直列回路の素子においての公式を、求めました。',
             'de-DE':'Wir haben alle Gleichungen der Bauelemente dieses Stromkreises gefunden,',
             'fr-FR':'Nous avons trouvé toutes les équations relatives à ses composants.',
             'ru-RU':'Мы нашли все уравнения, касающиеся его компонентов.'
