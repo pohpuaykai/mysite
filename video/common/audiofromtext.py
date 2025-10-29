@@ -33,6 +33,7 @@ class AudioFromText:
         """
         If we have the same wavFileOutPrefix, then we give back the same return.....<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         """
+
         #just for getting voices
         from video.common.text2audio import pyttsx3
         engine = pyttsx3.init()
@@ -109,6 +110,18 @@ class AudioFromText:
             engine = pyttsx3.init()
             voices = engine.getProperty('voices')
             now = time.time() # reference time
+            #
+
+            #for now we will use defaults
+            rate = {
+                'en-US':150,
+                'zh-CN':150,
+                'ja-JP':120, # this is too fast for the minWaitTime for pauseUntilCallback on frontend?????<<<<<<<<<
+                'de-DE':150,
+                'fr-FR':150,
+                'ru-RU':150
+            }.get(language, rate)
+            print('rate:', rate, 'language')
             #
             engine.setProperty('rate', rate)#You can adjust this value as needed
             engine.setProperty('volume', volume)#1.0 is maximum volume

@@ -17,7 +17,7 @@ class DCTwoResistorSeries extends Circuit {
         this.language_introduction_findEquations = {//This will be read out at the beginning of the animation_findEquations
             'en-US':'This is a circuit with two resistors connected in series, lets find all the equations related to the components of this circuit',
             'zh-CN':'我们求，此二电阻器串联电路内，所有方程式。',
-            'ja-JP':'こちらは、並列に接続されている抵抗が二つである。その直列回路の素子においての公式を、全て見つけましょう',
+            'ja-JP':'こちらは、直列に接続されている抵抗が二つである。その直列回路の素子においての公式を、全て見つけましょう',
             'de-DE':'Der folgende Stromkreis ist eine ReihenSchaltung. Versuchen wir jetzt, alle Gleichungen der Bauelemente dieses Stromkreises aufzuschreiben',
             'fr-FR':'Nous avons deux résistances en série et nous allons trouver toutes les équations relatives à ses composants.',
             'ru-RU':'У нас есть два последовательно соединенных резистора, и нам нужно найти все уравнения, связанные с их компонентами.'
@@ -50,7 +50,7 @@ class DCTwoResistorSeries extends Circuit {
             'ru-RU':'Это верно, но есть много лишних шагов. Можете ли вы найти более элегантное решение, чем те, что я предложил? Не стесняйтесь делиться своими решениями и мыслями в комментариях.'
         }
 
-        this.audioLanguage = 'ru-RU';
+        this.audioLanguage = 'ja-JP';
 
     }
 

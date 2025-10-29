@@ -7,13 +7,6 @@ import {Recorder} from './static/mediaRecorder/recorder.js';
 // import {asyncCreateTextMesh} from './static/custom/TextMeshCreater.js';
 // import {asyncCreateLatexMesh} from './static/custom/LatexMeshCreater.js';
 
-// import {mesh as cylinder_mesh} from './static/meshes/mesh_cylinder.js';
-// import {mesh as wall_mesh} from './static/meshes/mesh_wall.js';
-// import {mesh as trench_mesh} from './static/meshes/mesh_trench.js';
-// import {mesh as resistor_outline_mesh} from './static/meshes/mesh_resistor_outline.js';
-// import {MeshResistor} from './static/meshes/MeshResistor.js';
-// import {MeshCapacitor} from './static/meshes/MeshCapacitor.js';
-
 import {GuiControls} from './static/custom/GuiControls.js';
 // import {ComponentResistor} from './static/meshes/ComponentResistor.js';
 // import {ComponentBattery} from './static/meshes/ComponentBattery.js';
