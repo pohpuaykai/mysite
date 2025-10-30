@@ -181,7 +181,7 @@ class CircuitAnime {
                 'conclusion':''
             })
 
-            console.log('datum1: ', datum1);
+            // console.log('datum1: ', datum1);
 
             let lastDidNotHideMeshUUID___vor = null; let lastDidNotHideMeshUUID___hin = null;
             function positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx) {
@@ -261,28 +261,12 @@ class CircuitAnime {
                             animeSelf.updateCurrentPositionInAnimation('solvingStep:introduction')//actually the state is not needed, but good for debugging
                             animeSelf.playAudio('solveEquations')//this one is for eq0<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<can you refactor this please?
 
-                            // self.pauseUntilCallback(function(){//can you make this into a frame?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                            // }, function() {
-                            //     return animeSelf.isAudioVideoInSync()
-                            // }, function() {//minWait Time
-                            //     return 0;
-                            // }());
 
                         });
 
-                        // animeSelf.updateCurrentPositionInAnimation()//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<increase position in animation? Because you just finished self.smoothLookAt?
-                        // animeSelf.playAudio('solveEquations')
-                        
-
-                        // animeSelf.updateCurrentPositionInAudio()
-                        // animeSelf.audioPlayer_solveEquations.playAudio()//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<should be in all the continue, always start together with video<<<<<<<
-                        //nothing just wait for audio to finish playing
                     },
                     'continueCallbacks_recursor':[
-                        // function(threadSelf, rIdx, preCalInfoDict) {
-                        //     animeSelf.updateCurrentPositionInAnimation('solvingStep:introduction')//actually the state is not needed, but good for debugging
-                        // }
+
                     ],
                     'until_recursor':function(threadSelf, rIdx, preCalInfoDict){
                         return animeSelf.isAudioVideoInSync();
@@ -308,39 +292,17 @@ class CircuitAnime {
                         let branchedStepsIdx
                         [runningStepsIdx, branchedStepsIdx] = data
                         positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx)
-                        // animeSelf.updateCurrentPositionInAnimation('solvingStep:eq0')//actually the state is not needed, but good for debugging
-                        // animeSelf.playAudio('solveEquations')
+
                     },
                     'continueCallbacks_recursor':[
-                        // function(threadSelf, rIdx, preCalInfoDict) {
-                        //     const line = preCalInfoDict['line'];
-                        //     const data = line[rIdx];
-                        //     let runningStepsIdx//seems like this is not needed
-                        //     let branchedStepsIdx
-                        //     [runningStepsIdx, branchedStepsIdx] = data
-                        //     positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx)
-                        //     // animeSelf.updateCurrentPositionInAnimation('solvingStep:eq0')//actually the state is not needed, but good for debugging
-                        //     animeSelf.playAudio('solveEquations')
 
-                        // },
                         animeSelf.noop,
 
                         function(threadSelf, rIdx, preCalInfoDict) {
                             animeSelf.playAudio('solveEquations')
                         }
 
-                        // function(threadSelf, rIdx, preCalInfoDict){
-                        //     const line = preCalInfoDict['line'];
-                        //     const data = line[rIdx];
-                        //     let runningStepsIdx//seems like this is not needed
-                        //     let branchedStepsIdx
-                        //     [runningStepsIdx, branchedStepsIdx] = data
-                        //     positionAndRevealSolvingStep(runningStepsIdx, branchedStepsIdx)
-                        //     // animeSelf.updateCurrentPositionInAnimation('solvingStep:eq0')//actually the state is not needed, but good for debugging
-                        //     animeSelf.playAudio('solveEquations')
-                        // },
-                        // animeSelf.noop,
-                        // standardHideSolvingStep//contains updateCurrentPositionInAnimation, some how this was called early... why?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
                     ],
                     'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
                         // return true;
@@ -353,7 +315,6 @@ class CircuitAnime {
                 }
             }
             //add a callback for every data in 
-            // for(let i=1; i<datum1.length; i++) {
             for(let i=2; i<datum1.length-1; i++) {//first one is the introduction_audio_frame, second one is the first_step. -1 for the conclusion
                 callbacks1['eq'+(i-1).toString()] = {
                     'until_continueRecursor':function(threadSelf, rIdx, preCalInfoDict){
@@ -379,13 +340,7 @@ class CircuitAnime {
                     }
                 };
             }
-            //add the clean up and stopRecording
-            // callbacks1['eq'+(datum1.length-2).toString()]['finish_recursor'] = function(threadSelf, rIdx, preCalInfoDict) {//-2 because -1 is the conclusion
-            //     standardHideSolvingStep(threadSelf, rIdx, preCalInfoDict);//contains updateCurrentPositionInAnimation
-            //     // self.animationScheduler.pause(); //nessercity?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            //     console.log('animationScheduler.pause DONE')
 
-            // }
             callbacks1['conclusion'] = {
                 'finish_recursor': function(threadSelf, rIdx, preCalInfoDict) {
                     self.removeMeshesByRequestingAnimation('solveEquations', function() {//could this be a frame? like in Adobe Flash?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -653,8 +608,7 @@ class CircuitAnime {
 
             callbacks0['introduction'] = {
                 'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
-                    // animeSelf.audioPlayer_findEquations.playAudio()//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<need a different audio player
-                    // animeSelf.updateCurrentPositionInAnimation()
+
                     animeSelf.updateCurrentPositionInAnimation('findEquations:introduction')//actually the state is not needed, but good for debugging
                     animeSelf.playAudio('findEquations')
                     // animeSelf.updateCurrentPositionInAudio()//only advance when the audio pause, to stop the video, this is done in wavePlayer
@@ -688,7 +642,6 @@ class CircuitAnime {
                         const equationMeshUUID = line[rIdx]['equationMeshUUID'];
                         componentDisplay(list_list_networkNodeIds);
                         formulaDisplay(equationMeshUUID);
-                        // animeSelf.updateCurrentPositionInAnimation()
                         animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+':display');//actually the state is not needed, but good for debugging
                         animeSelf.playAudio('findEquations')
                     },
@@ -698,9 +651,7 @@ class CircuitAnime {
                             const line = preCalInfoDict['line'];
                             const list_list_networkNodeIds = line[rIdx]['list_list_networkNodeIds'];
                             componentHide(list_list_networkNodeIds)
-                            // animeSelf.updateCurrentPositionInAudio()
-                            // animeSelf.updateCurrentPositionInAnimation();//double playing?
-                            // animeSelf.playAudio('findEquations')
+
                         }
                     ],
                     'until_recursor':function(threadSelf,rIdx, preCalInfoDict){
@@ -719,9 +670,9 @@ class CircuitAnime {
                         'minWaitTime_continueRecursor':function(threadSelf,rIdx, preCalInfoDict){
                             return 0;
                         },
-                        //'finish_recursor':function(threadSelf,rIdx, preCalInfoDict){},
+
                         'continue_recursor':function(threadSelf,rIdx, preCalInfoDict){
-                            // console.log('highlightVarComponent')
+
                             const line = preCalInfoDict['line'];
                             const componentMeshUUID = line[rIdx]['componentMeshUUID'];
                             const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
@@ -744,12 +695,7 @@ class CircuitAnime {
                             const componentMeshUUID = line[rIdx]['componentMeshUUID'];
                             const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
                             unhighlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID);
-                            //leads to double playing*****
-                            // animeSelf.updateCurrentPositionInAnimation();
-                            // animeSelf.playAudio('findEquations')
-                            //leads to double playing*****
-                            // animeSelf.updateCurrentPositionInAnimation()
-                            // animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()+':highlightVarComponent');//actually the state is not needed, but good for debugging
+
                         });
                         varCallbacks['continueCallbacks_recursor'].push(animeSelf.noop);
                         varCallbacks['continueCallbacks_recursor'].push(
@@ -763,8 +709,7 @@ class CircuitAnime {
                                 const widthDepthIdx__dataLinearIdx = preCalInfoDict['widthDepthIdx__dataLinearIdx'];
                                 const equationMeshUUID = line[parseInt(widthDepthIdx__dataLinearIdx[tagName__taggedWidthDepthIdx[eqName]])]['equationMeshUUID']
                                 formulaHide(equationMeshUUID)
-                                // animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()+':highlightVarComponent');//actually the state is not needed, but good for debugging
-                                // animeSelf.playAudio('findEquations')
+
                             });
 
                     } else {
@@ -773,21 +718,14 @@ class CircuitAnime {
                             const componentMeshUUID = line[rIdx]['componentMeshUUID'];
                             const list_varChaStr__chaMeshUUID = line[rIdx]['list_varChaStr,chaMeshUUID']
                             unhighlightVarComponent(componentMeshUUID, list_varChaStr__chaMeshUUID);
-                            // animeSelf.updateCurrentPositionInAnimation()
-                            // animeSelf.updateCurrentPositionInAnimation('findEquations: eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()+':highlightVarComponent');//actually the state is not needed, but good for debugging
-                            // animeSelf.playAudio('findEquations')
+
                         });
                     }
                     callbacks0['eq'+(i+tagIdOffset).toString()+'VarCId'+j.toString()] = varCallbacks
                 }
 
             }
-            // debugger;
-            //-2 for the conclusion
-            // callbacks0['eq'+(datum0.length-2+tagIdOffset).toString()+'VarCId'+(datum0[datum0.length-2+tagIdOffset]['varComponentId'].length-1).toString()]['finish_recursor'] = function(threadSelf,rIdx, preCalInfoDict){
-            //     self.removeMeshesByRequestingAnimation('findEquations', function(){});
-            //     self.animationScheduler.playNextAnimation()
-            // }
+
             callbacks0['conclusion'] = {
                 'continue_recursor':function(threadSelf, rIdx, preCalInfoDict){
                     // animeSelf.updateCurrentPositionInAnimation()
@@ -865,7 +803,7 @@ class CircuitAnime {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
 
-      // return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
       return `${year}${month}${day}${hours}${minutes}${seconds}`;
     }
 }

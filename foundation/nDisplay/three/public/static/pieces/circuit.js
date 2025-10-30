@@ -3,8 +3,14 @@ import {Piece} from './piece.js';
 import {Animation} from '../custom/Animation.js';
 
 //all the components
-import {ComponentResistor} from '../meshes/ComponentResistor.js';
 import {ComponentBattery} from '../meshes/ComponentBattery.js';
+import {ComponentACSignalGenerator} from '../meshes/ComponentACSignalGenerator.js';
+import {ComponentResistor} from '../meshes/ComponentResistor.js';
+import {ComponentDiode} from '../meshes/ComponentDiode.js';
+import {ComponentCapacitor} from '../meshes/ComponentCapacitor.js';
+import {ComponentInductor} from '../meshes/ComponentInductor.js';
+import {ComponentTransistor} from '../meshes/ComponentTransistor.js';
+import {ComponentOscillator} from '../meshes/ComponentOscillator.js'
 
 class Circuit extends Piece{
     
@@ -201,9 +207,6 @@ class Circuit extends Piece{
         // xhr.onerror = function(){}
         xhr.open('POST', solveEquations_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        // xhr.setRequestHeader('Content-Type', 'application/json');
-        // circuit.getNetworkGraph();
-        // self.getNetworkGraph();
 
         xhr.send(JSON.stringify({
             'circuitName':self.circuitName,
@@ -234,13 +237,7 @@ class Circuit extends Piece{
 
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
-              // callback(
-              //     // responseDict['subtitles'][self.audioLanguage],
-              //     responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
-              //     responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
-              //     responseDict['language__wavFilePath'][self.audioLanguage]
-              // );
-              // debugger
+
               self.tag__getAudioUrls_findEquations = responseDict['tag']
               callback(responseDict['language__filepaths'][self.audioLanguage])
 
@@ -262,9 +259,7 @@ class Circuit extends Piece{
         // xhr.onerror = function(){}
         xhr.open('POST', basic_findEquations_audioFiles_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        // xhr.setRequestHeader('Content-Type', 'application/json');
-        // circuit.getNetworkGraph();
-        // self.getNetworkGraph();
+
 
         xhr.send(JSON.stringify({
             'circuitName':self.circuitName,
@@ -292,16 +287,6 @@ class Circuit extends Piece{
 
             function handleResponseText(responseText) {
               const responseDict = JSON.parse(responseText);
-              // console.log(responseDict);
-              // debugger
-              // callback(
-              //     responseDict['language__list_tuple_word_location_length_elapsedTime'][self.audioLanguage],
-              //     responseDict['language__pauseIdx__dict_startTime_endTime_listOfWordLocationLengthElapsedTime'][self.audioLanguage],
-              //     responseDict['language__wavFilePath'][self.audioLanguage]
-              // );
-              // callback(responseDict[self.audioLanguage]);
-
-
 
               self.tag__getAudioUrls_solveEquations = responseDict['tag']
               callback(responseDict['language__filepaths'][self.audioLanguage])
@@ -318,16 +303,13 @@ class Circuit extends Piece{
                 }
                 self.pollForTicket(ticketNum, ticketCallback);
               }
-              // asyncCreateLatexMesh(scene, renderer, camera, listOfEquations_latexStrs);
+
             }
         }
         // xhr.onerror = function(){}
         xhr.open('POST', basic_solvingSteps_audioFiles_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        // xhr.setRequestHeader('Content-Type', 'application/json');
-        // circuit.getNetworkGraph();
-        // self.getNetworkGraph();
-        // debugger
+
         xhr.send(JSON.stringify({
             'circuitName':self.circuitName,
             'solvingSteps':solvingSteps, 
@@ -355,7 +337,7 @@ class Circuit extends Piece{
         xhr.open('POST', wavFiles_url, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
         const formData = new FormData();
-        // console.log('wavFilename', wavFilename); debugger
+
         console.log('making formData')
         formData.append('filename', wavFilename)
         console.log('wavFileName: ', wavFilename)
@@ -371,11 +353,7 @@ class Circuit extends Piece{
         //xhr.onreadystatechange = //no needed for now
         xhr.open('POST', subtitlesTimingRecord_url, true);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
-        // const formData = new FormData();
-        // formData.append('list_subtitles_findEquations', list_subtitles_findEquations)
-        // formData.append('list_subtitles_solveEquations', list_subtitles_solveEquations)
-        // xhr.send(formData)
-        // console.log('wavFilename', wavFilename); debugger
+        
         xhr.send(JSON.stringify({
             'circuitName':self.circuitName,
             'list_subtitles_findEquations':list_subtitles_findEquations,
@@ -397,7 +375,7 @@ class Circuit extends Piece{
                 this.startTime = 0;
                 this.source;// = this.audioContext.createBufferSource();
                 this.pauseTimings = pauseTimings;
-                console.log('this.pauseTimings: ', this.pauseTimings)
+                // console.log('this.pauseTimings: ', this.pauseTimings)
                 this.playerPausedCallback = playerPausedCallback;
                 this.playerResumedCallback = playerResumedCallback;
                 this.checkIfAudioVideoInSync = checkIfAudioVideoInSync;
@@ -420,7 +398,7 @@ class Circuit extends Piece{
                         let startOffsetSegment = self.audioContext.currentTime - self.startTime
                         //console.log('startOffsetSegment:', startOffsetSegment, '+self.startOffset:', self.startOffset, '>', pausedTiming);
                         if(startOffsetSegment + self.startOffset > pausedTiming) {
-                            console.log('startOffsetSegment', startOffsetSegment, ' + ', self.startOffset, 'self.startOffset >', pausedTiming, 'pausedTiming');
+                            // console.log('startOffsetSegment', startOffsetSegment, ' + ', self.startOffset, 'self.startOffset >', pausedTiming, 'pausedTiming');
                             isProcessingInterval = true;
                             self.pausedTimingLastIndex +=1;
                             self.pauseAudio(startOffsetSegment);
@@ -490,9 +468,26 @@ class Circuit extends Piece{
             case 'battery':
                 component = new ComponentBattery(position, rotation);
                 break;
+            case 'acSignalGenerator':
+                component = new ComponentACSignalGenerator(position, rotation);
+                break;
+            case 'diode':
+                component = new ComponentDiode(position, rotation);
+                break;
+            case 'capacitor':
+                component = new ComponentCapacitor(position, rotation);
+                break;
+            case 'inductor':
+                component = new ComponentInductor(position, rotation);
+                break;
+            case 'transistor':
+                component = new ComponentTransistor(position, rotation);
+                break;
+            case 'oscillator':
+                component = new ComponentOscillator(position, rotation);
+                break;
             case 'wire':
-
-                component = new Wire(Object.assign({}, additionalInfo, position));//merge the additionalInfo and position together
+                component = new Wire(Object.assign({}, additionalInfo, position));//merge the additionalInfo and position together TODO
                 break;
             default:
                 throw new Error();

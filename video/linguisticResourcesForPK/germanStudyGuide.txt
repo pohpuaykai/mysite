@@ -1,0 +1,123 @@
+https://de.scribd.com/document/640045057/Untitled<<<<<more technical technical terms
+
+
+Sieh dir folgende Stromkreise an, deren Bauelemente identisch sind und wähle die richtige Antwort aus.
+Minuspol
+Stromteilchen
+Stromrichtung
+wesentlichen
+Bestandteile=Bauelemente=Bauteilen(smaller components of a GluhLampe)
+Messgerät
+Widerstand
+ParallelSchaltung
+ReihenSchaltung
+Schaltskizze der Schalter des StromKreises
+Erläutere
+Schaltplan
+Nichtleiter=Isolatoren
+
+
+Durch einen Verbraucher mit einem Widerstand von 125Ohm
+ fließt ein Strom der Stärke 180mA
+.
+
+Berechne die Spannung, die über dem Verbraucher anliegt.
+
+
+
+
+Durch ein Bügeleisen, das an eine elektrische Quelle mit der Spannung 220V
+ angeschlossen ist, fließt ein Strom der Stärke 4.4A
+.
+
+Berechne den Widerstand des Bügeleisens.
+
+
+
+
+
+Eine Glühlampe mit bekanntem Widerstand von 120Ohm
+ wird an eine elektrische Quelle mit der Nennspannung 2.4V
+ angeschlossen.
+
+Berechne die Stärke des Stroms, der durch den Verbraucher fließt.
+
+
+
+
+
+~~~~~~~~~~https://www.leifiphysik.de/elektrizitaetslehre/komplexere-schaltkreise/aufgabe/erklaerquiz-knotenregel
+Die Verzweigungen in Stromkreisen nennt man auch "Knoten". Für die Stromstärke in Stromkreisen gilt die sogenannte Knotenregel:
+"In jedem Verzweigungspunkt eines Stromkreises ist die Summe der hinfließenden Ströme gleich der Summe der abfließenden Ströme".
+Oder einfacher gesagt: So viel Stromstärke, wie zu einem Knoten "hinfließt", muss auch wieder "ab/weg- fließen". 
+Wähle die mathematische Schreibweise, dieser Regel aus. (Erinnerung: Der Formelbuchstabe für Stromstärke ist I.)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+-KCL: Knotenregel Ihin=Iab
+
+Aus der Knotenregel Ihin=Iab lassen sich allgemeine Gleichungen für einen Stromkreis aufstellen. Wähle die Gleichungen aus, die du aus der Knotenregel folgern kannst.
+
+
+
+
+
+
+
+
+
+~~~~~~~~~~https://www.leifiphysik.de/elektrizitaetslehre/komplexere-schaltkreise/aufgabe/quiz-zu-schaltungen-leicht
+Wie groß sind die Ströme I1 und I2?
+Wie groß sind die Spannungen U1 und U2?
+Wie groß ist der Gesamtstrom I und der Gesamtwiderstand R der Schaltung?
+Wie groß ist der Spannungsabfall an den einzelnen Widerständen und wie groß ist die Spannung der Batterie (Energiequelle)?
+In welchem Widerstandsbereich liegt der Gesamtwiderstand dieser Schaltung?
+In welchem Spannungsbereich liegt die Gesamtspannung(Batteriespannung) dieser Schaltung?
+
+
+
+
+~~~~~~~~~~https://www.leifiphysik.de/elektrizitaetslehre/komplexere-schaltkreise/aufgabe/quiz-zur-knotenregel
+Nutze die Knotenregel, um Gleichungen zwischen den Stromstärken im Stromkreis aufzustellen. Wähle alle richtigen Gleichungen.
+
+
+
+
+
+
+~~~~~~~~~~https://www.leifiphysik.de/elektrizitaetslehre/komplexere-schaltkreise/aufgabe/quiz-zur-maschenregel
+Gib die Spannung U1 an, die an der Glühlampe abfällt.
+
+
+
+
+
+
+~~~~~~~~~~~https://www.leifiphysik.de/elektrizitaetslehre/komplexere-schaltkreise/aufgabe/erklaerquiz-maschenregel
+Erinnere dich daran, was die Fachbegriffe Widerstand, Spannung und Stromstärke bedeuten. Bei der Maschenregel geht es um Spannung. Wähle die Beschreibung von Spannung aus. 
+Dies kannst du für den Wasserkreislauf im Bild auch mathematisch mit Hilfe von Gleichungen ausdrücken. Wähle die beiden zum Bild passenden Gleichungen aus.
+Dies kannst du mit Hilfe von Gleichungen ausdrücken. Wähle die zum Bild passende Gleichung aus.
+Im Wasserkreislauf müssen die Höhenunterschiede auf jedem Weg zusammen immer die gesamte Höhe h ergeben.
+Im Stromkreis ergeben die Teilspannungen auf jedem Weg von Minuspol zu Pluspol zusammen die Gesamtspannung (die Gesamtspannung ist in der Regel die Spannung der Spannungsquelle). 
+
+Im Bild verzweigt sich der Stromkreis. Verschiedene Teilspannungen sind gegeben. Betrachte den blauen Weg und bestimme damit die fehlende Teilspannung U2.
+Im Bild verzweigt sich der Stromkreis. Verschiedene Teilspannungen sind eingezeichnet. Betrachte den lila Weg und bestimme damit die fehlende Teilspannung U3.
+Die Maschenregel besagt:
+"Verfolgst du einen Stromweg von dem einen Pol zum anderen Pol, so ist die Summe der Teilspannungen gleich der Spannung der Quelle."
+ 
+
+Du siehst den Stromkreis mit blauen Weg eingezeichnet. Mit der Maschenregel kannst du eine Gleichung aufschreiben. 
+us der Maschenregel kannst du schlussfolgern, dass bei einer Verzweigung bei jedem Weg die gleiche Spannung anliegt. Bei mehreren Bauteilen auf einem der Wege teilt sich diese Spannung dann noch weiter auf. 
+Welche Gleichung kannst du damit aufstellen? 
+
+
+
+
+
+
+
+~~~~~~~~~~~~~~https://www.leifiphysik.de/elektrizitaetslehre/komplexere-schaltkreise/aufgabe/quiz-zu-schaltungen-mittel
+Welche Sätze sind für die gezeichnete Schaltung richtig?
+Gegenüber der vorherigen Schaltung wurde R1 um 40Ω erniedrigt, dafür R2 um 40Ω erhöht. Wie ist nun der Gesamtwiderstand?
+Wie groß sind der Gesamtstrom und die Batteriespannung?
+Die Amperemeter zeigen zunächst die Stromstärken I1=0,2A und I2=0,2A an. Wie ändern sich diese Stromstärken wenn man den vierten Widerstand wie angedeutet an A und B parallel dazu schaltet?
+Welche Stromstärke I zeigt das Messgerät vor und nach dem Dazuschalten des vierten Widerstand?
+Wie groß ist der Gesamtwiderstand der Schaltung? Wie ändert sich dieser Widerstand, falls man die Punkte A und B leitend verbindet?

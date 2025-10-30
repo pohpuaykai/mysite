@@ -1,0 +1,10 @@
+日本語
+https://engineer-education.com/electrical-mathematics-08_eulers-formula/
+https://engineer-education.com/electrical-mathematics-15_3x3matrix_wheatstone-bridge/
+https://engineer-education.com/electrical-mathematics-16_complex-numbers_calculus/
+https://engineer-education.com/electrical-mathematics-14_kirchhoffs-llaw_matrix-method/
+https://engineer-education.com/electrical-mathematics-13_inverse-matrix_determinant/
+
+https://t3840_lecture_notes.gitlab.io/2023_kiso_denki_kairo_1/ac_and_component_combination/
+https://hegtel.com/base_ohm-practice.html
+https://t3840_lecture_notes.gitlab.io/2023_kiso_denki_kairo_1/conductance/

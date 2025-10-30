@@ -1,0 +1,92 @@
+~~~~~~~~~~~~~~https://de.scribd.com/document/401301863/Circuits-Electriques-EXAMEN-THEORIQUE-1
+
+
+
+
+
+Combien y-a-t-il de branches dans ce circuit?
+
+Combien y-a-t-il de noeuds dans ce circuit?
+
+Calculez les valeurs inconnues:
+
+Calculez la difference de potential entre le point U et A
+
+Si je <<court-circuite>> la resistance R6, c'est-à-dire que je place un fil entre C et D, est-ce que, selon vous, le courant I3 va augmenter, diminuer ou rester le même?
+Justifiez votre reponse
+
+
+un fil = filament=wire
+Soit le circuit suivant
+
+
+Si l'intensité du courant traversant l'élément C est égale au quart de l'intensité du courant traversant l'élément B, quelle est alors la valeur du courant traversant l'élément E?
+
+Soit le circuit suivant:
+Vous avez utilize la méthode de mesure de tension par rapport à commun pour mesurer les potentiels A et B; vos résultats sont:
+
+Que vaut la d.d.p. aux bornes de R2?
+
+Que vaut le potential par rapport à commun au point b?
+
+Que vaut la puissance dissipée par R1?
+
+Quelles sont les caractéristiques du circuit equivalent de Thevenin vues entre les bornes b et c?
+
+Complétez les énoncés suivants:
+
+Si deux conducteurs d'aluminium de même section mais de longueur différente sont place en parallèle dans un circuit, le courant circulant dans le conducteur le plus court sera _____ que le courant circulant dans le conducteur le plus long.
+
+La phase est un decalage, normalement exprimée en _____ ou en ______, entre des ondes de même type qui ne passent pas zero en même temps.
+
+Selon le théorème de la superposition, le courant circulant dans un élément d'un circuit électrique est égal à _______ des courants qui seraient produits dans cet element par chacune des sources de tension agissant seule, les autres sources étant remplacées par des ______
+
+
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~https://elearning.esgee-oran.dz/pluginfile.php/16193/mod_page/content/65/Polycopi%C3%A9ELEC-ALIANE-2024.pdf
+On va utiliser les lois de Kirchhoff:
+
+Lois des nœuds (current law)
+Lois des mailles (voltage law)
+
+Les courants I0 et I1 s'écrivent: 
+
+Les équations des mailles deviennent:
+
+Ce système d'équation peut être résolu en utilisant le calcul matriciel (Méthode de Cramer)
+
+Les intensités des courants sont calculées comme suit
+
+
+On calculi le courant I en utilisant la loi des mailles
+
+
+
+Le théorème de Norton est une conséquence évidente du théorème de Thévenin compte tenu de la dualité entre
+circuit série et circuit parallèle
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~https://uel.unisciel.fr/physique/continu/continu_ch03/co/sexercer_03_15.html
+Ce réseau représente les élément passifs d'un pont de Wheatstone, dans le cas où la résistance interne de l'alimentation n'est pas négligeable.
+
+Calculer la résistance équivalente au réseau :
+
+Calculer la résistance équivalente au réseau ci-dessous vu de A et B
+
+Calculer la résistance équivalente aux réseaux ci-dessous
+
+
+
+On a deux résistances en parallèle
+
+La résistance R1 a une valeur de 100 Ω
+
+
+é
+
+C'est exact, mais il y a beaucoup d'étapes inutiles. Pouvez-vous trouver une solution plus simple que celles que j'ai présentées ? N'hésitez pas à partager votre solution et vos réflexions dans les commentaires.

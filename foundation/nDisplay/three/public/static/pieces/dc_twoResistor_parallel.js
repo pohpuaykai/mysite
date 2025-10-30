@@ -54,17 +54,18 @@ class DCTwoResistorParallel extends Circuit {
 
     act() {
 
-        const resistor0 = this.createComponent({componentName:'resistor', position:{x:0, y:-5, z:-20}});
-        this.enter(resistor0.uuid); 
-        // this.scene.add(resistor0); 
-        resistor0.setAllTouchingBoxVisibility(false);//this.render();
-        // console.log('resistor0'); console.log(resistor0.uuid);
-
         const battery0 = this.createComponent({componentName:'battery', position:{x:0, y:0, z:10}});
         this.enter(battery0.uuid);
         // this.scene.add(battery0); 
         battery0.setAllTouchingBoxVisibility(false);//this.render();
         // console.log('battery0'); console.log(battery0.uuid);
+
+
+        const resistor0 = this.createComponent({componentName:'resistor', position:{x:0, y:-5, z:-20}});
+        this.enter(resistor0.uuid); 
+        // this.scene.add(resistor0); 
+        resistor0.setAllTouchingBoxVisibility(false);//this.render();
+        // console.log('resistor0'); console.log(resistor0.uuid);
 
         const resistor1 = this.createComponent({componentName:'resistor', position:{x:0, y:5, z:-20}})
         this.enter(resistor1.uuid)
@@ -140,7 +141,7 @@ class DCTwoResistorParallel extends Circuit {
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
         const simplify = true; const record = true; const ticketing = true; const recordSubtitles = true;
-        (new CircuitAnime('dc_twoResistor_parallel', this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
+        (new CircuitAnime(this.circuitName, this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
 
         return {
             'scene':this.scene,
