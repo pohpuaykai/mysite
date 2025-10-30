@@ -2,7 +2,8 @@
 import {asyncCreateTextMesh} from '../custom/TextMeshCreater.js';
 import {Circuit} from './circuit.js';
 import {Wire} from '../meshes/Wire.js';
-import {CircuitAnime} from '../circuitAnime/basic.js';
+// import {CircuitAnime} from '../circuitAnime/basic.js';
+import {CircuitAnime} from '../circuitAnime/basicNoAudio.js';
 
 class ACTwoInductorSeries extends Circuit {
 
@@ -53,70 +54,70 @@ class ACTwoInductorSeries extends Circuit {
     }
 
     act() {
-        const sigGen = this.createComponent({componentName:'acSignalGenerator', position:{x:0, y:0, z:10}});
+        const sigGen = this.createComponent({componentName:'acSignalGenerator', position:{x:0, y:10, z:100}});
         this.enter(sigGen.uuid);
         sigGen.setAllTouchingBoxVisibility(false);//this.render();
 
-        const inductor0 = this.createComponent({componentName:'inductor', position:{x:0, y:0, z:-20}});
+        const inductor0 = this.createComponent({componentName:'inductor', position:{x:-15, y:0, z:-20}})
         this.enter(inductor0.uuid);
         inductor0.setAllTouchingBoxVisibility(false);//this.render();
 
-        const inductor1 = this.createComponent({componentName:'inductor', position:{x:15, y:0, z:-20}});
+        const inductor1 = this.createComponent({componentName:'inductor', position:{x:15, y:0, z:-20}})
         this.enter(inductor1.uuid);
         inductor1.setAllTouchingBoxVisibility(false);//this.render();
 
-        const wireBetween01 = this.wire(inductor0, sigGen, 0.644/2, 0, 0, '241');
+        const wireBetween01 = this.wire(inductor0, sigGen, 0.644/2, 0, 0, '124');
         wireBetween01.setAllTouchingBoxVisibility(false);
 
         const wireBetween10 = this.wire(inductor0, inductor1, 0.644/2, 1, 0);
         wireBetween10.setAllTouchingBoxVisibility(false);
 
-        const wireBetween11 = this.wire(sigGen, inductor1, 0.644/2, 1, 1, '142');
+        const wireBetween11 = this.wire(sigGen, inductor1, 0.644/2, 1, 1, '421');
         wireBetween11.setAllTouchingBoxVisibility(false);
 
 
-        // //get Equations and solving steps:
-        // const dependentUUID = battery0.uuid;
-        // const list_independentUUID = [resistor0.uuid, resistor1.uuid];
-        // const dependentVarType = 'resistance';
-        // const list_independentVarType = ['resistance', 'resistance'];
+        //get Equations and solving steps:
+        const dependentUUID = battery0.uuid;
+        const list_independentUUID = [resistor0.uuid, resistor1.uuid];
+        const dependentVarType = 'inductance';
+        const list_independentVarType = ['inductance', 'inductance'];
 
-        // function variableSelect(self) {
-        //     function onlySubString(s, subString){return s.includes(subString)}
-        //     const list_equationLatexStr = []; let dependentVarStr=undefined; const list_independentVarStr = [];
-        //     self.list_equationNetworkInfoDict.forEach(equationNetworkInfoDict => {
-        //         list_equationLatexStr.push(equationNetworkInfoDict['equation']);
-        //         Object.entries(equationNetworkInfoDict['variableInfos']).forEach(([nodeId, list_variableStr]) => {
-        //             //capture the dependentVarStr: resistance of resistor0
-        //             if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {//we only want to set dependentVarStr once
-        //                 const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
-        //                 // console.log('varString: ', varString, 'dependentVarStr')
-        //                 // if (varString !== undefined) {
-        //                     dependentVarStr = varString;
-        //                 // }
-        //             }
-        //             //capture the first element of list_independentVarStr
-        //             if(parseInt(nodeId) == self.uuid__id[resistor0.uuid]) {
-        //                 const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{R')})[0];
-        //                 if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
-        //                     list_independentVarStr.push(varString)
-        //                 }
-        //                 // list_independentVarStr.push(); //TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
-        //             }
-        //             //capture the first element of list_independentVarStr
-        //             if(parseInt(nodeId) == self.uuid__id[resistor1.uuid]) {
-        //                 const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{R')})[0];
-        //                 if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
-        //                     list_independentVarStr.push(varString)
-        //                 }
-        //             }
-        //         });
-        //     });
-        //     return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
-        // }
+        function variableSelect(self) {
+            function onlySubString(s, subString){return s.includes(subString)}
+            const list_equationLatexStr = []; let dependentVarStr=undefined; const list_independentVarStr = [];
+            self.list_equationNetworkInfoDict.forEach(equationNetworkInfoDict => {
+                list_equationLatexStr.push(equationNetworkInfoDict['equation']);
+                Object.entries(equationNetworkInfoDict['variableInfos']).forEach(([nodeId, list_variableStr]) => {
+                    //capture the dependentVarStr: resistance of resistor0
+                    if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {//we only want to set dependentVarStr once
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
+                        // console.log('varString: ', varString, 'dependentVarStr')
+                        // if (varString !== undefined) {
+                            dependentVarStr = varString;
+                        // }
+                    }
+                    //capture the first element of list_independentVarStr
+                    if(parseInt(nodeId) == self.uuid__id[resistor0.uuid]) {
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{I')})[0];
+                        if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
+                            list_independentVarStr.push(varString)
+                        }
+                        // list_independentVarStr.push(); //TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
+                    }
+                    //capture the first element of list_independentVarStr
+                    if(parseInt(nodeId) == self.uuid__id[resistor1.uuid]) {
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{I')})[0];
+                        if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
+                            list_independentVarStr.push(varString)
+                        }
+                    }
+                });
+            });
+            return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
+        }
 
-        // const simplify = true; const record = true; const ticketing = true; const recordSubtitles = true;
-        // (new CircuitAnime(this.circuitName, this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
+        const simplify = true; const record = true; const ticketing = true; const recordSubtitles = true;
+        (new CircuitAnime(this.circuitName, this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
 
         return {
             'scene':this.scene,

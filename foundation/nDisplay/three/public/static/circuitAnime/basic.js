@@ -57,19 +57,20 @@ class CircuitAnime {
 
 
         //
-        const animeSelf = this; this.audioPlaying = false;
+        // const animeSelf = this; //already have this.
+        this.audioPlaying = false;
         this.audioPlayer_findEquations = this.circuit.makeWavPlayerWithEndCallback(
             function(state) {//on end playAudio, we update the currentPositionInAudio
-                animeSelf.list_subtitles_findEquations[animeSelf.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
-                animeSelf.updateCurrentPositionInAudio(state)
-                animeSelf.audioPlaying = false;
+                self.list_subtitles_findEquations[animeSelf.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
+                self.updateCurrentPositionInAudio(state)
+                self.audioPlaying = false;
             }
         );
         this.audioPlayer_solveEquations = this.circuit.makeWavPlayerWithEndCallback(
             function(state) {//on end playAudio, we update the currentPositionInAudio
-                animeSelf.list_subtitles_solveEquations[animeSelf.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
-                animeSelf.updateCurrentPositionInAudio(state)
-                animeSelf.audioPlaying = false;
+                self.list_subtitles_solveEquations[animeSelf.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
+                self.updateCurrentPositionInAudio(state)
+                self.audioPlaying = false;
             }
         );
         this.frameIdx__audioBuffer_findEquations = null;
@@ -101,6 +102,24 @@ class CircuitAnime {
         if (this.recordSubtitles) {
             this.list_subtitles_findEquations = [] // each item is a serialNo, startTime, endTime
             this.list_subtitles_solveEquations = [] //each item is a serialNo, startTime, endTime
+        }
+
+        //flags for debugging
+        this.doSolveEquation = false; //this means that we run the solveEquation
+        if (this.doSolveEquation) {
+            this.startAnimationWhen = function() {
+                // console.log('loadedDatei_findEquations: ', animeSelf.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', animeSelf.loadedDatei_solveEquations, 'gotAudio_findEquations: ', animeSelf.gotAudio_findEquations, 'gotAudio_solveEquations: ', animeSelf.gotAudio_solveEquations)
+                return self.loadedDatei_findEquations && self.loadedDatei_solveEquations && self.gotAudio_findEquations && self.gotAudio_solveEquations;//check that all the animation is in before playing, needs to let the animations signal the animationScheduler before playing<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            }
+        } else {//we only have findEquation
+            this.startAnimationWhen = function() {
+                // console.log('loadedDatei_findEquations: ', animeSelf.loadedDatei_findEquations, 'gotAudio_findEquations: ', animeSelf.gotAudio_findEquations)
+                return self.loadedDatei_findEquations && self.gotAudio_findEquations;//check that all the animation is in before playing, needs to let the animations signal the animationScheduler before playing<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            }
+
+            self.circuit.start(function() {//actually why not set 2 flag for data loading of findEquations and solveEquations too?
+                return self.startAnimationWhen()
+            }, false);
         }
     }
 
@@ -387,8 +406,7 @@ class CircuitAnime {
             self.scheduleAnimation(thread1, 1, 'solveEquation', function(){animeSelf.loadedDatei_solveEquations=true});//1 so that it will run after the findEquationAnimation
 
             self.start(function() {//actually why not set 2 flag for data loading of findEquations and solveEquations too?
-                console.log('loadedDatei_findEquations: ', animeSelf.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', animeSelf.loadedDatei_solveEquations, 'gotAudio_findEquations: ', animeSelf.gotAudio_findEquations, 'gotAudio_solveEquations: ', animeSelf.gotAudio_solveEquations)
-                return animeSelf.loadedDatei_findEquations && animeSelf.loadedDatei_solveEquations && animeSelf.gotAudio_findEquations && animeSelf.gotAudio_solveEquations;//check that all the animation is in before playing, needs to let the animations signal the animationScheduler before playing<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                return animeSelf.startAnimationWhen()
             }, false);
         }
 
@@ -400,10 +418,12 @@ class CircuitAnime {
             let list_equationLatexStr; let dependentVarStr; let list_independentVarStr;
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
-            self.animate_solveEquations(
-                solveEquation___readyCallback, 
-                list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
+            if (animeSelf.doSolveEquation) {
+                self.animate_solveEquations(
+                    solveEquation___readyCallback, 
+                    list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
 
+            }
             //audio
             // console.log('self.list_equationNetworkInfoDict', self.list_equationNetworkInfoDict);
             // console.log('self.textStr__textMeshUUID', self.textStr__textMeshUUID);

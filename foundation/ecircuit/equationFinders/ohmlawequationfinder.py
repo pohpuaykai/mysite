@@ -9,10 +9,10 @@ class OhmlawEquationFinder(EquationFinder):
 
     def findEquations(self):
         """
-        All components that are not wire|source, will have OhmsLaw
+        All components that are not wire|diode, will have OhmsLaw. I feel Shockley is a kind of OhmsLaw, in the derivative?
         """
         for componentId, componentType in self.id__type.items():
-            if componentType not in ['wire']:#, 'AC_signal_generator', 'battery']: # power_sources also obey ohms law
+            if componentType not in ['wire', 'diode']:
                 resistanceVariable = EquationFinder.getVariable('resistance', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, resistanceVariable)
                 voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)
