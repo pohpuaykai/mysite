@@ -74,15 +74,32 @@ class Piece {
         const self = this;
         const indices = new Set();
 
-        function equationMeshCallback(latexStrIdx, textMeshInformation, meshUUID__mesh, latexStrMeshUUID) {
-            self.textStr__textMeshUUID[list_latexStr[latexStrIdx][0]] = {'info':textMeshInformation, 'type':'latex', 'meshUUID':latexStrMeshUUID};
-            self.meshUUID__mesh = Object.assign({}, meshUUID__mesh, self.meshUUID__mesh);
+        // function equationMeshCallback(latexStrIdx, textMeshInformation, meshUUID__mesh, latexStrMeshUUID) {// this one is every letter 1 callback
+        //     self.textStr__textMeshUUID[list_latexStr[latexStrIdx][0]] = {'info':textMeshInformation, 'type':'latex', 'meshUUID':latexStrMeshUUID};
+        //     self.meshUUID__mesh = Object.assign({}, meshUUID__mesh, self.meshUUID__mesh);
+        //     meshUUID__mesh[latexStrMeshUUID].visible = false;
+        //     meshUUID__mesh[latexStrMeshUUID].position.set(0, 0, 0);//default position, will be changed in the circuit itself.
+        //     self.enter(latexStrMeshUUID)
+        //     //check if all the list_latexStr's meshes are prepared by idx, then call the readyCallback
+        //     indices.add(latexStrIdx);
+        //     // console.log(indices.size, list_latexStr.length, indices.length == list_latexStr.length)
+        //     if (indices.size == list_latexStr.length) { // all the meshes are ready in textStr__textMeshUUID
+        //         // console.log('piece.js is calling the readyCallback')
+        //         readyCallback();
+        //         // console.log('this.textStr__textMeshUUID', self.textStr__textMeshUUID);
+        //         // console.log('self.meshUUID__mesh', self.meshUUID__mesh)
+        //     }
+        // }
+        function equationMeshCallback(latexIdx, textMeshInformation, meshUUID__mesh, latexStrMeshUUID) {
+            self.textStr__textMeshUUID[list_latexStr[latexIdx][0]] = {'info':textMeshInformation, 'type':'latex', 'meshUUID':latexStrMeshUUID};
+            // self.meshUUID__mesh = Object.assign({}, meshUUID__mesh, self.meshUUID__mesh);
+            self.meshUUID__mesh = meshUUID__mesh
             meshUUID__mesh[latexStrMeshUUID].visible = false;
             meshUUID__mesh[latexStrMeshUUID].position.set(0, 0, 0);//default position, will be changed in the circuit itself.
             self.enter(latexStrMeshUUID)
-            //check if all the list_latexStr's meshes are prepared by idx, then call the readyCallback
-            indices.add(latexStrIdx);
-            // console.log(indices.size, list_latexStr.length, indices.length == list_latexStr.length)
+            indices.add(latexIdx);
+            // console.log('latexIdx', latexIdx, 'textMeshInformation', textMeshInformation, 'meshUUID__mesh', meshUUID__mesh, ); debugger
+            
             if (indices.size == list_latexStr.length) { // all the meshes are ready in textStr__textMeshUUID
                 // console.log('piece.js is calling the readyCallback')
                 readyCallback();

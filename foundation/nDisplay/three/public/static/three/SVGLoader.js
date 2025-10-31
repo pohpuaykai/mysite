@@ -86,6 +86,10 @@ class SVGLoader extends Loader {
 
     }
 
+    setData(userData) {
+        this.userData = userData
+    }
+
     /**
      * Starts loading from the given URL and passes the loaded SVG asset
      * to the `onLoad()` callback.
@@ -107,7 +111,7 @@ class SVGLoader extends Loader {
 
             try {
 
-                onLoad( scope.parse( text ) );
+                onLoad( scope.parse( text ), scope.userData );
 
             } catch ( e ) {
 

@@ -270,7 +270,7 @@ class CircuitAnime {
 
             // console.log('list_equationNetworkInfoDict', self.list_equationNetworkInfoDict); 
             // console.log('textStr__textMeshUUID', self.textStr__textMeshUUID); debugger
-
+            console.log('componentMeshes: ', self.id__uuid)
             for (let i=0; i<self.list_equationNetworkInfoDict.length; i++) {
                 const equationNetworkInfoDict = self.list_equationNetworkInfoDict[i];
                 const key0 = 'eq'+i.toString()
@@ -292,6 +292,7 @@ class CircuitAnime {
                         '<<>>':key1,
                     }
                     // console.log(equationNetworkInfoDict['variableStr__nodeId']); debugger
+                    // console.log(self.id__uuid[equationNetworkInfoDict['variableStr__nodeId'][variableInfoD[j]['variableStr']]]); debugger
                     item0[key1] = {
                       'componentMeshUUID': self.id__uuid[equationNetworkInfoDict['variableStr__nodeId'][variableInfoD[j]['variableStr']]],//for component un|highlighting
                       'list_varChaStr,chaMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'][j]['info'],//for variable un|highlighting

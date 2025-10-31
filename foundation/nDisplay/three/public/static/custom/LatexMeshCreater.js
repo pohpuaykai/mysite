@@ -44,7 +44,7 @@ class LatexMeshCreator {
           meshUUID__mesh___existing[textStr__textMeshUUID___existing[latexStr]].setRequestingAnimation(requestingAnimationName)
           continue
         }
-        // console.log('variables', variables, 'latexStr', latexStr)
+        // console.log('variables', variables, 'latexStr', latexStr, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         const list_startPosEndPosVariableStr = []
         variables.forEach(variableStr => {
           // console.log('variableStr: ', variableStr, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
@@ -53,7 +53,7 @@ class LatexMeshCreator {
           }
         });
         list_startPosEndPosVariableStr.sort((tupa, tupb)=>tupb[0]-tupa[0]); //sort in descending order
-        // console.log('list_startPosEndPosVariableStr', list_startPosEndPosVariableStr)
+        // console.log('list_startPosEndPosVariableStr', list_startPosEndPosVariableStr);// debugger
 
 
         const svgString = self.getCleanSVG(latexStr);
@@ -62,64 +62,98 @@ class LatexMeshCreator {
         const url = URL.createObjectURL(blob);
 
         const loader = new SVGLoader();
+        loader.setData({'list_startPosEndPosVariableStr':list_startPosEndPosVariableStr, 'latexStr':latexStr, 'latexIdx':i})
         const variablesPos__list_chaMeshUUID = {}; //TODO remove
         const list_variableInfoDict = []
         let startVariableMatching = false;// if this true, then we are within the variable_capturing range of the latexStr
-        loader.load(url, (data) => {
-          let currentVariableToMatch = list_startPosEndPosVariableStr.pop();//will take the earliest in the latexStr, because we are poping the end of list_startPosEndPosVariableStr, which is ordered in descending
-          let variableMatchLeftOver = currentVariableToMatch[2]; let list_variableLetterMeshesUUID = [];
-          const paths = data.paths;
+        loader.load(url, (data, userData) => {
+          const list_startPosEndPosVariableStr = userData['list_startPosEndPosVariableStr'];
+          const latexStr = userData['latexStr']
+          const latexIdx = userData['latexIdx']
+          console.log(latexStr)
+          console.log('list_startPosEndPosVariableStr', list_startPosEndPosVariableStr);// debugger
+          console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
           const group = new Actor();// const group = new THREE.Group();
           group.name = latexStr;
           group.setType('latexStr');
           group.setRequestingAnimation(requestingAnimationName)
+          let currentVariableToMatch = list_startPosEndPosVariableStr.pop();//will take the earliest in the latexStr, because we are poping the end of list_startPosEndPosVariableStr, which is ordered in descending
+          while (list_startPosEndPosVariableStr.length) {
 
-          for (const path of paths) {
-            const xlinkHref = path.userData.node.id;
-            const hexCode = xlinkHref.substring(xlinkHref.lastIndexOf('-')+1, xlinkHref.length);
-            const decCode = parseInt(hexCode, 16); let chaStr = null;
-            if (xlinkHref.includes('TEX-N-')) { // normal font
-              chaStr = String.fromCodePoint(decCode)
-            } else { // stylised font
-              chaStr = self.stylizedDecCode__Char[decCode]
+            let variableMatchLeftOver = currentVariableToMatch[2]; let list_variableLetterMeshesUUID = [];
+            const paths = data.paths;
+
+            for (const path of paths) {
+              const xlinkHref = path.userData.node.id;
+              const hexCode = xlinkHref.substring(xlinkHref.lastIndexOf('-')+1, xlinkHref.length);
+              const decCode = parseInt(hexCode, 16); let chaStr = null;
+              if (xlinkHref.includes('TEX-N-')) { // normal font
+                chaStr = String.fromCodePoint(decCode)
+              } else { // stylised font
+                chaStr = self.stylizedDecCode__Char[decCode]
+              }
+              const material = new THREE.MeshBasicMaterial({
+                color: path.color,
+                color:new THREE.Color(1.0, 1.0, 1.0),
+                side: THREE.DoubleSide,
+                depthWrite: false
+              });
+
+              const shapes = path.toShapes(true);
+              const letter = new Actor();// const letter = new THREE.Group();
+              letter.setType('latexLetter');
+              letter.setRequestingAnimation(requestingAnimationName)
+              letter.name = chaStr;
+              // console.log(path, chaStr, '#ofshapes: ', shapes.length);
+              for (const shape of shapes) {
+                const geometry = new THREE.ShapeGeometry(shape);
+                const mesh = new THREE.Mesh(geometry, material);
+                // mesh.position.set(0, startYCoordinate+YSize*i, 100);
+                mesh.scale.set(0.01, 0.01, 0.01);
+                mesh.rotation.set(0, 0, Math.PI);
+                // mesh.color.set(1.0, 1.0, 1.0)//mesh.color is undefined
+                // group.add(mesh);
+                letter.add(mesh);
+                letter.addMainMesh(mesh.uuid);
+              }
+              group.add(letter);
+              group.addMainMesh(letter.uuid)
+
+              // console.log(letter.uuid, chaStr);//TODO need to group the letter together to form the variableMesh, and group the 
+              if (variableMatchLeftOver.indexOf(chaStr) >= 0) {
+                variableMatchLeftOver = variableMatchLeftOver.replace(chaStr, '')
+                list_variableLetterMeshesUUID.push([chaStr, letter.uuid]);
+                meshUUID__mesh[letter.uuid] = letter;//letterMesh
+                startVariableMatching = true;
+              } else if (startVariableMatching) {//we can this truc: "variable letters are consecutive in paths, if there is letter that is not part of the variable, then we should not keep it as a variable"
+                //keep fully_groupped variable in variablesPos__list_chaMeshUUID
+                // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
+                startVariableMatching = false;
+                list_variableInfoDict.push({
+                  'variableStr':currentVariableToMatch[2],
+                  'startPos':currentVariableToMatch[0],
+                  'endPos':currentVariableToMatch[1],
+                  'info':list_variableLetterMeshesUUID
+                });
+                //reset
+                list_variableLetterMeshesUUID = [];
+                if (list_startPosEndPosVariableStr.length > 0) {
+                  currentVariableToMatch = list_startPosEndPosVariableStr.pop();//need to match new variable
+                  variableMatchLeftOver = currentVariableToMatch[2];
+                  if (variableMatchLeftOver.indexOf(chaStr) >= 0) {
+                    variableMatchLeftOver = variableMatchLeftOver.replace(chaStr, '')
+                    list_variableLetterMeshesUUID.push([chaStr, letter.uuid]);
+                    meshUUID__mesh[letter.uuid] = letter;//letterMesh
+                  }
+                }
+              }//else ignore, they are not part of any variable... we do not capture them for now
+
             }
-            const material = new THREE.MeshBasicMaterial({
-              color: path.color,
-              color:new THREE.Color(1.0, 1.0, 1.0),
-              side: THREE.DoubleSide,
-              depthWrite: false
-            });
+            meshUUID__mesh[group.uuid] = group; // group is the whole latexStr
 
-            const shapes = path.toShapes(true);
-            const letter = new Actor();// const letter = new THREE.Group();
-            letter.setType('latexLetter');
-            letter.setRequestingAnimation(requestingAnimationName)
-            letter.name = chaStr;
-            // console.log(path, chaStr, '#ofshapes: ', shapes.length);
-            for (const shape of shapes) {
-              const geometry = new THREE.ShapeGeometry(shape);
-              const mesh = new THREE.Mesh(geometry, material);
-              // mesh.position.set(0, startYCoordinate+YSize*i, 100);
-              mesh.scale.set(0.01, 0.01, 0.01);
-              mesh.rotation.set(0, 0, Math.PI);
-              // mesh.color.set(1.0, 1.0, 1.0)//mesh.color is undefined
-              // group.add(mesh);
-              letter.add(mesh);
-              letter.addMainMesh(mesh.uuid);
-            }
-            group.add(letter);
-            group.addMainMesh(letter.uuid)
-
-            // console.log(letter.uuid, chaStr);//TODO need to group the letter together to form the variableMesh, and group the 
-            if (variableMatchLeftOver.indexOf(chaStr) >= 0) {
-              variableMatchLeftOver = variableMatchLeftOver.replace(chaStr, '')
-              list_variableLetterMeshesUUID.push([chaStr, letter.uuid]);
-              meshUUID__mesh[letter.uuid] = letter;//letterMesh
-              startVariableMatching = true;
-            } else if (startVariableMatching) {//we can this truc: "variable letters are consecutive in paths, if there is letter that is not part of the variable, then we should not keep it as a variable"
-              //keep fully_groupped variable in variablesPos__list_chaMeshUUID
-              // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
-              startVariableMatching = false;
+            //keep fully_groupped variable in variablesPos__list_chaMeshUUID
+            // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
+            if (list_variableLetterMeshesUUID.length > 0) {
               list_variableInfoDict.push({
                 'variableStr':currentVariableToMatch[2],
                 'startPos':currentVariableToMatch[0],
@@ -128,37 +162,15 @@ class LatexMeshCreator {
               });
               //reset
               list_variableLetterMeshesUUID = [];
-              if (list_startPosEndPosVariableStr.length > 0) {
-                currentVariableToMatch = list_startPosEndPosVariableStr.pop();//need to match new variable
-                variableMatchLeftOver = currentVariableToMatch[2];
-                if (variableMatchLeftOver.indexOf(chaStr) >= 0) {
-                  variableMatchLeftOver = variableMatchLeftOver.replace(chaStr, '')
-                  list_variableLetterMeshesUUID.push([chaStr, letter.uuid]);
-                  meshUUID__mesh[letter.uuid] = letter;//letterMesh
-                }
-              }
-            }//else ignore, they are not part of any variable... we do not capture them for now
+              
+            }
+            // console.log('variablesPos__list_chaMeshUUID', variablesPos__list_chaMeshUUID)
+            // self.generatedMeshes.push(group);//each group is an equation
 
+            // equationMeshCallback(i, list_variableInfoDict, meshUUID__mesh, group.uuid);
           }
-          meshUUID__mesh[group.uuid] = group; // group is the whole latexStr
 
-          //keep fully_groupped variable in variablesPos__list_chaMeshUUID
-          // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
-          if (list_variableLetterMeshesUUID.length > 0) {
-            list_variableInfoDict.push({
-              'variableStr':currentVariableToMatch[2],
-              'startPos':currentVariableToMatch[0],
-              'endPos':currentVariableToMatch[1],
-              'info':list_variableLetterMeshesUUID
-            });
-            //reset
-            list_variableLetterMeshesUUID = [];
-            
-          }
-          // console.log('variablesPos__list_chaMeshUUID', variablesPos__list_chaMeshUUID)
-          // self.generatedMeshes.push(group);//each group is an equation
-
-          equationMeshCallback(i, list_variableInfoDict, meshUUID__mesh, group.uuid);
+          equationMeshCallback(latexIdx, list_variableInfoDict, meshUUID__mesh, group.uuid)
          });
 
       }
