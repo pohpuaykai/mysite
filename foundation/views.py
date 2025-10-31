@@ -90,17 +90,16 @@ def automat_findEquations(request):
     """
     for equationFinderClass in EquationFinder.getAllEquationFinders():
         # equationFinderClass.list_equations = []
-        # print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        print('running class: ', equationFinderClass.__name__, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         # print('len(equationStr__variables)', len(equationStr__variables))
 
         for infoD in equationFinderClass(networkGraph, id__type, id__positiveLeadsDirections, edge__solderableIndices).findEquations():
             equation = infoD['equation']; list_list_networkNodeIds = infoD['list_list_networkNodeIds']
 
-            ######for debugging of frontEnd_matching of variableLetterString to meshUUID <<<<<<<<<<<<<remove after the test is done
-            # if not(equation._eqs =='-V_{R_{0}}-V_{R_{3}}+V_{DC_{1}}=0'):
-            #     continue # so far only this equation is giving problems on the frontEnd, so we restrict the backend to make testing easier for frontend
-            #######################################################################################################################
-
+            ###############
+            print('equation:')
+            print(equation.schemeStr)
+            ###############
 
             variableStr__nodeId = {}
             for nodeId, list_variableStr in EquationFinder.componentId__list_variables.items():

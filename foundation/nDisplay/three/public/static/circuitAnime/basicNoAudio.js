@@ -59,12 +59,12 @@ class CircuitAnime {
         this.doSolveEquation = false; //this means that we run the solveEquation
         if (this.doSolveEquation) {
             this.startAnimationWhen = function() {
-                // console.log('loadedDatei_findEquations: ', animeSelf.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', animeSelf.loadedDatei_solveEquations, 'gotAudio_findEquations: ', animeSelf.gotAudio_findEquations, 'gotAudio_solveEquations: ', animeSelf.gotAudio_solveEquations)
+                console.log('WithSolve, loadedDatei_findEquations: ', self.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', animeSelf.loadedDatei_solveEquations)
                 return self.loadedDatei_findEquations && self.loadedDatei_solveEquations
             }
         } else {//we only have findEquation
             this.startAnimationWhen = function() {
-                // console.log('loadedDatei_findEquations: ', animeSelf.loadedDatei_findEquations, 'gotAudio_findEquations: ', animeSelf.gotAudio_findEquations)
+                console.log('SansSolve, loadedDatei_findEquations: ', self.loadedDatei_findEquations)
                 return self.loadedDatei_findEquations
             }
 
@@ -268,6 +268,8 @@ class CircuitAnime {
                 startInCallbackIdx = 1
             }
 
+            // console.log('list_equationNetworkInfoDict', self.list_equationNetworkInfoDict); 
+            // console.log('textStr__textMeshUUID', self.textStr__textMeshUUID); debugger
 
             for (let i=0; i<self.list_equationNetworkInfoDict.length; i++) {
                 const equationNetworkInfoDict = self.list_equationNetworkInfoDict[i];
@@ -276,6 +278,7 @@ class CircuitAnime {
                     '<<>>':key0,
                     'varComponentId':[]
                 }
+                // console.log(self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]); debugger
                 item[key0] = {
                     'list_list_networkNodeIds':equationNetworkInfoDict['list_list_networkNodeIds'],//for highlight the components used to derive equation
                     'equationMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['meshUUID'] // to reveal the equation
@@ -288,6 +291,7 @@ class CircuitAnime {
                     const item0 = {
                         '<<>>':key1,
                     }
+                    // console.log(equationNetworkInfoDict['variableStr__nodeId']); debugger
                     item0[key1] = {
                       'componentMeshUUID': self.id__uuid[equationNetworkInfoDict['variableStr__nodeId'][variableInfoD[j]['variableStr']]],//for component un|highlighting
                       'list_varChaStr,chaMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'][j]['info'],//for variable un|highlighting

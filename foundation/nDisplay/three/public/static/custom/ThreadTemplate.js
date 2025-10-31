@@ -102,6 +102,7 @@ class ThreadTemplate {
         while (stack.length > 0) {
             const sache = stack.pop();
             // const sache = stack.shift();
+            console.log('WHAT IS SACHE???:', sache)
             if (animeSelf.isNonEmptyDictionary(sache['value'])) {// only dictionaries can have tagKeyword
                 drilldown(sache);//<<<<<<we only keep sache that have tagKeyWord in line?, maybe make drilldown delete all the children tagKeyWord?
                 if (tagKeyWord in sache['value']) {// no need to drill down anymore

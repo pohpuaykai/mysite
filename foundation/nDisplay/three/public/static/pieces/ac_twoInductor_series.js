@@ -77,7 +77,7 @@ class ACTwoInductorSeries extends Circuit {
 
 
         //get Equations and solving steps:
-        const dependentUUID = battery0.uuid;
+        const dependentUUID = sigGen.uuid;
         const list_independentUUID = [resistor0.uuid, resistor1.uuid];
         const dependentVarType = 'inductance';
         const list_independentVarType = ['inductance', 'inductance'];
@@ -89,24 +89,24 @@ class ACTwoInductorSeries extends Circuit {
                 list_equationLatexStr.push(equationNetworkInfoDict['equation']);
                 Object.entries(equationNetworkInfoDict['variableInfos']).forEach(([nodeId, list_variableStr]) => {
                     //capture the dependentVarStr: resistance of resistor0
-                    if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {//we only want to set dependentVarStr once
-                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
+                    if(parseInt(nodeId) == self.uuid__id[sigGen.uuid]) {//we only want to set dependentVarStr once
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{AC')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
                         // console.log('varString: ', varString, 'dependentVarStr')
                         // if (varString !== undefined) {
                             dependentVarStr = varString;
                         // }
                     }
                     //capture the first element of list_independentVarStr
-                    if(parseInt(nodeId) == self.uuid__id[resistor0.uuid]) {
-                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{I')})[0];
+                    if(parseInt(nodeId) == self.uuid__id[inductor0.uuid]) {
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{L')})[0];
                         if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
                             list_independentVarStr.push(varString)
                         }
                         // list_independentVarStr.push(); //TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
                     }
                     //capture the first element of list_independentVarStr
-                    if(parseInt(nodeId) == self.uuid__id[resistor1.uuid]) {
-                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{I')})[0];
+                    if(parseInt(nodeId) == self.uuid__id[inductor1.uuid]) {
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{L')})[0];
                         if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
                             list_independentVarStr.push(varString)
                         }
@@ -116,7 +116,7 @@ class ACTwoInductorSeries extends Circuit {
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
 
-        const simplify = true; const record = true; const ticketing = true; const recordSubtitles = true;
+        const simplify = true; const record = false; const ticketing = true; const recordSubtitles = true;
         (new CircuitAnime(this.circuitName, this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
 
         return {

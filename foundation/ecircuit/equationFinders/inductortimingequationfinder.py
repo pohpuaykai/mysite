@@ -16,7 +16,7 @@ class InductortimingEquationFinder(EquationFinder):
         """
 
         for componentId, componentType in self.id__type.items():
-            if componentType in ['capacitor']:
+            if componentType in ['inductor']:
                 associatedComponentIdList = [componentId]
                 currentVariable = EquationFinder.getVariable('current', componentType, componentId)
                 self.addVariableToComponentIdx(componentId, currentVariable)

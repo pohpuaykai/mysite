@@ -14,7 +14,9 @@ class Recorder {
         this.framePerSecond = 30;
         this.mediaRecorder = null;
 
-        this.destination = audioContext.createMediaStreamDestination();
+        if (audioContext !== undefined) {//this is for basicNoAudio.js
+            this.destination = audioContext.createMediaStreamDestination();
+        }
         this.source = audioContext.createBufferSource();
         this.source.connect(this.destination);
 

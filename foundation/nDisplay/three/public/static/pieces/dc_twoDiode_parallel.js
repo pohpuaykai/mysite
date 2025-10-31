@@ -116,7 +116,7 @@ class DCTwoDiodeParallel extends Circuit {
                         // }
                     }
                     //capture the first element of list_independentVarStr
-                    if(parseInt(nodeId) == self.uuid__id[resistor0.uuid]) {
+                    if(parseInt(nodeId) == self.uuid__id[diode0.uuid]) {
                         const varString = list_variableStr.filter(function(s){return onlySubString(s, 'V_{D')})[0];
                         if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
                             list_independentVarStr.push(varString)
@@ -124,7 +124,7 @@ class DCTwoDiodeParallel extends Circuit {
                         // list_independentVarStr.push(); //TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
                     }
                     //capture the first element of list_independentVarStr
-                    if(parseInt(nodeId) == self.uuid__id[resistor1.uuid]) {
+                    if(parseInt(nodeId) == self.uuid__id[diode1.uuid]) {
                         const varString = list_variableStr.filter(function(s){return onlySubString(s, 'V_{D')})[0];
                         if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
                             list_independentVarStr.push(varString)
@@ -135,7 +135,7 @@ class DCTwoDiodeParallel extends Circuit {
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
 
-        const simplify = true; const record = true; const ticketing = true; const recordSubtitles = true;
+        const simplify = true; const record = false; const ticketing = true; const recordSubtitles = true;
         (new CircuitAnime(this.circuitName, this, variableSelect, ticketing, simplify, record, recordSubtitles)).play();
 
         return {

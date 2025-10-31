@@ -399,7 +399,7 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
     @classmethod
     def getSubscriptSymbolMap(cls):
         return {
-            'ac_signal_generator':'AC',
+            'AC_signal_generator':'AC',
             'battery':'DC',
             'capacitor':'C',
             'diode':'D',
