@@ -415,7 +415,7 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
         }
 
     @classmethod
-    def getVariable(cls, electricalType, componentType, nodeId):
+    def getVariable(cls, electricalType, componentType, nodeId, isConstant=False):
         """
         This returns an appropriate variable that is parsable by LatexParser
 
@@ -431,64 +431,13 @@ self.directedEdges = a list of 2-tuples, each item is a nodeId
             transistor
         :param nodeId: integer
         """
-        main_symbol = cls.getMainSymbolMap().get(electricalType, None)
+        main_symbol = cls.getMainSymbolMap().get(electricalType, electricalType)
         if main_symbol is None:
             raise Exception()
 
         subscript = cls.getSubscriptSymbolMap().get(componentType, componentType)
-
-        # main_symbol = ''
-        # if electricalType in ['voltage']:
-        #     main_symbol = 'V'
-        # elif electricalType in ['current']:
-        #     main_symbol = 'I'
-        # elif electricalType in ['resistance']:
-        #     main_symbol = 'R'
-        # elif electricalType in ['capacitance']:
-        #     main_symbol = 'C'
-        # elif electricalType in ['inductance']:
-        #     main_symbol = 'L'
-        # elif electricalType in ['impedance']:
-        #     main_symbol = 'X'
-        # elif electricalType in ['frequency']:
-        #     main_symbol = 'w'
-        # elif electricalType in ['temperature']:
-        #     main_symbol = 'T'
-        # elif electricalType in ['current_amplification']:
-        #     main_symbol = '\\alpha'
-        # else:
-        #     raise Exception()
-        # subscript = ''
-        # if componentType in ['ac_signal_generator']:
-        #     subscript = 'AC'
-        # elif componentType in ['battery']:
-        #     subscript = 'DC'
-        # elif componentType in ['capacitor']:
-        #     subscript = 'C'
-        # elif componentType in ['diode']:
-        #     subscript = 'D'
-        # elif componentType in ['inductor']:
-        #     subscript = 'I'
-        # elif componentType in ['oscillator']:
-        #     subscript = 'O'
-        # elif componentType in ['resistor']:
-        #     subscript = 'R'
-        # elif componentType in ['transistor_emitter']:
-        #     subscript = 'TE'
-        # elif componentType in ['transistor_common']:
-        #     subscript = 'TC'
-        # elif componentType in ['transistor_base']:
-        #     subscript = 'TB'
-        # elif componentType in ['transistor_emitter_common']:
-        #     subscript = 'TEC'
-        # elif componentType in ['transistor_base_common']:
-        #     subscript = 'TBC'
-        # elif componentType in ['transistor_emitter_base']:
-        #     subscript = 'TEB'
-        # else:#undefined like totalsum
-        #     subscript = componentType
-
-
+        if isConstant:
+            subscript += '^C'
 
         subsubscript = str(nodeId)
         return f'{main_symbol}_{{{subscript}_{{{subsubscript}}}}}'

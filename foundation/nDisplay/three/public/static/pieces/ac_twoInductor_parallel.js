@@ -96,7 +96,7 @@ class ACTwoInductorParallel extends Circuit {
 
         //get Equations and solving steps:
         const dependentUUID = sigGen.uuid;
-        const list_independentUUID = [resistor0.uuid, resistor1.uuid];
+        const list_independentUUID = [inductor0.uuid, inductor1.uuid];
         const dependentVarType = 'inductance';
         const list_independentVarType = ['inductance', 'inductance'];
 

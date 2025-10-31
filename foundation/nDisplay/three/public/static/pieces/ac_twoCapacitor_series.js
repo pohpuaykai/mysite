@@ -78,7 +78,7 @@ class ACTwoCapacitorSeries extends Circuit {
 
         //get Equations and solving steps:
         const dependentUUID = sigGen.uuid;
-        const list_independentUUID = [resistor0.uuid, resistor1.uuid];
+        const list_independentUUID = [capacitor0.uuid, capacitor1.uuid];
         const dependentVarType = 'capacitance';
         const list_independentVarType = ['capacitance', 'capacitance'];
 

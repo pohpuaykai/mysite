@@ -20,11 +20,11 @@ class ShockleydiodeEquationFinder(EquationFinder):
             if componentType in ['diode']:
                 diodeCurrentVariable = EquationFinder.getVariable("current", componentType, componentId)#<<<<<<<
                 self.addVariableToComponentIdx(componentId, diodeCurrentVariable)
-                diode_saturationCurrentVariable = EquationFinder.getVariable("current", componentType, componentId)#<<<<<<<
+                diode_saturationCurrentVariable = EquationFinder.getVariable("current", componentType, componentId, isConstant=True)#<<<<<<<
                 self.addVariableToComponentIdx(componentId, diode_saturationCurrentVariable)
                 diodeVoltageVariable = EquationFinder.getVariable("voltage", componentType, componentId)#<<<<<<<
                 self.addVariableToComponentIdx(componentId, diodeVoltageVariable)
-                ideality_factorVariable = EquationFinder.getVariable("current", componentType, componentId)#<<<<<<<
+                ideality_factorVariable = EquationFinder.getVariable("n", componentType, componentId)#<<<<<<<
                 self.addVariableToComponentIdx(componentId, ideality_factorVariable)
                 boltzmann_constantVariable = self.getConstantVariable("boltzmann_constant")
                 charge_of_an_electronVariable = self.getConstantVariable("charge_of_an_electron")

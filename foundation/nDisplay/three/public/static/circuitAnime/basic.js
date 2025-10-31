@@ -529,15 +529,18 @@ class CircuitAnime {
                 const variableInfoD = self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'];
                 //console.log("self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]", self.textStr__textMeshUUID[equationNetworkInfoDict['equation']])
                 for(let j=0; j<variableInfoD.length; j++) {
-                    const key1 = key0+'VarCId'+j.toString()
-                    const item0 = {
-                        '<<>>':key1,
+
+                    if (variableInfoD[j]['variableStr'] in equationNetworkInfoDict['variableStr__nodeId']) {
+                        const key1 = key0+'VarCId'+j.toString()
+                        const item0 = {
+                            '<<>>':key1,
+                        }
+                        item0[key1] = {
+                          'componentMeshUUID': self.id__uuid[equationNetworkInfoDict['variableStr__nodeId'][variableInfoD[j]['variableStr']]],//for component un|highlighting
+                          'list_varChaStr,chaMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'][j]['info'],//for variable un|highlighting
+                        }
+                        item['varComponentId'].push(item0)
                     }
-                    item0[key1] = {
-                      'componentMeshUUID': self.id__uuid[equationNetworkInfoDict['variableStr__nodeId'][variableInfoD[j]['variableStr']]],//for component un|highlighting
-                      'list_varChaStr,chaMeshUUID':self.textStr__textMeshUUID[equationNetworkInfoDict['equation']]['info'][j]['info'],//for variable un|highlighting
-                    }
-                    item['varComponentId'].push(item0)
                 }
                 datum0.push(item);
             }

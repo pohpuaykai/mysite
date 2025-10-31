@@ -38,6 +38,9 @@ class Animation {
     }
 
     playNextAnimation() {
+        // console.log('this.animationHoldingPen.length', this.animationHoldingPen.length)
+        // console.log('this.lastAnimationPlayedId', this.lastAnimationPlayedId); 
+        // console.log('this.lastAnimationPlayedId >= this.animationHoldingPen.length', this.lastAnimationPlayedId >= this.animationHoldingPen.length); debugger
         if(this.lastAnimationPlayedId === null) {
             this.playing = true
             this.animationHoldingPen.sort((a, b) => a['priority'] - b['priority']);//ascending order
@@ -46,7 +49,7 @@ class Animation {
             console.log('playing animation: ', animationInfoDict['name'])
             animationInfoDict['animation']();
             this.lastAnimationPlayedId = 0; 
-        } else if (this.lastAnimationPlayedId >= this.animationHoldingPen.length) {// for non looping animations
+        } else if (this.lastAnimationPlayedId+1 >= this.animationHoldingPen.length) {// for non looping animations
             this.pause();this.playing = false;
         } else {
             this.lastAnimationPlayedId += 1;
