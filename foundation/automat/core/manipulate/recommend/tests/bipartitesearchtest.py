@@ -141,6 +141,214 @@ def bipartiteSearch__dc_twoResistor_parallel(verbose=False):
 
 
 
+
+    
+def bipartiteSearch__ac_twoCapacitor_parallel(verbose=False):
+    # from foundation.automat.core.equation import Equation
+    list_equationStrs = None
+    list_variables = None
+    equationVariables_bg = None
+    vertexId__equationVariableId = None
+    equationId__vertexId = None
+    variableId__vertexId = None
+    type__list_vertexIds = None
+    equationKey = 'equation'
+    variableKey = 'variable'
+    dependentVariableId = None
+    list_independentVariableIds = None
+    list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
+    #######################################################
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds)
+    expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
+    expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', substitutionPath == expected_substitutionPath)
+    if verbose:
+        # print('listOfCollectedEquations')
+        # pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        # print('listOfVariables')
+        # pp.pprint(listOfVariables)
+        # print('vertexId__equationVariableId')
+        # pp.pprint(vertexId__equationVariableId)
+        # print('equationVariables_g')
+        # pp.pprint(equationVariables_g)
+        # print('type__list_vertexIds')
+        # pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
+        print('equationVertexId__tuple_variableVertexIdContaining___NEW')
+        print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+
+
+
+    
+def bipartiteSearch__ac_twoCapacitor_series(verbose=False):
+    # from foundation.automat.core.equation import Equation
+    list_equationStrs = None
+    list_variables = None
+    equationVariables_bg = None
+    vertexId__equationVariableId = None
+    equationId__vertexId = None
+    variableId__vertexId = None
+    type__list_vertexIds = None
+    equationKey = 'equation'
+    variableKey = 'variable'
+    dependentVariableId = None
+    list_independentVariableIds = None
+    list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
+    #######################################################
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds)
+    expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
+    expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', substitutionPath == expected_substitutionPath)
+    if verbose:
+        # print('listOfCollectedEquations')
+        # pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        # print('listOfVariables')
+        # pp.pprint(listOfVariables)
+        # print('vertexId__equationVariableId')
+        # pp.pprint(vertexId__equationVariableId)
+        # print('equationVariables_g')
+        # pp.pprint(equationVariables_g)
+        # print('type__list_vertexIds')
+        # pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
+        print('equationVertexId__tuple_variableVertexIdContaining___NEW')
+        print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+
+###########################################
+
+    
+def bipartiteSearch__dc_twoDiode_parallel(verbose=False):
+    # from foundation.automat.core.equation import Equation
+    list_equationStrs = None
+    list_variables = None
+    equationVariables_bg = None
+    vertexId__equationVariableId = None
+    equationId__vertexId = None
+    variableId__vertexId = None
+    type__list_vertexIds = None
+    equationKey = 'equation'
+    variableKey = 'variable'
+    dependentVariableId = None
+    list_independentVariableIds = None
+    list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
+    #######################################################
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds)
+    expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
+    expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', substitutionPath == expected_substitutionPath)
+    if verbose:
+        # print('listOfCollectedEquations')
+        # pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        # print('listOfVariables')
+        # pp.pprint(listOfVariables)
+        # print('vertexId__equationVariableId')
+        # pp.pprint(vertexId__equationVariableId)
+        # print('equationVariables_g')
+        # pp.pprint(equationVariables_g)
+        # print('type__list_vertexIds')
+        # pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
+        print('equationVertexId__tuple_variableVertexIdContaining___NEW')
+        print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+
+
+
+    
+def bipartiteSearch__dc_twoDiode_series(verbose=False):
+    # from foundation.automat.core.equation import Equation
+    list_equationStrs = None
+    list_variables = None
+    equationVariables_bg = None
+    vertexId__equationVariableId = None
+    equationId__vertexId = None
+    variableId__vertexId = None
+    type__list_vertexIds = None
+    equationKey = 'equation'
+    variableKey = 'variable'
+    dependentVariableId = None
+    list_independentVariableIds = None
+    list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
+    #######################################################
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds)
+    expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
+    expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', substitutionPath == expected_substitutionPath)
+    if verbose:
+        # print('listOfCollectedEquations')
+        # pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        # print('listOfVariables')
+        # pp.pprint(listOfVariables)
+        # print('vertexId__equationVariableId')
+        # pp.pprint(vertexId__equationVariableId)
+        # print('equationVariables_g')
+        # pp.pprint(equationVariables_g)
+        # print('type__list_vertexIds')
+        # pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
+        print('equationVertexId__tuple_variableVertexIdContaining___NEW')
+        print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+
+######################################################################################
+
+
 if __name__=='__main__':
     # bipartiteSearch__dc_twoResistor_series(True)
-    bipartiteSearch__dc_twoResistor_parallel(True)
+    # bipartiteSearch__dc_twoResistor_parallel(True)
+    bipartiteSearch__ac_twoCapacitor_parallel(True)
+    # bipartiteSearch__ac_twoCapacitor_series(True)
+    # bipartiteSearch__ac_twoInductor_parallel(True)
+    # bipartiteSearch__ac_twoInductor_series(True)
+    # bipartiteSearch__dc_twoDiode_parallel(True)
+    # bipartiteSearch__dc_twoDiode_series(True)

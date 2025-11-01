@@ -12,7 +12,7 @@ class DCTwoDiodeSeries extends Circuit {
      * **/
     constructor(scene, camera, renderer, audioContext, controls, meshes) {
         super(scene, camera, renderer, audioContext, controls, meshes);
-        this.circuitName = ''//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        this.circuitName = 'dcTwoDiodeSeries'//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         this.language_introduction_findEquations = {//This will be read out at the beginning of the animation_findEquations
             'en-US':'',

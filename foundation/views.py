@@ -130,10 +130,12 @@ def automat_solveEquations(request):
     list_independentVarStr
     """
     equation_details = loads(request.body)
-    # import pprint
-    # pp = pprint.PrettyPrinter(indent=4)
-    # print('equation_details: ')
-    # pp.pprint(equation_details); import pdb;pdb.set_trace()
+    ##########
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+    print('equation_details: ')
+    pp.pprint(equation_details); import pdb;pdb.set_trace()
+    ##########
     id__type = dict(map(lambda t: (int(t[0]), t[1]), equation_details['id__type'].items()))
     list_equationStr = equation_details['list_equationStr']
     dependentVarStr = equation_details['dependentVarStr']
