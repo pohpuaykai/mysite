@@ -143,7 +143,8 @@ class Circuit extends Piece{
         }));
     }
 
-    animate_solveEquations(readyCallback, list_equationStr, dependentVarStr, list_independentVarStr, animationName, simplify) {
+    animate_solveEquations(
+        readyCallback, list_equationStr, dependentVarStr, list_independentVarStr, animationName, simplify) {
         //
     // list_equationStr
     // id__type
@@ -208,7 +209,7 @@ class Circuit extends Piece{
         xhr.open('POST', solveEquations_url);
         xhr.setRequestHeader('X-CSRFToken', csrftoken);
 
-        xhr.send(JSON.stringify({
+        const datei = {
             'circuitName':self.circuitName,
             'list_equationStr':list_equationStr,
             'id__type':self.id__type,
@@ -216,7 +217,10 @@ class Circuit extends Piece{
             'list_independentVarStr':list_independentVarStr,
             'simplify':simplify, //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TODO test
             'wantsTicket':true
-        }));
+        }
+        console.log('sending : ', datei)
+
+        xhr.send(JSON.stringify(datei));
 
     }
 

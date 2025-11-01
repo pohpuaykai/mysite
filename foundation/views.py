@@ -36,8 +36,8 @@ def automat_findEquations(request):
     
     """
     circuit_details = loads(request.body)
-    # import pprint
-    # pp = pprint.PrettyPrinter(indent=4)
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
     # pp.pprint(circuit_details)
     #because json keys has to be str.
     networkGraph = dict(map(lambda t: (int(t[0]), t[1]), circuit_details['networkGraph'].items()))
@@ -51,12 +51,12 @@ def automat_findEquations(request):
     # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # print('networkGraph')
     # pp.pprint(networkGraph)
+    # print('id__type')
     # pp.pprint(id__type)
+    # print('id__positiveLeadsDirections')
     # pp.pprint(id__positiveLeadsDirections)
     # print('edge__solderableIndices:')
     # pp.pprint(edge__solderableIndices)
-    # print('id__positiveLeadsDirections')
-    # pp.pprint(id__positiveLeadsDirections)
     # print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     # import pdb;pdb.set_trace()
 
@@ -131,10 +131,10 @@ def automat_solveEquations(request):
     """
     equation_details = loads(request.body)
     ##########
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
-    print('equation_details: ')
-    pp.pprint(equation_details); import pdb;pdb.set_trace()
+    # import pprint
+    # pp = pprint.PrettyPrinter(indent=4)
+    # print('equation_details: ')
+    # pp.pprint(equation_details); import pdb;pdb.set_trace()
     ##########
     id__type = dict(map(lambda t: (int(t[0]), t[1]), equation_details['id__type'].items()))
     list_equationStr = equation_details['list_equationStr']

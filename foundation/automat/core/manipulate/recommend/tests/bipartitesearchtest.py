@@ -145,17 +145,17 @@ def bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     
 def bipartiteSearch__ac_twoCapacitor_parallel(verbose=False):
     # from foundation.automat.core.equation import Equation
-    list_equationStrs = None
-    list_variables = None
-    equationVariables_bg = None
-    vertexId__equationVariableId = None
-    equationId__vertexId = None
-    variableId__vertexId = None
-    type__list_vertexIds = None
+    list_equationStrs = ['(= I_{C_{0}} (* C_{C_{0}} (/ (* d V_{C_{0}}) (* d t))))', '(= I_{C_{3}} (* C_{C_{3}} (/ (* d V_{C_{3}}) (* d t))))', '(= I_{AC_{8}} (* C_{AC_{8}} (/ (* d V_{AC_{8}}) (* d t))))', '(= (+ (+ (- 0 I_{AC_{8}}) I_{C_{0}}) I_{C_{3}}) 0)', '(= (+ (- 0 V_{C_{0}}) V_{AC_{8}}) 0)', '(= (- V_{AC_{8}} V_{C_{3}}) 0)']
+    list_variables = ['I_{C_{0}}', 'C_{C_{0}}', 'd', 'V_{C_{0}}', 't', 'I_{C_{3}}', 'C_{C_{3}}', 'V_{C_{3}}', 'I_{AC_{8}}', 'C_{AC_{8}}', 'V_{AC_{8}}']
+    equationVariables_bg = {1: [0, 14], 0: [1, 2, 3, 4, 5], 2: [0], 3: [0, 6, 10], 4: [0, 15], 5: [0, 6, 10], 7: [6, 14], 6: [7, 8, 3, 9, 5], 8: [6], 9: [6, 16], 11: [10, 14], 10: [11, 12, 3, 13, 5], 12: [10], 13: [10, 15, 16], 14: [11, 1, 7], 15: [4, 13], 16: [13, 9]}
+    vertexId__equationVariableId = {0: 0, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 1, 7: 5, 8: 6, 9: 7, 10: 2, 11: 8, 12: 9, 13: 10, 14: 3, 15: 4, 16: 5}
+    equationId__vertexId = {0: 0, 1: 6, 2: 10, 3: 14, 4: 15, 5: 16}
+    variableId__vertexId = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 13}
+    type__list_vertexIds = {'equation': [0, 6, 10, 14, 15, 16], 'variable': [1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 13]}
     equationKey = 'equation'
     variableKey = 'variable'
-    dependentVariableId = None
-    list_independentVariableIds = None
+    dependentVariableId = 9
+    list_independentVariableIds = [1, 6]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
     substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
@@ -195,17 +195,17 @@ def bipartiteSearch__ac_twoCapacitor_parallel(verbose=False):
     
 def bipartiteSearch__ac_twoCapacitor_series(verbose=False):
     # from foundation.automat.core.equation import Equation
-    list_equationStrs = None
-    list_variables = None
-    equationVariables_bg = None
-    vertexId__equationVariableId = None
-    equationId__vertexId = None
-    variableId__vertexId = None
-    type__list_vertexIds = None
+    list_equationStrs = ['(= I_{C_{0}} (* C_{C_{0}} (/ (* d V_{C_{0}}) (* d t))))', '(= I_{C_{3}} (* C_{C_{3}} (/ (* d V_{C_{3}}) (* d t))))', '(= I_{AC_{1}} (* C_{AC_{1}} (/ (* d V_{AC_{1}}) (* d t))))', '(= I_{C_{0}} I_{AC_{1}})', '(= I_{C_{0}} I_{C_{3}})', '(= (+ (- (- 0 V_{C_{0}}) V_{C_{3}}) V_{AC_{1}}) 0)']
+    list_variables = ['I_{C_{0}}', 'C_{C_{0}}', 'd', 'V_{C_{0}}', 't', 'I_{C_{3}}', 'C_{C_{3}}', 'V_{C_{3}}', 'I_{AC_{1}}', 'C_{AC_{1}}', 'V_{AC_{1}}']
+    equationVariables_bg = {1: [0, 14, 15], 0: [1, 2, 3, 4, 5], 2: [0], 3: [0, 6, 10], 4: [0, 16], 5: [0, 6, 10], 7: [6, 15], 6: [7, 8, 3, 9, 5], 8: [6], 9: [6, 16], 11: [10, 14], 10: [11, 12, 3, 13, 5], 12: [10], 13: [10, 16], 14: [1, 11], 15: [1, 7], 16: [4, 9, 13]}
+    vertexId__equationVariableId = {0: 0, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 1, 7: 5, 8: 6, 9: 7, 10: 2, 11: 8, 12: 9, 13: 10, 14: 3, 15: 4, 16: 5}
+    equationId__vertexId = {0: 0, 1: 6, 2: 10, 3: 14, 4: 15, 5: 16}
+    variableId__vertexId = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 13}
+    type__list_vertexIds = {'equation': [0, 6, 10, 14, 15, 16], 'variable': [1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 13]}
     equationKey = 'equation'
     variableKey = 'variable'
-    dependentVariableId = None
-    list_independentVariableIds = None
+    dependentVariableId = 9
+    list_independentVariableIds = [1, 6]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
     substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
@@ -242,6 +242,105 @@ def bipartiteSearch__ac_twoCapacitor_series(verbose=False):
 
 ###########################################
 
+    
+def bipartiteSearch__ac_twoInductor_parallel(verbose=False):
+    # from foundation.automat.core.equation import Equation
+    list_equationStrs = ['(= V_{I_{0}} (* L_{I_{0}} (/ (* d I_{I_{0}}) (* d t))))', '(= V_{I_{3}} (* L_{I_{3}} (/ (* d I_{I_{3}}) (* d t))))', '(= V_{AC_{8}} (* L_{AC_{8}} (/ (* d I_{AC_{8}}) (* d t))))', '(= (+ (+ (- 0 I_{AC_{8}}) I_{I_{0}}) I_{I_{3}}) 0)', '(= (+ (- 0 V_{I_{0}}) V_{AC_{8}}) 0)', '(= (- V_{AC_{8}} V_{I_{3}}) 0)']
+    list_variables = ['V_{I_{0}}', 'L_{I_{0}}', 'd', 'I_{I_{0}}', 't', 'V_{I_{3}}', 'L_{I_{3}}', 'I_{I_{3}}', 'V_{AC_{8}}', 'L_{AC_{8}}', 'I_{AC_{8}}']
+    equationVariables_bg = {1: [0, 15], 0: [1, 2, 3, 4, 5], 2: [0], 3: [0, 6, 10], 4: [0, 14], 5: [0, 6, 10], 7: [6, 16], 6: [7, 8, 3, 9, 5], 8: [6], 9: [6, 14], 11: [10, 15, 16], 10: [11, 12, 3, 13, 5], 12: [10], 13: [10, 14], 14: [13, 4, 9], 15: [1, 11], 16: [11, 7]}
+    vertexId__equationVariableId = {0: 0, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 1, 7: 5, 8: 6, 9: 7, 10: 2, 11: 8, 12: 9, 13: 10, 14: 3, 15: 4, 16: 5}
+    equationId__vertexId = {0: 0, 1: 6, 2: 10, 3: 14, 4: 15, 5: 16}
+    variableId__vertexId = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 13}
+    type__list_vertexIds = {'equation': [0, 6, 10, 14, 15, 16], 'variable': [1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 13]}
+    equationKey = 'equation'
+    variableKey = 'variable'
+    dependentVariableId = 9
+    list_independentVariableIds = [1, 6]
+    list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
+    #######################################################
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds)
+    expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
+    expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', substitutionPath == expected_substitutionPath)
+    if verbose:
+        # print('listOfCollectedEquations')
+        # pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        # print('listOfVariables')
+        # pp.pprint(listOfVariables)
+        # print('vertexId__equationVariableId')
+        # pp.pprint(vertexId__equationVariableId)
+        # print('equationVariables_g')
+        # pp.pprint(equationVariables_g)
+        # print('type__list_vertexIds')
+        # pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
+        print('equationVertexId__tuple_variableVertexIdContaining___NEW')
+        print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+
+
+
+    
+def bipartiteSearch__ac_twoInductor_series(verbose=False):
+    # from foundation.automat.core.equation import Equation
+    list_equationStrs = ['(= V_{I_{0}} (* L_{I_{0}} (/ (* d I_{I_{0}}) (* d t))))', '(= V_{I_{3}} (* L_{I_{3}} (/ (* d I_{I_{3}}) (* d t))))', '(= V_{AC_{1}} (* L_{AC_{1}} (/ (* d I_{AC_{1}}) (* d t))))', '(= I_{I_{0}} I_{AC_{1}})', '(= I_{I_{0}} I_{I_{3}})', '(= (+ (- (- 0 V_{I_{0}}) V_{I_{3}}) V_{AC_{1}}) 0)']
+    list_variables = ['V_{I_{0}}', 'L_{I_{0}}', 'd', 'I_{I_{0}}', 't', 'V_{I_{3}}', 'L_{I_{3}}', 'I_{I_{3}}', 'V_{AC_{1}}', 'L_{AC_{1}}', 'I_{AC_{1}}']
+    equationVariables_bg = {1: [0, 16], 0: [1, 2, 3, 4, 5], 2: [0], 3: [0, 6, 10], 4: [0, 14, 15], 5: [0, 6, 10], 7: [6, 16], 6: [7, 8, 3, 9, 5], 8: [6], 9: [6, 15], 11: [10, 16], 10: [11, 12, 3, 13, 5], 12: [10], 13: [10, 14], 14: [4, 13], 15: [4, 9], 16: [1, 7, 11]}
+    vertexId__equationVariableId = {0: 0, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 1, 7: 5, 8: 6, 9: 7, 10: 2, 11: 8, 12: 9, 13: 10, 14: 3, 15: 4, 16: 5}
+    equationId__vertexId = {0: 0, 1: 6, 2: 10, 3: 14, 4: 15, 5: 16}
+    variableId__vertexId = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 13}
+    type__list_vertexIds = {'equation': [0, 6, 10, 14, 15, 16], 'variable': [1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 13]}
+    equationKey = 'equation'
+    variableKey = 'variable'
+    dependentVariableId = 9
+    list_independentVariableIds = [1, 6]
+    list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
+    #######################################################
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+        list_equations, 
+        list_variables, 
+        equationVariables_bg, 
+        vertexId__equationVariableId, 
+        equationId__vertexId, 
+        variableId__vertexId,
+        type__list_vertexIds, 
+        equationKey, 
+        variableKey, 
+        dependentVariableId, 
+        list_independentVariableIds)
+    expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
+    expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
+
+    print(inspect.currentframe().f_code.co_name, ' PASSED? ', substitutionPath == expected_substitutionPath)
+    if verbose:
+        # print('listOfCollectedEquations')
+        # pp.pprint(list(map(lambda equation: equation._eqs, listOfCollectedEquations)))
+        # print('listOfVariables')
+        # pp.pprint(listOfVariables)
+        # print('vertexId__equationVariableId')
+        # pp.pprint(vertexId__equationVariableId)
+        # print('equationVariables_g')
+        # pp.pprint(equationVariables_g)
+        # print('type__list_vertexIds')
+        # pp.pprint(type__list_vertexIds)
+        print('substitutionPath')
+        print(substitutionPath)
+        print('equationVertexId__tuple_variableVertexIdContaining___NEW')
+        print(equationVertexId__tuple_variableVertexIdContaining___NEW)
+
+###########################################
     
 def bipartiteSearch__dc_twoDiode_parallel(verbose=False):
     # from foundation.automat.core.equation import Equation

@@ -312,7 +312,10 @@ class CircuitAnime {
             [list_equationLatexStr, dependentVarStr, list_independentVarStr] = animeSelf.variableSelector(self)
 
             if (animeSelf.doSolveEquation) {
-                self.animate_solveEquations(solveEquation___readyCallback, list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
+                self.animate_solveEquations(
+                    solveEquation___readyCallback, 
+                    list_equationLatexStr, dependentVarStr, list_independentVarStr, animeSelf.animationName, animeSelf.simplify);//this will just schedule the animation...
+
             }
         //
 

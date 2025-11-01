@@ -15,15 +15,29 @@ class CapacitortimingEquationFinder(EquationFinder):
         differentiator = time
         """
 
-        for componentId, componentType in self.id__type.items():
-            if componentType in ['capacitor']:
-                associatedComponentIdList = [componentId]
-                currentVariable = EquationFinder.getVariable('current', componentType, componentId)
-                self.addVariableToComponentIdx(componentId, currentVariable)
-                capacitanceVariable = EquationFinder.getVariable('capacitance', componentType, componentId)
-                self.addVariableToComponentIdx(componentId, capacitanceVariable)
-                voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)
-                self.addVariableToComponentIdx(componentId, voltageVariable)
-                timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
-                self.firstOrderSeperableDifferentialEquation(currentVariable, capacitanceVariable, voltageVariable, timeVariable, [associatedComponentIdList])
+        def addEquation(associatedComponentIdList, componentId, componentType):
+            currentVariable = EquationFinder.getVariable('current', componentType, componentId)
+            self.addVariableToComponentIdx(componentId, currentVariable)
+            capacitanceVariable = EquationFinder.getVariable('capacitance', componentType, componentId)
+            self.addVariableToComponentIdx(componentId, capacitanceVariable)
+            voltageVariable = EquationFinder.getVariable('voltage', componentType, componentId)
+            self.addVariableToComponentIdx(componentId, voltageVariable)
+            timeVariable = 't' # TODO standardise? might it have variable collision with other time? more than 1 time? when there is problems with time please check here
+            self.addVariableToComponentIdx(componentId, timeVariable)
+            self.firstOrderSeperableDifferentialEquation(currentVariable, capacitanceVariable, voltageVariable, timeVariable, [associatedComponentIdList])
+
+        for componentId, componentType in filter( lambda t: t[1] in ['capacitor'], self.id__type.items()):
+            addEquation([componentId], componentId, componentType)
+
+        for componentId, componentType in filter(lambda t: t[1] in ['AC_signal_generator'], self.id__type.items()):
+            #need to check if there are any loops_or_nodes_in_common with this common, which has a capacitor, then we should have to add this formula
+            #check for loops
+            for directedCycleWithSigGen in filter(lambda directedCycle: componentId in directedCycle, self.directedCycles):
+                if any(list(map(lambda componentId: self.id__type[componentId] in ['capacitor'], directedCycleWithSigGen))):
+                    addEquation([componentId], componentId, componentType)
+                    break
+                # import pdb;pdb.set_trace()
+
+            #check for nodes
+
         return self.list_equations

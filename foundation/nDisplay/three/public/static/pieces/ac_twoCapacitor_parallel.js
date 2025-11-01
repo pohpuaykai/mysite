@@ -108,13 +108,16 @@ class ACTwoCapacitorParallel extends Circuit {
             self.list_equationNetworkInfoDict.forEach(equationNetworkInfoDict => {
                 list_equationLatexStr.push(equationNetworkInfoDict['equation']);
                 Object.entries(equationNetworkInfoDict['variableInfos']).forEach(([nodeId, list_variableStr]) => {
+                    // console.log('nodeId', nodeId, 'sigGen.uuid: ', self.uuid__id[sigGen.uuid]); console.log('list_variableStr', list_variableStr, '<<<<<<<<<<')
                     //capture the dependentVarStr: resistance of resistor0
-                    if(parseInt(nodeId) == self.uuid__id[sigGen.uuid]) {//we only want to set dependentVarStr once
+                    if(parseInt(nodeId) == self.uuid__id[sigGen.uuid] && dependentVarStr==undefined) {//we only want to set dependentVarStr once
                         const varString = list_variableStr.filter(function(s){return onlySubString(s, 'C_{AC')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
+                        // debugger
                         // console.log('varString: ', varString, 'dependentVarStr')
-                        // if (varString !== undefined) {
+                        // if (varString !== undefined && dependent) {
                             dependentVarStr = varString;
                         // }
+                        // debugger;
                     }
                     //capture the first element of list_independentVarStr
                     if(parseInt(nodeId) == self.uuid__id[capacitor0.uuid]) {
@@ -133,6 +136,7 @@ class ACTwoCapacitorParallel extends Circuit {
                     }
                 });
             });
+            console.log('returning: ', [list_equationLatexStr, dependentVarStr, list_independentVarStr])
             return [list_equationLatexStr, dependentVarStr, list_independentVarStr]
         }
 
