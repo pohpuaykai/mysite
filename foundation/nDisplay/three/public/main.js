@@ -24,9 +24,9 @@ import {GuiControls} from './static/custom/GuiControls.js';
 // import {ACTwoCapacitorParallel} from './static/pieces/ac_twoCapacitor_parallel.js';
 // import {ACTwoCapacitorSeries} from './static/pieces/ac_twoCapacitor_series.js';
 // import {ACTwoInductorParallel} from './static/pieces/ac_twoInductor_parallel.js';
-import {ACTwoInductorSeries} from './static/pieces/ac_twoInductor_series.js';
+// import {ACTwoInductorSeries} from './static/pieces/ac_twoInductor_series.js';
 // import {DCTwoDiodeParallel} from './static/pieces/dc_twoDiode_parallel.js';
-// import {DCTwoDiodeSeries} from './static/pieces/dc_twoDiode_series.js';
+import {DCTwoDiodeSeries} from './static/pieces/dc_twoDiode_series.js';
 
 // import {Q2_3_5_aMoreComplexCircuit__P84} from './static/pieces/foundations_of_analog_and_digital_electronic_circuits_anantAgarwal/Q2_3_5_aMoreComplexCircuit__P84.js';
 // import {Q3_21__P18} from './static/pieces/3000_solved_problems_in_electric_circuits__syedANasar/Q3_21__P18.js';
@@ -86,9 +86,9 @@ const audioContext = new (window.AudioContext||window.webkitAudioContext)();
 // const circuit = new ACTwoCapacitorParallel(scene, camera, renderer, audioContext, controls, []);
 // const circuit = new ACTwoCapacitorSeries(scene, camera, renderer, audioContext, controls, []);
 // const circuit = new ACTwoInductorParallel(scene, camera, renderer, audioContext, controls, []);
-const circuit = new ACTwoInductorSeries(scene, camera, renderer, audioContext, controls, []);
+// const circuit = new ACTwoInductorSeries(scene, camera, renderer, audioContext, controls, []);
 // const circuit = new DCTwoDiodeParallel(scene, camera, renderer, audioContext, controls, []);
-// const circuit = new DCTwoDiodeSeries(scene, camera, renderer, audioContext, controls, []);
+const circuit = new DCTwoDiodeSeries(scene, camera, renderer, audioContext, controls, []);
 
 
 

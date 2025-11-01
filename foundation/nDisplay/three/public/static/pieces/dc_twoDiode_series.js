@@ -90,8 +90,8 @@ class DCTwoDiodeSeries extends Circuit {
                 list_equationLatexStr.push(equationNetworkInfoDict['equation']);
                 Object.entries(equationNetworkInfoDict['variableInfos']).forEach(([nodeId, list_variableStr]) => {
                     //capture the dependentVarStr: resistance of resistor0
-                    if(parseInt(nodeId) == self.uuid__id[battery0.uuid]) {//we only want to set dependentVarStr once
-                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
+                    if(parseInt(nodeId) == self.uuid__id[battery0.uuid] && dependentVarStr==undefined) {//we only want to set dependentVarStr once
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{')})[0];//TODO some hard coding here, to get rid of it, server need to have an endpoint to get variable_name given the description
                         // console.log('varString: ', varString, 'dependentVarStr')
                         // if (varString !== undefined) {
                             dependentVarStr = varString;
@@ -99,7 +99,7 @@ class DCTwoDiodeSeries extends Circuit {
                     }
                     //capture the first element of list_independentVarStr
                     if(parseInt(nodeId) == self.uuid__id[diode0.uuid]) {
-                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{R')})[0];
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{D')})[0];
                         if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
                             list_independentVarStr.push(varString)
                         }
@@ -107,7 +107,7 @@ class DCTwoDiodeSeries extends Circuit {
                     }
                     //capture the first element of list_independentVarStr
                     if(parseInt(nodeId) == self.uuid__id[diode1.uuid]) {
-                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'R_{R')})[0];
+                        const varString = list_variableStr.filter(function(s){return onlySubString(s, 'I_{D')})[0];
                         if (varString !== undefined && !(list_independentVarStr.includes(varString))) {
                             list_independentVarStr.push(varString)
                         }
