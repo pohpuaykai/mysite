@@ -1,8 +1,9 @@
 import inspect
 import pprint
 
+from foundation.automat.core.manipulate.recommend.searchers.bipartitesearcher import BipartiteSearcher
 from foundation.automat.core.equation import Equation
-from foundation.automat.core.manipulate.recommend.recommend import Recommend
+# from foundation.automat.core.manipulate.recommend.recommend import Recommend
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -41,7 +42,8 @@ def bipartiteSearch__dc_twoResistor_series(verbose=False):
     list_independentVariableIds = [6, 8]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -52,7 +54,8 @@ def bipartiteSearch__dc_twoResistor_series(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [5, 6, 9, 8, 11, 7, 13, 2, 0, 4, 3]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (1, 7, 8, 10), 16: (1, 2, 7, 10, 12), 17: (2, 7, 10, 12), 18: (2, 4, 7, 10, 12), 19: (1, 7, 10, 12), 20: (1, 4, 7, 10, 12), 21: (1, 2, 4, 10, 12, 14), 22: (1, 2, 10, 12), 23: (1, 2, 4, 10, 12), 24: (2, 4, 10, 12, 14), 25: (2, 4, 7, 10, 12, 14), 26: (1, 4, 10, 12, 14), 27: (1, 4, 7, 10, 12, 14), 28: (1, 2, 10, 12, 14), 29: (1, 2, 7, 10, 12, 14), 30: (1, 10, 12, 14), 31: (1, 7, 10, 12, 14)}
 
@@ -107,7 +110,8 @@ def bipartiteSearch__dc_twoResistor_parallel(verbose=False):
     list_independentVariableIds = [6, 7]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -118,7 +122,8 @@ def bipartiteSearch__dc_twoResistor_parallel(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
@@ -158,7 +163,8 @@ def bipartiteSearch__ac_twoCapacitor_parallel(verbose=False):
     list_independentVariableIds = [1, 6]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -169,7 +175,8 @@ def bipartiteSearch__ac_twoCapacitor_parallel(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
@@ -208,7 +215,8 @@ def bipartiteSearch__ac_twoCapacitor_series(verbose=False):
     list_independentVariableIds = [1, 6]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -219,7 +227,8 @@ def bipartiteSearch__ac_twoCapacitor_series(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
@@ -258,7 +267,8 @@ def bipartiteSearch__ac_twoInductor_parallel(verbose=False):
     list_independentVariableIds = [1, 6]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -269,7 +279,8 @@ def bipartiteSearch__ac_twoInductor_parallel(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
@@ -308,7 +319,8 @@ def bipartiteSearch__ac_twoInductor_series(verbose=False):
     list_independentVariableIds = [1, 6]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -319,7 +331,8 @@ def bipartiteSearch__ac_twoInductor_series(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
@@ -357,7 +370,8 @@ def bipartiteSearch__dc_twoDiode_parallel(verbose=False):
     list_independentVariableIds = [3, 5]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -368,7 +382,8 @@ def bipartiteSearch__dc_twoDiode_parallel(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
@@ -407,7 +422,8 @@ def bipartiteSearch__dc_twoDiode_series(verbose=False):
     list_independentVariableIds = [0, 2]
     list_equations = list(map(lambda equationStr: Equation(equationStr=equationStr, parserName='scheme'), list_equationStrs))
     #######################################################
-    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    # substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = Recommend.bipartiteSearch(
+    substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
         list_equations, 
         list_variables, 
         equationVariables_bg, 
@@ -418,7 +434,8 @@ def bipartiteSearch__dc_twoDiode_series(verbose=False):
         equationKey, 
         variableKey, 
         dependentVariableId, 
-        list_independentVariableIds)
+        # list_independentVariableIds)
+        list_independentVariableIds)).search()
     expected_substitutionPath = [0, 3, 11, 2, 9, 1, 13, 8, 7, 5, 4]
     expected_equationVertexId__tuple_variableVertexIdContaining = {15: (2, 3, 6, 14), 16: (3, 5, 6, 10, 14), 17: (5, 6, 8, 10, 12, 14), 18: (5, 6, 10, 12, 14), 19: (6, 8, 10, 12, 14), 20: (6, 10, 12, 14)}
 
