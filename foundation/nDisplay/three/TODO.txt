@@ -1,3 +1,71 @@
+REFACTORING recommend.py
+-remove the recommendtest?
+-split up the different types of search into different files?
+-so recommend should be a folder?
+-refactoring bipartiteSearch?
+--some dataPrep
+--weighting_
+--sorting_
+--treeExpansion
+-refactoring combingSearch
+--rename?
+---foundation\automat\core\manipulate\recommend\tests\solvetest.py
+---foundation\ecircuit\equationSolvers\bipartitesolver.py
+
+-cramer's rule|GE, maybe think, how the existing heuristics are related to the cramer's rule|GE?
+
+
+~THOUGHTS FROM MY PHONE
+=Search|combing or not|should have savepoints, incase search takes too long and breaks
+=For refactoring heuristics, what are the inOut of heuristics, types of heuristics by inOut? And their position in OG code?
+=Have another version of bipartite, where the solving is also done, so that we can find simplifiablestates. Because I am not sure which algorithm will be faster.. or we can mix and match...
+=Take history of state, feed to nnmc_give_details_for_different_variety, give which state|s to go
+=If we reach a simplifiable state, then we solve the whole path explicitly with simplification and then we modify the whole queue accordingly. Recognise_simplifiable_state,
+=If path contains newEqs then we do not add to queue... But we might miss possible equations... Maybe for long search...
+=Start node some equation, with the structure you want in the end... If there are 3 variables expected at the end, then use a equation with 3 variables to start{HEU}
+=Condensed manipulations in a npy, not as a py file yet... might it speed up search? We can stack manipulations together to make them 1 manipulation to speed up search, larger experience file. A more effective way to stack might be to do so for reducingManipulations
+=Equations with more overlaps(while keeping the use original original) with current equation in unwanted variables should be tried first...{HEU} {similar to tree in tree}
+=If you applied swapping as the last manipulation, you should not apply it again, even if it's no hin,because in these manipulation vor=hin{HEU}
+=Try to favour states that use up original equations first, not those that are added later? Later added equations less points, complicated equations less points{HEU}
+=Simple formulas should be given higher priority, so every insert into priorityqueue changes priority. nnmc_give_details_for_different_variety{HEU}
+=Combinatorially skipNodes, nnmc_give_details_for_different_variety
+=There is some metashape|metastructure|labelDiffCount|metalabelPosition when it is considered simple enough. It would be termination condition. "Polynomial" this can then be fed into symbolicGaussian. nnmc_give_details_for_different_variety
+=After all the nnmc, use angluinAlgo to find DFA|CFL for self programming?
+
+
+
+~THOUGHTS FROM TODO
+
+-draw many many many many many many electrical circuits to test|improve equationfinders, 2D(schematic)|3D display, bipartiteSolver?
+-refactor bipartiteSearch
+--each heuristic is its own class, and all the same heuristic in a folder...
+-current_divider 
+--<<Foundations of Analog and Digital Electronic Circuits>> better read and no errors on answers
+---do this to improve bipartiteSolver?
+--<<Schaum's 3000 Solved Problems In Electric Circuits>>
+---another stupid idea for scoring bipartiteSolver
+----LCSS each equation einander, go for the highest scoring one given the neighbour?
+----group equations together by Laplacian, by LCSS_score, and try to apply them together in succession, https://en.wikipedia.org/wiki/Laplacian_matrix
+----if current LCSS is similiar enough to existing visited schemeEq, then we can early terminate?
+---we will have to store the schemeEquation in State, and then LCSS with reducingManipulations to give reducibleStates higher score
+----instead of LCSS+scoring why not call simplify on each state? that will reduce statespace, but will each step become too long time?
+----Also if equations resembles a polynomial, should it have a higher score for bipartite?
+----This also goes for combingSearch, if equations resembles a polynomial, should it be an earlier termination for combingSearch?
+---What if we stack manipulations but only so that they produce resultingManipulations, that reduce the number of schemeLabels or levels of outputPattern? and then save those stacked_manipulations as 1 manipulation? If so, then our search will have more termination_points?
+---An idea from <<Foundations>> is to form simple polynomials from existing equations, where we can then select solvingVariables so that the #solvingVariables=#equations, and the use Cramer'sRuleWithCAS to solve for their closed form
+----how to form 'simple polynomials?'
+----how to select solvingVariables so that #solvingVariables=#equations
+----WORKON symbolicGaussian
+----can we use cramer'sRule as a heuristic to guide which variables to choose?<<<<<<<<<<<<<<<<<<<<<<<<<<
+-----unwanted Variables seem to map to dependent&independentVariables of cramer'sRule...
+
+
+
+
+
+
+
+
 -make pretty animations :D
 --tobe done before recording and uploading to YOUTUBE :D
 ---maybe also mention the type of variable in your audio? is it a resistance_variable, current_variable, voltage_variable in solvingStep

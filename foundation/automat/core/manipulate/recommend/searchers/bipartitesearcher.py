@@ -73,11 +73,19 @@ class BipartiteSearcher:
             visited.append(current)
                     
             if current in allEquationVertexIds:#neighbours will be variables
-                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: sortKey(vertexId, current___dict['path']))#<<<<<<<<<<<<<<<<<fillin sort key
+                def sortKey(vertexIdx, path):
+                    amt = 0
+                    amt += self.sortingEquationHeuristics__similarNeighboursExploredFirst(vertexIdx, path)
+                    return amt
+                neighbours = sorted(self.equationVariables_bg[current], key=lambda vertexId: sortKey(vertexId, current___dict['path']))#<<<<<<<<<<<<<<<<<fillin sort key
             else:
-                neighbours = sorted(equationVariables_bg[current], key=lambda vertexId: sortKey(vertexId, current___dict['path']))#<<<<<<<<<<<<<<<<<fillin sort key
+                def sortKey(vertexIdx, path):
+                    amt = 0
+                    amt += self.sortingVariableHeuristics__similarNeighboursExploredFirst(vertexIdx, path)
+                    return amt
+                neighbours = sorted(self.equationVariables_bg[current], key=lambda vertexId: sortKey(vertexId, current___dict['path']))#<<<<<<<<<<<<<<<<<fillin sort key
 
-            for orderOfExploration, neighbour in enumerate(neighbours):#[TODO optimisation possibility] equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
+            for orderOfExploration, neighbour in enumerate(neighbours):#[TODO optimisation possibility] self.equationVariables_bg[current] can be sorted, because you are depending on the orderOfExploration
                 if neighbour not in visited:
                     newPath = current___dict['path']+[neighbour]
 
@@ -94,8 +102,17 @@ class BipartiteSearcher:
                     if childDict['path'] not in visitedPaths:#global check for no repeat paths
                         visitedPaths.append(childDict['path'])
 
-                    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<les(heuristics)-Mettrez
-                    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<les(heuristics)-Mettrez
+                        childDictPriority = self.stateRankingHeuristics__originalEquationsPriority(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__followSortedHeuristics(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__longerPathPriority(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__preventIncreaseInUnwantedVariables(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__preventUsingEquationWithManyUnwantedVariables(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__linearityCondition(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__chooseLeastAppearedVariableOfEquationGroup(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__chooseEquationsFromEquationGroup(childDictPriority)
+                        childDictPriority = self.stateRankingHeuristics__penaliseUseOfNewEquation(childDictPriority)
+                        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                     if childDictPriority > float('-inf'):#we discard everything that is -infinity
                         priorityQueue.insert(childDict, childDictPriority)#-orderOfExploration try to ensure that those inserted later, have lower priority
@@ -121,7 +138,7 @@ class BipartiteSearcher:
         #
 
         #on the second equationVertexId, union all the variables of both equationsTogether to form a NEW equationVertexId{track this}
-        #add the NEW equationVertexId to equationVariables_bg
+        #add the NEW equationVertexId to self.equationVariables_bg
         #childDict['current'] need to jump to the NEW equationVertexId
         #{neighbour in equationVertexId__tuple_variableVertexIdContaining} is to check if neighbour is an equation
         if len(newPath) > 2 and neighbour in allEquationVertexIds:#equationVertexId__tuple_variableVertexIdContaining: #this means we have 1equation, 1variable ending the path and neighbour is the next equation
@@ -171,19 +188,19 @@ class BipartiteSearcher:
                 equationVertexId__tuple_variableVertexIdContaining[newEquationVertexId] = tuple_variableVertexIdContaining
                 #graph update. update the new equation, also update its neighbours
                 equationNeighbourIds = list(set(tuple_variableVertexIdContaining)-set(wantedVariableVertexIds))
-                equationVariables_bg[newEquationVertexId] = equationNeighbourIds
+                self.equationVariables_bg[newEquationVertexId] = equationNeighbourIds
                 for variableId in equationNeighbourIds:
-                    equationVariables_bg[variableId].append(newEquationVertexId)
+                    self.equationVariables_bg[variableId].append(newEquationVertexId)
                 #
-                vertexId__equationVariableId[newEquationVertexId] = newEquationId
-                equationId__vertexId[newEquationId] = newEquationVertexId
-                type__list_vertexIds[equationKey].append(newEquationVertexId)
+                self.vertexId__equationVariableId[newEquationVertexId] = newEquationId
+                self.equationId__vertexId[newEquationId] = newEquationVertexId
+                self.type__list_vertexIds[self.equationKey].append(newEquationVertexId)
                 equationVertexId__tuple_variableVertexIdContaining___NEW[newEquationVertexId] = tuple_variableVertexIdContaining
             else:
                 newEquationVertexId = tuple_variableVertexIdContaining__equationVertexId[tuple_variableVertexIdContaining]
             childDict['current'] = newEquationVertexId
 
-            # print('equationVariables_bg', equationVariables_bg)
+            # print('self.equationVariables_bg', self.equationVariables_bg)
             #
 
 
@@ -194,7 +211,7 @@ class BipartiteSearcher:
         # we might want to put heuristics in classes, and then turn them on and off as per experience(neuralnetwork?), since this might be a special case(over_trained_heuristic)?
 
         """
-        list_equationStrs = list(map(lambda equation: equation.schemeStr, list_equations))
+        list_equationStrs = list(map(lambda equation: equation.schemeStr, self.list_equations))
 
         def getEntitiesOfPattern(patternStr):
             parser = Schemeparser(equationStr=patternStr)
@@ -239,7 +256,7 @@ class BipartiteSearcher:
         #convert groupings to vertexId
         verticesIdGroupings = []
         for group in self.uf.grouping():
-            verticesIdGroupings.append(list(map(lambda equationId: equationId__vertexId[equationId], group)))
+            verticesIdGroupings.append(list(map(lambda equationId: self.equationId__vertexId[equationId], group)))
 
     def init__countNoOfTimesVarAppear(self):
         """
@@ -263,9 +280,9 @@ class BipartiteSearcher:
         for group in uf.grouping():
             groupTotalVariableCount = {}
             for equationIdx in group:
-                equation = list_equations[equationIdx]
+                equation = self.list_equations[equationIdx]
                 groupTotalVariableCount = updateCountDict(groupTotalVariableCount, equation.variables)
-            groupTotalVariableCount = dict(map(lambda t: (list_variables.index(t[0]), t[1]), groupTotalVariableCount.items()))
+            groupTotalVariableCount = dict(map(lambda t: (self.list_variables.index(t[0]), t[1]), groupTotalVariableCount.items()))
             ufGroupIdx = uf.find(equationIdx)
             ufGroupIdx__groupTotalVariableCount[ufGroupIdx] = groupTotalVariableCount
             # import pdb;pdb.set_trace()
@@ -282,29 +299,29 @@ class BipartiteSearcher:
                 self.currentMaxEquationId += 1; self.currentMaxEquationVertexId += 1
                 return self.currentMaxEquationId, self.currentMaxEquationVertexId
 
-        currentMaxEquationId = len(list_equations)-1; currentMaxEquationVertexId = max(list(equationId__vertexId.values())+list(variableId__vertexId.values()))
+        currentMaxEquationId = len(self.list_equations)-1; currentMaxEquationVertexId = max(list(self.equationId__vertexId.values())+list(self.variableId__vertexId.values()))
         # import pdb;pdb.set_trace()
         # print('currentMaxEquationVertexId', currentMaxEquationVertexId)
         self.equationVertexIdIssuer = EquationVertexIdIssuer(currentMaxEquationId, currentMaxEquationVertexId)
 
         self.tuple_variableVertexIdContaining__equationVertexId = {}#for checking duplicates
         self.equationVertexId__tuple_variableVertexIdContaining = {}
-        for equationVertexId in equationId__vertexId.values():
-            tuple_variableVertexIdContaining = tuple(sorted(equationVariables_bg[equationVertexId]))
+        for equationVertexId in self.equationId__vertexId.values():
+            tuple_variableVertexIdContaining = tuple(sorted(self.equationVariables_bg[equationVertexId]))
             self.tuple_variableVertexIdContaining__equationVertexId[tuple_variableVertexIdContaining] = equationVertexId
             self.equationVertexId__tuple_variableVertexIdContaining[equationVertexId] = tuple_variableVertexIdContaining
         # if bipartiteTreeExpand:
         #     equationVertexId__tuple_variableVertexIdContaining___NEW = {} # for user easy returns
 
     def init__valuesForHeuristics(self):
-        self.allVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], range(0, len(list_variables))))
-        self.wantedVariableVertexIds = list(map(lambda variableId: variableId__vertexId[variableId], [dependentVariableId]+list_independentVariableIds))
+        self.allVariableVertexIds = list(map(lambda variableId: self.variableId__vertexId[variableId], range(0, len(self.list_variables))))
+        self.wantedVariableVertexIds = list(map(lambda variableId: self.variableId__vertexId[variableId], [self.dependentVariableId]+self.list_independentVariableIds))
         self.unwantedVariableVertexIds = list(set(self.allVariableVertexIds) - set(self.wantedVariableVertexIds))
-        self.allEquationVertexIds = list(map(lambda equationId: equationId__vertexId[equationId], range(0, len(list_equations))))
+        self.allEquationVertexIds = list(map(lambda equationId: self.equationId__vertexId[equationId], range(0, len(self.list_equations))))
         self.originalEquationVertexIds = copy(self.allEquationVertexIds)
         #remove wantedVariableVertexIds
         equationVariables_bg___noWantedVariableVertexIds = {}
-        for parentVertexId, childVertexIds in equationVariables_bg.items():
+        for parentVertexId, childVertexIds in self.equationVariables_bg.items():
             if parentVertexId not in wantedVariableVertexIds:
                 filteredChildVertexIds = []
                 for childVertexId in childVertexIds:
@@ -319,12 +336,12 @@ class BipartiteSearcher:
  #finding a startNode, maybe start with the most number of unwanted variable...
         """
         maxEquationVertexId = None;maxTotalCount = -1
-        wantedVariables = list(map(lambda variableId: variableId__vertexId[variableId], [dependentVariableId]+list_independentVariableIds))
-        unwantedVariables = list(map(lambda variableId: variableId__vertexId[variableId], set(range(0, len(list_variables))) - set(wantedVariables)))
+        wantedVariables = list(map(lambda variableId: self.variableId__vertexId[variableId], [self.dependentVariableId]+self.list_independentVariableIds))
+        unwantedVariables = list(map(lambda variableId: self.variableId__vertexId[variableId], set(range(0, len(self.list_variables))) - set(wantedVariables)))
         # print('unwantedVariables: ', unwantedVariables)
-        for equationId, equation in enumerate(list_equations):
+        for equationId, equation in enumerate(self.list_equations):
             # variables__count = equation.variablesScheme; 
-            variables__count = dict(map(lambda n: (n, 1), equationVariables_bg[equationId__vertexId[equationId]]))#it has to have only 1 count, otherwise it will not work?
+            variables__count = dict(map(lambda n: (n, 1), self.equationVariables_bg[self.equationId__vertexId[equationId]]))#it has to have only 1 count, otherwise it will not work?
             totalWantedVariableCount = 0
             # print('variables__count: ', variables__count)
             # for wantedVariable in set(variables__count.keys()).intersection(set(wantedVariables)):
@@ -334,7 +351,7 @@ class BipartiteSearcher:
             totalWantedVariableCount = len(set(variables__count.keys()).intersection(unwantedVariables))
             # print('equationId: ', equationId, 'variables__count', variables__count, 'totalWantedVariableCount', totalWantedVariableCount, 'maxTotalCount: ', maxTotalCount)
             if totalWantedVariableCount > maxTotalCount:
-                maxTotalCount = totalWantedVariableCount; maxEquationVertexId = equationId__vertexId[equationId]
+                maxTotalCount = totalWantedVariableCount; maxEquationVertexId = self.equationId__vertexId[equationId]
 
     def sortingEquationHeuristics__similarNeighboursExploredFirst(self, vertexIdx, path):
         key = 0
@@ -342,76 +359,79 @@ class BipartiteSearcher:
             key += 10*self.LOW_WEIGHTS # we want this to be higher than 
             eq0VertexId = path[-1]
             if eq0VertexId in originalEquationVertexIds:
-                groupTotalVariableCount = ufGroupIdx__groupTotalVariableCount[uf.find(vertexId__equationVariableId[eq0VertexId])]
-                if vertexId__equationVariableId[vertexIdx] in groupTotalVariableCount:
-                    variableCountInGroup = groupTotalVariableCount[vertexId__equationVariableId[vertexIdx]]
-                    key += (variableCountInGroup/sum(groupTotalVariableCount.values())) * LOW_WEIGHTS
+                groupTotalVariableCount = ufGroupIdx__groupTotalVariableCount[uf.find(self.vertexId__equationVariableId[eq0VertexId])]
+                if self.vertexId__equationVariableId[vertexIdx] in groupTotalVariableCount:
+                    variableCountInGroup = groupTotalVariableCount[self.vertexId__equationVariableId[vertexIdx]]
+                    key += (variableCountInGroup/sum(groupTotalVariableCount.values())) * self.LOW_WEIGHTS
         else:
-            key += 10*HIGH_WEIGHTS
+            key += 10*self.HIGH_WEIGHTS
         #find previous group of equation in uf, rank by group_variable_occurence#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         return key
 
     def sortingVariableHeuristics__similarNeighboursExploredFirst(self, vertexIdx, path):
         key = 0
         if vertexIdx in originalEquationVertexIds:
-            key += 10*LOW_WEIGHTS
-            # print('checking: ', path[-2], vertexIdx, 'same group?: ', path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]))
+            key += 10*self.LOW_WEIGHTS
+            # print('checking: ', path[-2], vertexIdx, 'same group?: ', path[-2] != vertexIdx and uf.together(self.vertexId__equationVariableId[path[-2]], self.vertexId__equationVariableId[vertexIdx]))
             # print(path[-2], vertexIdx, '<<<<<these should be vertexIdx')
             if path[-2] in originalEquationVertexIds:
-                if path[-2] != vertexIdx and uf.together(vertexId__equationVariableId[path[-2]], vertexId__equationVariableId[vertexIdx]):
-                    key+= LOW_WEIGHTS
+                if path[-2] != vertexIdx and uf.together(self.vertexId__equationVariableId[path[-2]], self.vertexId__equationVariableId[vertexIdx]):
+                    key+= self.LOW_WEIGHTS
                 else:
-                    key+= HIGH_WEIGHTS
+                    key+= self.HIGH_WEIGHTS
         else:
-            key += 10*HIGH_WEIGHTS
+            key += 10*self.HIGH_WEIGHTS
         #find previous group of equation in uf, if neighbour in the group, give higher priority#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         return key
 
-    def stateRankingHeuristics__originalEquationsPriority(self):
+    def stateRankingHeuristics__originalEquationsPriority(self, childDictPriority):
         """
         Higher points for using original Equations, instead of expanded ones.
 
         This was good for 2 element circuits...
         """
 
-        childDictPriority = HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else LOW_WEIGHTS
+        childDictPriority += self.HIGH_WEIGHTS if neighbour in unwantedVariableVertexIds or neighbour in allEquationVertexIds else self.LOW_WEIGHTS
                         
         return childDictPriority
 
-    def stateRankingHeuristics__followSortedHeuristics(self):
+    def stateRankingHeuristics__followSortedHeuristics(self, childDictPriority):
         """
         We should try to make the states follow the sorted order
 
         This was good for 2 element circuits...
         """
 
-        childDictPriority = childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
+        childDictPriority += childDictPriority - orderOfExploration if neighbour in unwantedVariableVertexIds else childDictPriority # do not subtract orderofExploration if it is a equation
         #
         return childDictPriority
 
-    def stateRankingHeuristics__longerPathPriority(self):
+    def stateRankingHeuristics__longerPathPriority(self, childDictPriority):
         """
         Higher points for states with longerPaths
 
         This was good for 2 elements circuits...
         """
         childDictPriority += PATHLENGTH_FACTOR * len(childDict['path']) # should continue on the longest path, and not jump other timeframe of shorter path,  and then at some point in the history go for the shorter path first, when most of the original equations are exhausted?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        return childDictPriority
 
-    def stateRankingHeuristics__preventIncreaseInUnwantedVariables(self):
+    def stateRankingHeuristics__preventIncreaseInUnwantedVariables(self, childDictPriority):
         """
         If we have to add unwantedVariables, we deduct points....
 
         This was good for 2 elements circuits...
         """
         childDictPriority += WANTEDVARIABLE_PENALTY if neighbour in wantedVariableVertexIds else 0 # because this means we will substitute the wanted variable away
+        return childDictPriority
 
-    def stateRankingHeuristics__preventUsingEquationWithManyUnwantedVariables(self):
+
+    def stateRankingHeuristics__preventUsingEquationWithManyUnwantedVariables(self, childDictPriority):
         """
         Less points for states that use equations with many unwanted variables
         """
         if neighbour in allEquationVertexIds: #if it is an equation
-            variableVertexIds = list(equationVertexId__tuple_variableVertexIdContaining[neighbour]) # this is not a good way to get the containing_variables, because, we removed the variables from equationVariables_bg
+            variableVertexIds = list(equationVertexId__tuple_variableVertexIdContaining[neighbour]) # this is not a good way to get the containing_variables, because, we removed the variables from self.equationVariables_bg
             eliminatedVariableVertexId = childDict['path'][-2]
             # print('neighbour', neighbour)
             # print('variableVertexIds: ', variableVertexIds)
@@ -423,8 +443,9 @@ class BipartiteSearcher:
                     else: # it is unwanted
                         # print('unwanted added: ', INCREASE_IN_UNWANTED_VARIABLE_PENALTY, 'to', childDictPriority, '=', childDictPriority+INCREASE_IN_UNWANTED_VARIABLE_PENALTY)
                         childDictPriority += INCREASE_IN_UNWANTED_VARIABLE_PENALTY
+        return childDictPriority
 
-    def stateRankingHeuristics__linearityCondition(self):
+    def stateRankingHeuristics__linearityCondition(self, childDictPriority):
         """
         If we try to substitute away a variable, that appears more than once, then heavy penalty
         this is because we are not able to do simplify, for variables that appears more than once
@@ -434,8 +455,9 @@ class BipartiteSearcher:
 
         if neighbour in allVariableVertexIds and childDict['variableCount'].get(neighbour, 0) > 1:
             childDictPriority += TRYING_TO_ELIMINATE_VARIABLE_WITH_MORE_THAN_ONE_COUNT_PENALTY
+        return childDictPriority
 
-    def stateRankingHeuristics__chooseLeastAppearedVariableOfEquationGroup(self):
+    def stateRankingHeuristics__chooseLeastAppearedVariableOfEquationGroup(self, childDictPriority):
         """
         #within the same group of equations, there are same variables between all the equations, 
         give each variable a count of the number of times they appear. when choosing a variable to subtitute away, 
@@ -445,10 +467,10 @@ class BipartiteSearcher:
         """
         if len(newPath) > 2 and neighbour in allEquationVertexIds and (set(originalEquationVertexIds) >= set(newPath[::2])):#does not contain any equationVertexId, that nonoriginal<<<<<<
             #within the same group of equations, there are same variables between all the equations, give each variable a count of the number of times they appear. when choosing a variable to subtitute away, choose the one that appears the least... #this heuristic was (this was working well when we wanted to find the resistorSumFormulas for series2Resistor & parallel2Resistor)
-            variableIdx = vertexId__equationVariableId[newPath[-2]] # you want all the previous equations
-            previousEquationIdx = vertexId__equationVariableId[newPath[-1]]
+            variableIdx = self.vertexId__equationVariableId[newPath[-2]] # you want all the previous equations
+            previousEquationIdx = self.vertexId__equationVariableId[newPath[-1]]
             ufGroupIdx = uf.find(previousEquationIdx)
-            # variableIdx = vertexId__equationVariableId[newPath[-2]]
+            # variableIdx = self.vertexId__equationVariableId[newPath[-2]]
             # print("ufGroupIdx__groupTotalVariableCount", ufGroupIdx__groupTotalVariableCount); import pdb;pdb.set_trace()
             if variableIdx in ufGroupIdx__groupTotalVariableCount[ufGroupIdx]:
                 groupTotalVariableCount = ufGroupIdx__groupTotalVariableCount[ufGroupIdx]
@@ -456,8 +478,9 @@ class BipartiteSearcher:
                 totalVariableCountInGroup = sum(map(lambda t: t[1], groupTotalVariableCount.items()))
                 penaltyAmt = SAME_EQUATION_GROUP_VARIABLE_COUNT_REWARD * ((totalVariableCountInGroup - variableCount)/(totalVariableCountInGroup*len(newPath))) # the more of the same variable in the same equation_group, the higher the penalty...
                 childDictPriority += penaltyAmt
+        return childDictPriority
 
-    def stateRankingHeuristics__chooseEquationsFromEquationGroup(self):
+    def stateRankingHeuristics__chooseEquationsFromEquationGroup(self, childDictPriority):
         """
         #SAME_EQUATION_GROUP_REWARDS, we want similiar equations(odd_index on path) to be processed together...
 
@@ -479,15 +502,12 @@ class BipartiteSearcher:
             if is_contiguous_sublist(equationVertexIdGroupList, equationVertexIdList):
                 rewardAmt = SAME_EQUATION_GROUP_REWARDS * len(equationVertexIdGroupList)
                 childDictPriority += rewardAmt # please note that we might repeat this reward more than once for the same criteria<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                #rewarded?
-                # pathsToInvestigate = [[5, 6, 9, 8, 11, 7, 13, 2, 0], [5, 7, 13, 4, 3, 8, 11, 1, 9, 2, 0]]
-                # if newPath in pathsToInvestigate:
-                #     print(newPath, 'is rewarded for same_equation_group: ', rewardAmt, 'result:', childDictPriority)
-                #     import pdb;pdb.set_trace()
-                #
-    def stateRankingHeuristics__penaliseUseOfNewEquation(self):
+        return childDictPriority
+
+    def stateRankingHeuristics__penaliseUseOfNewEquation(self, childDictPriority):
         """
         """
 
         if bipartiteTreeExpand:
             childDictPriority += NEWEQUATION_PENALTY if neighbour in equationVertexId__tuple_variableVertexIdContaining___NEW else 0
+        return childDictPriority
