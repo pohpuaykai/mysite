@@ -149,7 +149,7 @@ class LatexMeshCreator {
                         }//else ignore, they are not part of any variable... we do not capture them for now
 
                     }
-                    meshUUID__mesh[group.uuid] = group; // group is the whole latexStr
+                    // meshUUID__mesh[group.uuid] = group; // group is the whole latexStr
 
                     //keep fully_groupped variable in variablesPos__list_chaMeshUUID
                     // variablesPos__list_chaMeshUUID[currentVariableToMatch] = list_variableLetterMeshesUUID;
@@ -169,9 +169,14 @@ class LatexMeshCreator {
 
                     // equationMeshCallback(i, list_variableInfoDict, meshUUID__mesh, group.uuid);
                 }
-
+                meshUUID__mesh[group.uuid] = group; // group is the whole latexStr
+                console.log('LatexMeshCreator: ***********')
+                console.log(meshUUID__mesh)
+                console.log('group.uuid: ', group.uuid)
+                // console.log('group.uuid, ' (group.uuid in meshUUID__mesh))
+                console.log('***************************')
                 equationMeshCallback(latexIdx, list_variableInfoDict, meshUUID__mesh, group.uuid)
-             });
+            });
 
         }
 

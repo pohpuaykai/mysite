@@ -94,6 +94,7 @@ class Piece {
             self.textStr__textMeshUUID[list_latexStr[latexIdx][0]] = {'info':textMeshInformation, 'type':'latex', 'meshUUID':latexStrMeshUUID};
             self.meshUUID__mesh = Object.assign({}, meshUUID__mesh, self.meshUUID__mesh); //merges the dictionaries meshUUID__mesh and self.meshUUID__mesh
             // self.meshUUID__mesh = meshUUID__mesh
+            console.log('equationMeshCallback:')
             console.log('latexStrMeshUUID', latexStrMeshUUID)
             console.log('self.meshUUID__mesh', self.meshUUID__mesh)
             self.meshUUID__mesh[latexStrMeshUUID].visible = false;

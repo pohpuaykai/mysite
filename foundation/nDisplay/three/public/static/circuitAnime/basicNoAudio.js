@@ -56,7 +56,7 @@ class CircuitAnime {
         this.doSolveEquation = true; //this means that we run the solveEquation
         if (this.doSolveEquation) {
             this.startAnimationWhen = function() {
-                console.log('WithSolve, loadedDatei_findEquations: ', self.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', animeSelf.loadedDatei_solveEquations)
+                console.log('WithSolve, loadedDatei_findEquations: ', self.loadedDatei_findEquations, 'loadedDatei_solveEquations: ', self.loadedDatei_solveEquations)
                 return self.loadedDatei_findEquations && self.loadedDatei_solveEquations
             }
         } else {//we only have findEquation
