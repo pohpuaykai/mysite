@@ -3,10 +3,7 @@ REFACTORING recommend.py
 -split up the different types of search into different files?
 -so recommend should be a folder?
 -refactoring bipartiteSearch?
---some dataPrep
---weighting_
---sorting_
---treeExpansion
+--temporaryVariables should be passed around, not in a class......
 -refactoring combingSearch
 --rename?
 ---foundation\automat\core\manipulate\recommend\tests\solvetest.py

@@ -460,8 +460,8 @@ def bipartiteSearch__dc_twoDiode_series(verbose=False):
 
 
 if __name__=='__main__':
-    bipartiteSearch__dc_twoResistor_series(True)
-    # bipartiteSearch__dc_twoResistor_parallel(True)
+    # bipartiteSearch__dc_twoResistor_series(True) # working
+    bipartiteSearch__dc_twoResistor_parallel(True) # working
     # bipartiteSearch__ac_twoCapacitor_parallel(True)
     # bipartiteSearch__ac_twoCapacitor_series(True)
     # bipartiteSearch__ac_twoInductor_parallel(True)

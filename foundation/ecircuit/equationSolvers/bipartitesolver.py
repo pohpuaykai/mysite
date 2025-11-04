@@ -1,5 +1,7 @@
 from foundation.automat.core.equation import Equation
-from foundation.automat.core.manipulate.recommend.recommend import Recommend
+
+from foundation.automat.core.manipulate.recommend.searchers.bipartitesearcher import BipartiteSearcher
+# from foundation.automat.core.manipulate.recommend.recommend import Recommend
 
 class BipartiteSolver:
 
@@ -92,8 +94,8 @@ class BipartiteSolver:
         # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
         # import pdb;pdb.set_trace()
 
-
-        substitutionPath, equationVertexId__tuple_variableVertexIdContaining = Recommend.bipartiteSearch(
+        substitutionPath, equationVertexId__tuple_variableVertexIdContaining___NEW = (BipartiteSearcher(
+        # substitutionPath, equationVertexId__tuple_variableVertexIdContaining = Recommend.bipartiteSearch(
             listOfCollectedEquations, 
             listOfVariables, 
             equationVariables_g, 
@@ -105,7 +107,8 @@ class BipartiteSolver:
             variableKey, 
             dependentVariableId, 
             list_independentVariablesIds
-        )
+        # )
+        )).search()
         print('substitutionPath: ', substitutionPath)
         broadSteps = []
 
