@@ -3,8 +3,8 @@
 import {Animation} from '../custom/Animation.js';
 import {Circuit} from './circuit.js';
 import {Wire} from '../meshes/Wire.js';
-import {CircuitAnime} from '../circuitAnime/basic.js';
-// import {CircuitAnime} from '../circuitAnime/basicNoAudio.js';
+// import {CircuitAnime} from '../circuitAnime/basic.js';
+import {CircuitAnime} from '../circuitAnime/basicNoAudio.js';
 
 class DCTwoResistorSeries extends Circuit {
 

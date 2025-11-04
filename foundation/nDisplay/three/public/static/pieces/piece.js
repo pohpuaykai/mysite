@@ -92,10 +92,12 @@ class Piece {
         // }
         function equationMeshCallback(latexIdx, textMeshInformation, meshUUID__mesh, latexStrMeshUUID) {
             self.textStr__textMeshUUID[list_latexStr[latexIdx][0]] = {'info':textMeshInformation, 'type':'latex', 'meshUUID':latexStrMeshUUID};
-            // self.meshUUID__mesh = Object.assign({}, meshUUID__mesh, self.meshUUID__mesh);
-            self.meshUUID__mesh = meshUUID__mesh
-            meshUUID__mesh[latexStrMeshUUID].visible = false;
-            meshUUID__mesh[latexStrMeshUUID].position.set(0, 0, 0);//default position, will be changed in the circuit itself.
+            self.meshUUID__mesh = Object.assign({}, meshUUID__mesh, self.meshUUID__mesh); //merges the dictionaries meshUUID__mesh and self.meshUUID__mesh
+            // self.meshUUID__mesh = meshUUID__mesh
+            console.log('latexStrMeshUUID', latexStrMeshUUID)
+            console.log('self.meshUUID__mesh', self.meshUUID__mesh)
+            self.meshUUID__mesh[latexStrMeshUUID].visible = false;
+            self.meshUUID__mesh[latexStrMeshUUID].position.set(0, 0, 0);//default position, will be changed in the circuit itself.
             self.enter(latexStrMeshUUID)
             indices.add(latexIdx);
             // console.log('latexIdx', latexIdx, 'textMeshInformation', textMeshInformation, 'meshUUID__mesh', meshUUID__mesh, ); debugger

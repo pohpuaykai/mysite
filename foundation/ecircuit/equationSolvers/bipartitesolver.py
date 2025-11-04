@@ -1,7 +1,7 @@
 from foundation.automat.core.equation import Equation
 
 from foundation.automat.core.manipulate.recommend.searchers.bipartitesearcher import BipartiteSearcher
-# from foundation.automat.core.manipulate.recommend.recommend import Recommend
+from foundation.automat.core.manipulate.recommend.recommend import Recommend # still contains combingSearch
 
 class BipartiteSolver:
 
