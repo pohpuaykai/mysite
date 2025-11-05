@@ -6,7 +6,7 @@ import os
 import pickle
 
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import render
 
 # from foundation.decorators import ticketable
@@ -163,4 +163,5 @@ def wavFiles(request):
     print('wavFilepatH: ', filepath)
     file = open(filepath, 'rb')
     # return HttpResponse(file.read(), content_type="application/octet-stream")
-    return HttpResponse(file.read(), content_type="audio/wav")
+    # return HttpResponse(file.read(), content_type="audio/wav")
+    return FileResponse(file, content_type='audio/wav')#how does FileResponse work?<<<<<<<
