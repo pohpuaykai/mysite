@@ -61,14 +61,14 @@ class CircuitAnime {
         this.audioPlaying = false;
         this.audioPlayer_findEquations = this.circuit.makeWavPlayerWithEndCallback(
             function(state) {//on end playAudio, we update the currentPositionInAudio
-                self.list_subtitles_findEquations[animeSelf.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
+                self.list_subtitles_findEquations[self.list_subtitles_findEquations.length-1]['endTime'] = performance.now()
                 self.updateCurrentPositionInAudio(state)
                 self.audioPlaying = false;
             }
         );
         this.audioPlayer_solveEquations = this.circuit.makeWavPlayerWithEndCallback(
             function(state) {//on end playAudio, we update the currentPositionInAudio
-                self.list_subtitles_solveEquations[animeSelf.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
+                self.list_subtitles_solveEquations[self.list_subtitles_solveEquations.length-1]['endTime'] = performance.now()
                 self.updateCurrentPositionInAudio(state)
                 self.audioPlaying = false;
             }
