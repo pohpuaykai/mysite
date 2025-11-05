@@ -532,10 +532,6 @@ class Recommend:
                         #     'unHistory':unHistory___new#the equivalent of history, but in reverse fo each item in history
                         # });import pdb;pdb.set_trace()
                         #
-                        #heuristics, if a certain type of history has been tried before, reorder the priority_queue to try something new?
-                        #heuristics, so there are simplification_patterns where the nodes decrease from iPattern to oPattern, these should also serve as targets, so formulas that have the most potential to be matched by these patterns, should be given higher priority..<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        #heuristics, if we can simplify until there is only 1 of each variable, we can solve for anyVariable, by makeSubject<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        
                     # else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
         # print('we actually finished running, this was not expected', visitedSchemeStrs)
         # minStrLen = min(map(lambda s: len(s), visitedSchemeStrs)) # but some schemeStrings with same length, might be unfactorised, have 2 as a factor, instead of 1, for example. 
