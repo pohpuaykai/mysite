@@ -1,5 +1,6 @@
 import sys
 from copy import deepcopy
+from foundation.automat.core.manipulate.recommend.recommend import Recommend
 from foundation.automat.common.priorityqueue import PriorityQueue
 
 from foundation.automat.core.equation import Equation
@@ -12,15 +13,17 @@ class SolveSearcher:
     
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, equation, maximumDepth, verbose=False):
+        self.equation = equation
+        self.maximumDepth = maximumDepth
+        self.verbose = verbose
 
     def search(self):
-        visitedSchemeStrs = [equation.schemeStr]
+        visitedSchemeStrs = [self.equation.schemeStr]
         schemeLeastLength = sys.maxsize; leastLengthSchemeEquations = []; solvingSteps = []
         priorityQueue = PriorityQueue(); 
         priorityQueue.insert({
-            'eq':equation,
+            'eq':self.equation,
             'depth':0,
             'history':[],
             'unHistory':[]#the equivalent of history, but in reverse fo each item in history
@@ -30,12 +33,12 @@ class SolveSearcher:
             state = priorityQueue.popMax()
             eq = state['eq']; depth = state['depth']; history = state['history']; unHistory = state['unHistory']
             
-            if depth >= maximumDepth:
+            if depth >= self.maximumDepth:
                 # print('stopping search... because one of the states reached maximumDepth')
                 #what to return?
                 break
 
-            manipulations = cls.filterForHeuristicsRelevantTo(eq, Recommend.getMetaData()) # branches
+            manipulations = Recommend.filterForHeuristicsRelevantTo(eq, Recommend.getMetaData()) # branches
 
             
             for idd in map(lambda row: row['identity'], manipulations):
@@ -46,8 +49,8 @@ class SolveSearcher:
                 if historyKey in history[-1:] or unHistoryKey in unHistory[-1:]:
                     # print('skipping manipulate: ', historyKey)
                     continue #skip, we do not want to directly undo our affords
-                manipulateClass = cls.getManipulateClass(idd['filename'])
-                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=verbose)
+                manipulateClass = Recommend.getManipulateClass(idd['filename'])
+                manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
                 returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=False)
                 if returnTup is not None:
                     manipulatedSchemeWord, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
