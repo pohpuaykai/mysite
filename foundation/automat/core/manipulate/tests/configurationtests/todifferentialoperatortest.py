@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (/ d (* d $1)) $0)
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (/ d (* d $1)) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (D (* u v) x) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))' # (D $0 $1)
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D $0 $1)
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D $0 $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))' # (* (/ d (* d $1)) $0)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (* d $0) (* d $1))
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (* d $0) (* d $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (/ d (* d x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))' # (D $0 $1)
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D $0 $1)
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D $0 $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (/ d (* d x)) (* u v)) (+ (* u (/ (* d v) (* d x))) (* v (/ (* d u) (* d x)))))' # (/ (* d $0) (* d $1))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (/ partial (* partial $1)) $0)
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (/ partial (* partial $1)) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (D (* u v) x) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # (D $0 $1)
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D $0 $1)
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D $0 $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # (* (/ partial (* partial $1)) $0)
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (* partial $0) (* partial $1))
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (* partial $0) (* partial $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (D v x)) (* v (D u x))))' # (D $0 $1)
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = ToDifferentialOperator(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D $0 $1)
+    ma0 = ToDifferentialOperator(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D $0 $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (/ partial (* partial x)) (* u v)) (+ (* u (/ (* partial v) (* partial x))) (* v (/ (* partial u) (* partial x)))))' # (/ (* partial $0) (* partial $1))

@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Multiplynegative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* -1 $0)
+    ma0 = Multiplynegative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* -1 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- "0" b))' # (- 0 $0)
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Multiplynegative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- 0 $0)
+    ma0 = Multiplynegative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- 0 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* "-1" b))' # (* -1 $0)

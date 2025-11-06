@@ -40,14 +40,14 @@ class Manipulate:
 
 
 
-    def __init__(self, equation, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
+    def __init__(self, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
         self.direction = direction; self.idx = idx
         self.calculateSchemeNodeChanges = calculateSchemeNodeChanges
 
-        self.eq = equation
+        # self.eq = equation
         self.verbose = verbose
         #make and store the scheme string
-        self.schemeStr = equation.schemeStr#equation.toString('scheme')
+        # self.schemeStr = equation.schemeStr#equation.toString('scheme')
         from foundation.automat.common.schemegrammarparser import SchemeGrammarParser
         self.grammarParserClass = SchemeGrammarParser
         self.grammarParser = None
@@ -70,7 +70,7 @@ class Manipulate:
         return len(self.grammarParser.oUniqueVariables) > 0
 
 
-    def applicable(self, startPos__nodeId=None):
+    def applicable(self, eq, startPos__nodeId=None):
         """
         #~ DRAFT ~#
         check if equation is manipulatable with this pattern
@@ -82,31 +82,21 @@ class Manipulate:
         #     print('self.schemeStr', self.schemeStr)
         #
         # self.grammarParser.buildEnclosureTree(self.schemeStr)
+        self.schemeStr = eq.schemeStr
         self.grammarParser.matchIPattern(self.schemeStr, startPos__nodeId=startPos__nodeId)
         # print('IS IT NO MATCH??????????????????????????????????????', self.inputGrammar, '|||', self.outputGrammar, self.grammarParser.noMatches, '|||', self.schemeStr)
         return not self.grammarParser.noMatches
 
 
-    def apply(self, startPos__nodeId=None, toAst=False):
+    def apply(self, eq, startPos__nodeId=None, toAst=False):#<<<<<<<<<<<<<<<<<<<<<<move equation here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<change all the unit test :)
         """
         #~ DRAFT ~#
         return manipulated equation
         """
-        # if not self.outputGrammarHasVariables(): # no variables
-        #     if self.verbose:
-        #         print(f'{self.outputGrammar} has no grammar')
-        #     return self.outputGrammar # output does not depend on input variables, no manipulation needed.
-        # import pdb;pdb.set_trace()
-        # print('applying iPattern: ', self.inputGrammar, 'on', self.schemeStr, 'corresponding oPattern: ', self.outputGrammar)
-        if self.applicable(startPos__nodeId): # here we have matches, BUT, we should permuate applying outputGrammar to all the matches{using skipNode}, sometimes, we do not want to change all the inputGrammar
-            existingVariables = list(self.eq.variablesScheme.keys())
-            # manipulatedSchemeWord = self.grammarParser.parse(self.schemeStr, existingVariables=existingVariables)
-            # print('self.variableMinArgs: ', self.variableMinArgs); print('self.variableMaxArgs: ', self.variableMaxArgs); import pdb;pdb.set_trace()
-            # print(self.TYPE, self.__class__.__name__, self.direction, self.idx, 'applying oPattern: ', self.outputGrammar, '| ON|', self.schemeStr, 'associated iPattern: ', self.inputGrammar)
-            #option to turn off schemeNodeChangeLog so that search might be faster<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        if self.applicable(eq, startPos__nodeId): # here we have matches, BUT, we should permuate applying outputGrammar to all the matches{using skipNode}, sometimes, we do not want to change all the inputGrammar
+            existingVariables = list(eq.variablesScheme.keys())#self.eq.variablesScheme.keys())
             manipulatedSchemeWord = self.grammarParser.parse(nodeIdsToSkip=[], variableMinArgs=self.variableMinArgs, variableMaxArgs=self.variableMaxArgs)
-            # return Schemeparser(equationStr=manipulatedSchemeWord)
-
+            
             if toAst: #<<<<<<<<<<<<<<rename this flag for equation
 
             # # TODO seems unelegant..., but we should not modify self.eq and it also seems unelegant to instantiate Equation again

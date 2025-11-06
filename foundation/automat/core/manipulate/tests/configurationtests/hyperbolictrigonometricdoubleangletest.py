@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosh (* 2 $0))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosh (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (^ (sinh x) "2") (^ (cosh x) "2")))' # (+ (^ (sinh $0) 2) (^ (cosh $0) 2))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (^ (sinh $0) 2) (^ (cosh $0) 2))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (^ (sinh $0) 2) (^ (cosh $0) 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cosh (* "2" x)))' # (cosh (* 2 $0))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosh (* 2 $0))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosh (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (* "2" (^ (sinh x) "2")) "1"))' # (+ (* 2 (^ (sinh $0) 2)) 1)
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* 2 (^ (sinh $0) 2)) 1)
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* 2 (^ (sinh $0) 2)) 1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cosh (* "2" x)))' # (cosh (* 2 $0))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosh (* 2 $0))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosh (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (- (* "2" (^ (cosh x) "2")) "1"))' # (- (* 2 (^ (cosh $0) 2)) 1)
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* 2 (^ (cosh $0) 2)) 1)
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* 2 (^ (cosh $0) 2)) 1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cosh (* "2" x)))' # (cosh (* 2 $0))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sinh (* 2 $0))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sinh (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (* "2" (sinh x)) (cosh x)))' # (* (* 2 (sinh $0)) (cosh $0))
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (* 2 (sinh $0)) (cosh $0))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (* 2 (sinh $0)) (cosh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sinh (* "2" x)))' # (sinh (* 2 $0))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tanh (* 2 $0))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tanh (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (* "2" (tanh x)) (+ "1" (^ (tanh x) "2"))))' # (/ (* 2 (tanh $0)) (+ 1 (^ (tanh $0) 2)))
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (* 2 (tanh $0)) (+ 1 (^ (tanh $0) 2)))
+    ma0 = Hyperbolictrigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (* 2 (tanh $0)) (+ 1 (^ (tanh $0) 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tanh (* "2" x)))' # (tanh (* 2 $0))

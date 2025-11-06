@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Quadraticpolynomial(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
+    ma0 = Quadraticpolynomial(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= x (/ (+ (- "0" b) (nroot "2" (- (^ b "2") (* (* "4" a) c)))) (* "2" a)))' # (= $3 (/ (+ (- 0 $1) (nroot 2 (- (^ $1 2) (* (* 4 $0) $2)))) (* 2 $0)))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Quadraticpolynomial(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $3 (/ (+ (- 0 $1) (nroot 2 (- (^ $1 2) (* (* 4 $0) $2)))) (* 2 $0)))
+    ma0 = Quadraticpolynomial(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $3 (/ (+ (- 0 $1) (nroot 2 (- (^ $1 2) (* (* 4 $0) $2)))) (* 2 $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (+ (+ (* a (^ x 2)) (* b x)) c) "0")' # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Quadraticpolynomial(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
+    ma0 = Quadraticpolynomial(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= x (/ (- (- "0" b) (nroot "2" (- (^ b "2") (* (* "4" a) c)))) (* "2" a)))' # (= $3 (/ (- (- 0 $1) (nroot 2 (- (^ $1 2) (* (* 4 $0) $2)))) (* 2 $0)))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Quadraticpolynomial(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $3 (/ (- (- 0 $1) (nroot 2 (- (^ $1 2) (* (* 4 $0) $2)))) (* 2 $0)))
+    ma0 = Quadraticpolynomial(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $3 (/ (- (- 0 $1) (nroot 2 (- (^ $1 2) (* (* 4 $0) $2)))) (* 2 $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (+ (+ (* a (^ x 2)) (* b x)) c) "0")' # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Quadraticpolynomial(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
+    ma0 = Quadraticpolynomial(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (+ (* a (^ (+ x (/ b (* "2" a))) "2")) (- c (/ (^ b "2") (* "4" a)))) "0")' # (= (+ (* $0 (^ (+ $3 (/ $1 (* 2 $0))) 2)) (- $2 (/ (^ $1 2) (* 4 $0)))) 0)
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Quadraticpolynomial(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (+ (* $0 (^ (+ $3 (/ $1 (* 2 $0))) 2)) (- $2 (/ (^ $1 2) (* 4 $0)))) 0)
+    ma0 = Quadraticpolynomial(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (+ (* $0 (^ (+ $3 (/ $1 (* 2 $0))) 2)) (- $2 (/ (^ $1 2) (* 4 $0)))) 0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (+ (+ (* a (^ x 2)) (* b x)) c) "0")' # (= (+ (+ (* $0 (^ $3 2)) (* $1 $3)) $2) 0)

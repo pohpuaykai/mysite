@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D ($0 $1) $2)
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D ($0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (D (sin y) y) (D y x)))' # (* (D ($0 $1) $1) (D $1 $2))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (D ($0 $1) $1) (D $1 $2))
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (D ($0 $1) $1) (D $1 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (sin y) x))' # (D ($0 $1) $2)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (+ $0 $1) $2)
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (+ $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (D a x) (D b x)))' # (+ (D $0 $2) (D $1 $2))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (D $0 $2) (D $1 $2))
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (D $0 $2) (D $1 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (+ a b) x))' # (D (+ $0 $1) $2)
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (* $0 $1) $2)
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (* $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (* a (D b x)) (* b (D a x))))' # (+ (* $0 (D $1 $2)) (* $1 (D $0 $2)))
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 (D $1 $2)) (* $1 (D $0 $2)))
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $0 (D $1 $2)) (* $1 (D $0 $2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (* a b) x))' # (D (* $0 $1) $2)
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (/ $0 $1) $2)
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (/ $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (- (* b (D a x)) (* a (D b x))) (* b b)))' # (/ (- (* $1 (D $0 $2)) (* $0 (D $1 $2))) (* $1 $1))
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Derivativerules(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- (* $1 (D $0 $2)) (* $0 (D $1 $2))) (* $1 $1))
+    ma0 = Derivativerules(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- (* $1 (D $0 $2)) (* $0 (D $1 $2))) (* $1 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (/ a b) x))' # (D (/ $0 $1) $2)

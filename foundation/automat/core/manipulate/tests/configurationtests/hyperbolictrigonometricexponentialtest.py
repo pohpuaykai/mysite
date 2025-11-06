@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (^ e $0)
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (^ e $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (nroot "2" (/ (+ "1" (tanh x)) (- "1" (tanh x)))))' # (nroot 2 (/ (+ 1 (tanh $0)) (- 1 (tanh $0))))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (nroot 2 (/ (+ 1 (tanh $0)) (- 1 (tanh $0))))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (nroot 2 (/ (+ 1 (tanh $0)) (- 1 (tanh $0))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (^ "e" x))' # (^ e $0)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (^ e $0)
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (^ e $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (+ "1" (tanh (/ x "2"))) (- "1" (tanh (/ x "2")))))' # (/ (+ 1 (tanh (/ $0 2))) (- 1 (tanh (/ $0 2))))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (+ 1 (tanh (/ $0 2))) (- 1 (tanh (/ $0 2))))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (+ 1 (tanh (/ $0 2))) (- 1 (tanh (/ $0 2))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (^ "e" x))' # (^ e $0)
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (^ e (* i $0))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (^ e (* i $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (sinh (* "i" x)) (cosh (* "i" x))))' # (+ (sinh (* i $0)) (cosh (* i $0)))
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (sinh (* i $0)) (cosh (* i $0)))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (sinh (* i $0)) (cosh (* i $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (^ "e" (* "i" x)))' # (^ e (* i $0))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (^ e $0)
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (^ e $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (sinh x) (cosh x)))' # (+ (sinh $0) (cosh $0))
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (sinh $0) (cosh $0))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (sinh $0) (cosh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (^ "e" x))' # (^ e $0)
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (^ e (- 0 $0))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (^ e (- 0 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (- (cosh x) (sinh x)))' # (- (cosh $0) (sinh $0))
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometricexponential(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (cosh $0) (sinh $0))
+    ma0 = Hyperbolictrigonometricexponential(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (cosh $0) (sinh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (^ "e" (- "0" x)))' # (^ e (- 0 $0))

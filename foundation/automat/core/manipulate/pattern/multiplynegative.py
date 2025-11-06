@@ -7,10 +7,12 @@ class Multiplynegative(Manipulate):
 
     """
     TYPE = 'essential'
+    NO_OF_MANIPULATIONS = '1'
+    
 
-    def __init__(self, equation, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
+    def __init__(self, direction, idx, calculateSchemeNodeChanges=False, verbose=False):
         """
 
         """
         self.rawRegexes = [{'type': 'regex', 'vor': {'scheme': '(* -1 $0)', 'return': '(- 0 $0)'}, 'minArgs': {'$0': 0}, 'maxArgs': {'$0': None}, 'preCond': {'$0': None}, 'hin': {'scheme': '(- 0 $0)', 'return': '(* -1 $0)'}}]
-        super().__init__(equation, direction, idx, calculateSchemeNodeChanges=calculateSchemeNodeChanges, verbose=verbose)
+        super().__init__(direction, idx, calculateSchemeNodeChanges=calculateSchemeNodeChanges, verbose=verbose)

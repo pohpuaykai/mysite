@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Nrootderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (nroot $0 $1) $2)
+    ma0 = Nrootderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (nroot $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (nroot f g) (/ (- (/ (* (D g x) f) g) (* (D f x) (log "e" g))) (^ f 2))))' # (* (nroot $0 $1) (/ (- (/ (* (D $1 $2) $0) $1) (* (D $0 $2) (log e $1))) (^ $0 2)))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Nrootderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (nroot $0 $1) (/ (- (/ (* (D $1 $2) $0) $1) (* (D $0 $2) (log e $1))) (^ $0 2)))
+    ma0 = Nrootderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (nroot $0 $1) (/ (- (/ (* (D $1 $2) $0) $1) (* (D $0 $2) (log e $1))) (^ $0 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (nroot f g) x))' # (D (nroot $0 $1) $2)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Nrootderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (nroot $0 $1) $2)
+    ma0 = Nrootderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (nroot $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (* (D f x) (/ "1" a)) (^ f (- (/ "1" a) "1"))))' # (* (* (D $1 $2) (/ 1 $0)) (^ $1 (- (/ 1 $0) 1)))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Nrootderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (* (D $1 $2) (/ 1 $0)) (^ $1 (- (/ 1 $0) 1)))
+    ma0 = Nrootderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (* (D $1 $2) (/ 1 $0)) (^ $1 (- (/ 1 $0) 1)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (nroot a f) x))' # (D (nroot $0 $1) $2)

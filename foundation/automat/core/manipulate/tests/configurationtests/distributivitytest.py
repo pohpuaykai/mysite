@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 $1) (* $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $0 $1) (* $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (+ c d)))' # (* $0 (+ $1 $2))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ $1 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (+ $1 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (+ (* b c) (* b d)))' # (+ (* $0 $1) (* $0 $2))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* $0 $1) (* $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* $0 $1) (* $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (- c d)))' # (* $0 (- $1 $2))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (- $1 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (- $1 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- (* b c) (* b d)))' # (- (* $0 $1) (* $0 $2))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (/ $0 $1) (/ $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (/ $0 $1) (/ $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (+ (/ 1 c) (/ 1 d))))' # (* $0 (+ (/ 1 $1) (/ 1 $2)))
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ (/ 1 $1) (/ 1 $2)))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (+ (/ 1 $1) (/ 1 $2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (+ (/ b c) (/ b d)))' # (+ (/ $0 $1) (/ $0 $2))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (/ $0 $1) (/ $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (/ $0 $1) (/ $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (- (/ 1 c) (/ 1 d))))' # (* $0 (- (/ 1 $1) (/ 1 $2)))
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (- (/ 1 $1) (/ 1 $2)))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (- (/ 1 $1) (/ 1 $2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- (/ b c) (/ b d)))' # (- (/ $0 $1) (/ $0 $2))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (/ $0 $1) (* $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (/ $0 $1) (* $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (+ (/ 1 c) d)))' # (* $0 (+ (/ 1 $1) $2))
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ (/ 1 $1) $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (+ (/ 1 $1) $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (+ (/ b c) (* b d)))' # (+ (/ $0 $1) (* $0 $2))
@@ -248,8 +248,8 @@ def test__vor5__configTest(verbose=False):
     direction = 'vor'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (/ $0 $1) (* $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (/ $0 $1) (* $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (- (/ 1 c) d)))' # (* $0 (- (/ 1 $1) $2))
@@ -271,8 +271,8 @@ def test__hin5__configTest(verbose=False):
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (- (/ 1 $1) $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (- (/ 1 $1) $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- (/ b c) (* b d)))' # (- (/ $0 $1) (* $0 $2))
@@ -294,8 +294,8 @@ def test__vor6__configTest(verbose=False):
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 $1) (/ $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $0 $1) (/ $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (+ c (/ 1 d))))' # (* $0 (+ $1 (/ 1 $2)))
@@ -317,8 +317,8 @@ def test__hin6__configTest(verbose=False):
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (+ $1 (/ 1 $2)))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (+ $1 (/ 1 $2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (+ (* b c) (/ b d)))' # (+ (* $0 $1) (/ $0 $2))
@@ -340,8 +340,8 @@ def test__vor7__configTest(verbose=False):
     direction = 'vor'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* $0 $1) (/ $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* $0 $1) (/ $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* b (- c (/ 1 d))))' # (* $0 (- $1 (/ 1 $2)))
@@ -363,8 +363,8 @@ def test__hin7__configTest(verbose=False):
     direction = 'hin'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* $0 (- $1 (/ 1 $2)))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* $0 (- $1 (/ 1 $2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- (* b c) (/ b d)))' # (- (* $0 $1) (/ $0 $2))
@@ -386,8 +386,8 @@ def test__vor8__configTest(verbose=False):
     direction = 'vor'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (/ $1 $0) (/ $2 $0))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (/ $1 $0) (/ $2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ (+ b d) c))' # (/ (+ $1 $2) $0)
@@ -409,8 +409,8 @@ def test__hin8__configTest(verbose=False):
     direction = 'hin'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (+ $1 $2) $0)
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (+ $1 $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (+ (/ b d) (/ c d)))' # (+ (/ $1 $0) (/ $2 $0))
@@ -432,8 +432,8 @@ def test__vor9__configTest(verbose=False):
     direction = 'vor'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (/ $1 $0) (/ $2 $0))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (/ $1 $0) (/ $2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ (- b d) c))' # (/ (- $1 $2) $0)
@@ -455,8 +455,8 @@ def test__hin9__configTest(verbose=False):
     direction = 'hin'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- $1 $2) $0)
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- $1 $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- (/ b d) (/ c d)))' # (- (/ $1 $0) (/ $2 $0))
@@ -478,8 +478,8 @@ def test__vor10__configTest(verbose=False):
     direction = 'vor'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $1 $0) (* $2 $0))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $1 $0) (* $2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* (+ b d) c))' # (* (+ $1 $2) $0)
@@ -501,8 +501,8 @@ def test__hin10__configTest(verbose=False):
     direction = 'hin'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (+ $1 $2) $0)
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (+ $1 $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (+ (* b d) (* c d)))' # (+ (* $1 $0) (* $2 $0))
@@ -524,8 +524,8 @@ def test__vor11__configTest(verbose=False):
     direction = 'vor'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* $1 $0) (* $2 $0))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* $1 $0) (* $2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (* (- b d) c))' # (* (- $1 $2) $0)
@@ -547,8 +547,8 @@ def test__hin11__configTest(verbose=False):
     direction = 'hin'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (- $1 $2) $0)
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (- $1 $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (- (* b d) (* c d)))' # (- (* $1 $0) (* $2 $0))
@@ -570,8 +570,8 @@ def test__vor12__configTest(verbose=False):
     direction = 'vor'
     idx = 12
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* $0 $1) (* $2 $0))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* $0 $1) (* $2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(* (- b c) a)' # (* (- $1 $2) $0)
@@ -593,8 +593,8 @@ def test__hin12__configTest(verbose=False):
     direction = 'hin'
     idx = 12
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (- $1 $2) $0)
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (- $1 $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(- (* a b) (* c a))' # (- (* $0 $1) (* $2 $0))
@@ -616,8 +616,8 @@ def test__vor13__configTest(verbose=False):
     direction = 'vor'
     idx = 13
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* $1 $0) (* $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* $1 $0) (* $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(* (- b c) a)' # (* (- $1 $2) $0)
@@ -639,8 +639,8 @@ def test__hin13__configTest(verbose=False):
     direction = 'hin'
     idx = 13
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (- $1 $2) $0)
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (- $1 $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(- (* b a) (* a c))' # (- (* $1 $0) (* $0 $2))

@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (* "2" (sin x)) (cos x)))' # (* (* 2 (sin $0)) (cos $0))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (* 2 (sin $0)) (cos $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (* 2 (sin $0)) (cos $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (* "2" x)))' # (sin (* 2 $0))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (* "2" (tan x)) (+ "1" (^ (tan x) "2"))))' # (/ (* 2 (tan $0)) (+ 1 (^ (tan $0) 2)))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (* 2 (tan $0)) (+ 1 (^ (tan $0) 2)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (* 2 (tan $0)) (+ 1 (^ (tan $0) 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (* "2" x)))' # (sin (* 2 $0))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (- (^ (cos x) "2") (^ (sin x) "2")))' # (- (^ (cos $0) 2) (^ (sin $0) 2))
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (^ (cos $0) 2) (^ (sin $0) 2))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (^ (cos $0) 2) (^ (sin $0) 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (* "2" x)))' # (cos (* 2 $0))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (- (* "2" (^ (cos x) "2")) "1"))' # (- (* 2 (^ (cos $0) 2)) 1)
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- (* 2 (^ (cos $0) 2)) 1)
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- (* 2 (^ (cos $0) 2)) 1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (* "2" x)))' # (cos (* 2 $0))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (- "1" (* "2" (^ (sin x) "2"))))' # (- 1 (* 2 (^ (sin $0) 2)))
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- 1 (* 2 (^ (sin $0) 2)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- 1 (* 2 (^ (sin $0) 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (* "2" x)))' # (cos (* 2 $0))
@@ -248,8 +248,8 @@ def test__vor5__configTest(verbose=False):
     direction = 'vor'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (- "1" (^ (tan x) "2")) (+ "1" (^ (tan x) "2"))))' # (/ (- 1 (^ (tan $0) 2)) (+ 1 (^ (tan $0) 2)))
@@ -271,8 +271,8 @@ def test__hin5__configTest(verbose=False):
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- 1 (^ (tan $0) 2)) (+ 1 (^ (tan $0) 2)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- 1 (^ (tan $0) 2)) (+ 1 (^ (tan $0) 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (* "2" x)))' # (cos (* 2 $0))
@@ -294,8 +294,8 @@ def test__vor6__configTest(verbose=False):
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (* "2" (tan x)) (- "1" (^ (tan x) "2"))))' # (/ (* 2 (tan $0)) (- 1 (^ (tan $0) 2)))
@@ -317,8 +317,8 @@ def test__hin6__configTest(verbose=False):
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (* 2 (tan $0)) (- 1 (^ (tan $0) 2)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (* 2 (tan $0)) (- 1 (^ (tan $0) 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tan (* "2" x)))' # (tan (* 2 $0))
@@ -340,8 +340,8 @@ def test__vor7__configTest(verbose=False):
     direction = 'vor'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cot (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cot (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (- (* (^ cot "2") x) "1") (* "2" (cot x))))' # (/ (- (* (^ cot 2) $0) 1) (* 2 (cot $0)))
@@ -363,8 +363,8 @@ def test__hin7__configTest(verbose=False):
     direction = 'hin'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- (* (^ cot 2) $0) 1) (* 2 (cot $0)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- (* (^ cot 2) $0) 1) (* 2 (cot $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cot (* "2" x)))' # (cot (* 2 $0))
@@ -386,8 +386,8 @@ def test__vor8__configTest(verbose=False):
     direction = 'vor'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cot (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cot (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (- "1" (* (^ tan "2") x)) (* "2" (tan x))))' # (/ (- 1 (* (^ tan 2) $0)) (* 2 (tan $0)))
@@ -409,8 +409,8 @@ def test__hin8__configTest(verbose=False):
     direction = 'hin'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- 1 (* (^ tan 2) $0)) (* 2 (tan $0)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- 1 (* (^ tan 2) $0)) (* 2 (tan $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cot (* "2" x)))' # (cot (* 2 $0))
@@ -432,8 +432,8 @@ def test__vor9__configTest(verbose=False):
     direction = 'vor'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sec (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sec (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (^ (sec x) "2") (- "2" (* (^ sec "2") x))))' # (/ (^ (sec $0) 2) (- 2 (* (^ sec 2) $0)))
@@ -455,8 +455,8 @@ def test__hin9__configTest(verbose=False):
     direction = 'hin'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (^ (sec $0) 2) (- 2 (* (^ sec 2) $0)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (^ (sec $0) 2) (- 2 (* (^ sec 2) $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sec (* "2" x)))' # (sec (* 2 $0))
@@ -478,8 +478,8 @@ def test__vor10__configTest(verbose=False):
     direction = 'vor'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sec (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sec (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (+ "1" (* (^ tan "2") x)) (- "1" (* (^ tan "2") x))))' # (/ (+ 1 (* (^ tan 2) $0)) (- 1 (* (^ tan 2) $0)))
@@ -501,8 +501,8 @@ def test__hin10__configTest(verbose=False):
     direction = 'hin'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (+ 1 (* (^ tan 2) $0)) (- 1 (* (^ tan 2) $0)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (+ 1 (* (^ tan 2) $0)) (- 1 (* (^ tan 2) $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sec (* "2" x)))' # (sec (* 2 $0))
@@ -524,8 +524,8 @@ def test__vor11__configTest(verbose=False):
     direction = 'vor'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosec (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosec (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (* (sec x) (cosec x)) "2"))' # (/ (* (sec $0) (cosec $0)) 2)
@@ -547,8 +547,8 @@ def test__hin11__configTest(verbose=False):
     direction = 'hin'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (* (sec $0) (cosec $0)) 2)
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (* (sec $0) (cosec $0)) 2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cosec (* "2" x)))' # (cosec (* 2 $0))
@@ -570,8 +570,8 @@ def test__vor12__configTest(verbose=False):
     direction = 'vor'
     idx = 12
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosec (* 2 $0))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosec (* 2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (+ "1" (* (^ tan "2") x)) (* "2" (tan x))))' # (/ (+ 1 (* (^ tan 2) $0)) (* 2 (tan $0)))
@@ -593,8 +593,8 @@ def test__hin12__configTest(verbose=False):
     direction = 'hin'
     idx = 12
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricdoubleangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (+ 1 (* (^ tan 2) $0)) (* 2 (tan $0)))
+    ma0 = Trigonometricdoubleangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (+ 1 (* (^ tan 2) $0)) (* 2 (tan $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cosec (* "2" x)))' # (cosec (* 2 $0))

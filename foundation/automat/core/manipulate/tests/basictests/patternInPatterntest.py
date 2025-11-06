@@ -10,13 +10,19 @@ pp = pprint.PrettyPrinter(indent=4)
 
 def test_findPatternInPatternAndThenGeneratePattern(verbose=False):
     manipulateClassEQ = Recommend.getManipulateClass('distributivity')
-    import pdb;pdb.set_trace()
-    eq = Equation(manipulateClassEQ.inputGrammar, 'scheme') # this is also a manipulation, but we only want the string
+    direction = 'vor'
+    idx = 0
+    mEQ = manipulateClassEQ(direction, idx)#can manipulationClass not have schemeWord??<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    # import pdb;pdb.set_trace()
+    eq = Equation(mEQ.inputGrammar, 'scheme') # this is also a manipulation, but we only want the string
     manipulateClass = Recommend.getManipulateClass('communtativity')
-    #how to get the direction and idx from the manipulateClass itself?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<not possible, maybe put it in?
-    import pdb;pdb.set_trace()
-    manipulate = manipulateClass(eq, idd['direction'], idd['idx'], calculateSchemeNodeChanges=True, verbose=self.verbose)
-    returnTup = manipulate.apply(startPos__nodeId=hint['startPos__nodeId'], toAst=True)
+    #manipulateClass.NO_OF_MANIPULATIONS [lower bound of idx], direction={vor, hin}
+    manipulate = manipulateClass(direction, idx, calculateSchemeNodeChanges=True, verbose=verbose)
+    """
+    There is something wrong with 
+    manipulate.py, line 112
+    """
+    returnTup = manipulate.apply(eq)#, startPos__nodeId=hint['startPos__nodeId'], toAst=True)
     if verbose:
         print(returnTup)
 

@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (arcsin $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (arcsin $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (sin (arcsin y)) (sin (arcsin x)))' # (sin (arcsin $0))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (arccos $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (arccos $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (nroot "2" (- "1" (^ x "2"))))' # (nroot 2 (- 1 (^ $0 2)))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (nroot 2 (- 1 (^ $0 2)))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (nroot 2 (- 1 (^ $0 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (arccos x)))' # (sin (arccos $0))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (arctan $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (arctan $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ x (nroot "2" (+ "1" (^ x "2")))))' # (/ $0 (nroot 2 (+ 1 (^ $0 2))))
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ $0 (nroot 2 (+ 1 (^ $0 2))))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ $0 (nroot 2 (+ 1 (^ $0 2))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (arctan x)))' # (sin (arctan $0))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (arccosec $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (arccosec $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ "1" x))' # (/ 1 $0)
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 $0)
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (arccosec x)))' # (sin (arccosec $0))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (arcsec $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (arcsec $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (nroot "2" (- (^ x "2") "1")) x))' # (/ (nroot 2 (- (^ $0 2) 1)) $0)
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (nroot 2 (- (^ $0 2) 1)) $0)
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (nroot 2 (- (^ $0 2) 1)) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (arcsec x)))' # (sin (arcsec $0))
@@ -248,8 +248,8 @@ def test__vor5__configTest(verbose=False):
     direction = 'vor'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (arccot $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (arccot $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ "1" (nroot "2" (+ "1" (^ x "2")))))' # (/ 1 (nroot 2 (+ 1 (^ $0 2))))
@@ -271,8 +271,8 @@ def test__hin5__configTest(verbose=False):
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (nroot 2 (+ 1 (^ $0 2))))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (nroot 2 (+ 1 (^ $0 2))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (arccot x)))' # (sin (arccot $0))
@@ -294,8 +294,8 @@ def test__vor6__configTest(verbose=False):
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (arcsin $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (arcsin $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (nroot "2" (- "1" (^ x "2"))))' # (nroot 2 (- 1 (^ $0 2)))
@@ -317,8 +317,8 @@ def test__hin6__configTest(verbose=False):
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (nroot 2 (- 1 (^ $0 2)))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (nroot 2 (- 1 (^ $0 2)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (arcsin x)))' # (cos (arcsin $0))
@@ -340,8 +340,8 @@ def test__vor7__configTest(verbose=False):
     direction = 'vor'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (arccos $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (arccos $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -363,8 +363,8 @@ def test__hin7__configTest(verbose=False):
     direction = 'hin'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (cos (arccos y)) (cos (arccos x)))' # (cos (arccos $0))
@@ -386,8 +386,8 @@ def test__vor8__configTest(verbose=False):
     direction = 'vor'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (arctan $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (arctan $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ "1" (nroot "2" (+ "1" (^ x "2")))))' # (/ 1 (nroot 2 (+ 1 (^ $0 2))))
@@ -409,8 +409,8 @@ def test__hin8__configTest(verbose=False):
     direction = 'hin'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (nroot 2 (+ 1 (^ $0 2))))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (nroot 2 (+ 1 (^ $0 2))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (arctan x)))' # (cos (arctan $0))
@@ -432,8 +432,8 @@ def test__vor9__configTest(verbose=False):
     direction = 'vor'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (arccosec $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (arccosec $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (nroot "2" (- (^ x "2") "1")) x))' # (/ (nroot 2 (- (^ $0 2) 1)) $0)
@@ -455,8 +455,8 @@ def test__hin9__configTest(verbose=False):
     direction = 'hin'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (nroot 2 (- (^ $0 2) 1)) $0)
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (nroot 2 (- (^ $0 2) 1)) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (arccosec x)))' # (cos (arccosec $0))
@@ -478,8 +478,8 @@ def test__vor10__configTest(verbose=False):
     direction = 'vor'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (arcsec $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (arcsec $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ "1" x))' # (/ 1 $0)
@@ -501,8 +501,8 @@ def test__hin10__configTest(verbose=False):
     direction = 'hin'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 $0)
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (arcsec x)))' # (cos (arcsec $0))
@@ -524,8 +524,8 @@ def test__vor11__configTest(verbose=False):
     direction = 'vor'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (arccot $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (arccot $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ x (nroot "2" (+ "1" (^ x "2")))))' # (/ $0 (nroot 2 (+ 1 (^ $0 2))))
@@ -547,8 +547,8 @@ def test__hin11__configTest(verbose=False):
     direction = 'hin'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ $0 (nroot 2 (+ 1 (^ $0 2))))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ $0 (nroot 2 (+ 1 (^ $0 2))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (arccot x)))' # (cos (arccot $0))
@@ -570,8 +570,8 @@ def test__vor12__configTest(verbose=False):
     direction = 'vor'
     idx = 12
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (arcsin $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (arcsin $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ x (nroot "2" (- "1" (^ x "2")))))' # (/ $0 (nroot 2 (- 1 (^ $0 2))))
@@ -593,8 +593,8 @@ def test__hin12__configTest(verbose=False):
     direction = 'hin'
     idx = 12
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ $0 (nroot 2 (- 1 (^ $0 2))))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ $0 (nroot 2 (- 1 (^ $0 2))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tan (arcsin x)))' # (tan (arcsin $0))
@@ -616,8 +616,8 @@ def test__vor13__configTest(verbose=False):
     direction = 'vor'
     idx = 13
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (arccos $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (arccos $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (nroot "2" (- "1" (^ x "2"))) x))' # (/ (nroot 2 (- 1 (^ $0 2))) $0)
@@ -639,8 +639,8 @@ def test__hin13__configTest(verbose=False):
     direction = 'hin'
     idx = 13
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (nroot 2 (- 1 (^ $0 2))) $0)
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (nroot 2 (- 1 (^ $0 2))) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tan (arccos x)))' # (tan (arccos $0))
@@ -662,8 +662,8 @@ def test__vor14__configTest(verbose=False):
     direction = 'vor'
     idx = 14
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (arctan $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (arctan $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -685,8 +685,8 @@ def test__hin14__configTest(verbose=False):
     direction = 'hin'
     idx = 14
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (tan (arctan y)) (tan (arctan x)))' # (tan (arctan $0))
@@ -708,8 +708,8 @@ def test__vor15__configTest(verbose=False):
     direction = 'vor'
     idx = 15
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (arccosec $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (arccosec $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ "1" (nroot "2" (- (^ x "2") "1"))))' # (/ 1 (nroot 2 (- (^ $0 2) 1)))
@@ -731,8 +731,8 @@ def test__hin15__configTest(verbose=False):
     direction = 'hin'
     idx = 15
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (nroot 2 (- (^ $0 2) 1)))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (nroot 2 (- (^ $0 2) 1)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tan (arccosec x)))' # (tan (arccosec $0))
@@ -754,8 +754,8 @@ def test__vor16__configTest(verbose=False):
     direction = 'vor'
     idx = 16
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (arcsec $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (arcsec $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (nroot "2" (- (^ x "2") "1")))' # (nroot 2 (- (^ $0 2) 1))
@@ -777,8 +777,8 @@ def test__hin16__configTest(verbose=False):
     direction = 'hin'
     idx = 16
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (nroot 2 (- (^ $0 2) 1))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (nroot 2 (- (^ $0 2) 1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tan (arcsec x)))' # (tan (arcsec $0))
@@ -800,8 +800,8 @@ def test__vor17__configTest(verbose=False):
     direction = 'vor'
     idx = 17
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan (arccot $0))
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan (arccot $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ "1" $0))' # (/ 1 $0)
@@ -823,8 +823,8 @@ def test__hin17__configTest(verbose=False):
     direction = 'hin'
     idx = 17
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricarctrigonometric(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 $0)
+    ma0 = Trigonometricarctrigonometric(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tan (arccot $0)))' # (tan (arccot $0))

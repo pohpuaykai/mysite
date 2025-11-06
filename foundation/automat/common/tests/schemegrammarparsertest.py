@@ -2174,6 +2174,7 @@ def test__patternInPattern__trial0(verbose=False):
     sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
     sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
     manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
+    sgparser.getRootOfTree___oStr()
     expected = '(+ (* $0 $2) (* $0 $1))'
     expected_schemeNodeChangeLog = [
     {   'd': 'e', 'e': 1, 'in': 0, 'iw': '+', 'm': 0, 'on': 0, 'ow': '+', 's': 1, 't': 'static', 'v': None},

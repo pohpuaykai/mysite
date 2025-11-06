@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Logarithmicderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (log $0 $1) $2)
+    ma0 = Logarithmicderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (log $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (- (* (* (D g x) (/ "1" g)) (log "e" f)) (* (* (D f x) (/ "1" f)) (log "e" g))) (^ (log "e" f) "2")))' # (/ (- (* (* (D $1 $2) (/ 1 $1)) (log e $0)) (* (* (D $0 $2) (/ 1 $0)) (log e $1))) (^ (log e $0) 2))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Logarithmicderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- (* (* (D $1 $2) (/ 1 $1)) (log e $0)) (* (* (D $0 $2) (/ 1 $0)) (log e $1))) (^ (log e $0) 2))
+    ma0 = Logarithmicderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- (* (* (D $1 $2) (/ 1 $1)) (log e $0)) (* (* (D $0 $2) (/ 1 $0)) (log e $1))) (^ (log e $0) 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (log f g) x))' # (D (log $0 $1) $2)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Logarithmicderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (log $0 $1) $2)
+    ma0 = Logarithmicderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (log $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (D x x) (* x (log "e" "10"))))' # (/ (D $1 $2) (* $1 (log e $0)))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Logarithmicderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (D $1 $2) (* $1 (log e $0)))
+    ma0 = Logarithmicderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (D $1 $2) (* $1 (log e $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (log "10" x) x))' # (D (log $0 $1) $2)
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Logarithmicderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (log e $0) $1)
+    ma0 = Logarithmicderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (log e $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (D x x) x))' # (/ (D $0 $1) $1)
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Logarithmicderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (D $0 $1) $1)
+    ma0 = Logarithmicderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (D $0 $1) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (log "e" x) x))' # (D (log e $0) $1)

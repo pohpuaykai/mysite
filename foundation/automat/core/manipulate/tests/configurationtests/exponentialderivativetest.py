@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (^ e $0) $1)
+    ma0 = Exponentialderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (^ e $0) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (^ "e" x) (D x x)))' # (* (^ e $0) (D $0 $1))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (^ e $0) (D $0 $1))
+    ma0 = Exponentialderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (^ e $0) (D $0 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (^ "e" x) x))' # (D (^ e $0) $1)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (D (^ $0 $1) $2)
+    ma0 = Exponentialderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (D (^ $0 $1) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (* (^ x x) (+ (* (D x x) (log "e" x)) (* (D x x) (/ x x)))))' # (* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0))))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialderivative(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0))))
+    ma0 = Exponentialderivative(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (D (^ x x) x))' # (D (^ $0 $1) $2)

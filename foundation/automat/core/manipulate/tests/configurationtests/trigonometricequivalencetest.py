@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (sin $0) (cos $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (sin $0) (cos $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (tan b))' # (tan $0)
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ (sin b) (cos b)))' # (/ (sin $0) (cos $0))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (cos $0) (sin $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (cos $0) (sin $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (cot b))' # (cot $0)
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cot $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cot $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ (cos b) (sin b)))' # (/ (cos $0) (sin $0))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (sin $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (sin $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (cosec b))' # (cosec $0)
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosec $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosec $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ "1" (sin b)))' # (/ 1 (sin $0))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (cos $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (cos $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (sec b))' # (sec $0)
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sec $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sec $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ "1" (cos b)))' # (/ 1 (cos $0))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (tan $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (tan $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (cot b))' # (cot $0)
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cot $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cot $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ "1" (tan b)))' # (/ 1 (tan $0))
@@ -248,8 +248,8 @@ def test__vor5__configTest(verbose=False):
     direction = 'vor'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ 1 (cot $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ 1 (cot $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (tan b))' # (tan $0)
@@ -271,8 +271,8 @@ def test__hin5__configTest(verbose=False):
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tan $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tan $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ "1" (cot b)))' # (/ 1 (cot $0))
@@ -294,8 +294,8 @@ def test__vor6__configTest(verbose=False):
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin (- 0 $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin (- 0 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (- "0" (sin x)))' # (- 0 (sin $0))
@@ -317,8 +317,8 @@ def test__hin6__configTest(verbose=False):
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (- 0 (sin $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (- 0 (sin $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin (- "0" x)))' # (sin (- 0 $0))
@@ -340,8 +340,8 @@ def test__vor7__configTest(verbose=False):
     direction = 'vor'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos (- 0 $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos (- 0 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos x))' # (cos $0)
@@ -363,8 +363,8 @@ def test__hin7__configTest(verbose=False):
     direction = 'hin'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos (- "0" x)))' # (cos (- 0 $0))
@@ -386,8 +386,8 @@ def test__vor8__configTest(verbose=False):
     direction = 'vor'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sin $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sin $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (- (^ "e" (* "i" x)) (^ "e" (- "0" (* "i" x)))) (* "2" "i")))' # (/ (- (^ e (* i $0)) (^ e (- 0 (* i $0)))) (* 2 i))
@@ -409,8 +409,8 @@ def test__hin8__configTest(verbose=False):
     direction = 'hin'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (- (^ e (* i $0)) (^ e (- 0 (* i $0)))) (* 2 i))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (- (^ e (* i $0)) (^ e (- 0 (* i $0)))) (* 2 i))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sin x))' # (sin $0)
@@ -432,8 +432,8 @@ def test__vor9__configTest(verbose=False):
     direction = 'vor'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cos $0)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cos $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (+ (^ "e" (* "i" x)) (^ "e" (- "0" (* "i" x)))) "2"))' # (/ (+ (^ e (* i $0)) (^ e (- 0 (* i $0)))) 2)
@@ -455,8 +455,8 @@ def test__hin9__configTest(verbose=False):
     direction = 'hin'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (+ (^ e (* i $0)) (^ e (- 0 (* i $0)))) 2)
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (+ (^ e (* i $0)) (^ e (- 0 (* i $0)))) 2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cos x))' # (cos $0)
@@ -478,8 +478,8 @@ def test__vor10__configTest(verbose=False):
     direction = 'vor'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (^ e (* i $0))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (^ e (* i $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (cos x) (* "i" (sin x))))' # (+ (cos $0) (* i (sin $0)))
@@ -501,8 +501,8 @@ def test__hin10__configTest(verbose=False):
     direction = 'hin'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Trigonometricequivalence(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (cos $0) (* i (sin $0)))
+    ma0 = Trigonometricequivalence(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (cos $0) (* i (sin $0)))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (^ "e" (* "i" x)))' # (^ e (* i $0))

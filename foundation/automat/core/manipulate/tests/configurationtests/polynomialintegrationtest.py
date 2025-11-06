@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Polynomialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (int 1 $0)
+    ma0 = Polynomialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (int 1 $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ x v_{0}))' # (+ $0 $1)
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Polynomialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ $0 $1)
+    ma0 = Polynomialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ $0 $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (int "1" x))' # (int 1 $0)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Polynomialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (int (* $0 (* $2 (^ $1 (- $2 1)))) $1)
+    ma0 = Polynomialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (int (* $0 (* $2 (^ $1 (- $2 1)))) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (* a (^ x n)) v_{0}))' # (+ (* $0 (^ $1 $2)) $3)
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Polynomialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 (^ $1 $2)) $3)
+    ma0 = Polynomialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $0 (^ $1 $2)) $3)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (int (* a (* n (^ x (- n "1")))) x))' # (int (* $0 (* $2 (^ $1 (- $2 1)))) $1)

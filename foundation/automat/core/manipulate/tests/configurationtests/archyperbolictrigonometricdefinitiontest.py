@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (arcsinh (sinh $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (arcsinh (sinh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (arcsinh (sinh x)) (arcsinh (sinh x)))' # (arcsinh (sinh $0))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sinh (arcsinh $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sinh (arcsinh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (sinh (arcsinh x)) (sinh (arcsinh x)))' # (sinh (arcsinh $0))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (arccosh (cosh $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (arccosh (cosh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (arccosh (cosh x)) (arccosh (cosh x)))' # (arccosh (cosh $0))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosh (arccosh $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosh (arccosh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (cosh (arccosh x)) (cosh (arccosh x)))' # (cosh (arccosh $0))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (arctanh (tanh $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (arctanh (tanh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (arctanh (tanh x)) (arctanh (tanh x)))' # (arctanh (tanh $0))
@@ -248,8 +248,8 @@ def test__vor5__configTest(verbose=False):
     direction = 'vor'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tanh (arctanh $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tanh (arctanh $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -271,8 +271,8 @@ def test__hin5__configTest(verbose=False):
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (tanh (arctanh x)) (tanh (arctanh x)))' # (tanh (arctanh $0))
@@ -294,8 +294,8 @@ def test__vor6__configTest(verbose=False):
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (arcsech (sech $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (arcsech (sech $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -317,8 +317,8 @@ def test__hin6__configTest(verbose=False):
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (arcsech (sech x)) (arcsech (sech x)))' # (arcsech (sech $0))
@@ -340,8 +340,8 @@ def test__vor7__configTest(verbose=False):
     direction = 'vor'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sech (arcsech $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sech (arcsech $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -363,8 +363,8 @@ def test__hin7__configTest(verbose=False):
     direction = 'hin'
     idx = 7
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (sech (arcsech x)) (sech (arcsech x)))' # (sech (arcsech $0))
@@ -386,8 +386,8 @@ def test__vor8__configTest(verbose=False):
     direction = 'vor'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (arccosech (cosech $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (arccosech (cosech $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -409,8 +409,8 @@ def test__hin8__configTest(verbose=False):
     direction = 'hin'
     idx = 8
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (arccosech (cosech x)) (arccosech (cosech x)))' # (arccosech (cosech $0))
@@ -432,8 +432,8 @@ def test__vor9__configTest(verbose=False):
     direction = 'vor'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosech (arccosech $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosech (arccosech $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -455,8 +455,8 @@ def test__hin9__configTest(verbose=False):
     direction = 'hin'
     idx = 9
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (cosech (arccosech x)) (cosech (arccosech x)))' # (cosech (arccosech $0))
@@ -478,8 +478,8 @@ def test__vor10__configTest(verbose=False):
     direction = 'vor'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (arccoth (coth $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (arccoth (coth $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -501,8 +501,8 @@ def test__hin10__configTest(verbose=False):
     direction = 'hin'
     idx = 10
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (arccoth (coth x)) (arccoth (coth x)))' # (arccoth (coth $0))
@@ -524,8 +524,8 @@ def test__vor11__configTest(verbose=False):
     direction = 'vor'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (coth (arccoth $0))
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (coth (arccoth $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y x)' # $0
@@ -547,8 +547,8 @@ def test__hin11__configTest(verbose=False):
     direction = 'hin'
     idx = 11
     eq0 = Equation(eqs, eqsType)
-    ma0 = Archyperbolictrigonometricdefinition(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # $0
+    ma0 = Archyperbolictrigonometricdefinition(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # $0
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (coth (arccoth x)) (coth (arccoth x)))' # (coth (arccoth $0))

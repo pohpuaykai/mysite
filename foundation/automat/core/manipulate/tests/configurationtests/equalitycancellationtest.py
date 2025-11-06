@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (* $0 $1) (* $0 $2))
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (* $0 $1) (* $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= b c)' # (= $1 $2)
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $1 $2)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $1 $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* a b) (* a c))' # (= (* $0 $1) (* $0 $2))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (/ $0 $1) (/ $2 $1))
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (/ $0 $1) (/ $2 $1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a c)' # (= $0 $2)
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $0 $2)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $0 $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (/ a b) (/ c b))' # (= (/ $0 $1) (/ $2 $1))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (+ $0 $1) (+ $0 $2))
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (+ $0 $1) (+ $0 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= b c)' # (= $1 $2)
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $1 $2)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $1 $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (+ a b) (+ a c))' # (= (+ $0 $1) (+ $0 $2))
@@ -156,8 +156,8 @@ def test__vor3__configTest(verbose=False):
     direction = 'vor'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (- $1 $0) (- $2 $0))
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (- $1 $0) (- $2 $0))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= b c)' # (= $1 $2)
@@ -179,8 +179,8 @@ def test__hin3__configTest(verbose=False):
     direction = 'hin'
     idx = 3
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $1 $2)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $1 $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (- b a) (- c a))' # (= (- $1 $0) (- $2 $0))
@@ -202,8 +202,8 @@ def test__vor4__configTest(verbose=False):
     direction = 'vor'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (* $0 $1) $0)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (* $0 $1) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= b 1)' # (= $1 1)
@@ -225,8 +225,8 @@ def test__hin4__configTest(verbose=False):
     direction = 'hin'
     idx = 4
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $1 1)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $1 1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* a b) a)' # (= (* $0 $1) $0)
@@ -248,8 +248,8 @@ def test__vor5__configTest(verbose=False):
     direction = 'vor'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (* (* $0 $1) $2) $0)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (* (* $0 $1) $2) $0)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* b c) 1)' # (= (* $1 $2) 1)
@@ -271,8 +271,8 @@ def test__hin5__configTest(verbose=False):
     direction = 'hin'
     idx = 5
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= (* $1 $2) 1)
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= (* $1 $2) 1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= (* (* a b) c) a)' # (= (* (* $0 $1) $2) $0)
@@ -294,8 +294,8 @@ def test__vor6__configTest(verbose=False):
     direction = 'vor'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= $0 (/ (* $1 $0) $2))
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= $0 (/ (* $1 $0) $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= 1 (/ b c))' # (= 1 (/ $1 $2))
@@ -317,8 +317,8 @@ def test__hin6__configTest(verbose=False):
     direction = 'hin'
     idx = 6
     eq0 = Equation(eqs, eqsType)
-    ma0 = Equalitycancellation(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (= 1 (/ $1 $2))
+    ma0 = Equalitycancellation(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (= 1 (/ $1 $2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= a (/ (* b a) c))' # (= $0 (/ (* $1 $0) $2))

@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometrichalfangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (sinh (/ $0 2))
+    ma0 = Hyperbolictrigonometrichalfangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (sinh (/ $0 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (sinh x) (nroot "2" (* "2" (+ (cosh x) "1")))))' # (/ (sinh $0) (nroot 2 (* 2 (+ (cosh $0) 1))))
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometrichalfangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (sinh $0) (nroot 2 (* 2 (+ (cosh $0) 1))))
+    ma0 = Hyperbolictrigonometrichalfangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (sinh $0) (nroot 2 (* 2 (+ (cosh $0) 1))))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (sinh (/ x "2")))' # (sinh (/ $0 2))
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometrichalfangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (cosh (/ $0 2))
+    ma0 = Hyperbolictrigonometrichalfangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (cosh (/ $0 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (nroot "2" (/ (+ (cosh x) "1") "2")))' # (nroot 2 (/ (+ (cosh $0) 1) 2))
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometrichalfangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (nroot 2 (/ (+ (cosh $0) 1) 2))
+    ma0 = Hyperbolictrigonometrichalfangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (nroot 2 (/ (+ (cosh $0) 1) 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (cosh (/ x "2")))' # (cosh (/ $0 2))
@@ -110,8 +110,8 @@ def test__vor2__configTest(verbose=False):
     direction = 'vor'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometrichalfangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (tanh (/ $0 2))
+    ma0 = Hyperbolictrigonometrichalfangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (tanh (/ $0 2))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (/ (sinh x) (+ (cosh x) "1")))' # (/ (sinh $0) (+ (cosh $0) 1))
@@ -133,8 +133,8 @@ def test__hin2__configTest(verbose=False):
     direction = 'hin'
     idx = 2
     eq0 = Equation(eqs, eqsType)
-    ma0 = Hyperbolictrigonometrichalfangle(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (/ (sinh $0) (+ (cosh $0) 1))
+    ma0 = Hyperbolictrigonometrichalfangle(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (/ (sinh $0) (+ (cosh $0) 1))
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (tanh (/ x "2")))' # (tanh (/ $0 2))

@@ -18,8 +18,8 @@ def test__vor0__configTest(verbose=False):
     direction = 'vor'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (int (* (^ e $0) (D $0 $1)) $1)
+    ma0 = Exponentialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (int (* (^ e $0) (D $0 $1)) $1)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (^ "e" x) v_{0}))' # (+ (^ e $0) $2)
@@ -41,8 +41,8 @@ def test__hin0__configTest(verbose=False):
     direction = 'hin'
     idx = 0
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (^ e $0) $2)
+    ma0 = Exponentialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (^ e $0) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (int (* (^ "e" x) (D x v_{0})) v_{0}))' # (int (* (^ e $0) (D $0 $1)) $1)
@@ -64,8 +64,8 @@ def test__vor1__configTest(verbose=False):
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (int (* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0)))) $2)
+    ma0 = Exponentialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (int (* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0)))) $2)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (+ (^ x x) v_{0}))' # (+ (^ $0 $1) $3)
@@ -87,8 +87,8 @@ def test__hin1__configTest(verbose=False):
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Exponentialintegration(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (^ $0 $1) $3)
+    ma0 = Exponentialintegration(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (^ $0 $1) $3)
     ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = Schemeparser(equationStr=manipulatedSchemeEquation)._parse()
     manipulatedAst = ast
     expected = '(= y (int (* (^ x x) (+ (* (D x v_{0}) (log "e" x)) (* (D x v_{0}) (/ x x)))) v_{0}))' # (int (* (^ $0 $1) (+ (* (D $1 $2) (log e $0)) (* (D $0 $2) (/ $1 $0)))) $2)

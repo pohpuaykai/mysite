@@ -18,8 +18,8 @@ def test__makesubjecttest0__linearEliminationBySubstitution_eq1_noMatch(verbose=
     direction = 'hin'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Distributivity(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 $1) (* $0 $2))
+    ma0 = Distributivity(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $0 $1) (* $0 $2))
 
     #manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
 
@@ -42,8 +42,8 @@ def test__makesubjecttest0__linearEliminationBySubstitution_eq1_match(verbose=Fa
     direction = 'vor'
     idx = 1
     eq0 = Equation(eqs, eqsType)
-    ma0 = Subtractzero(eq0, direction, idx, verbose=verbose)
-    manipulatedSchemeEquation = ma0.apply() # (+ (* $0 $1) (* $0 $2))
+    ma0 = Subtractzero(direction, idx, verbose=verbose)
+    manipulatedSchemeEquation = ma0.apply(eq0) # (+ (* $0 $1) (* $0 $2))
 
     #manipulatedAst = Schemeparser(equationStr=manipulatedSchemeEquation).ast
 
