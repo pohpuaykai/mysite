@@ -2158,6 +2158,53 @@ def test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplicatio
 
 
 
+def test__patternInPattern__trial0(verbose=False):
+    """
+    NOW, schemeword are inputPattern|outputPattern too
+    
+    """
+    inputPattern = '(+ $0 $1)'
+    outputPattern = '(+ $1 $0)'
+    schemeword = '(+ (* $0 $1) (* $0 $2))'
+    parser = Schemeparser(equationStr=schemeword)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    nodeIdsToSkip = []
+    variableMinArgs = {}
+    variableMaxArgs = {}
+    sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
+    sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+    manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
+    expected = '(+ (* $0 $2) (* $0 $1))'
+    expected_schemeNodeChangeLog = [
+    {   'd': 'e', 'e': 1, 'in': 0, 'iw': '+', 'm': 0, 'on': 0, 'ow': '+', 's': 1, 't': 'static', 'v': None},
+    {   'd': 'e', 'e': 4, 'in': 2, 'iw': '*', 'm': 0, 'on': 1, 'ow': '*', 's': 14, 't': 'var', 'v': '$1'},
+    {   'd': 'e', 'e': 6, 'in': 5, 'iw': '$0', 'm': 0, 'on': 3, 'ow': '$0', 's': 16, 't': 'var', 'v': '$1'},
+    {   'd': 'e', 'e': 9, 'in': 6, 'iw': '$2', 'm': 0, 'on': 4, 'ow': '$2', 's': 19, 't': 'var', 'v': '$1'},
+    {   'd': 'e', 'e': 14, 'in': 1, 'iw': '*', 'm': 0, 'on': 2, 'ow': '*', 's': 4, 't': 'var', 'v': '$0'},
+    {   'd': 'e', 'e': 16, 'in': 3, 'iw': '$0', 'm': 0, 'on': 5, 'ow': '$0', 's': 6, 't': 'var', 'v': '$0'},
+    {   'd': 'e', 'e': 19, 'in': 4, 'iw': '$1', 'm': 0, 'on': 6, 'ow': '$1', 's': 9, 't': 'var', 'v': '$0'}]
+    expected_startPos__nodeId = {}
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('schemeNodeChangeLog(positional changes):')
+        pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
+        print('expected_startPos__nodeId: ')
+        pp.pprint(sgparser.startPos__nodeId___oStr)
+        print('OG startPos__nodeId: ')
+        pp.pprint(startPos__nodeId)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword 
+        and \
+        expected_schemeNodeChangeLog == sgparser.schemeNodeChangeLog #sgparser.schemeNodeChangeLog keeps swapping order... TODO why?
+        and \
+        expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
+        )
+
+
+
 
 # def test__latexParserUnparse__(verbose=False):
 #     """"""
@@ -2232,5 +2279,6 @@ if __name__=='__main__':
     # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_doubleInverse()
     # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication0()
     # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication1(True)
-    test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication2(True)
+    # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication2(True)
+    test__patternInPattern__trial0(True)
     #after this test latexUnparse, equation.Manipulate again

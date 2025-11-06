@@ -49,7 +49,8 @@ class Patternate:
                     'type':config['type'],
                     'className':config['className'],
                     'manipulations':config['manipulations'],
-                    'imports':['from foundation.automat.core.manipulate.manipulate import Manipulate']
+                    'imports':['from foundation.automat.core.manipulate.manipulate import Manipulate'],
+                    'no_of_manipulations':len(config['manipulations'])
                 })
                 fileName = f"{config['className'].lower()}.py"
                 self.writeToFile(fileName, renderedMainFTemplate)
