@@ -1,7 +1,8 @@
 from foundation.automat.core.equation import Equation
 
 from foundation.automat.core.manipulate.recommend.searchers.bipartitesearcher import BipartiteSearcher
-from foundation.automat.core.manipulate.recommend.recommend import Recommend # still contains combingSearch
+from foundation.automat.core.manipulate.recommend.recommend import Recommend
+from foundation.automat.core.manipulate.recommend.searchers.solvesearcher import SolveSearcher
 
 class BipartiteSolver:
 
@@ -199,7 +200,8 @@ class BipartiteSolver:
         from foundation.automat.parser.sorte.schemeparser import Schemeparser
 
         eq = Equation(equationStr=vorEquation.schemeStr, parserName='scheme')
-        chosenSchemeStrsWithSolvingSteps = Recommend.combingSearch(eq)
+        # chosenSchemeStrsWithSolvingSteps = Recommend.combingSearch(eq)
+        chosenSchemeStrsWithSolvingSteps = (SolveSearcher(eq, 7)).search() # 7 levels deep, for now.. not sure why<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         chosenSchemeStrWithSolvingSteps = chosenSchemeStrsWithSolvingSteps[0] # for now we just take the first one
         vor__subSteps = []
         for (manipulationFilename, direction, idx) in chosenSchemeStrWithSolvingSteps['solvingStep']:
