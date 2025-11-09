@@ -255,7 +255,7 @@ class Recommend:
 
 
 
-    def simplify(self, eq, hint=None):
+    def simplify(self, eq, hint=None):#this one is only for equation.py
         #run FILTER_HEURISTIC and SORTIN_HEURISTIC
         simplifyingManipulations = self.getRowsInMeta('totalNodeCountIO', '>0') # the number of nodes get lesser, its ok, its this is a 1 step
         simplifyingManipulations = Recommend.filterForHeuristicsRelevantTo(eq, simplifyingManipulations)

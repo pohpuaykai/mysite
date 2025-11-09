@@ -51,37 +51,40 @@ class SolveSearcher:
                     continue #skip, we do not want to directly undo our affords
                 manipulateClass = Recommend.getManipulateClass(idd['filename'])
                 manipulate = manipulateClass(eq, idd['direction'], idd['idx'], verbose=self.verbose)
-                returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=False)
-                if returnTup is not None:
-                    manipulatedSchemeWord, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
-                    
-                    if manipulatedSchemeWord not in visitedSchemeStrs:
-                        history___new = deepcopy(history); unHistory___new = deepcopy(unHistory)
-                        history___new.append((idd['filename'], idd['direction'], idd['idx']))
-                        reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
-                        unHistory___new.append((idd['filename'], reverseDirection, idd['idx']))
-                        visitedSchemeStrs.append(manipulatedSchemeWord)# visitedSchemeStrs.append(sgp.oStr)
-                        #
-                        if len(manipulatedSchemeWord) < schemeLeastLength:
-                            solvingSteps = []
-                            leastLengthSchemeEquations = []
-                            schemeLeastLength = len(manipulatedSchemeWord)
-                        if len(manipulatedSchemeWord) == schemeLeastLength:
-                            leastLengthSchemeEquations.append(manipulatedSchemeWord)
-                            solvingSteps.append(history___new)
-                        #
-                        #priority settings
-                        #Heuristics: stack simplifications together, here the more experience the better
-                        priority = -(depth+1) #Heuristics: if it can reach more reducingManipulation, then higher priority<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        #
-                        childDict = {
-                            'eq':Equation(manipulatedSchemeWord, parserName='scheme'),
-                            'depth':depth+1,
-                            'history':history___new,
-                            'unHistory':unHistory___new#the equivalent of history, but in reverse fo each item in history
-                        }
-                        priorityQueue.insert(childDict, priority)
-                    # else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
+                
+                
+                # returnTup = manipulate.apply(startPos__nodeId=eq.startPos__nodeId, toAst=False)
+                for returnTup in manipulate.generateAllPossibleSkippable():
+                    if returnTup is not None:
+                        manipulatedSchemeWord, manipulateType, manipulateClassName, manipulateDirection, manipulateIdx = returnTup
+                        
+                        if manipulatedSchemeWord not in visitedSchemeStrs:
+                            history___new = deepcopy(history); unHistory___new = deepcopy(unHistory)
+                            history___new.append((idd['filename'], idd['direction'], idd['idx']))
+                            reverseDirection = 'vor' if idd['direction'] == 'hin' else 'hin'
+                            unHistory___new.append((idd['filename'], reverseDirection, idd['idx']))
+                            visitedSchemeStrs.append(manipulatedSchemeWord)# visitedSchemeStrs.append(sgp.oStr)
+                            #
+                            if len(manipulatedSchemeWord) < schemeLeastLength:
+                                solvingSteps = []
+                                leastLengthSchemeEquations = []
+                                schemeLeastLength = len(manipulatedSchemeWord)
+                            if len(manipulatedSchemeWord) == schemeLeastLength:
+                                leastLengthSchemeEquations.append(manipulatedSchemeWord)
+                                solvingSteps.append(history___new)
+                            #
+                            #priority settings
+                            #Heuristics: stack simplifications together, here the more experience the better
+                            priority = -(depth+1) #Heuristics: if it can reach more reducingManipulation, then higher priority<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                            #
+                            childDict = {
+                                'eq':Equation(manipulatedSchemeWord, parserName='scheme'),
+                                'depth':depth+1,
+                                'history':history___new,
+                                'unHistory':unHistory___new#the equivalent of history, but in reverse fo each item in history
+                            }
+                            priorityQueue.insert(childDict, priority)
+                        # else: #if we visit the same formula again... and there is a smaller depth? like in bellmanFord, add a new pattern? but the maintenance will have to give it a name
 
 
         from foundation.automat.parser.sorte.schemeparser import Schemeparser# prevent circular_import

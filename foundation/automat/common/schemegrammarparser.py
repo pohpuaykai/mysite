@@ -369,7 +369,9 @@ class SchemeGrammarParser:
 
         # print('self.iEnclosureTree', self.iEnclosureTree); import pdb;pdb.set_trace()
         # if len(self.iEnclosureTree) == 0: # there are no matches#<<<<<<<<<<<<<<<<<<<<<<<<<this criteria is bad for detecting no match. perhaps each MODE should have its own noMatch<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        noOfMatches = self.iId__data[0]['noOfMatches'] # we assume rootId is always 0
+        noOfMatches = 0
+        if 'noOfMatches' in self.iId__data[0]:
+            noOfMatches = self.iId__data[0]['noOfMatches'] # we assume rootId is always 0
         # print('are there matches?', noOfMatches); import pdb;pdb.set_trace()
         if noOfMatches == 0:
             self.oStr = self.iStr
@@ -443,6 +445,55 @@ class SchemeGrammarParser:
         validNonOverlappingMatches are sorted (by schemeStartPosition children), 
 
 
+        HOW?
+        traverse the iEnclosureTree(each node is a match), with queue
+        make sliding window of children, in order to get validMatchesWithPos (matches that do not contradict in $variables)
+        then out_of validMatchesWithPos, we choose those nonOverlapping
+        then, we use nonOverlapping to find hin & vor. (iStatic are spaces only)
+
+
+        ####
+        ##########put all these thoughts into comments????????
+        iPattern $0 $1 $2
+        (igrpg (uhdrf 1 3 5) (uhdfg 1 3 5) (udrfg 1 3 5))
+
+        what does this match?
+        are [(uhdrf 1 3 5),(uhdfg 1 3 5),(udrfg 1 3 5)] also matches? if so what is hin and vor?
+        are [(1 3 5),(1 3 5),(1 3 5)] also matches? if so what is hin and vor?
+
+
+
+
+
+
+
+        So0,
+        schemeWord: (= a b)
+        iPattern: $0
+        oPattern: (^ $0 1)
+        ((^ = 1) (^ a 1) (^ b 1))
+
+        so1
+        (^ (= a b) 1) # this makes sense in subscripts of summation|production|indiction? but it seems like only in subscripts? and sometimes we do make swaps in index of summation|production|indication?
+        #when does this not make sense?
+        #for non_function, when does this make sense? always makes sense? only for this (iPattern, oPattern)?
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        FOR NOW
+        0. always fit a non_function(no brackets) [any (iPattern, oPattern)]
+        1. else fits the most number of consistent arguments? of any schemeFunction
+        -0. what is hin_vor? should include function_name because we are putting them back
+        -1. because, we are just putting hin_vor back, the original schemeword does not matter, when extracting hin_vor
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        any other STRANGE cases?
+
+        more than 1 variable? (more general)
+
+
+        also, do you want to match the function? What use_case? or would that be more general? but the function should be different than its arguments?
+        so, to be more general, do you want a function swapper? seperate_or_getrannt?
+        ####
+
 
         calls schemeparser.parse on schemeword to get ast, map startEndPos and substrings from schemeword to the nodeId of ast
         then make slidingWindow of length=len(#_of_variables_of_pattern), on ast, to produce enclosureTree (matches), if there are not enough args on ast, then its no match
@@ -463,149 +514,128 @@ class SchemeGrammarParser:
         #make the enclosureTree from schemeTree first, so that it is easier to reason with
         #some schemeTree arguments might not fit the inputPattern, or has less arguments than there are variables in inputPattern
         #so we need to do those 2 filters on the schemeTree to get the enclosureTree.
-        def makeSlidingWindowMatches(childNodes, windowLen):
-            matches = []
-            for offset in range(0, len(childNodes)-windowLen+1):
-                matches.append(childNodes[offset:offset+windowLen])
-            return matches
-        # self.schemeparser___iStr = Schemeparser(equationStr=self.iStr)
-        # ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = self.schemeparser___iStr._parse()
-        nodeId__startPos = dict(map(lambda t: (t[1], t[0]), self.startPos__nodeId___iStr.items()))
-        def getStartPosition(nodeId):
-            sp = nodeId__startPos[nodeId]
-            if sp>0 and self.iStr[sp-1]=='(':
-                return sp-len('(')
-            return sp
-        # nodeId__len = self.schemeparser___iStr.nodeId__len # is len the entire length? for schemeFunctions, is it inclusive of brackets
         #
-        # print('nodeId__startPos:', nodeId__startPos);
-        # print('nodeId__len: ', nodeId__len);
-        # import pdb;pdb.set_trace()
-        #
-        enclosureTreeId = self.getEnclosureNodeId(); self.iEnclosureTree = {enclosureTreeId:[]}; self.iId__data = {enclosureTreeId:{}}
-        queue = [{'schemeNode':self.schemeparser___iStr.rootOfTree, 'enclosureId':enclosureTreeId}]; enclosureTreeId += 1
         noOfVariables = self.iPattern.count('$')
-        # self.noMatches = True #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<then if found any valid matches, then set to false
-        while len(queue) > 0:
-            cN = queue.pop(0)
-            (parentSchemeLabel, parentSchemeId) = cN['schemeNode']; parentEnclosureId = cN['enclosureId']
-            children = self.ast___iStr.get((parentSchemeLabel, parentSchemeId), []) # get need (parentSchemeLabel, parentSchemeId)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            # print(children)
-            children = sorted(children, key=lambda child: getStartPosition(child[1]))
-            # print('children: ', children)
-            # print('len(children) >= noOfVariables', len(children) >= noOfVariables); import pdb;pdb.set_trace()
-            if len(children) >= noOfVariables:# we can do a match#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                matches = makeSlidingWindowMatches(children, noOfVariables)
-                #need to do var__val matching, to check for inconsistency before we can declare this as a enclosureTreeNodeId?
-                # validMatches = [];
-                #along the way, we get the inVar and inStatic
-                # inVars = []; inStatics = [];
-                validMatchesWithPos = []
-                for matchIdx, match in enumerate(matches):
-                    firstSchemeNodeId = match[0][1];
-                    schemeStartPos = getStartPosition(firstSchemeNodeId);
-                    # inVar = []; inStatic = []; # is it better to capture the inVar and inStatic after the overlapping check?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    var__val = {}; consistent = True
-                    zipped = list(zip(self.iSortedVariablesAndPosition, match)); zipped__len = len(zipped)
-                    matchWithPos = []
-                    for idx, (inVarPos, (schemeLabel, schemeNodeId)) in enumerate(zipped):#match is a list of schemeNodeId
-                        var_i, patternInVarStartPos = inVarPos; 
-                        schemeStartPos = getStartPosition(schemeNodeId); schemeEndPos = schemeStartPos+self.nodeId__len___iStr[schemeNodeId]# if nodeId__startPos maps schemeFunction like () to the position_of_openRoundBracket, then it is right, if nodeId__startPos maps schemeFunction like () to the position_of_openRoundBracket+1, then it is wrong
-                        matchWithPos.append({'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId})
-                        #for consistency matching
-                        if var_i in var__val:
-                            matchedVal = schemeword[schemeStartPos:schemeEndPos]
-                            if matchedVal != var__val[var_i]:
-                                consistent = False
-                                break
-                            var__val[var_i] = matchedVal
-                        #
-                        # for capturing statics
-                        if idx != zipped__len-1:#we add a static after each variable (which is just a space), except for the last variable, after which there is no space
-                            (_, patternInVarStartPos___next), (_, schemeNodeId___next) = zipped[idx+1]
-                            # inStatic[(patternInVarStartPos+len(var_i), patternInVarStartPos___next)] = (schemeEndPos, getStartPosition(schemeNodeId___next))
-                            # inStatic.append((schemeEndPos, getStartPosition(schemeNodeId___next)))
+        if not self.iStr.startswith('(') and noOfVariables == 1: # this is a non_function and only 1 variable in self.iPattern, then we have a match
+            self.iId__data = {}
+            self.iId__data[0] = {
+                'noOfMatches':1,
+                'statics':[], # iPattern having only 1 var does not have spaces, and so does not have static
+                'vars':[[(0, len(self.iStr))]],
+                'hins':[(len(self.iStr), len(self.iStr))],#whole self.iStr is a match, so there are no hins
+                'vors':[(0, 0)],#whole self.iStr is a match, so there are no vors
+                's':0,
+                'e':len(self.iStr),
+                'w':self.iStr,
+                'matchIdx':0,
+                'pid':None
+            }
+            self.iId__data[1] = {
+                # 'id':enclosureTreeId,
+                'noOfMatches':0,
+                's':0,
+                'e':len(self.iStr),
+                'w':self.iStr,
+                'matchIdx':1,
+                'pid':0
+            }
+            self.iEnclosureTree = {0:[1]}
+        else:
+        #
 
-                        # for capturing inVars
-                        # inVar.append((inVarPos, schemeStartPos, schemeEndPos, None))#here we need to put in the enclosureNodeId, but it is not created yet until we get to nonOverlapping
-                        #
-                    if consistent: #then we keep this match, its inStatic and inVar in validMatches
-                        validMatchesWithPos.append(matchWithPos)
-                        # validMatches.append(match); 
-                        # inVars.append(inVar); inStatics.append(inStatic)
-                #
-                # print('validMatchesWithPos', validMatchesWithPos); import pdb;pdb.set_trace()
-                
-                # if len(validMatches) > 0:
-                if len(validMatchesWithPos) > 0:#this method is just a filter
-                    #only get the most number of validMatches that are nonOverlapping
-                    lastEndPos = -1#for checking overlap, since we are doing GreedyParadigm, we will always take the first validMatches
-                    # validNonOverlappingMatches = []; 
-                    # inVars___nonOverlapping = []; inStatics___nonOverlapping = [];
-                    validNonOverlappingMatchesWithPos = [];
-                    # for matchIdx, match in enumerate(validMatches):
-                    for matchIdx, match in enumerate(validMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
-                        schemeStartPos = match[0]['schemeStartPos']
-                        # print('0 match: ', match); import pdb;pdb.set_trace()
-                        # schemeStartPos = getStartPosition(match[0][1]) # match[0] is schemeNode, [1] is the nodeId
-                        if lastEndPos <= schemeStartPos:
-                            #capture
-                            validNonOverlappingMatchesWithPos.append(match)
-                            # validNonOverlappingMatches.append(match);
-                            # inVars___nonOverlapping.append(inVars[matchIdx]); inStatics___nonOverlapping.append(inStatics[matchIdx])
-                            # print('inVars__nonOverlapping, capture: ', inVars___nonOverlapping); import pdb;pdb.set_trace()
+            def makeSlidingWindowMatches(childNodes, windowLen):
+                matches = []
+                for offset in range(0, len(childNodes)-windowLen+1):
+                    matches.append(childNodes[offset:offset+windowLen])
+                return matches
+            nodeId__startPos = dict(map(lambda t: (t[1], t[0]), self.startPos__nodeId___iStr.items()))
+            def getStartPosition(nodeId):
+                sp = nodeId__startPos[nodeId]
+                if sp>0 and self.iStr[sp-1]=='(':
+                    return sp-len('(')
+                return sp
+            # nodeId__len = self.schemeparser___iStr.nodeId__len # is len the entire length? for schemeFunctions, is it inclusive of brackets
+            enclosureTreeId = self.getEnclosureNodeId(); self.iEnclosureTree = {enclosureTreeId:[]}; self.iId__data = {enclosureTreeId:{}}
+            queue = [{'schemeNode':self.schemeparser___iStr.rootOfTree, 'enclosureId':enclosureTreeId}]; enclosureTreeId += 1
+            while len(queue) > 0:
+                cN = queue.pop(0)
+                (parentSchemeLabel, parentSchemeId) = cN['schemeNode']; parentEnclosureId = cN['enclosureId']
+                children = self.ast___iStr.get((parentSchemeLabel, parentSchemeId), [])
+                children = sorted(children, key=lambda child: getStartPosition(child[1]))
+                if len(children) >= noOfVariables:# we can do a match#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    matches = makeSlidingWindowMatches(children, noOfVariables)
+                    #need to do var__val matching, to check for inconsistency before we can declare this as a enclosureTreeNodeId?
+                    validMatchesWithPos = []
+                    for matchIdx, match in enumerate(matches):
+                        firstSchemeNodeId = match[0][1];
+                        schemeStartPos = getStartPosition(firstSchemeNodeId);
+                        var__val = {}; consistent = True
+                        zipped = list(zip(self.iSortedVariablesAndPosition, match)); zipped__len = len(zipped)
+                        matchWithPos = []
+                        for idx, (inVarPos, (schemeLabel, schemeNodeId)) in enumerate(zipped):#match is a list of schemeNodeId
+                            var_i, patternInVarStartPos = inVarPos; 
+                            schemeStartPos = getStartPosition(schemeNodeId); schemeEndPos = schemeStartPos+self.nodeId__len___iStr[schemeNodeId]# if nodeId__startPos maps schemeFunction like () to the position_of_openRoundBracket, then it is right, if nodeId__startPos maps schemeFunction like () to the position_of_openRoundBracket+1, then it is wrong
+                            matchWithPos.append({'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId})
+                            #for consistency matching
+                            if var_i in var__val:
+                                matchedVal = schemeword[schemeStartPos:schemeEndPos]
+                                if matchedVal != var__val[var_i]:
+                                    consistent = False
+                                    break
+                                var__val[var_i] = matchedVal
                             #
-                            #update lastEndPos
-                            # schemeEndPos = getStartPosition(match[-1][1])+self.nodeId__len___iStr[match[-1][1]]
-                            schemeEndPos = match[-1]['schemeEndPos']
-                            lastEndPos = schemeEndPos
-                    #
-                    # print('validNonOverlappingMatchesWithPos', validNonOverlappingMatchesWithPos); import pdb;pdb.set_trace()
-                    # if len(validNonOverlappingMatches) > 0:
-                    if len(validNonOverlappingMatchesWithPos) > 0:
-                        # self.noMatches = False #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<then if found any valid matches, then set to false
-                        """ mental image:
-                        There should be no static except for the space between variables, because static is defined as nonvariables in the inputPattern and outputPattern
-                        This is for 1 enclosureId:
-                        vor|$0 $0 $1 $2 $0 $0 $1 $2 $0 $0 $1 $2|hin=vor
-                            ~~~match~~~ ~~~match~~~ ~~~match~~~
-                        The vor and hin are delimited by s___parent and e___parent, meaning that there can be a lot of schemeNodes in the vor and hin, but there is at least one schemeNode
-                        validNonOverlappingMatches are sorted (by schemeStartPosition children), 
-                        """
-                        #here each match is a new enclosureTreeId
-                        s___parent = getStartPosition(parentSchemeId); e___parent = s___parent+self.nodeId__len___iStr[parentSchemeId]; # also used to get vorhin 
-                        list_existingChild = self.iEnclosureTree.get(parentEnclosureId, []); 
-                        #getting the vor
-                        # print('validNonOverlappingMatchesWithPos', validNonOverlappingMatchesWithPos); import pdb;pdb.set_trace()
-                        vorStartPos = s___parent; vorEndPos = validNonOverlappingMatchesWithPos[0][0]['schemeStartPos']#getStartPosition(validNonOverlappingMatches[0][0][1]); # firstSchemeNodeIdOfFirstMatch
-                        # lastSchemeNodeIdOfLastMatch = validNonOverlappingMatches[-1][-1][1]
-                        # hinStartPos = getStartPosition(lastSchemeNodeIdOfLastMatch)+self.nodeId__len___iStr[lastSchemeNodeIdOfLastMatch]; 
-
-                        # hinEndPos = e___parent
-                        hinStartPos = validNonOverlappingMatchesWithPos[-1][-1]['schemeEndPos'];hinEndPos = e___parent
-                        iVars = []; iStatics = []; iVors = []; iHins = [];
-                        iVors.append((vorStartPos, vorEndPos))
-                        # for matchIdx, match in enumerate(validNonOverlappingMatches): # each match is a enclosureTreeId
-                        for matchIdx, match in enumerate(validNonOverlappingMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
-                            enclosureTreeId = self.getEnclosureNodeId()
-                            list_existingChild.append(enclosureTreeId)
-                            #also capture the iVar & iStatic
-                            iVar = []; iStatic = []; staticStartPos = vorEndPos
-                            #need to put children_attached_with_enclosureTreeId back into the queue
-                            for varIdx, d in enumerate(match): # each d is a variable in the iPattern
-                                # print('d',d); import pdb;pdb.set_trace()
-                                queue.append({'schemeNode':(d['schemeLabel'], d['schemeNodeId']), 'enclosureId':enclosureTreeId}) # there will not be a childSchemeId with 2 different enclosureTreeId, because matches are nonOverlapping.
-                                iVar.append((d['schemeStartPos'], d['schemeEndPos']))
-                                if varIdx != len(match)-1:#static are not at the start&end of iPattern, so we take the end of each var to the start of each var as the static, which should be a single space
-                                    nextD = match[varIdx-1]
-                                    iStatic.append((d['schemeEndPos'], nextD['schemeStartPos']))
-
-
-
-                            #if iVars is not consistent, iStatic cannot be appended also<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                            if self.variablesConsistent(iVar):
+                            # for capturing statics
+                            if idx != zipped__len-1:#we add a static after each variable (which is just a space), except for the last variable, after which there is no space
+                                (_, patternInVarStartPos___next), (_, schemeNodeId___next) = zipped[idx+1]
+                        if consistent: #then we keep this match, its inStatic and inVar in validMatches
+                            validMatchesWithPos.append(matchWithPos)
+                    # if len(validMatches) > 0:
+                    if len(validMatchesWithPos) > 0:#this method is just a filter
+                        #only get the most number of validMatches that are nonOverlapping
+                        lastEndPos = -1#for checking overlap, since we are doing GreedyParadigm, we will always take the first validMatches
+                        validNonOverlappingMatchesWithPos = [];
+                        # for matchIdx, match in enumerate(validMatches):
+                        for matchIdx, match in enumerate(validMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
+                            schemeStartPos = match[0]['schemeStartPos']
+                            if lastEndPos <= schemeStartPos:
+                                #capture
+                                validNonOverlappingMatchesWithPos.append(match)
+                                #update lastEndPos
+                                schemeEndPos = match[-1]['schemeEndPos']
+                                lastEndPos = schemeEndPos
+                        #
+                        if len(validNonOverlappingMatchesWithPos) > 0:
+                            """ mental image:
+                            There should be no static except for the space between variables, because static is defined as nonvariables in the inputPattern and outputPattern
+                            This is for 1 enclosureId:
+                            vor|$0 $0 $1 $2 $0 $0 $1 $2 $0 $0 $1 $2|hin=vor
+                                ~~~match~~~ ~~~match~~~ ~~~match~~~
+                            The vor and hin are delimited by s___parent and e___parent, meaning that there can be a lot of schemeNodes in the vor and hin, but there is at least one schemeNode
+                            validNonOverlappingMatches are sorted (by schemeStartPosition children), 
+                            """
+                            #here each match is a new enclosureTreeId
+                            s___parent = getStartPosition(parentSchemeId); e___parent = s___parent+self.nodeId__len___iStr[parentSchemeId]; # also used to get vorhin 
+                            list_existingChild = self.iEnclosureTree.get(parentEnclosureId, []); 
+                            #getting the vor
+                            vorStartPos = s___parent; vorEndPos = validNonOverlappingMatchesWithPos[0][0]['schemeStartPos']
+                            hinStartPos = validNonOverlappingMatchesWithPos[-1][-1]['schemeEndPos'];hinEndPos = e___parent
+                            iVars = []; iStatics = []; iVors = []; iHins = [];
+                            iVors.append((vorStartPos, vorEndPos))
+                            for matchIdx, match in enumerate(validNonOverlappingMatchesWithPos):#each match is a dict with 'inVarPos':inVarPos, 'schemeStartPos':schemeStartPos, 'schemeEndPos':schemeEndPos, 'schemeLabel':schemeLabel, 'schemeNodeId':schemeNodeId
+                                enclosureTreeId = self.getEnclosureNodeId()
+                                list_existingChild.append(enclosureTreeId)
+                                #also capture the iVar & iStatic
+                                iVar = []; iStatic = []; staticStartPos = vorEndPos
+                                #need to put children_attached_with_enclosureTreeId back into the queue
+                                for varIdx, d in enumerate(match): # each d is a variable in the iPattern
+                                    queue.append({'schemeNode':(d['schemeLabel'], d['schemeNodeId']), 'enclosureId':enclosureTreeId}) # there will not be a childSchemeId with 2 different enclosureTreeId, because matches are nonOverlapping.
+                                    iVar.append((d['schemeStartPos'], d['schemeEndPos']))
+                                    if varIdx != len(match)-1:#static are not at the start&end of iPattern, so we take the end of each var to the start of each var as the static, which should be a single space
+                                        nextD = match[varIdx-1]
+                                        iStatic.append((d['schemeEndPos'], nextD['schemeStartPos']))
+                                #if iVars is not consistent, iStatic cannot be appended also<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                # if self.variablesConsistent(iVar):
                                 iVars.append(iVar); iStatics.append(iStatic)
-
                                 s = iVars[matchIdx][0][0]; #s is the start of inVars
                                 e = iVars[matchIdx][-1][-1]; # e is the end of inVars
                                 if enclosureTreeId in self.iId__data:# might be a parent too so has some answers
@@ -617,7 +647,6 @@ class SchemeGrammarParser:
                                         'matchIdx':matchIdx,
                                         'pid':parentEnclosureId
                                     })
-                                    # print('0enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
                                 else:#this is totally new
                                     self.iId__data[enclosureTreeId] = {
                                         # 'id':enclosureTreeId,
@@ -628,42 +657,34 @@ class SchemeGrammarParser:
                                         'matchIdx':matchIdx,
                                         'pid':parentEnclosureId
                                     }
-                                    # print('1enclosureTreeId: ', enclosureTreeId, 'schemeword[:s]', schemeword[:s], 'schemeword[e:]', schemeword[e:]); import pdb;pdb.set_trace()
-                        iHins.append((hinStartPos, hinEndPos))
-                        self.iEnclosureTree[parentEnclosureId] = list_existingChild
+                            iHins.append((hinStartPos, hinEndPos))
+                            self.iEnclosureTree[parentEnclosureId] = list_existingChild
 
-                        self.iId__data[parentEnclosureId] = {
-                            # 'id':parentEnclosureId,
-                            'noOfMatches':len(iVars),
-                            'statics':iStatics, # this should contain all the spaces between each variable in the inputPattern
-                            'vars':iVars,
-                            'hins':iHins,
-                            'vors':iVors,
-                            's':s___parent,
-                            'e':e___parent,
-                            'w':self.iStr[s:e],
-                            # 'vor':self.iStr[vorStartPos:vorEndPos],
-                            # 'hin':self.iStr[hinStartPos:hinEndPos]
-                        }
-                        #
-                        #update self.iId__data too
-                    else:# all valid matches, overlap, i am not sure how this can happen?
+                            self.iId__data[parentEnclosureId] = {
+                                # 'id':parentEnclosureId,
+                                'noOfMatches':len(iVars),
+                                'statics':iStatics, # this should contain all the spaces between each variable in the inputPattern
+                                'vars':iVars,
+                                'hins':iHins,
+                                'vors':iVors,
+                                's':s___parent,
+                                'e':e___parent,
+                                'w':self.iStr[s:e],
+                            }
+                            #
+                            #update self.iId__data too
+                        else:# all valid matches, overlap, i am not sure how this can happen?
+                            for (childSchemeLabel, childSchemeId) in children:
+                                queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
+
+                    else:# only have inconsistent matches, all matches have some variables that disagree on values matched
                         for (childSchemeLabel, childSchemeId) in children:
                             queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
 
-                else:# only have inconsistent matches, all matches have some variables that disagree on values matched
+                else:#not enough schemeArgs to match inputPatternVariables
                     for (childSchemeLabel, childSchemeId) in children:
                         queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
-
-            else:#not enough schemeArgs to match inputPatternVariables
-                for (childSchemeLabel, childSchemeId) in children:
-                    queue.append({'schemeNode':(childSchemeLabel, childSchemeId), 'enclosureId':parentEnclosureId})
-
-        # print('***')
-        # self.pp.pprint(self.iId__data);
-        # self.pp.pprint(self.iEnclosureTree);
-        # import pdb;pdb.set_trace()
-        #calculate__startPos__nodeId can be done here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            #calculate__startPos__nodeId can be done here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         return self.iId__data, self.iEnclosureTree # TODO do not have to return here
 
     def matchIPattern___MODE2(self):
@@ -770,20 +791,11 @@ class SchemeGrammarParser:
                             # print('restarting............ currentPointerPosition: ', currentPointerPosition, 'schemeStartPos: ', schemeStartPos)
                             currentPointerPosition = schemeStartPos#+len(ips) # +len(ips) is to keep the currentPointerPosition always at the start of schemeCompliantVariableOfIPattern
                             segmentIdx = 0 # if all the list_schemeLevelCompliantStartPos (which are all the valid are no match), then we cannot continue with this matching anymore
-                            # print('this ips no match! currentPointerPosition:', currentPointerPosition); 
-                            # print('iStatics: ', iStatics)
-                            # print('iStatic', iStatic)
-                            # print(absoluteStartPos)
-                            # import pdb;pdb.set_trace()
                             noMatch = True
                             iVors.pop(); 
                             if len(iHins) > 0:
                                 iHins.pop()
-                            # iHins = []; iVors = []; 
-                            # noOfMatches -=1;
                             iVar = []; iStatic = []; 
-                            # print('iHins', iHins); print('iVors', iVors)
-
                             if len(iStatics) == 0:
                                 vorStartPointer = absoluteStartPos
                             else:
@@ -792,7 +804,6 @@ class SchemeGrammarParser:
                 # if len(iVar) > 0:#, but might not be a complete match... has to be a complete match<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 if len(iVar) == len(self.iSortedVariablesAndPositionSansNum) and self.variablesConsistent(iVar):
                     iVars.append(iVar); iStatics.append(iStatic)
-                    # print('captureing iStatic: ', iStatic); import pdb;pdb.set_trace()
                     noOfMatches += 1
 
 
@@ -912,6 +923,7 @@ class SchemeGrammarParser:
 
         self.nodeIdsToSkip = nodeIdsToSkip; self.variableMinArgs = variableMinArgs; self.variableMaxArgs = variableMaxArgs
 
+        self.OLDSchemeNodeId__NEWSchemeNodeId___oStr = {} # map old to new first for future uses
         self.iEnclosureTreeId__oEnclosureTreeId = {}
         self.oEnclosureTreeId__iEnclosureTreeId = {}
 
@@ -1689,21 +1701,32 @@ class SchemeGrammarParser:
 
 
         iSortedList_tuple_startEndPosRange_id = constructNonOverlappingRangesTOid(self.iId__data, self.iEnclosureTree, numberOfVariables, 'i') # this did not consider that the nodeId might be skipped<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        # print('done with iSortedList_tuple_startEndPosRange_id'); import pdb;pdb.set_trace()
+        # print('done with iSortedList_tuple_startEndPosRange_id'); 
+        # print(iSortedList_tuple_startEndPosRange_id)
+        # import pdb;pdb.set_trace()
         oSortedList_tuple_startEndPosRange_id = constructNonOverlappingRangesTOid(self.oId__data, self.oEnclosureTree, len(self.oSortedVariablesAndPositionSansNum), 'o')
 
         # print('iSortedList_tuple_startEndPosRange_id', iSortedList_tuple_startEndPosRange_id)
         # print('oSortedList_tuple_startEndPosRange_id', oSortedList_tuple_startEndPosRange_id); import pdb;pdb.set_trace()
 
         def zipTogether(sortedList_tuple_startEndPosRange_id, sortedList_tuple_startPos_endPos_nodeId):
+            #
+            # print('zipTogether')
+            # print(sortedList_tuple_startEndPosRange_id)
+            # print(sortedList_tuple_startPos_endPos_nodeId)
+            #
             madeUpIdIdx = 0; schemeIdIdx = 0; results = []
             while madeUpIdIdx < len(sortedList_tuple_startEndPosRange_id) and schemeIdIdx < len(sortedList_tuple_startPos_endPos_nodeId):
                 (segmentStartPos, segmentEndPos, theIds) = sortedList_tuple_startEndPosRange_id[min(madeUpIdIdx, len(sortedList_tuple_startEndPosRange_id)-1)]
                 (labelStartPos, labelEndPos, schemeNodeId) = sortedList_tuple_startPos_endPos_nodeId[min(schemeIdIdx, len(sortedList_tuple_startPos_endPos_nodeId)-1)]
+                # print('segmentStartPos: ', segmentStartPos)
+                # print('labelStartPos: ', labelStartPos)
+                # print('labelEndPos: ', labelEndPos)
+                # print('segmentEndPos', segmentEndPos)
                 if segmentStartPos <= labelStartPos and labelEndPos <= segmentEndPos:
                     results.append((labelStartPos, labelEndPos, schemeNodeId, theIds))
                     schemeIdIdx+=1
-                elif labelStartPos <= segmentStartPos:
+                elif labelStartPos <= segmentStartPos and (segmentEndPos > labelEndPos):
                     schemeIdIdx+=1
                 elif segmentEndPos <= labelEndPos:
                     madeUpIdIdx+=1
@@ -1717,6 +1740,7 @@ class SchemeGrammarParser:
             list(map(lambda t: (t[0], t[0]+self.nodeId__labelLen___oStr[t[1]], t[1]), sorted(self.startPos__nodeId___oStr.items(), key=lambda t: t[0])))
         )
 
+        # print('end of zip together')
         # print('iSortedList_tuple_labelPosRangeSchemeIdTheIds', iSortedList_tuple_labelPosRangeSchemeIdTheIds)
         # print('oSortedList_tuple_labelPosRangeSchemeIdTheIds', oSortedList_tuple_labelPosRangeSchemeIdTheIds); import pdb;pdb.set_trace()
 
@@ -1938,7 +1962,6 @@ class SchemeGrammarParser:
                 maxId += 1
                 startPos__nodeId___oStr_new[data['s']] = maxId
         #
-        self.OLDSchemeNodeId__NEWSchemeNodeId___oStr = {} # map old to new first for future uses
         for startPos, nodeId___OLD in self.schemeparser___oStr.startPos__nodeId.items():
             nodeId___NEW = startPos__nodeId___oStr_new[startPos]
             self.OLDSchemeNodeId__NEWSchemeNodeId___oStr[nodeId___OLD] = nodeId___NEW

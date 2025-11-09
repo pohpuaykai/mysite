@@ -940,6 +940,8 @@ def test__manipulateExponential__exponential1IsAnythingToThe1(verbose=False):
         pp.pprint(sgparser.startPos__nodeId___oStr)
         print('OG startPos__nodeId: ')
         pp.pprint(startPos__nodeId)
+        print('iId__data')
+        pp.pprint(sgparser.iId__data)
     print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
         expected == manipulatedSchemeword 
         and \
@@ -947,6 +949,44 @@ def test__manipulateExponential__exponential1IsAnythingToThe1(verbose=False):
         and \
         expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
         )
+
+
+
+def test__manipulateExponential__exponential1IsAnythingToThe1OneToo(verbose=False):
+    """"""
+    inputPattern = '$0' # this kind can only replace arguments, function_replacement(unless this_function is a argument of another function) does not make sense
+    outputPattern = '(^ $0 1)'
+    schemeword = '1'
+    parser = Schemeparser(equationStr=schemeword)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    nodeIdsToSkip = []#[0]
+    variableMinArgs = {'$0':0}
+    variableMaxArgs = {}
+    sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
+    sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+    manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
+    expected = '(^ 1 1)'
+    expected_schemeNodeChangeLog = None
+    expected_startPos__nodeId = None
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('schemeNodeChangeLog(positional changes):')
+        pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
+        print('expected_startPos__nodeId: ')
+        pp.pprint(sgparser.startPos__nodeId___oStr)
+        print('OG startPos__nodeId: ')
+        pp.pprint(startPos__nodeId)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword 
+        and \
+        expected_schemeNodeChangeLog == sgparser.schemeNodeChangeLog #sgparser.schemeNodeChangeLog keeps swapping order... TODO why?
+        and \
+        expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
+        )
+
 
 
 def test__exponential1IsAnythingToThe1__complicatedWithUserSkip(verbose=False):#swap the outputPattern and inputPattern in another test<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1076,6 +1116,7 @@ def test__manipulateLogarithm__changeBaseFormula(verbose=False):#<<<<<<<<<<<<<<<
     {   'd': 'a', 'e': 32, 'in': None, 'iw': None, 'm': 0, 'on': 7, 'ow': 'v_{0}', 's': 27, 't': 'var', 'v': '$2'},
     {   'd': 'e', 'e': 33, 'in': 3, 'iw': 'b', 'm': 0, 'on': 8, 'ow': 'b', 's': 10, 't': 'var', 'v': '$0'}]
     expected_startPos__nodeId = {1: 0, 3: 1, 6: 5, 9: 2, 13: 6, 19: 4, 23: 7, 27: 8, 33: 3}
+    
     if verbose:
         print('OG:')
         print(schemeword)
@@ -1177,6 +1218,7 @@ $0 $1 ... $n, where n is an integer, its still a plainOldSchemeParser catching a
     variableMaxArgs = {}
     sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
     sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+    
     manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
     expected = '(= (* (/ (+ (* (/ (+ (* (/ a v_{6}) v_{6}) (* (/ (/ (* (/ c v_{12}) v_{12}) (* (/ (sin (* (/ (* (* (/ a v_{18}) v_{18}) (* (/ w v_{19}) v_{19})) v_{16}) v_{16})) v_{13}) v_{13})) v_{7}) v_{7})) v_{2}) v_{2}) (* (/ (+ (* (/ a v_{8}) v_{8}) (* (/ (/ (* (/ c v_{14}) v_{14}) (* (/ (sin (* (/ (* (* (/ a v_{20}) v_{20}) (* (/ w v_{21}) v_{21})) v_{17}) v_{17})) v_{15}) v_{15})) v_{9}) v_{9})) v_{3}) v_{3})) v_{0}) v_{0}) (* (/ (- (* (/ 435 v_{4}) v_{4}) (* (/ (* (* (/ 4 v_{10}) v_{10}) (* (/ 97 v_{11}) v_{11})) v_{5}) v_{5})) v_{1}) v_{1}))'
     expected_schemeNodeChangeLog = [
@@ -2175,6 +2217,7 @@ def test__patternInPattern__trial0(verbose=False):
     sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
     manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
     sgparser.getRootOfTree___oStr()
+    sgparser.getAST___oStr()
     expected = '(+ (* $0 $2) (* $0 $1))'
     expected_schemeNodeChangeLog = [
     {   'd': 'e', 'e': 1, 'in': 0, 'iw': '+', 'm': 0, 'on': 0, 'ow': '+', 's': 1, 't': 'static', 'v': None},
@@ -2205,6 +2248,46 @@ def test__patternInPattern__trial0(verbose=False):
         )
 
 
+
+def test__patternInPattern__trialMODE1(verbose=False):
+    """
+    NOW, schemeword are inputPattern|outputPattern too
+    
+    """
+    inputPattern = '$0'
+    outputPattern = '(^ $0 1)'
+    schemeword = '1'
+    parser = Schemeparser(equationStr=schemeword)
+    ast, functionsD, variablesD, primitives, totalNodeCount, startPos__nodeId = parser._parse()
+    nodeIdsToSkip = []
+    variableMinArgs = {}
+    variableMaxArgs = {}
+    sgparser = SchemeGrammarParser(inputPattern, outputPattern, verbose=verbose)
+    sgparser.matchIPattern(schemeword, startPos__nodeId=startPos__nodeId)
+    manipulatedSchemeword = sgparser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=variableMinArgs, variableMaxArgs=variableMaxArgs)
+    sgparser.getRootOfTree___oStr()
+    sgparser.getAST___oStr()
+    expected = '(^ 1 1)'
+    expected_schemeNodeChangeLog = None
+    expected_startPos__nodeId = None
+    if verbose:
+        print('OG:')
+        print(schemeword)
+        print('result:')
+        print(manipulatedSchemeword)
+        print('schemeNodeChangeLog(positional changes):')
+        pp.pprint(sgparser.schemeNodeChangeLog) # positional changes
+        print('expected_startPos__nodeId: ')
+        pp.pprint(sgparser.startPos__nodeId___oStr)
+        print('OG startPos__nodeId: ')
+        pp.pprint(startPos__nodeId)
+    print(inspect.currentframe().f_code.co_name, 'PASSED? ', 
+        expected == manipulatedSchemeword 
+        and \
+        expected_schemeNodeChangeLog == sgparser.schemeNodeChangeLog #sgparser.schemeNodeChangeLog keeps swapping order... TODO why?
+        and \
+        expected_startPos__nodeId == sgparser.startPos__nodeId___oStr
+        )
 
 
 # def test__latexParserUnparse__(verbose=False):
@@ -2259,14 +2342,15 @@ if __name__=='__main__':
     # test__functionCountChanges__subtractZero() #MODE2 decrease_in_static reverse_MODE1
     # test__functionCountChanges__distributivity() #MODE2 simple decrease_in_static decrease_in_var
     # test__moreVariableOutputThanInput__exponential1IsAnythingToThe0() # MODE0 complicated small_vorhin
+    # test__manipulateExponential__exponential1IsAnythingToThe1OneToo()
     # test__exponential1IsAnythingToThe0__skipNode() # MODE0 complicated small_vorhin skipNode
     # test__manipulateLogarithm__logSameBaseAsArgumentGives1() # MODE0 
 
-    # test__manipulateExponential__exponential1IsAnythingToThe1() #MODE1_simple
-    # test__exponential1IsAnythingToThe1__complicatedWithUserSkip() #MODE1_complicatedWithSkip
+    # test__manipulateExponential__exponential1IsAnythingToThe1(True) #MODE1_simple
+    # test__exponential1IsAnythingToThe1__complicatedWithUserSkip(True) #MODE1_complicatedWithSkip
     # test__manipulateLogarithm__changeBaseFormula() #MODE2 simple increase_in_static generate_extra_outputVar
-    # test__onlyVariable__multiplyDivideCancal() #MODE1
-    # test__onlyVariable__multiplyDivideCancal6LevelsDeep() #MODE1 complicated
+    # test__onlyVariable__multiplyDivideCancal(True) #MODE1
+    test__onlyVariable__multiplyDivideCancal6LevelsDeep() #MODE1 complicated
     # test__latexParserUnparse__sqrtInSqrt() #MODE2 small_decrease_in_static
     # test__latexParserUnparse__parallelSumOfCapacitance() #MODE2 decrease_in_static
     # test__latexParserUnparse__6levelsOfMatchesMODE2() #MODE2 complicated decrease_in_static vorhin_with_many_schemeNodes
@@ -2281,5 +2365,6 @@ if __name__=='__main__':
     # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication0()
     # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication1(True)
     # test__bipartiteSearch__factoriseAndCancel_2TermHarmonics_unitOfMultiplication2(True)
-    test__patternInPattern__trial0(True)
+    # test__patternInPattern__trial0(True)
+    # test__patternInPattern__trialMODE1(True)
     #after this test latexUnparse, equation.Manipulate again

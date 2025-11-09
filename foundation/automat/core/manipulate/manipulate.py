@@ -72,8 +72,9 @@ class Manipulate:
 
     def applicable(self, eq, startPos__nodeId=None):
         """
-        #~ DRAFT ~#
         check if equation is manipulatable with this pattern
+
+        return all the things matchIPattern, for nodeIdsToSkip
         """
         if self.grammarParser is None:
             self.initGrammerParser()
@@ -85,19 +86,38 @@ class Manipulate:
         self.schemeStr = eq.schemeStr
         self.grammarParser.matchIPattern(self.schemeStr, startPos__nodeId=startPos__nodeId)
         # print('IS IT NO MATCH??????????????????????????????????????', self.inputGrammar, '|||', self.outputGrammar, self.grammarParser.noMatches, '|||', self.schemeStr)
+        # print('self.grammarParser.noMatches', self.grammarParser.noMatches)
+        # print(self.schemeStr, 'schemeStr')
+        # print(self.grammarParser.iPattern, 'iPattern')
+        # print(self.grammarParser.oPattern, 'oPattern')
+
+        #find nodeIdsToSkip<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        #also depends on the MODE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        # print('self.grammarParser.iId__data')
+        # print(self.grammarParser.iId__data)
+        # import pdb;pdb.set_trace()
+        #skipCombiList is the list of list_of_schemeNodeIds to skip
+        self.skipCombiList = self.findNodeIdsToSkip() # need to exclude this if this is userprovided
         return not self.grammarParser.noMatches
 
 
     def apply(self, eq, startPos__nodeId=None, toAst=False):#<<<<<<<<<<<<<<<<<<<<<<move equation here<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<change all the unit test :)
         """
         #~ DRAFT ~#
+
+        SPLIT this up into 
+        0. solvesearcher
+        1. recommend
+        2. equation?????????
+
         return manipulated equation
         """
         if self.applicable(eq, startPos__nodeId): # here we have matches, BUT, we should permuate applying outputGrammar to all the matches{using skipNode}, sometimes, we do not want to change all the inputGrammar
             existingVariables = list(eq.variablesScheme.keys())#self.eq.variablesScheme.keys())
+
             manipulatedSchemeWord = self.grammarParser.parse(nodeIdsToSkip=[], variableMinArgs=self.variableMinArgs, variableMaxArgs=self.variableMaxArgs)
             
-            if toAst: #<<<<<<<<<<<<<<rename this flag for equation
+            if toAst: #<<<<<<<<<<<<<<This flag is for simplify(Equation)
 
             # # TODO seems unelegant..., but we should not modify self.eq and it also seems unelegant to instantiate Equation again
             # # TODO perhaps Manipulate should be a object of Equation?
@@ -106,12 +126,17 @@ class Manipulate:
                 # return Schemeparser(equationStr=manipulatedSchemeWord), self.grammarParser.schemeNodeChangeLog, Schemeparser(equationStr=self.inputGrammar), Schemeparser(equationStr=self.outputGrammar)
 
             #need to return the equation
-            if self.calculateSchemeNodeChanges: # then we can get the orginal nodeIds
+            if self.calculateSchemeNodeChanges: # then we can get the orginal nodeIds, <<<<<<<<<<<<<<<this flag is also for simplify(Equation)<<<<<<<<<<<<<
 
                 from foundation.automat.core.equation import Equation
+                # print('self.grammarParser.oStr', self.grammarParser.oStr)
+                # print('self.grammarParser.iStr', self.grammarParser.iStr)
+                # print('self.grammarParser.iPattern', self.grammarParser.iPattern)
+                # print('self.grammarParser.oPattern', self.grammarParser.oPattern)
+                # import pdb;pdb.set_trace()
                 eq___new = Equation(self.grammarParser.oStr, parserName='scheme')
-                eq___new.astScheme = self.grammarParser.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 eq___new.rootOfTree = self.grammarParser.getRootOfTree___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                eq___new.astScheme = self.grammarParser.getAST___oStr() # this is not renamed...<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 eq___new.startPos__nodeIdScheme = self.grammarParser.startPos__nodeId___oStr
                 eq___new.nodeId__lenScheme = self.grammarParser.getNodeId__len___oStr()# this is schemeNodeLen, not schemeLabelLen, nodeId needs to be recalculated
                 return eq___new, self.TYPE, self.__class__.__name__, self.direction, self.idx
@@ -119,8 +144,52 @@ class Manipulate:
                 # eq__new = Equation(self.schemeparser___oStr)#if Equation takes a schemegrammar parser, then it will be faster
                 return manipulatedSchemeWord, self.TYPE, self.__class__.__name__, self.direction, self.idx
             # return manipulatedSchemeWord
-        return None # pattern unapplicable
+        return None, None, None, None, None # pattern unapplicable
 
+    def generateAllPossibleSkippable(self):# this should replace apply in solvesearcher.py
+        """
+
+        """
+        allSkippable = []
+        for nodeIdsToSkip in self.skipCombiList:
+            manipulatedSchemeWord = self.grammarParser.parse(nodeIdsToSkip=nodeIdsToSkip, variableMinArgs=self.variableMinArgs, variableMaxArgs=self.variableMaxArgs)
+            
+            # eq__new = Equation(self.schemeparser___oStr)#if Equation takes a schemegrammar parser, then it will be faster
+            allSkippable.append((
+                manipulatedSchemeWord, 
+                self.TYPE, 
+                self.__class__.__name__, 
+                self.direction, 
+                self.idx
+            ))
+            # return manipulatedSchemeWord, self.TYPE, self.__class__.__name__, self.direction, self.idx
+        return allSkippable
+
+
+    def findNodeIdsToSkip(self):
+        """generate all possible Node ids to skip
+        a possible node id can only be self.grammarParser.iId__data
+        
+        binary_counting(noOfMatches)
+        """
+        match_tuple_enclosureId_matchId = []
+        for rootId, children in self.grammarParser.iEnclosureTree.items():
+            for matchIdx, _ in children:
+                match_tuple_enclosureId_matchId += (rootId, matchIdx)
+        schemeIdsToCombi = []
+        for tuple_enclosureId_matchId in matchEnclosureIds:#but i need to know their parent and matchId....
+            schemeIdRootOfIPattern = self.tuple_enclosureId_matchId__schemeIdRootOfIPattern[tuple_enclosureId_matchId]#convert to schemeId, then binaryCount, then pass back all combi 
+            schemeIdsToCombi.append(schemeIdRootOfIPattern)
+        from math import pow
+        combiNumLen = len(schemeIdsToCombi)
+        combiList = []
+        for combiNum in range(0, pow(2, combiNumLen)):
+            combi = []
+            for idx, takeOrNot in enumerate((bin(combiNum))[2:].zfill(combiNumLen)): # 2: is the python_prefix for binary number
+                if takeOrNot == '1': # take
+                    combi.append(schemeIdsToCombi[idx])
+            combiList.append(combi)
+        return combiList
 
     #HELPER
     def removeItemIfValueIfNone(self, dictionary):

@@ -300,7 +300,9 @@ use recommend.py Recommend(self).simplify(hint) to find the appropriate pattern 
                 print('AFTER startPos__nodeIdScheme', self.startPos__nodeIdScheme)
             if simplify:
                 simplifyDone = False
-                returnTup = recommend.simplify(self, hint={'invertedResults':invertedResults, 'lastOp':op, 'startPos__nodeId':self.startPos__nodeIdScheme}) # part of solving steps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                returnTup = recommend.simplify(self, 
+                    hint={'invertedResults':invertedResults, 'lastOp':op, 'startPos__nodeId':self.startPos__nodeIdScheme}
+                ) # part of solving steps<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 if self.verbose:
                     print('found a simplification: ', returnTup is not None)
                     # import pdb;pdb.set_trace()
